@@ -16,32 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.polaris.iceberg.catalog.migrator.api;
 
-val baseVersion = file("version.txt").readText().trim()
+import java.util.List;
+import org.apache.iceberg.catalog.TableIdentifier;
+import org.immutables.value.Value;
 
-rootProject.name = "iceberg-catalog-migrator"
+@Value.Immutable
+public interface CatalogMigrationResult {
 
-gradle.beforeProject {
-  group = "org.apache.polaris.catalogs.migrator"
-  version = baseVersion
-  description =
-    when (name) {
-      "api" -> "Iceberg catalog migrator - api implementation"
-      "api-test" -> "Iceberg catalog migrator - common test implementation"
-      "cli" -> "Iceberg catalog migrator - CLI implementation"
-      else -> name
-    }
+  List<TableIdentifier> registeredTableIdentifiers();
+
+  List<TableIdentifier> failedToRegisterTableIdentifiers();
+
+  List<TableIdentifier> failedToDeleteTableIdentifiers();
 }
-
-fun catalogMigratorProject(name: String) {
-  include("iceberg-catalog-migrator-$name")
-  project(":iceberg-catalog-migrator-$name").projectDir = file(name)
-}
-
-catalogMigratorProject("api")
-
-catalogMigratorProject("api-test")
-
-catalogMigratorProject("cli")
-
-catalogMigratorProject("bom")

@@ -127,7 +127,7 @@ jobs:
           # Iceberg Catalog Migrator ${RELEASE_VERSION} release
 
           * ${NUM_COMMITS} commits since ${LAST_TAG#catalog-migrator-}
-          * Maven Central: https://search.maven.org/search?q=g:org.projectnessie.iceberg-catalog-migrator+v:${RELEASE_VERSION}
+          * Maven Central: https://search.maven.org/search?q=g:org.apache.polaris.catalogs.migrator+v:${RELEASE_VERSION}
 
           ## Try it
           

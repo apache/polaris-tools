@@ -16,32 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.polaris.iceberg.catalog.migrator.cli;
 
-val baseVersion = file("version.txt").readText().trim()
+import java.io.InputStream;
+import java.util.Properties;
+import picocli.CommandLine.IVersionProvider;
 
-rootProject.name = "iceberg-catalog-migrator"
-
-gradle.beforeProject {
-  group = "org.apache.polaris.catalogs.migrator"
-  version = baseVersion
-  description =
-    when (name) {
-      "api" -> "Iceberg catalog migrator - api implementation"
-      "api-test" -> "Iceberg catalog migrator - common test implementation"
-      "cli" -> "Iceberg catalog migrator - CLI implementation"
-      else -> name
+public class CLIVersionProvider implements IVersionProvider {
+  @Override
+  public String[] getVersion() throws Exception {
+    try (InputStream input =
+        CLIVersionProvider.class
+            .getResource("version.properties")
+            .openConnection()
+            .getInputStream()) {
+      Properties props = new Properties();
+      props.load(input);
+      return new String[] {props.getProperty("cli.version")};
     }
+  }
 }
-
-fun catalogMigratorProject(name: String) {
-  include("iceberg-catalog-migrator-$name")
-  project(":iceberg-catalog-migrator-$name").projectDir = file(name)
-}
-
-catalogMigratorProject("api")
-
-catalogMigratorProject("api-test")
-
-catalogMigratorProject("cli")
-
-catalogMigratorProject("bom")

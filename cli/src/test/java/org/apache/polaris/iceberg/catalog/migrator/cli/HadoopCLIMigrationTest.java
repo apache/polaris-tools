@@ -16,32 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.polaris.iceberg.catalog.migrator.cli;
 
-val baseVersion = file("version.txt").readText().trim()
+import java.util.Collections;
+import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
+import org.junit.jupiter.api.BeforeAll;
 
-rootProject.name = "iceberg-catalog-migrator"
+public class HadoopCLIMigrationTest extends AbstractCLIMigrationTest {
 
-gradle.beforeProject {
-  group = "org.apache.polaris.catalogs.migrator"
-  version = baseVersion
-  description =
-    when (name) {
-      "api" -> "Iceberg catalog migrator - api implementation"
-      "api-test" -> "Iceberg catalog migrator - common test implementation"
-      "cli" -> "Iceberg catalog migrator - CLI implementation"
-      else -> name
-    }
+  @BeforeAll
+  protected static void setup() {
+    initializeSourceCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
+    initializeTargetCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
+  }
 }
-
-fun catalogMigratorProject(name: String) {
-  include("iceberg-catalog-migrator-$name")
-  project(":iceberg-catalog-migrator-$name").projectDir = file(name)
-}
-
-catalogMigratorProject("api")
-
-catalogMigratorProject("api-test")
-
-catalogMigratorProject("cli")
-
-catalogMigratorProject("bom")
