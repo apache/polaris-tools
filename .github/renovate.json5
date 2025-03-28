@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:base"],
+
+  "labels": ["dependencies"],
+
+  packageRules: [
+    // Check for updates, merge automatically
+    {
+      matchManagers: ["maven", "gradle", "gradle-wrapper"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      platformAutomerge: true,
+    },
+
+    // Special rule for Iceberg and related artifacts
+    {
+      matchManagers: ["maven", "gradle"],
+      matchUpdateTypes: ["minor", "patch"],
+      matchPackagePatterns: [
+        "^org[.]apache[.]hadoop:hadoop-aws$",
+        "^org[.]apache[.]hadoop:hadoop-common$",
+        "^org[.]apache[.]hive:.*$",
+        "^org[.]apache[.]iceberg:.*",
+        "^software[.]amazon[.]awssdk:.*",
+      ],
+      automerge: false,
+      prBodyNotes: [":warning: Only update org.apache.iceberg with org.apache.hadoop + software.amazon.awssdk:warning:"]
+    },
+
+    // Check for major updates, but do not merge automatically
+    {
+      matchManagers: ["maven", "gradle", "gradle-wrapper"],
+      matchUpdateTypes: ["major"],
+      automerge: false,
+    },
+  ],
+
+  // Max 50 PRs in total, 10 per hour
+  prConcurrentLimit: 50,
+  prHourlyLimit: 10,
+}
