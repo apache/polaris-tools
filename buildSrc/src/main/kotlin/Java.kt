@@ -36,7 +36,6 @@ fun Project.configureJava() {
     manifest {
       attributes["Implementation-Title"] = "iceberg-catalog-migrator"
       attributes["Implementation-Version"] = project.version
-      attributes["Implementation-Vendor"] = "Dremio"
     }
     duplicatesStrategy = DuplicatesStrategy.WARN
   }
