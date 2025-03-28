@@ -1,1 +1,1 @@
-Iceberg-Catalog-Migrator
+polaris-tools

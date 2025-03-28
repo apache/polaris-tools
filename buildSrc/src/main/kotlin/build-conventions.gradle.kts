@@ -20,8 +20,6 @@
 val hasSrcMain = projectDir.resolve("src/main").exists()
 val hasSrcTest = projectDir.resolve("src/test").exists()
 
-apply<PublishingHelperPlugin>()
-
 configureIde()
 
 configureSpotless()
