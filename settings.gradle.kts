@@ -19,10 +19,10 @@
 
 val baseVersion = file("version.txt").readText().trim()
 
-rootProject.name = "iceberg-catalog-migrator"
+rootProject.name = "polaris-tools"
 
 gradle.beforeProject {
-  group = "org.apache.polaris.catalogs.migrator"
+  group = "org.apache.polaris.tools"
   version = baseVersion
   description =
     when (name) {
@@ -44,4 +44,6 @@ catalogMigratorProject("api-test")
 
 catalogMigratorProject("cli")
 
-catalogMigratorProject("bom")
+include("bom")
+
+project(":bom").projectDir = file("bom")
