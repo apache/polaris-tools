@@ -146,7 +146,7 @@ val processResources =
     )
   }
 
-val mainClassName = "org.apache.polaris.catalogs.migrator.cli.CatalogMigrationCLI"
+val mainClassName = "org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigrationCLI"
 
 val shadowJar = tasks.named<ShadowJar>("shadowJar") { isZip64 = true }
 
