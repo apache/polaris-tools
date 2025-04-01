@@ -43,7 +43,7 @@ These benchmarks can only be run after using CreateTreeDataset to populate the s
 
 ## Parameters
 
-All parameters are configured through the `application.conf` file located in `src/gatling/resources/`. The configuration uses the [Typesafe Config](https://github.com/lightbend/config) format.
+All parameters are configured through the [benchmark-defaults.conf](src/gatling/resources/benchmark-defaults.conf) file located in `src/gatling/resources/`. The configuration uses the [Typesafe Config](https://github.com/lightbend/config) format. The reference configuration file contains default values as well as documentation for each parameter.
 
 ### Dataset Structure Parameters
 
@@ -62,8 +62,8 @@ dataset.tree {
   namespace-properties = 10                      # Number of properties to add to each namespace
   table-properties = 10                          # Number of properties to add to each table
   view-properties = 10                           # Number of properties to add to each view
-  max-tables = -1                                # Maximum tables (-1 for unlimited)
-  max-views = -1                                 # Maximum views (-1 for unlimited)
+  max-tables = -1                                # Cap on total tables (-1 for no cap). Must be less than N^(D-1) * tables-per-namespace
+  max-views = -1                                 # Cap on total views (-1 for no cap). Must be less than N^(D-1) * views-per-namespace
 }
 ```
 
@@ -158,7 +158,7 @@ The dataset has a tree shape. At the root of the tree is a Polaris realm that mu
 
 An arbitrary number of catalogs can be created under the realm. However, only the first catalog (`C_0`) is used for the rest of the dataset.
 
-The namespaces part of the dataset is a complete `N`-ary tree. That is, it starts with a root namespace (`NS_0`) and then, each namespace contains exactly `0` or `N` children namespaces. The width as well as the depth of the namespaces tree are configurable. The total number of namespaces can easily be calculated with the following formulae, where `N` is the tree arity and `D` is the total tree depth, including the root:
+The namespaces part of the dataset is a complete `N`-ary tree. That is, it starts with a root namespace (`NS_0`) and then, each namespace contains exactly `0` or `N` children namespaces. The width as well as the depth of the namespaces tree are configurable. The total number of namespaces can easily be calculated with the following formulae, where `N` is the tree width and `D` is the total tree depth, including the root:
 
 $$\text{Total number of namespaces} =
 \begin{cases}
@@ -166,11 +166,11 @@ $$\text{Total number of namespaces} =
     D & \mbox{if } N = 1
 \end{cases}$$
 
-The tables are created under the leaves of the tree. That is, they are put under the namespaces with no child namespace. The number of tables that is created under each leaf namespace is configurable. The total number of tables can easily be calculated with the following formulae, where `N` is the tree arity, `D` is the total tree depth, and `T` is the number of tables per leaf namespace:
+The tables are created under the leaves of the tree. That is, they are put under the namespaces with no child namespace. The number of tables that is created under each leaf namespace is configurable. The total number of tables can easily be calculated with the following formulae, where `N` is the tree width, `D` is the total tree depth, and `T` is the number of tables per leaf namespace:
 
 Total number of tables = *N*<sup>*D* − 1</sup> \* *T*
 
-The views are created alongside the tables. The number of views that is created under each leaf namespace is also configurable. The total number of views can easily be calculated with the following formulae, where `N` is the tree arity, `D` is the total tree depth, `V` is the number of views per leaf namespace:
+The views are created alongside the tables. The number of views that is created under each leaf namespace is also configurable. The total number of views can easily be calculated with the following formulae, where `N` is the tree width, `D` is the total tree depth, `V` is the number of views per leaf namespace:
 
 Total number of tables = *N*<sup>*D* − 1</sup> \* *V*
 

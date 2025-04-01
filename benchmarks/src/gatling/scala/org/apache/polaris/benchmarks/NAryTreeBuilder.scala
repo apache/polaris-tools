@@ -19,6 +19,16 @@
 
 package org.apache.polaris.benchmarks
 
+/**
+ * Builds a complete N-ary tree structure for organizing namespaces in synthetic datasets.
+ *
+ * This builder is used to create a hierarchical namespace structure where each non-leaf namespace
+ * has exactly `nsWidth` child namespaces. The tree structure is used to organize tables and views
+ * in a deterministic way. Tables and views are placed in the leaf namespaces of the tree.
+ *
+ * @param nsWidth The number of children each non-leaf namespace will have (N)
+ * @param nsDepth The total depth of the tree, including the root namespace
+ */
 case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
 
   /**
