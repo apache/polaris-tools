@@ -68,7 +68,6 @@ case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
    * @return The total number of nodes in the tree.
    */
   val numberOfNodes: Int = {
-    print(s"Computing number of nodes for n-ary tree with width $nsWidth and depth $nsDepth...")
     // The sum of nodes from level 0 to level d-1 is (n^(d+1) - 1) / (n - 1) if n > 1
     // Else, the sum of nodes from level 0 to level d-1 is d
     if (nsWidth == 1) {
