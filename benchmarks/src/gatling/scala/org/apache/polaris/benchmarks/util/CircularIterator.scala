@@ -34,12 +34,13 @@ class CircularIterator[T](builder: () => Iterator[T]) extends Iterator[T] {
   }
 }
 
-class BufferedRandomIterator[T](underlying: CircularIterator[T], bufferSize: Int)
+class BufferedRandomIterator[T](underlying: CircularIterator[T], bufferSize: Int, seed: Long)
     extends Iterator[T] {
+  private val random = new Random(seed)
   private var buffer: Iterator[T] = populateAndShuffle()
 
   private def populateAndShuffle(): Iterator[T] =
-    Random.shuffle((1 to bufferSize).map(_ => underlying.next()).toList).iterator
+    random.shuffle((1 to bufferSize).map(_ => underlying.next()).toList).iterator
 
   override def hasNext: Boolean = true
 

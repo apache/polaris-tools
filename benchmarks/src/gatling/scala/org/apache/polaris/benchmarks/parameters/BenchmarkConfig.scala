@@ -42,7 +42,8 @@ object BenchmarkConfig {
       workload.getDouble("read-write-ratio"),
       workload.getInt("updates-per-namespace"),
       workload.getInt("updates-per-table"),
-      workload.getInt("updates-per-view")
+      workload.getInt("updates-per-view"),
+      workload.getLong("seed")
     )
 
     val datasetParams = DatasetParameters(

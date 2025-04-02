@@ -69,7 +69,8 @@ class TableCommitsCreator extends Simulation {
   private val tblFetchFeeder = new CircularIterator(tblActions.tableFetchFeeder)
   private val tblUpdateFeeder = new BufferedRandomIterator(
     new CircularIterator(tblActions.propertyUpdateFeeder),
-    100_000
+    100_000,
+    wp.seed
   )
 
   private val viewListFeeder = new CircularIterator(viewActions.viewIdentityFeeder)

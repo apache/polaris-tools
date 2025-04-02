@@ -23,7 +23,8 @@ case class WorkloadParameters(
     readWriteRatio: Double,
     updatesPerNamespace: Int,
     updatesPerTable: Int,
-    updatesPerView: Int
+    updatesPerView: Int,
+    seed: Long
 ) {
   require(
     readWriteRatio >= 0.0 && readWriteRatio <= 1.0,
