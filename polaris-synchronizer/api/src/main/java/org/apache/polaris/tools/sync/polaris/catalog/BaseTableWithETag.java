@@ -16,32 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.catalog;
 
 import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.TableOperations;
 import org.apache.iceberg.metrics.MetricsReporter;
 
-/**
- * Wrapper around {@link BaseTable} that contains the latest ETag for the table.
- */
+/** Wrapper around {@link BaseTable} that contains the latest ETag for the table. */
 public class BaseTableWithETag extends BaseTable {
 
-    private final String eTag;
+  private final String eTag;
 
-    public BaseTableWithETag(TableOperations ops, String name, String eTag) {
-        super(ops, name);
-        this.eTag = eTag;
-    }
+  public BaseTableWithETag(TableOperations ops, String name, String eTag) {
+    super(ops, name);
+    this.eTag = eTag;
+  }
 
-    public BaseTableWithETag(TableOperations ops, String name, MetricsReporter reporter, String eTag) {
-        super(ops, name, reporter);
-        this.eTag = eTag;
-    }
+  public BaseTableWithETag(
+      TableOperations ops, String name, MetricsReporter reporter, String eTag) {
+    super(ops, name, reporter);
+    this.eTag = eTag;
+  }
 
-    public String eTag() {
-        return eTag;
-    }
-
+  public String eTag() {
+    return eTag;
+  }
 }

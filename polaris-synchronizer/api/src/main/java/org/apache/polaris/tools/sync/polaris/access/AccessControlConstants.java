@@ -16,13 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.access;
 
 public class AccessControlConstants {
 
-    public static final String OMNIPOTENCE_PROPERTY = "IS_OMNIPOTENT_PRINCIPAL";
+  public static final String OMNIPOTENCE_PROPERTY = "IS_OMNIPOTENT_PRINCIPAL";
 
-    protected static final String OMNIPOTENT_PRINCIPAL_NAME_PREFIX = "omnipotent-principal-";
-
+  protected static final String OMNIPOTENT_PRINCIPAL_NAME_PREFIX = "omnipotent-principal-";
 }

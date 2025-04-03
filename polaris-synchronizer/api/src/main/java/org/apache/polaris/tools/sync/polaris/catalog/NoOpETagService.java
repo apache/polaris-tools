@@ -16,24 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.catalog;
 
 import org.apache.iceberg.catalog.TableIdentifier;
 
-/**
- * Implementation that returns nothing and stores no ETags.
- */
+/** Implementation that returns nothing and stores no ETags. */
 public class NoOpETagService implements ETagService {
 
-    @Override
-    public String getETag(String catalogName, TableIdentifier tableIdentifier) {
-        return null;
-    }
+  @Override
+  public String getETag(String catalogName, TableIdentifier tableIdentifier) {
+    return null;
+  }
 
-    @Override
-    public void storeETag(String catalogName, TableIdentifier tableIdentifier, String eTag) {
-
-    }
-
+  @Override
+  public void storeETag(String catalogName, TableIdentifier tableIdentifier, String eTag) {}
 }

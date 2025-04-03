@@ -16,30 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris;
 
 import picocli.CommandLine;
 
 @CommandLine.Command(
-        name = "polaris-synchronizer",
-        mixinStandardHelpOptions = true,
-        subcommands = {SyncPolarisCommand.class, CreateOmnipotentPrincipalCommand.class})
+    name = "polaris-synchronizer",
+    mixinStandardHelpOptions = true,
+    subcommands = {SyncPolarisCommand.class, CreateOmnipotentPrincipalCommand.class})
 public class PolarisSynchronizerCLI {
 
-    public PolarisSynchronizerCLI() {}
+  public PolarisSynchronizerCLI() {}
 
-    public static void main(String... args) {
-        CommandLine commandLine =
-                new CommandLine(new PolarisSynchronizerCLI())
-                        .setExecutionExceptionHandler(
-                                (ex, cmd, parseResult) -> {
-                                    cmd.getErr().println(cmd.getColorScheme().richStackTraceString(ex));
-                                    return 1;
-                                });
-        commandLine.setUsageHelpWidth(150);
-        int exitCode = commandLine.execute(args);
-        System.exit(exitCode);
-    }
-
+  public static void main(String... args) {
+    CommandLine commandLine =
+        new CommandLine(new PolarisSynchronizerCLI())
+            .setExecutionExceptionHandler(
+                (ex, cmd, parseResult) -> {
+                  cmd.getErr().println(cmd.getColorScheme().richStackTraceString(ex));
+                  return 1;
+                });
+    commandLine.setUsageHelpWidth(150);
+    int exitCode = commandLine.execute(args);
+    System.exit(exitCode);
+  }
 }

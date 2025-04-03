@@ -18,16 +18,6 @@
  */
 package org.apache.polaris.tools.sync.polaris;
 
-import org.apache.polaris.core.admin.model.Catalog;
-import org.apache.polaris.core.admin.model.PrincipalRole;
-import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
-import org.apache.polaris.tools.sync.polaris.PolarisService;
-import org.apache.polaris.tools.sync.polaris.access.AccessControlService;
-import org.apache.polaris.tools.sync.polaris.options.PolarisOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -37,6 +27,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.polaris.core.admin.model.Catalog;
+import org.apache.polaris.core.admin.model.PrincipalRole;
+import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
+import org.apache.polaris.tools.sync.polaris.access.AccessControlService;
+import org.apache.polaris.tools.sync.polaris.options.PolarisOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 @CommandLine.Command(
     name = "create-omnipotent-principal",

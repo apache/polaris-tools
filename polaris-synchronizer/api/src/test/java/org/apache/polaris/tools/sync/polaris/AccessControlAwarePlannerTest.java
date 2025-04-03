@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris;
 
+import java.util.List;
 import org.apache.polaris.core.admin.model.CatalogRole;
 import org.apache.polaris.core.admin.model.PrincipalRole;
 import org.apache.polaris.tools.sync.polaris.access.AccessControlConstants;
@@ -29,104 +29,121 @@ import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationPlan;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 public class AccessControlAwarePlannerTest {
 
-    private final static PrincipalRole omnipotentPrincipalRoleSource = new PrincipalRole()
-            .name("omnipotent-principal-XXXXX")
-            .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
+  private static final PrincipalRole omnipotentPrincipalRoleSource =
+      new PrincipalRole()
+          .name("omnipotent-principal-XXXXX")
+          .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
 
-    private final static PrincipalRole omnipotentPrincipalRoleTarget = new PrincipalRole()
-            .name("omnipotent-principal-YYYYY")
-            .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
+  private static final PrincipalRole omnipotentPrincipalRoleTarget =
+      new PrincipalRole()
+          .name("omnipotent-principal-YYYYY")
+          .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
 
-    @Test
-    public void filtersOmnipotentPrincipalRoles() {
-        SynchronizationPlanner accessControlAwarePlanner = new AccessControlAwarePlanner(new NoOpSyncPlanner());
+  @Test
+  public void filtersOmnipotentPrincipalRoles() {
+    SynchronizationPlanner accessControlAwarePlanner =
+        new AccessControlAwarePlanner(new NoOpSyncPlanner());
 
-        SynchronizationPlan<PrincipalRole> plan = accessControlAwarePlanner.planPrincipalRoleSync(
-                List.of(omnipotentPrincipalRoleSource), List.of(omnipotentPrincipalRoleTarget));
+    SynchronizationPlan<PrincipalRole> plan =
+        accessControlAwarePlanner.planPrincipalRoleSync(
+            List.of(omnipotentPrincipalRoleSource), List.of(omnipotentPrincipalRoleTarget));
 
-        Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleSource));
-        Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleTarget));
-    }
+    Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleSource));
+    Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleTarget));
+  }
 
-    private final static PrincipalRole serviceAdminSource = new PrincipalRole()
-            .name("service_admin");
+  private static final PrincipalRole serviceAdminSource = new PrincipalRole().name("service_admin");
 
-    private final static PrincipalRole serviceAdminTarget = new PrincipalRole()
-            .name("service_admin");
+  private static final PrincipalRole serviceAdminTarget = new PrincipalRole().name("service_admin");
 
-    @Test
-    public void filtersServiceAdmin() {
-        SynchronizationPlanner accessControlAwarePlanner = new AccessControlAwarePlanner(new NoOpSyncPlanner());
+  @Test
+  public void filtersServiceAdmin() {
+    SynchronizationPlanner accessControlAwarePlanner =
+        new AccessControlAwarePlanner(new NoOpSyncPlanner());
 
-        SynchronizationPlan<PrincipalRole> plan = accessControlAwarePlanner.planPrincipalRoleSync(
-                List.of(serviceAdminSource), List.of(serviceAdminTarget));
+    SynchronizationPlan<PrincipalRole> plan =
+        accessControlAwarePlanner.planPrincipalRoleSync(
+            List.of(serviceAdminSource), List.of(serviceAdminTarget));
 
-        Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminSource));
-        Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminTarget));
-    }
+    Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminSource));
+    Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminTarget));
+  }
 
-    private final static CatalogRole omnipotentCatalogRoleSource = new CatalogRole()
-            .name("omnipotent-principal-XXXXX")
-            .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
+  private static final CatalogRole omnipotentCatalogRoleSource =
+      new CatalogRole()
+          .name("omnipotent-principal-XXXXX")
+          .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
 
-    private final static CatalogRole omnipotentCatalogRoleTarget = new CatalogRole()
-            .name("omnipotent-principal-YYYYY")
-            .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
+  private static final CatalogRole omnipotentCatalogRoleTarget =
+      new CatalogRole()
+          .name("omnipotent-principal-YYYYY")
+          .putPropertiesItem(AccessControlConstants.OMNIPOTENCE_PROPERTY, "");
 
-    @Test
-    public void filtersOmnipotentCatalogRolesAndChildren() {
-        SynchronizationPlanner accessControlAwarePlanner = new AccessControlAwarePlanner(new NoOpSyncPlanner());
+  @Test
+  public void filtersOmnipotentCatalogRolesAndChildren() {
+    SynchronizationPlanner accessControlAwarePlanner =
+        new AccessControlAwarePlanner(new NoOpSyncPlanner());
 
-        SynchronizationPlan<CatalogRole> plan = accessControlAwarePlanner.planCatalogRoleSync(
-                "catalogName", List.of(omnipotentCatalogRoleSource), List.of(omnipotentCatalogRoleTarget));
+    SynchronizationPlan<CatalogRole> plan =
+        accessControlAwarePlanner.planCatalogRoleSync(
+            "catalogName",
+            List.of(omnipotentCatalogRoleSource),
+            List.of(omnipotentCatalogRoleTarget));
 
-        Assertions.assertTrue(plan.entitiesToSkipAndSkipChildren().contains(omnipotentCatalogRoleSource));
-        Assertions.assertTrue(plan.entitiesToSkipAndSkipChildren().contains(omnipotentCatalogRoleTarget));
-    }
+    Assertions.assertTrue(
+        plan.entitiesToSkipAndSkipChildren().contains(omnipotentCatalogRoleSource));
+    Assertions.assertTrue(
+        plan.entitiesToSkipAndSkipChildren().contains(omnipotentCatalogRoleTarget));
+  }
 
-    private final static CatalogRole catalogAdminSource = new CatalogRole()
-            .name("catalog_admin");
+  private static final CatalogRole catalogAdminSource = new CatalogRole().name("catalog_admin");
 
-    private final static CatalogRole catalogAdminTarget = new CatalogRole()
-            .name("catalog_admin");
+  private static final CatalogRole catalogAdminTarget = new CatalogRole().name("catalog_admin");
 
-    @Test
-    public void filtersCatalogAdminAndChildren() {
-        SynchronizationPlanner accessControlAwarePlanner = new AccessControlAwarePlanner(new NoOpSyncPlanner());
+  @Test
+  public void filtersCatalogAdminAndChildren() {
+    SynchronizationPlanner accessControlAwarePlanner =
+        new AccessControlAwarePlanner(new NoOpSyncPlanner());
 
-        SynchronizationPlan<CatalogRole> plan = accessControlAwarePlanner.planCatalogRoleSync(
-                "catalogName", List.of(catalogAdminSource), List.of(catalogAdminTarget));
+    SynchronizationPlan<CatalogRole> plan =
+        accessControlAwarePlanner.planCatalogRoleSync(
+            "catalogName", List.of(catalogAdminSource), List.of(catalogAdminTarget));
 
-        Assertions.assertTrue(plan.entitiesToSkipAndSkipChildren().contains(catalogAdminSource));
-        Assertions.assertTrue(plan.entitiesToSkipAndSkipChildren().contains(catalogAdminTarget));
-    }
+    Assertions.assertTrue(plan.entitiesToSkipAndSkipChildren().contains(catalogAdminSource));
+    Assertions.assertTrue(plan.entitiesToSkipAndSkipChildren().contains(catalogAdminTarget));
+  }
 
-    @Test
-    public void filtersOutAssignmentOfOmnipotentPrincipalRoles() {
-        SynchronizationPlanner accessControlAwarePlanner = new AccessControlAwarePlanner(new NoOpSyncPlanner());
+  @Test
+  public void filtersOutAssignmentOfOmnipotentPrincipalRoles() {
+    SynchronizationPlanner accessControlAwarePlanner =
+        new AccessControlAwarePlanner(new NoOpSyncPlanner());
 
-        SynchronizationPlan<PrincipalRole> plan = accessControlAwarePlanner.planAssignPrincipalRolesToCatalogRolesSync(
-                "catalogName", "catalogRoleName",
-                List.of(omnipotentPrincipalRoleSource), List.of(omnipotentPrincipalRoleTarget));
+    SynchronizationPlan<PrincipalRole> plan =
+        accessControlAwarePlanner.planAssignPrincipalRolesToCatalogRolesSync(
+            "catalogName",
+            "catalogRoleName",
+            List.of(omnipotentPrincipalRoleSource),
+            List.of(omnipotentPrincipalRoleTarget));
 
-        Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleSource));
-        Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleTarget));
-    }
+    Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleSource));
+    Assertions.assertTrue(plan.entitiesToSkip().contains(omnipotentPrincipalRoleTarget));
+  }
 
-    @Test
-    public void filtersOutAssignmentOfServiceAdmin() {
-        SynchronizationPlanner accessControlAwarePlanner = new AccessControlAwarePlanner(new NoOpSyncPlanner());
+  @Test
+  public void filtersOutAssignmentOfServiceAdmin() {
+    SynchronizationPlanner accessControlAwarePlanner =
+        new AccessControlAwarePlanner(new NoOpSyncPlanner());
 
-        SynchronizationPlan<PrincipalRole> plan = accessControlAwarePlanner.planAssignPrincipalRolesToCatalogRolesSync(
-                "catalogName", "catalogRoleName",
-                List.of(serviceAdminSource), List.of(serviceAdminTarget));
+    SynchronizationPlan<PrincipalRole> plan =
+        accessControlAwarePlanner.planAssignPrincipalRolesToCatalogRolesSync(
+            "catalogName",
+            "catalogRoleName",
+            List.of(serviceAdminSource),
+            List.of(serviceAdminTarget));
 
-        Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminSource));
-        Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminTarget));
-    }
-
+    Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminSource));
+    Assertions.assertTrue(plan.entitiesToSkip().contains(serviceAdminTarget));
+  }
 }

@@ -16,14 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.http;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpHeaders;
-import org.apache.http.entity.ContentType;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,52 +27,52 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
 
-/**
- * Utility class to manage OAuth2 flow for a Polaris instance.
- */
+/** Utility class to manage OAuth2 flow for a Polaris instance. */
 public class OAuth2Util {
 
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+  private static final HttpClient httpClient = HttpClient.newHttpClient();
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static String fetchToken(
-            String oauth2ServerUri, String clientId, String clientSecret, String scope)
-            throws IOException {
+  public static String fetchToken(
+      String oauth2ServerUri, String clientId, String clientSecret, String scope)
+      throws IOException {
 
-        Map<String, String> formBody =
-                Map.of(
-                        "grant_type", "client_credentials",
-                        "scope", scope,
-                        "client_id", clientId,
-                        "client_secret", clientSecret);
+    Map<String, String> formBody =
+        Map.of(
+            "grant_type", "client_credentials",
+            "scope", scope,
+            "client_id", clientId,
+            "client_secret", clientSecret);
 
-        String formBodyAsString = HttpUtil.constructFormEncodedString(formBody);
+    String formBodyAsString = HttpUtil.constructFormEncodedString(formBody);
 
-        HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(URI.create(oauth2ServerUri))
-                        .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.getMimeType())
-                        .POST(HttpRequest.BodyPublishers.ofString(formBodyAsString))
-                        .build();
+    HttpRequest request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(oauth2ServerUri))
+            .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.getMimeType())
+            .POST(HttpRequest.BodyPublishers.ofString(formBodyAsString))
+            .build();
 
-        try {
-            HttpResponse<String> response =
-                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            Map<String, String> responseBody =
-                    objectMapper.readValue(response.body(), new TypeReference<>() {});
+    try {
+      HttpResponse<String> response =
+          httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      Map<String, String> responseBody =
+          objectMapper.readValue(response.body(), new TypeReference<>() {});
 
-            String accessToken = responseBody.getOrDefault("access_token", null);
+      String accessToken = responseBody.getOrDefault("access_token", null);
 
-            if (accessToken != null) {
-                return accessToken;
-            }
+      if (accessToken != null) {
+        return accessToken;
+      }
 
-            throw new NoSuchElementException(
-                    "No field 'access_token' found in response from oauth2-server-uri.");
-        } catch (Exception e) {
-            throw new RuntimeException("Could not fetch access token", e);
-        }
+      throw new NoSuchElementException(
+          "No field 'access_token' found in response from oauth2-server-uri.");
+    } catch (Exception e) {
+      throw new RuntimeException("Could not fetch access token", e);
     }
+  }
 }

@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.planning;
 
+import java.util.List;
+import java.util.Set;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.polaris.core.admin.model.Catalog;
@@ -27,27 +28,44 @@ import org.apache.polaris.core.admin.model.GrantResource;
 import org.apache.polaris.core.admin.model.PrincipalRole;
 import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationPlan;
 
-import java.util.List;
-import java.util.Set;
-
 /**
- * Generic interface to generate synchronization plans for different types of entities
- * based on what principal roles exist on the source and target.
+ * Generic interface to generate synchronization plans for different types of entities based on what
+ * principal roles exist on the source and target.
  */
 public interface SynchronizationPlanner {
 
-    SynchronizationPlan<PrincipalRole> planPrincipalRoleSync(List<PrincipalRole> principalRolesOnSource, List<PrincipalRole> principalRolesOnTarget);
+  SynchronizationPlan<PrincipalRole> planPrincipalRoleSync(
+      List<PrincipalRole> principalRolesOnSource, List<PrincipalRole> principalRolesOnTarget);
 
-    SynchronizationPlan<Catalog> planCatalogSync(List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget);
+  SynchronizationPlan<Catalog> planCatalogSync(
+      List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget);
 
-    SynchronizationPlan<CatalogRole> planCatalogRoleSync(String catalogName, List<CatalogRole> catalogRolesOnSource, List<CatalogRole> catalogRolesOnTarget);
+  SynchronizationPlan<CatalogRole> planCatalogRoleSync(
+      String catalogName,
+      List<CatalogRole> catalogRolesOnSource,
+      List<CatalogRole> catalogRolesOnTarget);
 
-    SynchronizationPlan<GrantResource> planGrantSync(String catalogName, String catalogRoleName, List<GrantResource> grantsOnSource, List<GrantResource> grantsOnTarget);
+  SynchronizationPlan<GrantResource> planGrantSync(
+      String catalogName,
+      String catalogRoleName,
+      List<GrantResource> grantsOnSource,
+      List<GrantResource> grantsOnTarget);
 
-    SynchronizationPlan<PrincipalRole> planAssignPrincipalRolesToCatalogRolesSync(String catalogName, String catalogRoleName, List<PrincipalRole> assignedPrincipalRolesOnSource, List<PrincipalRole> assignedPrincipalRolesOnTarget);
+  SynchronizationPlan<PrincipalRole> planAssignPrincipalRolesToCatalogRolesSync(
+      String catalogName,
+      String catalogRoleName,
+      List<PrincipalRole> assignedPrincipalRolesOnSource,
+      List<PrincipalRole> assignedPrincipalRolesOnTarget);
 
-    SynchronizationPlan<Namespace> planNamespaceSync(String catalogName, Namespace namespace, List<Namespace> namespacesOnSource, List<Namespace> namespacesOnTarget);
+  SynchronizationPlan<Namespace> planNamespaceSync(
+      String catalogName,
+      Namespace namespace,
+      List<Namespace> namespacesOnSource,
+      List<Namespace> namespacesOnTarget);
 
-    SynchronizationPlan<TableIdentifier> planTableSync(String catalogName, Namespace namespace, Set<TableIdentifier> tablesOnSource, Set<TableIdentifier> tablesOnTarget);
-
+  SynchronizationPlan<TableIdentifier> planTableSync(
+      String catalogName,
+      Namespace namespace,
+      Set<TableIdentifier> tablesOnSource,
+      Set<TableIdentifier> tablesOnTarget);
 }

@@ -18,12 +18,7 @@
  */
 package org.apache.polaris.tools.sync.polaris;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.iceberg.catalog.TableIdentifier;
-import org.apache.polaris.tools.sync.polaris.catalog.ETagService;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -32,8 +27,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.polaris.tools.sync.polaris.catalog.ETagService;
 
 /** Implementation that stores/loads ETags to/from a CSV file. */
 public class CsvETagService implements ETagService, Closeable {

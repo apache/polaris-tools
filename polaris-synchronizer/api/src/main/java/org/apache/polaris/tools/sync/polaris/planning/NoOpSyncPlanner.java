@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.planning;
 
+import java.util.List;
+import java.util.Set;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.polaris.core.admin.model.Catalog;
@@ -27,44 +28,61 @@ import org.apache.polaris.core.admin.model.GrantResource;
 import org.apache.polaris.core.admin.model.PrincipalRole;
 import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationPlan;
 
-import java.util.List;
-import java.util.Set;
-
 public class NoOpSyncPlanner implements SynchronizationPlanner {
 
-    @Override
-    public SynchronizationPlan<PrincipalRole> planPrincipalRoleSync(List<PrincipalRole> principalRolesOnSource, List<PrincipalRole> principalRolesOnTarget) {
-        return new SynchronizationPlan<>();
-    }
+  @Override
+  public SynchronizationPlan<PrincipalRole> planPrincipalRoleSync(
+      List<PrincipalRole> principalRolesOnSource, List<PrincipalRole> principalRolesOnTarget) {
+    return new SynchronizationPlan<>();
+  }
 
-    @Override
-    public SynchronizationPlan<Catalog> planCatalogSync(List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget) {
-        return new SynchronizationPlan<>();
-    }
+  @Override
+  public SynchronizationPlan<Catalog> planCatalogSync(
+      List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget) {
+    return new SynchronizationPlan<>();
+  }
 
-    @Override
-    public SynchronizationPlan<CatalogRole> planCatalogRoleSync(String catalogName, List<CatalogRole> catalogRolesOnSource, List<CatalogRole> catalogRolesOnTarget) {
-        return new SynchronizationPlan<>();
-    }
+  @Override
+  public SynchronizationPlan<CatalogRole> planCatalogRoleSync(
+      String catalogName,
+      List<CatalogRole> catalogRolesOnSource,
+      List<CatalogRole> catalogRolesOnTarget) {
+    return new SynchronizationPlan<>();
+  }
 
-    @Override
-    public SynchronizationPlan<GrantResource> planGrantSync(String catalogName, String catalogRoleName, List<GrantResource> grantsOnSource, List<GrantResource> grantsOnTarget) {
-        return new SynchronizationPlan<>();
-    }
+  @Override
+  public SynchronizationPlan<GrantResource> planGrantSync(
+      String catalogName,
+      String catalogRoleName,
+      List<GrantResource> grantsOnSource,
+      List<GrantResource> grantsOnTarget) {
+    return new SynchronizationPlan<>();
+  }
 
-    @Override
-    public SynchronizationPlan<PrincipalRole> planAssignPrincipalRolesToCatalogRolesSync(String catalogName, String catalogRoleName, List<PrincipalRole> assignedPrincipalRolesOnSource, List<PrincipalRole> assignedPrincipalRolesOnTarget) {
-        return new SynchronizationPlan<>();
-    }
+  @Override
+  public SynchronizationPlan<PrincipalRole> planAssignPrincipalRolesToCatalogRolesSync(
+      String catalogName,
+      String catalogRoleName,
+      List<PrincipalRole> assignedPrincipalRolesOnSource,
+      List<PrincipalRole> assignedPrincipalRolesOnTarget) {
+    return new SynchronizationPlan<>();
+  }
 
-    @Override
-    public SynchronizationPlan<Namespace> planNamespaceSync(String catalogName, Namespace namespace, List<Namespace> namespacesOnSource, List<Namespace> namespacesOnTarget) {
-        return null;
-    }
+  @Override
+  public SynchronizationPlan<Namespace> planNamespaceSync(
+      String catalogName,
+      Namespace namespace,
+      List<Namespace> namespacesOnSource,
+      List<Namespace> namespacesOnTarget) {
+    return null;
+  }
 
-    @Override
-    public SynchronizationPlan<TableIdentifier> planTableSync(String catalogName, Namespace namespace, Set<TableIdentifier> tablesOnSource, Set<TableIdentifier> tablesOnTarget) {
-        return new SynchronizationPlan<>();
-    }
-
+  @Override
+  public SynchronizationPlan<TableIdentifier> planTableSync(
+      String catalogName,
+      Namespace namespace,
+      Set<TableIdentifier> tablesOnSource,
+      Set<TableIdentifier> tablesOnTarget) {
+    return new SynchronizationPlan<>();
+  }
 }

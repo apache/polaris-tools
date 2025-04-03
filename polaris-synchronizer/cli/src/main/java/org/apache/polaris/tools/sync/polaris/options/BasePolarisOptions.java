@@ -18,10 +18,9 @@
  */
 package org.apache.polaris.tools.sync.polaris.options;
 
+import java.io.IOException;
 import org.apache.polaris.tools.sync.polaris.PolarisService;
 import org.apache.polaris.tools.sync.polaris.PolarisServiceFactory;
-
-import java.io.IOException;
 
 public abstract class BasePolarisOptions {
 

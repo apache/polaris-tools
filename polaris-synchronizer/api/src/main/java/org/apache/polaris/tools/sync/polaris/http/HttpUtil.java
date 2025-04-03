@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.http;
 
 import java.net.URLEncoder;
@@ -27,14 +26,16 @@ import java.util.stream.Collectors;
 /** Encapsulates handy http utility methods. */
 public class HttpUtil {
 
-    /** Turn a {@link Map <String, String>} into an xxx-url-form-encoded compatible String form body */
-    public static String constructFormEncodedString(Map<String, String> parameters) {
-        return parameters.entrySet().stream()
-                .map(
-                        entry ->
-                                URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)
-                                        + "="
-                                        + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining("&"));
-    }
+  /**
+   * Turn a {@link Map <String, String>} into an xxx-url-form-encoded compatible String form body
+   */
+  public static String constructFormEncodedString(Map<String, String> parameters) {
+    return parameters.entrySet().stream()
+        .map(
+            entry ->
+                URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)
+                    + "="
+                    + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+        .collect(Collectors.joining("&"));
+  }
 }

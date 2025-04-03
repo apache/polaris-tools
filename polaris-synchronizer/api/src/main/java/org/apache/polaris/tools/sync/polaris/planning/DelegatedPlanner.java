@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.tools.sync.polaris.planning;
 
+import java.util.List;
+import java.util.Set;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.polaris.core.admin.model.Catalog;
@@ -27,53 +28,76 @@ import org.apache.polaris.core.admin.model.GrantResource;
 import org.apache.polaris.core.admin.model.PrincipalRole;
 import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationPlan;
 
-import java.util.List;
-import java.util.Set;
-
 /**
- * Extend this to delegate planning to another planner, but only override methods for the functionality needed.
+ * Extend this to delegate planning to another planner, but only override methods for the
+ * functionality needed.
  */
 public abstract class DelegatedPlanner implements SynchronizationPlanner {
 
-    protected final SynchronizationPlanner delegate;
+  protected final SynchronizationPlanner delegate;
 
-    public DelegatedPlanner(SynchronizationPlanner delegate) {
-        this.delegate = delegate;
-    }
+  public DelegatedPlanner(SynchronizationPlanner delegate) {
+    this.delegate = delegate;
+  }
 
-    @Override
-    public SynchronizationPlan<PrincipalRole> planPrincipalRoleSync(List<PrincipalRole> principalRolesOnSource, List<PrincipalRole> principalRolesOnTarget) {
-        return delegate.planPrincipalRoleSync(principalRolesOnSource, principalRolesOnTarget);
-    }
+  @Override
+  public SynchronizationPlan<PrincipalRole> planPrincipalRoleSync(
+      List<PrincipalRole> principalRolesOnSource, List<PrincipalRole> principalRolesOnTarget) {
+    return delegate.planPrincipalRoleSync(principalRolesOnSource, principalRolesOnTarget);
+  }
 
-    @Override
-    public SynchronizationPlan<Catalog> planCatalogSync(List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget) {
-        return delegate.planCatalogSync(catalogsOnSource, catalogsOnTarget);
-    }
+  @Override
+  public SynchronizationPlan<Catalog> planCatalogSync(
+      List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget) {
+    return delegate.planCatalogSync(catalogsOnSource, catalogsOnTarget);
+  }
 
-    @Override
-    public SynchronizationPlan<CatalogRole> planCatalogRoleSync(String catalogName, List<CatalogRole> catalogRolesOnSource, List<CatalogRole> catalogRolesOnTarget) {
-        return delegate.planCatalogRoleSync(catalogName, catalogRolesOnSource, catalogRolesOnTarget);
-    }
+  @Override
+  public SynchronizationPlan<CatalogRole> planCatalogRoleSync(
+      String catalogName,
+      List<CatalogRole> catalogRolesOnSource,
+      List<CatalogRole> catalogRolesOnTarget) {
+    return delegate.planCatalogRoleSync(catalogName, catalogRolesOnSource, catalogRolesOnTarget);
+  }
 
-    @Override
-    public SynchronizationPlan<GrantResource> planGrantSync(String catalogName, String catalogRoleName, List<GrantResource> grantsOnSource, List<GrantResource> grantsOnTarget) {
-        return delegate.planGrantSync(catalogName, catalogRoleName, grantsOnSource, grantsOnTarget);
-    }
+  @Override
+  public SynchronizationPlan<GrantResource> planGrantSync(
+      String catalogName,
+      String catalogRoleName,
+      List<GrantResource> grantsOnSource,
+      List<GrantResource> grantsOnTarget) {
+    return delegate.planGrantSync(catalogName, catalogRoleName, grantsOnSource, grantsOnTarget);
+  }
 
-    @Override
-    public SynchronizationPlan<PrincipalRole> planAssignPrincipalRolesToCatalogRolesSync(String catalogName, String catalogRoleName, List<PrincipalRole> assignedPrincipalRolesOnSource, List<PrincipalRole> assignedPrincipalRolesOnTarget) {
-        return delegate.planAssignPrincipalRolesToCatalogRolesSync(catalogName, catalogRoleName, assignedPrincipalRolesOnSource, assignedPrincipalRolesOnTarget);
-    }
+  @Override
+  public SynchronizationPlan<PrincipalRole> planAssignPrincipalRolesToCatalogRolesSync(
+      String catalogName,
+      String catalogRoleName,
+      List<PrincipalRole> assignedPrincipalRolesOnSource,
+      List<PrincipalRole> assignedPrincipalRolesOnTarget) {
+    return delegate.planAssignPrincipalRolesToCatalogRolesSync(
+        catalogName,
+        catalogRoleName,
+        assignedPrincipalRolesOnSource,
+        assignedPrincipalRolesOnTarget);
+  }
 
-    @Override
-    public SynchronizationPlan<Namespace> planNamespaceSync(String catalogName, Namespace namespace, List<Namespace> namespacesOnSource, List<Namespace> namespacesOnTarget) {
-        return delegate.planNamespaceSync(catalogName, namespace, namespacesOnSource, namespacesOnTarget);
-    }
+  @Override
+  public SynchronizationPlan<Namespace> planNamespaceSync(
+      String catalogName,
+      Namespace namespace,
+      List<Namespace> namespacesOnSource,
+      List<Namespace> namespacesOnTarget) {
+    return delegate.planNamespaceSync(
+        catalogName, namespace, namespacesOnSource, namespacesOnTarget);
+  }
 
-    @Override
-    public SynchronizationPlan<TableIdentifier> planTableSync(String catalogName, Namespace namespace, Set<TableIdentifier> tablesOnSource, Set<TableIdentifier> tablesOnTarget) {
-        return delegate.planTableSync(catalogName, namespace, tablesOnSource, tablesOnTarget);
-    }
-
+  @Override
+  public SynchronizationPlan<TableIdentifier> planTableSync(
+      String catalogName,
+      Namespace namespace,
+      Set<TableIdentifier> tablesOnSource,
+      Set<TableIdentifier> tablesOnTarget) {
+    return delegate.planTableSync(catalogName, namespace, tablesOnSource, tablesOnTarget);
+  }
 }

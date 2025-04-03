@@ -18,25 +18,24 @@
  */
 package org.apache.polaris.tools.sync.polaris;
 
-import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
-import org.apache.polaris.tools.sync.polaris.catalog.ETagService;
-import org.apache.polaris.tools.sync.polaris.catalog.NoOpETagService;
-import org.apache.polaris.tools.sync.polaris.planning.AccessControlAwarePlanner;
-import org.apache.polaris.tools.sync.polaris.planning.ModificationAwarePlanner;
-import org.apache.polaris.tools.sync.polaris.planning.SourceParitySynchronizationPlanner;
-import org.apache.polaris.tools.sync.polaris.planning.SynchronizationPlanner;
-import org.apache.polaris.tools.sync.polaris.options.SourceOmniPotentPrincipalOptions;
-import org.apache.polaris.tools.sync.polaris.options.SourcePolarisOptions;
-import org.apache.polaris.tools.sync.polaris.options.TargetOmnipotentPrincipal;
-import org.apache.polaris.tools.sync.polaris.options.TargetPolarisOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
+import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
+import org.apache.polaris.tools.sync.polaris.catalog.ETagService;
+import org.apache.polaris.tools.sync.polaris.catalog.NoOpETagService;
+import org.apache.polaris.tools.sync.polaris.options.SourceOmniPotentPrincipalOptions;
+import org.apache.polaris.tools.sync.polaris.options.SourcePolarisOptions;
+import org.apache.polaris.tools.sync.polaris.options.TargetOmnipotentPrincipal;
+import org.apache.polaris.tools.sync.polaris.options.TargetPolarisOptions;
+import org.apache.polaris.tools.sync.polaris.planning.AccessControlAwarePlanner;
+import org.apache.polaris.tools.sync.polaris.planning.ModificationAwarePlanner;
+import org.apache.polaris.tools.sync.polaris.planning.SourceParitySynchronizationPlanner;
+import org.apache.polaris.tools.sync.polaris.planning.SynchronizationPlanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 @CommandLine.Command(
     name = "sync-polaris",
