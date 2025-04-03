@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Data structure that holds the state of all the planned modifications that should be made on the
- * target
+ * target.
  *
  * @param <T> the entity type that the plan is for
  */

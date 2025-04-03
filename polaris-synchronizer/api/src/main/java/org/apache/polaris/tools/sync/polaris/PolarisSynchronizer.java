@@ -77,7 +77,7 @@ public class PolarisSynchronizer {
       PrincipalWithCredentials targetOmnipotentPrincipal,
       PolarisService source,
       PolarisService target,
-      ETagService eTagService) {
+      ETagService etagService) {
     this.clientLogger =
         clientLogger == null ? LoggerFactory.getLogger(PolarisSynchronizer.class) : clientLogger;
     this.syncPlanner = synchronizationPlanner;
@@ -94,11 +94,11 @@ public class PolarisSynchronizer {
     this.targetOmnipotentPrincipalRole =
         targetAccessControlService.getOmnipotentPrincipalRoleForPrincipal(
             targetOmnipotentPrincipal.getPrincipal().getName());
-    this.etagService = eTagService;
+    this.etagService = etagService;
   }
 
   /**
-   * Calculates the total number of sync tasks to complete
+   * Calculates the total number of sync tasks to complete.
    *
    * @param plan the plan to scan for cahnges
    * @return the nuber of syncs to perform
@@ -109,7 +109,7 @@ public class PolarisSynchronizer {
         + plan.entitiesToRemove().size();
   }
 
-  /** Sync principal roles from source to target */
+  /** Sync principal roles from source to target. */
   public void syncPrincipalRoles() {
     List<PrincipalRole> principalRolesSource;
 
@@ -207,7 +207,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Sync assignments of principal roles to a catalog role
+   * Sync assignments of principal roles to a catalog role.
    *
    * @param catalogName the catalog that the catalog role is in
    * @param catalogRoleName the name of the catalog role
@@ -348,7 +348,7 @@ public class PolarisSynchronizer {
     }
   }
 
-  /** Sync catalogs across the source and target polaris instance */
+  /** Sync catalogs across the source and target polaris instance. */
   public void syncCatalogs() {
     List<Catalog> catalogsSource;
 
@@ -489,7 +489,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Sync catalog roles across the source and polaris instance for a catalog
+   * Sync catalog roles across the source and polaris instance for a catalog.
    *
    * @param catalogName the catalog to sync roles for
    */
@@ -620,7 +620,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Sync grants for a catalog role across the source and the target
+   * Sync grants for a catalog role across the source and the target.
    *
    * @param catalogName
    * @param catalogRoleName
@@ -756,7 +756,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Setup an omnipotent principal for the provided catalog on the source Polaris instance
+   * Setup an omnipotent principal for the provided catalog on the source Polaris instance.
    *
    * @param catalogName
    */
@@ -774,7 +774,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Setup an omnipotent principal for the provided catalog on the target Polaris instance
+   * Setup an omnipotent principal for the provided catalog on the target Polaris instance.
    *
    * @param catalogName
    */
@@ -802,7 +802,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Sync namespaces contained within a parent namespace
+   * Sync namespaces contained within a parent namespace.
    *
    * @param catalogName
    * @param parentNamespace
@@ -962,7 +962,7 @@ public class PolarisSynchronizer {
   }
 
   /**
-   * Sync tables contained within a namespace
+   * Sync tables contained within a namespace.
    *
    * @param catalogName
    * @param namespace
@@ -1038,7 +1038,7 @@ public class PolarisSynchronizer {
         }
 
         if (table instanceof BaseTableWithETag tableWithETag) {
-          etagService.storeETag(catalogName, tableId, tableWithETag.eTag());
+          etagService.storeETag(catalogName, tableId, tableWithETag.etag());
         }
 
         clientLogger.info(
@@ -1080,7 +1080,7 @@ public class PolarisSynchronizer {
         }
 
         if (table instanceof BaseTableWithETag tableWithETag) {
-          etagService.storeETag(catalogName, tableId, tableWithETag.eTag());
+          etagService.storeETag(catalogName, tableId, tableWithETag.etag());
         }
 
         clientLogger.info(

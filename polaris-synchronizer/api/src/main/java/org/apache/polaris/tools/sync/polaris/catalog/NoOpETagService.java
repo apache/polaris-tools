@@ -29,5 +29,5 @@ public class NoOpETagService implements ETagService {
   }
 
   @Override
-  public void storeETag(String catalogName, TableIdentifier tableIdentifier, String eTag) {}
+  public void storeETag(String catalogName, TableIdentifier tableIdentifier, String etag) {}
 }

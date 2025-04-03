@@ -123,7 +123,7 @@ public class ModificationAwarePlanner implements SynchronizationPlanner {
   }
 
   /**
-   * Compares two objects to see if they are the same
+   * Compares two objects to see if they are the same.
    *
    * @param o1
    * @param o2

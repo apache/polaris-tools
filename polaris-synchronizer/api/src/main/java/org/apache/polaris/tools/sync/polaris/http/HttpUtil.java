@@ -26,9 +26,7 @@ import java.util.stream.Collectors;
 /** Encapsulates handy http utility methods. */
 public class HttpUtil {
 
-  /**
-   * Turn a {@link Map <String, String>} into an xxx-url-form-encoded compatible String form body
-   */
+  /** Turn a {@link Map} into an xxx-url-form-encoded compatible String form body. */
   public static String constructFormEncodedString(Map<String, String> parameters) {
     return parameters.entrySet().stream()
         .map(

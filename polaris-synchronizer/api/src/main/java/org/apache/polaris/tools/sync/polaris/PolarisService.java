@@ -176,7 +176,7 @@ public class PolarisService {
   }
 
   /**
-   * Recursively discover all namespaces contained within an Iceberg catalog
+   * Recursively discover all namespaces contained within an Iceberg catalog.
    *
    * @param catalog
    * @return a list of all the namespaces in the catalog
@@ -193,7 +193,7 @@ public class PolarisService {
   }
 
   /**
-   * Discover all child namespaces of a given namespace
+   * Discover all child namespaces of a given namespace.
    *
    * @param namespaceCatalog a catalog that supports nested namespaces
    * @param namespace the namespace to look under
@@ -336,7 +336,7 @@ public class PolarisService {
   }
 
   /**
-   * Perform cascading drop of a namespace
+   * Perform cascading drop of a namespace.
    *
    * @param icebergCatalog the iceberg catalog to use
    * @param namespace the namespace to drop

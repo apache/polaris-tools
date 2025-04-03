@@ -26,7 +26,7 @@ import org.apache.polaris.management.ApiClient;
 import org.apache.polaris.management.client.PolarisManagementDefaultApi;
 import org.apache.polaris.tools.sync.polaris.http.OAuth2Util;
 
-/** Used to initialize a {@link PolarisService} */
+/** Used to initialize a {@link PolarisService}. */
 public class PolarisServiceFactory {
 
   private static void validatePolarisInstanceProperties(

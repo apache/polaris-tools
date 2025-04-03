@@ -25,20 +25,20 @@ import org.apache.iceberg.metrics.MetricsReporter;
 /** Wrapper around {@link BaseTable} that contains the latest ETag for the table. */
 public class BaseTableWithETag extends BaseTable {
 
-  private final String eTag;
+  private final String etag;
 
-  public BaseTableWithETag(TableOperations ops, String name, String eTag) {
+  public BaseTableWithETag(TableOperations ops, String name, String etag) {
     super(ops, name);
-    this.eTag = eTag;
+    this.etag = etag;
   }
 
   public BaseTableWithETag(
-      TableOperations ops, String name, MetricsReporter reporter, String eTag) {
+      TableOperations ops, String name, MetricsReporter reporter, String etag) {
     super(ops, name, reporter);
-    this.eTag = eTag;
+    this.etag = etag;
   }
 
-  public String eTag() {
-    return eTag;
+  public String etag() {
+    return etag;
   }
 }

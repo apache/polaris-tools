@@ -18,7 +18,14 @@
  */
 package org.apache.polaris.tools.sync.polaris.access;
 
-import static org.apache.polaris.core.admin.model.CatalogPrivilege.*;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.CATALOG_MANAGE_METADATA;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.CATALOG_READ_PROPERTIES;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.NAMESPACE_LIST;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.NAMESPACE_READ_PROPERTIES;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.TABLE_LIST;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.TABLE_READ_PROPERTIES;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.VIEW_LIST;
+import static org.apache.polaris.core.admin.model.CatalogPrivilege.VIEW_READ_PROPERTIES;
 import static org.apache.polaris.tools.sync.polaris.access.AccessControlConstants.OMNIPOTENCE_PROPERTY;
 import static org.apache.polaris.tools.sync.polaris.access.AccessControlConstants.OMNIPOTENT_PRINCIPAL_NAME_PREFIX;
 
@@ -83,7 +90,7 @@ public class AccessControlService {
   }
 
   /**
-   * Retrieves the omnipotent principal role for the provided principalName
+   * Retrieves the omnipotent principal role for the provided principalName.
    *
    * @param principalName the principal name to search for roles with
    * @return the principal role for the provided principal, if exists
@@ -149,7 +156,7 @@ public class AccessControlService {
 
   /**
    * Creates an omnipotent catalog role for a catalog and assigns it to the provided omnipotent
-   * principal role
+   * principal role.
    *
    * @param catalogName the catalog to create the catalog role for
    * @param omnipotentPrincipalRole the omnipotent principal role to assign the created catalog role
@@ -189,7 +196,7 @@ public class AccessControlService {
   }
 
   /**
-   * Adds grants for privilege level desired on the omnipotent catalog role
+   * Adds grants for privilege level desired on the omnipotent catalog role.
    *
    * @param catalogName the catalog to identify the role in
    * @param catalogRoleName the name of the catalog role to assign the grants tpo
@@ -248,7 +255,7 @@ public class AccessControlService {
   }
 
   /**
-   * Determines if an omnipotent catalog role already exists for this catalog
+   * Determines if an omnipotent catalog role already exists for this catalog.
    *
    * @param catalogName the catalog to search in
    * @return true if exists, false otherwise
@@ -265,7 +272,7 @@ public class AccessControlService {
 
   /**
    * Creates catalog role for catalog, assigns it to provided principal role, and assigns grants
-   * with appropriate privilege level
+   * with appropriate privilege level.
    *
    * @param catalogName the catalog to create the role for
    * @param omnipotentPrincipalRole the principal role to assign the catalog role to

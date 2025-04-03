@@ -27,7 +27,7 @@ import org.apache.iceberg.catalog.TableIdentifier;
 public interface ETagService {
 
   /**
-   * Retrieves the ETag for the table
+   * Retrieves the ETag for the table.
    *
    * @param catalogName the catalog the table is in
    * @param tableIdentifier the table identifier
@@ -40,7 +40,7 @@ public interface ETagService {
    *
    * @param catalogName the catalog the table is in
    * @param tableIdentifier the table identifier
-   * @param eTag the ETag that was provided by the Iceberg REST api
+   * @param etag the ETag that was provided by the Iceberg REST api
    */
-  void storeETag(String catalogName, TableIdentifier tableIdentifier, String eTag);
+  void storeETag(String catalogName, TableIdentifier tableIdentifier, String etag);
 }
