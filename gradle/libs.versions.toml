@@ -1,4 +1,5 @@
 [versions]
+apacheCommonsCSV = "1.13.0"
 assertj = "3.27.3"
 aws = "2.30.3" # this is in mapping with iceberg repo.
 checkstyle = "10.21.3"
@@ -11,17 +12,20 @@ hive = "2.3.9" # this is in mapping with iceberg repo.
 iceberg = "1.7.1"
 immutables = "2.10.1"
 jacoco = "0.8.12"
+jakartaAnnotation = "2.1.1"
 jandex = "3.2.3"
 junit = "5.12.0"
 logback = "1.5.17"
 logcaptor = "2.10.1"
 nessie = "0.101.3"
 nessieRunner = "0.32.2"
+openApiGenerator = "7.11.0"
 picocli = "4.7.6"
 shadowPlugin = "8.1.1"
 slf4j = "1.7.36"
 
 [libraries]
+apache-commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "apacheCommonsCSV" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 aws-sdk-apache-client = { module = "software.amazon.awssdk:apache-client", version.ref = "aws" }
 aws-sdk-auth = { module = "software.amazon.awssdk:auth", version.ref = "aws" }
@@ -50,15 +54,18 @@ immutables-value-processor = { module = "org.immutables:value-processor", versio
 jacoco-ant = { module = "org.jacoco:org.jacoco.ant", version.ref = "jacoco" }
 jacoco-report = { module = "org.jacoco:org.jacoco.report", version.ref = "jacoco" }
 jacoco-maven-plugin = { module = "org.jacoco:jacoco-maven-plugin", version.ref = "jacoco" }
+jakarta-annotation = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jakartaAnnotation" }
 jandex = { module = "org.jboss:jandex", version.ref = "jandex" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logcaptor = { module = "io.github.hakky54:logcaptor", version.ref = "logcaptor" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 slf4j = { module = "org.slf4j:log4j-over-slf4j", version.ref = "slf4j" }
+openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openApiGenerator" }
 
 [plugins]
 errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }
 nessie-run = { id = "org.projectnessie", version.ref = "nessieRunner" }
 nexus-publish-plugin = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
+openapi-generator-gradle-plugin = { id = "org.openapi.generator", version.ref = "openApiGenerator" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadowPlugin" }

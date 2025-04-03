@@ -44,6 +44,15 @@ catalogMigratorProject("api-test")
 
 catalogMigratorProject("cli")
 
+fun polarisSynchronizerProject(name: String) {
+  include("polaris-synchronizer-$name")
+  project(":polaris-synchronizer-$name").projectDir = file("polaris-synchronizer/$name")
+}
+
+polarisSynchronizerProject("api")
+
+polarisSynchronizerProject("cli")
+
 include("bom")
 
 project(":bom").projectDir = file("bom")
