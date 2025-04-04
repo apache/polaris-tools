@@ -20,26 +20,7 @@
 package org.apache.polaris.benchmarks.parameters
 
 case class WorkloadParameters(
-    updatesPerNamespace: Int,
-    updatesPerTable: Int,
-    updatesPerView: Int,
-    seed: Long,
     readTreeDataset: ReadTreeDatasetParameters,
     createTreeDataset: CreateTreeDatasetParameters,
     readUpdateTreeDataset: ReadUpdateTreeDatasetParameters
-) {
-  require(
-    updatesPerNamespace >= 0,
-    "Updates per namespace must be non-negative"
-  )
-
-  require(
-    updatesPerTable >= 0,
-    "Updates per table must be non-negative"
-  )
-
-  require(
-    updatesPerView >= 0,
-    "Updates per view must be non-negative"
-  )
-}
+) {}

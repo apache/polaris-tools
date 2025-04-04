@@ -115,15 +115,24 @@ case class NamespaceActions(
       )
     }
 
-  def namespacePropertiesUpdateFeeder(): Feeder[Any] = namespaceIdentityFeeder()
-    .flatMap { row =>
-      (0 until wp.updatesPerNamespace).map { updateId =>
-        val updates = Map(s"UpdatedAttribute_$updateId" -> s"$updateId")
-        row ++ Map(
-          "jsonPropertyUpdates" -> Json.toJson(updates).toString()
-        )
-      }
-    }
+  /**
+   * Creates a Gatling Feeder that generates namespace property updates. Each row contains a single
+   * property update targeting a specific namespace. The feeder is infinite, in that it will
+   * generate a new property update every time.
+   *
+   * @return An iterator providing namespace property update details
+   */
+  def namespacePropertiesUpdateFeeder(): Feeder[Any] = Iterator
+    .from(0)
+    .flatMap(updateId =>
+      namespaceIdentityFeeder()
+        .map { row =>
+          val updates = Map(s"UpdatedAttribute_$updateId" -> s"$updateId")
+          row ++ Map(
+            "jsonPropertyUpdates" -> Json.toJson(updates).toString()
+          )
+        }
+    )
 
   /**
    * Creates a new namespace in a specified catalog. The namespace is created with a full path and

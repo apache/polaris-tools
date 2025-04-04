@@ -107,14 +107,18 @@ case class TableActions(
 
   /**
    * Creates a Gatling Feeder that generates table property updates. Each row contains a single
-   * property update targeting a specific table.
+   * property update targeting a specific table. The feeder is infinite, in that it will generate a
+   * new property update every time.
    *
    * @return An iterator providing table property update details
    */
-  def propertyUpdateFeeder(): Feeder[Any] = tableIdentityFeeder()
-    .flatMap(row =>
-      Range(0, wp.updatesPerTable)
-        .map(k => row + ("newProperty" -> s"""{"NewAttribute_$k": "NewValue_$k"}"""))
+  def propertyUpdateFeeder(): Feeder[Any] = Iterator
+    .from(0)
+    .flatMap(updateId =>
+      tableIdentityFeeder()
+        .map { row =>
+          row ++ Map("newProperty" -> s"""{"NewAttribute_$updateId": "NewValue_$updateId"}""")
+        }
     )
 
   /**

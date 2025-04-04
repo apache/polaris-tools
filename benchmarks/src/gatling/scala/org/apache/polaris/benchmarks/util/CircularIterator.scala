@@ -19,35 +19,15 @@
 
 package org.apache.polaris.benchmarks.util
 
-import scala.util.Random
-
 class CircularIterator[T](builder: () => Iterator[T]) extends Iterator[T] {
   private var currentIterator: Iterator[T] = builder()
 
   override def hasNext: Boolean = true
 
-  override def next(): T = synchronized {
+  override def next(): T = {
     if (!currentIterator.hasNext) {
       currentIterator = builder()
     }
     currentIterator.next()
-  }
-}
-
-class BufferedRandomIterator[T](underlying: CircularIterator[T], bufferSize: Int, seed: Long)
-    extends Iterator[T] {
-  private val random = new Random(seed)
-  private var buffer: Iterator[T] = populateAndShuffle()
-
-  private def populateAndShuffle(): Iterator[T] =
-    random.shuffle((1 to bufferSize).map(_ => underlying.next()).toList).iterator
-
-  override def hasNext: Boolean = true
-
-  override def next(): T = synchronized {
-    if (!buffer.hasNext) {
-      buffer = populateAndShuffle()
-    }
-    buffer.next()
   }
 }

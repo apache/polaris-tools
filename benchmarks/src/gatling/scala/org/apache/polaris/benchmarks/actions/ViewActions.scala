@@ -99,14 +99,18 @@ case class ViewActions(
 
   /**
    * Creates a Gatling Feeder that generates view property updates. Each row contains a single
-   * property update targeting a specific view.
+   * property update targeting a specific view. The feeder is infinite, in that it will generate a
+   * new property update every time.
    *
    * @return An iterator providing view property update details
    */
-  def propertyUpdateFeeder(): Feeder[Any] = viewIdentityFeeder()
-    .flatMap(row =>
-      Range(0, wp.updatesPerView)
-        .map(k => row + ("newProperty" -> s"""{"NewAttribute_$k": "NewValue_$k"}"""))
+  def propertyUpdateFeeder(): Feeder[Any] = Iterator
+    .from(0)
+    .flatMap(updateId =>
+      viewIdentityFeeder()
+        .map { row =>
+          row ++ Map("newProperty" -> s"""{"NewAttribute_$updateId": "NewValue_$updateId"}""")
+        }
     )
 
   /**

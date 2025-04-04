@@ -23,7 +23,7 @@ Benchmarks for the Polaris service using Gatling.
 
 ## Available Benchmarks
 
-- `org.apache.polaris.benchmarks.simulations.CreateTreeDataset`: creates a test dataset with a specific structure.  It is a write-only workload designed to populate the system for subsequent benchmarks.
+- `org.apache.polaris.benchmarks.simulations.CreateTreeDataset`: Creates a test dataset with a specific structure.  It is a write-only workload designed to populate the system for subsequent benchmarks.
 - `org.apache.polaris.benchmarks.simulations.ReadTreeDataset`: Performs read-only operations to fetch namespaces, tables, and views.  Some attributes of the objects are also fetched.  This benchmark is intended to be used against a Polaris instance with a pre-existing tree dataset.  It has no side effects on the dataset and can be executed multiple times without any issues.
 - `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset`: Performs read and update operations against a Polaris instance populated with a test dataset.  It is a read/write workload that can be used to test the system's ability to handle concurrent read and update operations.  It is not destructive and does not prevent subsequent executions of `ReadTreeDataset` or `ReadUpdateTreeDataset`.
 

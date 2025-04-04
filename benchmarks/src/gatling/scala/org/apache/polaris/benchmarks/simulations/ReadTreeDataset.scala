@@ -33,7 +33,8 @@ import scala.concurrent.duration.DurationInt
 /**
  * This simulation is a 100% read workload that fetches a tree dataset in Polaris. It is intended to
  * be used against a Polaris instance with a pre-existing tree dataset. It has no side effect on the
- * dataset and therefore can be executed multiple times without any issue.
+ * dataset and therefore can be executed multiple times without any issue. It fetches each entity
+ * exactly once.
  */
 class ReadTreeDataset extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)

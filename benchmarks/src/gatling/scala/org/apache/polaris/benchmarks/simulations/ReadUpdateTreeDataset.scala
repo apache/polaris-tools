@@ -37,6 +37,9 @@ import scala.concurrent.duration._
 
 /**
  * This simulation tests read and update operations on an existing dataset.
+ *
+ * The ratio of read operations to write operations is controlled by the readWriteRatio parameter in
+ * the ReadUpdateTreeDatasetParameters.
  */
 class ReadUpdateTreeDataset extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -91,17 +94,17 @@ class ReadUpdateTreeDataset extends Simulation {
   private val nsListFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
   private val nsExistsFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
   private val nsFetchFeeder = new CircularIterator(nsActions.namespaceFetchFeeder)
-  private val nsUpdateFeeder = new CircularIterator(nsActions.namespacePropertiesUpdateFeeder)
+  private val nsUpdateFeeder = nsActions.namespacePropertiesUpdateFeeder()
 
   private val tblListFeeder = new CircularIterator(tblActions.tableIdentityFeeder)
   private val tblExistsFeeder = new CircularIterator(tblActions.tableIdentityFeeder)
   private val tblFetchFeeder = new CircularIterator(tblActions.tableFetchFeeder)
-  private val tblUpdateFeeder = new CircularIterator(tblActions.propertyUpdateFeeder)
+  private val tblUpdateFeeder = tblActions.propertyUpdateFeeder()
 
   private val viewListFeeder = new CircularIterator(viewActions.viewIdentityFeeder)
   private val viewExistsFeeder = new CircularIterator(viewActions.viewIdentityFeeder)
   private val viewFetchFeeder = new CircularIterator(viewActions.viewFetchFeeder)
-  private val viewUpdateFeeder = new CircularIterator(viewActions.propertyUpdateFeeder)
+  private val viewUpdateFeeder = viewActions.propertyUpdateFeeder()
 
   // --------------------------------------------------------------------------------
   // Workload: Randomly read and write entities
