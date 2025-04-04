@@ -110,7 +110,7 @@ class ReadUpdateTreeDataset extends Simulation {
     scenario("Read and write entities using the Iceberg REST API")
       .exec(authActions.restoreAccessTokenInSession)
       .randomSwitch(
-        wp.gatlingReadRatio -> group("Read")(
+        wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
           uniformRandomSwitch(
             exec(feed(nsListFeeder).exec(nsActions.fetchAllChildrenNamespaces)),
             exec(feed(nsExistsFeeder).exec(nsActions.checkNamespaceExists)),
@@ -123,7 +123,7 @@ class ReadUpdateTreeDataset extends Simulation {
             exec(feed(viewFetchFeeder).exec(viewActions.fetchView))
           )
         ),
-        wp.gatlingWriteRatio -> group("Write")(
+        wp.readUpdateTreeDataset.gatlingWriteRatio -> group("Write")(
           uniformRandomSwitch(
             exec(feed(nsUpdateFeeder).exec(nsActions.updateNamespaceProperties)),
             exec(feed(tblUpdateFeeder).exec(tblActions.updateTable)),

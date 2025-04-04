@@ -44,7 +44,6 @@ object BenchmarkConfig {
       val rutdConfig = workload.getConfig("read-update-tree-dataset")
 
       WorkloadParameters(
-        workload.getDouble("read-write-ratio"),
         workload.getInt("updates-per-namespace"),
         workload.getInt("updates-per-table"),
         workload.getInt("updates-per-view"),
@@ -58,6 +57,7 @@ object BenchmarkConfig {
           ctdConfig.getInt("view-throughput")
         ),
         ReadUpdateTreeDatasetParameters(
+          rutdConfig.getDouble("read-write-ratio"),
           rutdConfig.getInt("throughput"),
           rutdConfig.getInt("duration-in-minutes")
         )

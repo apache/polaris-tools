@@ -74,7 +74,9 @@ Workload settings are configured under `workload`:
 
 ```hocon
 workload {
-  read-write-ratio = 0.8  # Ratio of reads (0.0-1.0)
+  read-update-tree-dataset {
+    read-write-ratio = 0.8  # Ratio of reads (0.0-1.0)
+  }
 }
 ```
 
@@ -96,7 +98,9 @@ http {
 }
 
 workload {
-  read-write-ratio = 0.8
+  read-update-tree-dataset {
+    read-write-ratio = 0.8  # Ratio of reads (0.0-1.0)
+  }
 }
 ```
 
