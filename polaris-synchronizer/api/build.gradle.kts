@@ -37,6 +37,14 @@ dependencies {
   implementation(libs.iceberg.spark.runtime)
   implementation(libs.slf4j)
 
+  implementation(libs.hadoop.common) {
+    exclude("org.apache.avro", "avro")
+    exclude("org.slf4j", "slf4j-log4j12")
+    exclude("javax.servlet", "servlet-api")
+    exclude("com.google.code.gson", "gson")
+    exclude("commons-beanutils")
+  }
+
   testImplementation(platform(libs.junit.bom))
   testImplementation("org.junit.jupiter:junit-jupiter-params")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
