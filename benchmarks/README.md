@@ -19,7 +19,7 @@
 
 # Polaris Benchmarks
 
-This repository contains benchmarks for the Polaris service using Gatling.
+Benchmarks for the Polaris service using Gatling.
 
 ## Available Benchmarks
 
