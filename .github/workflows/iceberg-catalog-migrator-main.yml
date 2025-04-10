@@ -17,12 +17,16 @@
 # under the License.
 #
 
-name: CI
+name: Iceberg Catalog Migrator CI
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'iceberg-catalog-migrator/**'
   pull_request:
+    paths:
+      - 'iceberg-catalog-migrator/**'
 
 jobs:
   java:
@@ -49,7 +53,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build & Check
-        run: ./gradlew --rerun-tasks assemble ${{ env.ADDITIONAL_GRADLE_OPTS }} check publishToMavenLocal
+        run: |
+          cd iceberg-catalog-migrator
+          ./gradlew --rerun-tasks assemble ${{ env.ADDITIONAL_GRADLE_OPTS }} check publishToMavenLocal
 
       - name: Capture test results
         uses: actions/upload-artifact@v4

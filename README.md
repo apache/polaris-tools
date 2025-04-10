@@ -21,4 +21,5 @@ This repo has the tools developed by [Apache polaris community](https://polaris.
 
 Read more about the following tools:
 
-1. Iceberg catalog migrator: [README.md](/iceberg-catalog-migrator/README.md)
+1. Benchmarks: [README.md](/benchmarks/README.md)
+2. Iceberg catalog migrator: [README.md](/iceberg-catalog-migrator/README.md)

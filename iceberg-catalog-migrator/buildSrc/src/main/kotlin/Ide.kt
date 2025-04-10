@@ -50,8 +50,8 @@ fun Project.configureIde() {
 
       project.settings {
         copyright {
-          useDefault = "Nessie-ASF"
-          profiles.create("Nessie-ASF") {
+          useDefault = "Iceberg-catalog-migrator"
+          profiles.create("Iceberg-catalog-migrator") {
             // strip trailing LF
             val copyrightText =
               rootProject.file("codestyle/copyright-header.txt").readLines().joinToString("\n")
