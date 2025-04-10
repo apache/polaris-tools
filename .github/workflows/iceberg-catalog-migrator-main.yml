@@ -1,0 +1,67 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Iceberg Catalog Migrator CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'iceberg-catalog-migrator/**'
+  pull_request:
+    paths:
+      - 'iceberg-catalog-migrator/**'
+
+jobs:
+  java:
+    name: Java/Gradle
+    runs-on: ubuntu-24.04
+    strategy:
+      max-parallel: 4
+      matrix:
+        java-version: [21, 23]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            21
+            ${{ matrix.java-version != '21' && matrix.java-version || '' }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build & Check
+        run: |
+          cd iceberg-catalog-migrator
+          ./gradlew --rerun-tasks assemble ${{ env.ADDITIONAL_GRADLE_OPTS }} check publishToMavenLocal
+
+      - name: Capture test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: |
+            **/build/reports/*
+            **/build/test-results/*
