@@ -19,9 +19,19 @@
 
 package org.apache.polaris.benchmarks.parameters
 
-case class WorkloadParameters(
-    createCommits: CreateCommitsParameters,
-    readTreeDataset: ReadTreeDatasetParameters,
-    createTreeDataset: CreateTreeDatasetParameters,
-    readUpdateTreeDataset: ReadUpdateTreeDatasetParameters
-) {}
+/**
+ * Case class to hold the parameters for the CreateCommits simulation.
+ *
+ * @param tableCommitsThroughput The number of table commits to create per second.
+ * @param viewCommitsThroughput The number of view commits to create per second.
+ * @param durationInMinutes The duration of the simulation in minutes.
+ */
+case class CreateCommitsParameters(
+    tableCommitsThroughput: Int,
+    viewCommitsThroughput: Int,
+    durationInMinutes: Int
+) {
+  require(tableCommitsThroughput >= 0, "Table commits throughput cannot be negative")
+  require(viewCommitsThroughput >= 0, "View commits throughput cannot be negative")
+  require(durationInMinutes > 0, "Duration in minutes must be positive")
+}
