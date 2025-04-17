@@ -45,12 +45,12 @@ object BenchmarkConfig {
 
       WorkloadParameters(
         ReadTreeDatasetParameters(
-          rtdConfig.getInt("table-throughput"),
-          rtdConfig.getInt("view-throughput")
+          rtdConfig.getInt("table-concurrency"),
+          rtdConfig.getInt("view-concurrency")
         ),
         CreateTreeDatasetParameters(
-          ctdConfig.getInt("table-throughput"),
-          ctdConfig.getInt("view-throughput")
+          ctdConfig.getInt("table-concurrency"),
+          ctdConfig.getInt("view-concurrency")
         ),
         ReadUpdateTreeDatasetParameters(
           rutdConfig.getDouble("read-write-ratio"),
