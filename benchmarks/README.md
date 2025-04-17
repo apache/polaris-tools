@@ -23,30 +23,9 @@ Benchmarks for the Polaris service using Gatling.
 
 ## Available Benchmarks
 
-### Dataset Creation Benchmark
-
-The CreateTreeDataset benchmark creates a test dataset with a specific structure:
-
-- `org.apache.polaris.benchmarks.simulations.CreateTreeDataset`: Creates up to 50 entities simultaneously
-
-This is a write-only workload designed to populate the system for subsequent benchmarks.
-
-### Read/Update Benchmark
-
-The ReadUpdateTreeDataset benchmark tests read and update operations on an existing dataset:
-
-- `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset`: Performs up to 20 read/update operations simultaneously
-
-This benchmark can only be run after using CreateTreeDataset to populate the system.
-
-### Read-Only Benchmark
-
-The ReadTreeDataset benchmark is a 100% read workload that fetches a tree dataset in Polaris:
-
-- `org.apache.polaris.benchmarks.simulations.ReadTreeDataset`: Performs read-only operations to verify namespaces, tables, and views
-
-This benchmark is intended to be used against a Polaris instance with a pre-existing tree dataset. It has no side effects on the dataset and can be executed multiple times without any issues.
-
+- `org.apache.polaris.benchmarks.simulations.CreateTreeDataset`: creates a test dataset with a specific structure.  It is a write-only workload designed to populate the system for subsequent benchmarks.
+- `org.apache.polaris.benchmarks.simulations.ReadTreeDataset`: Performs read-only operations to fetch namespaces, tables, and views.  Some attributes of the objects are also fetched.  This benchmark is intended to be used against a Polaris instance with a pre-existing tree dataset.  It has no side effects on the dataset and can be executed multiple times without any issues.
+- `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset`: Performs read and update operations against a Polaris instance populated with a test dataset.  It is a read/write workload that can be used to test the system's ability to handle concurrent read and update operations.  It is not destructive and does not prevent subsequent executions of `ReadTreeDataset` or `ReadUpdateTreeDataset`.
 
 ## Parameters
 
