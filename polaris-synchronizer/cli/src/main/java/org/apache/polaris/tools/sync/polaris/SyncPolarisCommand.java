@@ -46,8 +46,6 @@ public class SyncPolarisCommand implements Callable<Integer> {
 
   private final Logger consoleLog = LoggerFactory.getLogger("console-log");
 
-
-
   @CommandLine.Option(
           names = {"--source-properties"},
           required = true,
