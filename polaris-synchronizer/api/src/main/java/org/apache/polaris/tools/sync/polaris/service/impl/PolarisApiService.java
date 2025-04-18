@@ -20,7 +20,6 @@
 package org.apache.polaris.tools.sync.polaris.service.impl;
 
 import org.apache.iceberg.catalog.Namespace;
-import org.apache.iceberg.rest.auth.OAuth2Properties;
 import org.apache.polaris.core.admin.model.AddGrantRequest;
 import org.apache.polaris.core.admin.model.Catalog;
 import org.apache.polaris.core.admin.model.CatalogRole;
@@ -83,14 +82,7 @@ public class PolarisApiService implements PolarisService {
         ApiClient client = new ApiClient();
         client.updateBaseUri(baseUrl + "/api/management/v1");
 
-        if (properties.containsKey(CLIENT_ID_PROPERTY) && properties.containsKey(CLIENT_SECRET_PROPERTY)) {
-            // if the option is passed in as client id and client secret, format it to credential
-            properties.putIfAbsent(OAuth2Properties.CREDENTIAL, String.format("%s:%s",
-                    properties.get(CLIENT_ID_PROPERTY), properties.get(CLIENT_SECRET_PROPERTY)));
-        }
-
-        AuthenticationSessionWrapper authenticationSessionWrapper
-                = new AuthenticationSessionWrapper(properties);
+        AuthenticationSessionWrapper authenticationSessionWrapper = new AuthenticationSessionWrapper(properties);
 
         client.setRequestInterceptor(requestBuilder
                 -> authenticationSessionWrapper.getSessionHeaders().forEach(requestBuilder::header));

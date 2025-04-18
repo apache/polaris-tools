@@ -61,8 +61,7 @@ with 10 concurrent catalog setup threads:
 java -jar cli/build/libs/polaris-synchronizer-cli.jar create-omnipotent-principal \
 --polaris-api-connection-properties base-url=http://localhost:8181 \
 --polaris-api-connection-properties oauth2-server-uri=http://localhost:8181/api/catalog/v1/oauth/tokens \
---polaris-api-connection-properties client-id=root \
---polaris-api-connection-properties client-secret=<client_secret> \
+--polaris-api-connection-properties credential=<client_id>:<client_secret> \
 --polaris-api-connection-properties scope=PRINCIPAL_ROLE:ALL \
 --replace \ # replace it if it already exists
 --concurrency 10 # 10 concurrent catalog setup threads
@@ -105,8 +104,7 @@ java -jar cli/build/libs/polaris-synchronizer-cli.jar \
 create-omnipotent-principal \
 --polaris-api-connection-properties base-url=http://localhost:8181 \
 --polaris-api-connection-properties oauth2-server-uri=http://localhost:8181/api/catalog/v1/oauth/tokens \
---polaris-api-connection-properties client-id=root \
---polaris-api-connection-properties client-secret=<client_secret> \
+--polaris-api-connection-properties credential=<client_id>:<client_secret> \
 --polaris-api-connection-properties scope=PRINCIPAL_ROLE:ALL \
 --replace \ # replace if it already exists
 --concurrency 10 \ # 10 concurrent catalog setup threads
@@ -148,8 +146,7 @@ using client credentials.
 ```
 java -jar cli/build/libs/polaris-synchronizer-cli.jar sync-polaris \
 --source-properties base-url=http://localhost:8181 \
---source-properties client-id=root \
---source-properties client-secret=<client_secret> \
+--source-properties credential=<client_id>:<client_secret> \
 --source-properties oauth2-server-uri=http://localhost:8181/api/catalog/v1/oauth/tokens \
 --source-properties scope=PRINCIPAL_ROLE:ALL \
 --source-properties omnipotent-principal-name=omnipotent-principal-XXXXX \
@@ -157,8 +154,7 @@ java -jar cli/build/libs/polaris-synchronizer-cli.jar sync-polaris \
 --source-properties omnipotent-principal-client-secret=<omni_client_secret> \
 --source-properties omnipotent-principal-oauth2-server-uri=http://localhost:8181/api/catalog/v1/oauth/tokens \
 --target-properties base-url=http://localhost:5858 \
---target-properties client-id=root \
---target-properties client-secret=<client_secret> \
+--target-properties credential=<client_id>:<client_secret> \
 --target-properties oauth2-server-uri=http://localhost:5858/api/catalog/v1/oauth/tokens \
 --target-properties scope=PRINCIPAL_ROLE:ALL \
 --target-properties omnipotent-principal-name=omnipotent-principal-YYYYY \
