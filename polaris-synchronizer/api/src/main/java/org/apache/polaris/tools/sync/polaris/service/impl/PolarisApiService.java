@@ -19,8 +19,8 @@
 
 package org.apache.polaris.tools.sync.polaris.service.impl;
 
-import org.apache.http.HttpHeaders;
 import org.apache.iceberg.catalog.Namespace;
+import org.apache.iceberg.rest.auth.OAuth2Properties;
 import org.apache.polaris.core.admin.model.AddGrantRequest;
 import org.apache.polaris.core.admin.model.Catalog;
 import org.apache.polaris.core.admin.model.CatalogRole;
@@ -39,7 +39,7 @@ import org.apache.polaris.core.admin.model.RevokeGrantRequest;
 import org.apache.polaris.management.ApiClient;
 import org.apache.polaris.management.client.PolarisManagementDefaultApi;
 import org.apache.polaris.tools.sync.polaris.access.AccessControlService;
-import org.apache.polaris.tools.sync.polaris.http.OAuth2Util;
+import org.apache.polaris.tools.sync.polaris.auth.AuthenticationSessionWrapper;
 import org.apache.polaris.tools.sync.polaris.service.IcebergCatalogService;
 import org.apache.polaris.tools.sync.polaris.service.PolarisService;
 
@@ -53,6 +53,10 @@ public class PolarisApiService implements PolarisService {
      * with write access when initializing {@link org.apache.iceberg.catalog.Catalog}.
      */
     public static final String ICEBERG_WRITE_ACCESS_PROPERTY = "iceberg-write-access";
+
+    public static final String CLIENT_ID_PROPERTY = "client-id";
+
+    public static final String CLIENT_SECRET_PROPERTY = "client-secret";
 
     private Map<String, String> properties = null;
 
@@ -75,25 +79,21 @@ public class PolarisApiService implements PolarisService {
         this.properties = properties;
 
         String baseUrl = properties.get("base-url");
-        String token = properties.get("bearer-token");
-
-        if (token == null) {
-            String oauth2ServerUri = properties.get("oauth2-server-uri");
-            String clientId = properties.get("client-id");
-            String clientSecret = properties.get("client-secret");
-            String scope = properties.get("scope");
-
-            token = OAuth2Util.fetchToken(oauth2ServerUri, clientId, clientSecret, scope);
-        }
-
-        String bearerToken = token; // to make it effectively final to use it in a lambda
 
         ApiClient client = new ApiClient();
         client.updateBaseUri(baseUrl + "/api/management/v1");
 
-        // TODO: Add token refresh
-        client.setRequestInterceptor(requestBuilder ->
-                requestBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken));
+        if (properties.containsKey(CLIENT_ID_PROPERTY) && properties.containsKey(CLIENT_SECRET_PROPERTY)) {
+            // if the option is passed in as client id and client secret, format it to credential
+            properties.putIfAbsent(OAuth2Properties.CREDENTIAL, String.format("%s:%s",
+                    properties.get(CLIENT_ID_PROPERTY), properties.get(CLIENT_SECRET_PROPERTY)));
+        }
+
+        AuthenticationSessionWrapper authenticationSessionWrapper
+                = new AuthenticationSessionWrapper(properties);
+
+        client.setRequestInterceptor(requestBuilder
+                -> authenticationSessionWrapper.getSessionHeaders().forEach(requestBuilder::header));
 
         this.baseUrl = baseUrl;
         this.api = new PolarisManagementDefaultApi(client);
