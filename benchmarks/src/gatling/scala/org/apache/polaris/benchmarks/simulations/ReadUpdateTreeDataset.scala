@@ -21,6 +21,7 @@ package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.{
@@ -31,8 +32,12 @@ import org.apache.polaris.benchmarks.parameters.{
 import org.apache.polaris.benchmarks.util.CircularIterator
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
+import scala.concurrent.duration._
 
+/**
+ * This simulation tests read and update operations on an existing dataset.
+ */
 class ReadUpdateTreeDataset extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -48,6 +53,7 @@ class ReadUpdateTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
   private val accessToken: AtomicReference[String] = new AtomicReference()
+  private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
 
   private val authActions = AuthenticationActions(cp, accessToken)
   private val catActions = CatalogActions(dp, accessToken)
@@ -56,13 +62,31 @@ class ReadUpdateTreeDataset extends Simulation {
   private val viewActions = ViewActions(dp, wp, accessToken)
 
   // --------------------------------------------------------------------------------
-  // Workload: Authenticate and store the access token for later use
+  // Authentication related workloads:
+  // * Authenticate and store the access token for later use every minute
+  // * Wait for an OAuth token to be available
+  // * Stop the token refresh loop
   // --------------------------------------------------------------------------------
-  val authenticate: ScenarioBuilder = scenario("Authenticate using the OAuth2 REST API endpoint")
-    .feed(authActions.feeder())
-    .tryMax(5) {
-      exec(authActions.authenticateAndSaveAccessToken)
-    }
+  val continuouslyRefreshOauthToken: ScenarioBuilder =
+    scenario("Authenticate every minute using the Iceberg REST API")
+      .asLongAs(_ => shouldRefreshToken.get())(
+        feed(authActions.feeder())
+          .exec(authActions.authenticateAndSaveAccessToken)
+          .pause(1.minute)
+      )
+
+  val waitForAuthentication: ScenarioBuilder =
+    scenario("Wait for the authentication token to be available")
+      .asLongAs(_ => accessToken.get() == null)(
+        pause(1.second)
+      )
+
+  val stopRefreshingToken: ScenarioBuilder =
+    scenario("Stop refreshing the authentication token")
+      .exec { session =>
+        shouldRefreshToken.set(false)
+        session
+      }
 
   private val nsListFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
   private val nsExistsFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
@@ -107,4 +131,30 @@ class ReadUpdateTreeDataset extends Simulation {
           )
         )
       )
+
+  // --------------------------------------------------------------------------------
+  // Build up the HTTP protocol configuration and set up the simulation
+  // --------------------------------------------------------------------------------
+  private val httpProtocol = http
+    .baseUrl(cp.baseUrl)
+    .acceptHeader("application/json")
+    .contentTypeHeader("application/json")
+
+  // Get the configured throughput and duration
+  private val throughput = wp.readUpdateTreeDataset.throughput
+  private val durationInMinutes = wp.readUpdateTreeDataset.durationInMinutes
+
+  setUp(
+    continuouslyRefreshOauthToken.inject(atOnceUsers(1)).protocols(httpProtocol),
+    waitForAuthentication
+      .inject(atOnceUsers(1))
+      .andThen(
+        readWriteScenario
+          .inject(
+            constantUsersPerSec(throughput).during(durationInMinutes.minutes).randomized
+          )
+          .protocols(httpProtocol)
+      )
+      .andThen(stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+  )
 }

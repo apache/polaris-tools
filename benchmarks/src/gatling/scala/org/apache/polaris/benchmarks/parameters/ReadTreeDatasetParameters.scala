@@ -17,25 +17,18 @@
  * under the License.
  */
 
-package org.apache.polaris.benchmarks.simulations
+package org.apache.polaris.benchmarks.parameters
 
-import io.gatling.core.Predef._
-import io.gatling.http.Predef._
-
-import scala.concurrent.duration.DurationInt
-
-class ReadUpdateTreeDatasetSequential extends ReadUpdateTreeDataset {
-  // --------------------------------------------------------------------------------
-  // Build up the HTTP protocol configuration and set up the simulation
-  // --------------------------------------------------------------------------------
-  private val httpProtocol = http
-    .baseUrl(cp.baseUrl)
-    .acceptHeader("application/json")
-    .contentTypeHeader("application/json")
-
-  setUp(
-    authenticate
-      .inject(atOnceUsers(1))
-      .andThen(readWriteScenario.inject(constantUsersPerSec(1).during(5.minutes)))
-  ).protocols(httpProtocol)
+/**
+ * Case class to hold the parameters for the ReadTreeDataset simulation.
+ *
+ * @param tableThroughput The number of table operations to perform per second.
+ * @param viewThroughput The number of view operations to perform per second.
+ */
+case class ReadTreeDatasetParameters(
+    tableThroughput: Int,
+    viewThroughput: Int
+) {
+  require(tableThroughput >= 0, "Table throughput cannot be negative")
+  require(viewThroughput >= 0, "View throughput cannot be negative")
 }

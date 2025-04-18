@@ -67,7 +67,7 @@ case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
    *
    * @return The total number of nodes in the tree.
    */
-  val numberOfNodes: Int = {
+  val numberOfNodes: Int =
     // The sum of nodes from level 0 to level d-1 is (n^(d+1) - 1) / (n - 1) if n > 1
     // Else, the sum of nodes from level 0 to level d-1 is d
     if (nsWidth == 1) {
@@ -75,7 +75,6 @@ case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
     } else {
       ((math.pow(nsWidth, nsDepth) - 1) / (nsWidth - 1)).toInt
     }
-  }
 
   /**
    * Returns a range of ordinals for the nodes on the last level of a complete n-ary tree.

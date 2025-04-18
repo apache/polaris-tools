@@ -21,6 +21,7 @@ package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.{
@@ -30,7 +31,8 @@ import org.apache.polaris.benchmarks.parameters.{
 }
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
+import scala.concurrent.duration._
 
 /**
  * This simulation is a 100% write workload that creates a tree dataset in Polaris. It is intended
@@ -51,6 +53,7 @@ class CreateTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
   private val accessToken: AtomicReference[String] = new AtomicReference()
+  private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
 
   private val authenticationActions = AuthenticationActions(cp, accessToken, 5, Set(500))
   private val catalogActions = CatalogActions(dp, accessToken, 0, Set())
@@ -64,11 +67,31 @@ class CreateTreeDataset extends Simulation {
   private val createdViews = new AtomicInteger()
 
   // --------------------------------------------------------------------------------
-  // Workload: Authenticate and store the access token for later use
+  // Authentication related workloads:
+  // * Authenticate and store the access token for later use every minute
+  // * Wait for an OAuth token to be available
+  // * Stop the token refresh loop
   // --------------------------------------------------------------------------------
-  val authenticate: ScenarioBuilder = scenario("Authenticate using the OAuth2 REST API endpoint")
-    .feed(authenticationActions.feeder())
-    .exec(authenticationActions.authenticateAndSaveAccessToken)
+  val continuouslyRefreshOauthToken: ScenarioBuilder =
+    scenario("Authenticate every minute using the Iceberg REST API")
+      .asLongAs(_ => shouldRefreshToken.get())(
+        feed(authenticationActions.feeder())
+          .exec(authenticationActions.authenticateAndSaveAccessToken)
+          .pause(1.minute)
+      )
+
+  val waitForAuthentication: ScenarioBuilder =
+    scenario("Wait for the authentication token to be available")
+      .asLongAs(_ => accessToken.get() == null)(
+        pause(1.second)
+      )
+
+  val stopRefreshingToken: ScenarioBuilder =
+    scenario("Stop refreshing the authentication token")
+      .exec { session =>
+        shouldRefreshToken.set(false)
+        session
+      }
 
   // --------------------------------------------------------------------------------
   // Workload: Create catalogs
@@ -118,4 +141,34 @@ class CreateTreeDataset extends Simulation {
       feed(viewActions.viewCreationFeeder())
         .exec(viewActions.createView)
     )
+
+  // --------------------------------------------------------------------------------
+  // Build up the HTTP protocol configuration and set up the simulation
+  // --------------------------------------------------------------------------------
+  private val httpProtocol = http
+    .baseUrl(cp.baseUrl)
+    .acceptHeader("application/json")
+    .contentTypeHeader("application/json")
+
+  // Get the configured throughput for tables and views
+  private val tableThroughput = wp.createTreeDataset.tableThroughput
+  private val viewThroughput = wp.createTreeDataset.viewThroughput
+
+  setUp(
+    continuouslyRefreshOauthToken.inject(atOnceUsers(1)).protocols(httpProtocol),
+    waitForAuthentication
+      .inject(atOnceUsers(1))
+      .andThen(createCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(
+        createNamespaces
+          .inject(
+            constantUsersPerSec(1).during(1.seconds),
+            constantUsersPerSec(dp.nsWidth - 1).during(dp.nsDepth.seconds)
+          )
+          .protocols(httpProtocol)
+      )
+      .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+      .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
+      .andThen(stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+  )
 }

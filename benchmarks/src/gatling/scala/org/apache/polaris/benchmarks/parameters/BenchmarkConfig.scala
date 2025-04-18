@@ -38,13 +38,31 @@ object BenchmarkConfig {
       http.getString("base-url")
     )
 
-    val workloadParams = WorkloadParameters(
-      workload.getDouble("read-write-ratio"),
-      workload.getInt("updates-per-namespace"),
-      workload.getInt("updates-per-table"),
-      workload.getInt("updates-per-view"),
-      workload.getLong("seed")
-    )
+    val workloadParams = {
+      val rtdConfig = workload.getConfig("read-tree-dataset")
+      val ctdConfig = workload.getConfig("create-tree-dataset")
+      val rutdConfig = workload.getConfig("read-update-tree-dataset")
+
+      WorkloadParameters(
+        workload.getDouble("read-write-ratio"),
+        workload.getInt("updates-per-namespace"),
+        workload.getInt("updates-per-table"),
+        workload.getInt("updates-per-view"),
+        workload.getLong("seed"),
+        ReadTreeDatasetParameters(
+          rtdConfig.getInt("table-throughput"),
+          rtdConfig.getInt("view-throughput")
+        ),
+        CreateTreeDatasetParameters(
+          ctdConfig.getInt("table-throughput"),
+          ctdConfig.getInt("view-throughput")
+        ),
+        ReadUpdateTreeDatasetParameters(
+          rutdConfig.getInt("throughput"),
+          rutdConfig.getInt("duration-in-minutes")
+        )
+      )
+    }
 
     val datasetParams = DatasetParameters(
       dataset.getInt("num-catalogs"),

@@ -6,9 +6,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
- 
+
    http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,21 +25,28 @@ Benchmarks for the Polaris service using Gatling.
 
 ### Dataset Creation Benchmark
 
-The CreateTreeDataset benchmark creates a test dataset with a specific structure. It exists in two variants:
+The CreateTreeDataset benchmark creates a test dataset with a specific structure:
 
-- `org.apache.polaris.benchmarks.simulations.CreateTreeDatasetSequential`: Creates entities one at a time
-- `org.apache.polaris.benchmarks.simulations.CreateTreeDatasetConcurrent`: Creates up to 50 entities simultaneously
+- `org.apache.polaris.benchmarks.simulations.CreateTreeDataset`: Creates up to 50 entities simultaneously
 
-These are write-only workloads designed to populate the system for subsequent benchmarks.
+This is a write-only workload designed to populate the system for subsequent benchmarks.
 
 ### Read/Update Benchmark
 
-The ReadUpdateTreeDataset benchmark tests read and update operations on an existing dataset. It exists in two variants:
+The ReadUpdateTreeDataset benchmark tests read and update operations on an existing dataset:
 
-- `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDatasetSequential`: Performs read/update operations one at a time
-- `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDatasetConcurrent`: Performs up to 20 read/update operations simultaneously
+- `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset`: Performs up to 20 read/update operations simultaneously
 
-These benchmarks can only be run after using CreateTreeDataset to populate the system.
+This benchmark can only be run after using CreateTreeDataset to populate the system.
+
+### Read-Only Benchmark
+
+The ReadTreeDataset benchmark is a 100% read workload that fetches a tree dataset in Polaris:
+
+- `org.apache.polaris.benchmarks.simulations.ReadTreeDataset`: Performs read-only operations to verify namespaces, tables, and views
+
+This benchmark is intended to be used against a Polaris instance with a pre-existing tree dataset. It has no side effects on the dataset and can be executed multiple times without any issues.
+
 
 ## Parameters
 
@@ -117,13 +124,19 @@ workload {
 Run benchmarks with your configuration:
 
 ```bash
-# Sequential dataset creation
-./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDatasetSequential \
+# Dataset creation
+./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDataset \
   -Dconfig.file=./application.conf
 
-# Concurrent dataset creation
-./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDatasetConcurrent \
+# Read/Update operations
+./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset \
   -Dconfig.file=./application.conf
+
+# Read-only operations
+./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.ReadTreeDataset \
+  -Dconfig.file=./application.conf
+
+
 ```
 
 A message will show the location of the Gatling report:
