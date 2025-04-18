@@ -141,14 +141,12 @@ diff between the source and target Polaris instances. This can be achieved using
 > Polaris instance. The new credentials will be logged to stdout, ONLY for each newly created or overwritten principal. 
 > Please note that this output should be securely managed, client credentials should only ever be stored in a secure vault.
 
-**Example** Running the synchronization between source Polaris instance using an access token, and a target Polaris instance
+**Example** Running the synchronization between source Polaris instance using a bearer token, and a target Polaris instance
 using client credentials.
 ```
 java -jar cli/build/libs/polaris-synchronizer-cli.jar sync-polaris \
 --source-properties base-url=http://localhost:8181 \
---source-properties credential=<client_id>:<client_secret> \
---source-properties oauth2-server-uri=http://localhost:8181/api/catalog/v1/oauth/tokens \
---source-properties scope=PRINCIPAL_ROLE:ALL \
+--source-properties token=<bearer_token> \
 --source-properties omnipotent-principal-name=omnipotent-principal-XXXXX \
 --source-properties omnipotent-principal-client-id=589550e8b23d271e \
 --source-properties omnipotent-principal-client-secret=<omni_client_secret> \

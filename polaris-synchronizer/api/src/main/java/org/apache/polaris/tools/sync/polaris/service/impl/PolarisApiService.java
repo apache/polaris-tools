@@ -53,10 +53,6 @@ public class PolarisApiService implements PolarisService {
      */
     public static final String ICEBERG_WRITE_ACCESS_PROPERTY = "iceberg-write-access";
 
-    public static final String CLIENT_ID_PROPERTY = "client-id";
-
-    public static final String CLIENT_SECRET_PROPERTY = "client-secret";
-
     private Map<String, String> properties = null;
 
     private String baseUrl = null;

@@ -46,45 +46,19 @@ public class SyncPolarisCommand implements Callable<Integer> {
 
   private final Logger consoleLog = LoggerFactory.getLogger("console-log");
 
+
+
   @CommandLine.Option(
           names = {"--source-properties"},
           required = true,
-          description = "Properties to initialize Polaris entity source." +
-                  "\nProperties:" +
-                  "\n\t- base-url: the base url of the Polaris instance (eg. http://localhost:8181)" +
-                  "\n\t- bearer-token: the bearer token to authenticate against the Polaris instance with. Must " +
-                  "be provided if any of oauth2-server-uri, client-id, client-secret, or scope are not provided." +
-                  "\n\t- oauth2-server-uri: the uri of the OAuth2 server to authenticate to. (eg. http://localhost:8181/api/catalog/v1/oauth/tokens)" +
-                  "\n\t- client-id: the client id belonging to a service admin to authenticate with" +
-                  "\n\t- client-secret: the client secret belong to a service admin to authenticate with" +
-                  "\n\t- scope: the scope to authenticate with for the service_admin (eg. PRINCIPAL_ROLE:ALL)" +
-                  "\nOmnipotent Principal Properties:" +
-                  "\n\t- omnipotent-principal-name: the name of the omnipotent principal created using create-omnipotent-principal on the source Polaris" +
-                  "\n\t- omnipotent-principal-client-id: the client id of the omnipotent principal created using create-omnipotent-principal on the source Polaris" +
-                  "\n\t- omnipotent-principal-client-secret: the client secret of the omnipotent principal created using create-omnipotent-principal on the source Polaris" +
-                  "\n\t- omnipotent-principal-oauth2-server-uri: (default: /v1/oauth/tokens endpoint for provided Polaris base-url) "
-                    + "the OAuth2 server to use to authenticate the omnipotent-principal for Iceberg catalog access"
+          description = CLIUtil.API_SERVICE_PROPERTIES_DESCRIPTION + CLIUtil.OMNIPOTENT_PRINCIPAL_PROPERTIES_DESCRIPTION
   )
   private Map<String, String> sourceProperties;
 
   @CommandLine.Option(
           names = {"--target-properties"},
           required = true,
-          description = "Properties to initialize Polaris entity target." +
-                  "\nProperties:" +
-                  "\n\t- base-url: the base url of the Polaris instance (eg. http://localhost:8181)" +
-                  "\n\t- bearer-token: the bearer token to authenticate against the Polaris instance with. Must " +
-                  "be provided if any of oauth2-server-uri, client-id, client-secret, or scope are not provided." +
-                  "\n\t- oauth2-server-uri: the uri of the OAuth2 server to authenticate to. (eg. http://localhost:8181/api/catalog/v1/oauth/tokens)" +
-                  "\n\t- client-id: the client id belonging to a service admin to authenticate with" +
-                  "\n\t- client-secret: the client secret belong to a service admin to authenticate with" +
-                  "\n\t- scope: the scope to authenticate with for the service_admin (eg. PRINCIPAL_ROLE:ALL)" +
-                  "\nOmnipotent Principal Properties:" +
-                  "\n\t- omnipotent-principal-name: the name of the omnipotent principal created using create-omnipotent-principal on the target Polaris" +
-                  "\n\t- omnipotent-principal-client-id: the client id of the omnipotent principal created using create-omnipotent-principal on the target Polaris" +
-                  "\n\t- omnipotent-principal-client-secret: the client secret of the omnipotent principal created using create-omnipotent-principal on the target Polaris" +
-                  "\n\t- omnipotent-principal-oauth2-server-uri: (default: /v1/oauth/tokens endpoint for provided Polaris base-url) "
-                  + "the OAuth2 server to use to retrieve a bearer token for the omnipotent-principal"
+          description = CLIUtil.API_SERVICE_PROPERTIES_DESCRIPTION + CLIUtil.OMNIPOTENT_PRINCIPAL_PROPERTIES_DESCRIPTION
   )
   private Map<String, String> targetProperties;
 
