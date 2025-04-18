@@ -20,7 +20,6 @@ package org.apache.polaris.tools.sync.polaris.catalog;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -40,7 +39,7 @@ import org.apache.iceberg.rest.RESTCatalog;
 import org.apache.iceberg.rest.ResourcePaths;
 import org.apache.iceberg.rest.responses.LoadTableResponse;
 import org.apache.iceberg.rest.responses.LoadTableResponseParser;
-import org.apache.polaris.tools.sync.polaris.http.OAuth2Util;
+import org.apache.polaris.tools.sync.polaris.auth.AuthenticationSessionWrapper;
 
 /**
  * Overrides loadTable default implementation to issue a custom loadTable request to the Polaris
@@ -58,13 +57,13 @@ public class PolarisCatalog extends RESTCatalog
 
   private Map<String, String> properties = null;
 
-  private String accessToken = null;
-
   private HttpClient httpClient = null;
 
   private ObjectMapper objectMapper = null;
 
   private ResourcePaths resourcePaths = null;
+
+  private AuthenticationSessionWrapper authenticationSession = null;
 
   public PolarisCatalog() {
     super();
@@ -82,22 +81,8 @@ public class PolarisCatalog extends RESTCatalog
 
     super.initialize(name, props);
 
-    if (accessToken == null || httpClient == null || this.objectMapper == null) {
-      String oauth2ServerUri = props.get("uri") + "/v1/oauth/tokens";
-      String credential = props.get("credential");
-
-      String clientId = credential.split(":")[0];
-      String clientSecret = credential.split(":")[1];
-
-      String scope = props.get("scope");
-
-      // TODO: Add token refresh
-      try {
-        this.accessToken = OAuth2Util.fetchToken(oauth2ServerUri, clientId, clientSecret, scope);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-
+    if (authenticationSession == null || httpClient == null || this.objectMapper == null) {
+      this.authenticationSession = new AuthenticationSessionWrapper(this.properties);
       this.httpClient = HttpClient.newBuilder().build();
       this.objectMapper = new ObjectMapper();
     }
@@ -127,8 +112,9 @@ public class PolarisCatalog extends RESTCatalog
     HttpRequest.Builder requestBuilder =
         HttpRequest.newBuilder()
             .uri(URI.create(tablePath))
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
             .GET();
+
+    this.authenticationSession.getSessionHeaders().forEach(requestBuilder::header);
 
     // specify last known etag in if-none-match header
     if (etag != null) {
