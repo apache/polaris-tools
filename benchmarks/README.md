@@ -144,6 +144,8 @@ A message will show the location of the Gatling report:
 Reports generated in: ./benchmarks/build/reports/gatling/<simulation-name>/index.html
 ```
 
+![Sample Gatling report](docs/gatling-report.png)
+
 ### Example Polaris server startup
 
 For repeated testing and benchmarking purposes it's convenient to have fixed client-ID + client-secret combinations. **The following example is ONLY for testing and benchmarking against an airgapped Polaris instance**
@@ -252,4 +254,4 @@ The diagram below shows sample catalog, namespace and table definition given the
 -   Number of columns per table: `999`
 -   Number of table properties: `59`
 
-![Dataset size example showing catalog, namespace, and table definitions](docs/dataset-size.png)
+![Dataset size example showing catalog, namespace, and table definitions](docs/dataset-size.svg)
