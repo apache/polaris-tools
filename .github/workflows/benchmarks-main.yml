@@ -24,9 +24,11 @@ on:
     branches: [ main ]
     paths:
       - 'benchmarks/**'
+      - '.github/**'
   pull_request:
     paths:
       - 'benchmarks/**'
+      - '.github/**'
 
 jobs:
   java:

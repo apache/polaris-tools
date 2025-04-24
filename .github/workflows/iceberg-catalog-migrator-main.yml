@@ -24,9 +24,11 @@ on:
     branches: [ main ]
     paths:
       - 'iceberg-catalog-migrator/**'
+      - '.github/**'
   pull_request:
     paths:
       - 'iceberg-catalog-migrator/**'
+      - '.github/**'
 
 jobs:
   java:
