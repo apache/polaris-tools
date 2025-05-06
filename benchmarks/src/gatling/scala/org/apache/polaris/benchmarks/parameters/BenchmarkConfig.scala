@@ -42,6 +42,7 @@ object BenchmarkConfig {
       val rtdConfig = workload.getConfig("read-tree-dataset")
       val ctdConfig = workload.getConfig("create-tree-dataset")
       val rutdConfig = workload.getConfig("read-update-tree-dataset")
+      val wwotdConfig = workload.getConfig("weighted-workload-on-tree-dataset")
 
       WorkloadParameters(
         ReadTreeDatasetParameters(
@@ -56,6 +57,12 @@ object BenchmarkConfig {
           rutdConfig.getDouble("read-write-ratio"),
           rutdConfig.getInt("throughput"),
           rutdConfig.getInt("duration-in-minutes")
+        ),
+        WeightedWorkloadOnTreeDatasetParameters(
+          wwotdConfig.getInt("seed"),
+          WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "readers"),
+          WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "writers"),
+          wwotdConfig.getInt("duration-in-minutes")
         )
       )
     }

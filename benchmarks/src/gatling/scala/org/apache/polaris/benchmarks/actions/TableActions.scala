@@ -184,6 +184,7 @@ case class TableActions(
     http("Fetch Table")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}")
       .header("Authorization", "Bearer #{accessToken}")
+      .header("If-None-Match", "")
       .check(status.is(200))
       .check(jsonPath("$.metadata.table-uuid").saveAs("tableUuid"))
       .check(jsonPath("$.metadata.location").is("#{location}"))

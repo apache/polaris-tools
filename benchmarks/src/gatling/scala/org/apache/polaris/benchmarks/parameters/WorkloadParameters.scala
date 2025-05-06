@@ -22,5 +22,6 @@ package org.apache.polaris.benchmarks.parameters
 case class WorkloadParameters(
     readTreeDataset: ReadTreeDatasetParameters,
     createTreeDataset: CreateTreeDatasetParameters,
-    readUpdateTreeDataset: ReadUpdateTreeDatasetParameters
+    readUpdateTreeDataset: ReadUpdateTreeDatasetParameters,
+    weightedWorkloadOnTreeDataset: WeightedWorkloadOnTreeDatasetParameters
 ) {}
