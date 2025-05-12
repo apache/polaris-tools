@@ -49,7 +49,7 @@ public class ITWorksWithPolaris {
                                     "Required system property quarkus.http.test-port is not set")));
 
     @Test
-    public void pingNessie() {
+    public void pingPolaris() {
         // Use the POLARIS_SERVER_URI in your tests ...
     }
 }
