@@ -117,4 +117,21 @@ case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
     val lastLevel = nsDepth - 1
     math.pow(nsWidth, lastLevel).toInt
   }
+
+  /**
+   * Computes the ordinals of all sibling nodes for a given node.
+   *
+   * @param ordinal the ordinal of the node
+   * @return a list of ordinals representing the sibling nodes (excluding the node itself)
+   */
+  def siblingsOf(ordinal: Int): List[Int] =
+    if (ordinal == 0) {
+      // Root node has no siblings
+      List.empty
+    } else {
+      // Get parent ordinal
+      val parent = (ordinal - 1) / nsWidth
+      // Get all children of parent (siblings including self) and exclude self
+      childrenOf(parent).filter(_ != ordinal)
+    }
 }
