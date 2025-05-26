@@ -149,7 +149,7 @@ case class TableActions(
    *
    * There is no limit to the number of users that can create tables concurrently.
    */
-  val createTable: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create table")(
+  val createTable: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create Table")(
     http("Create Table")
       .post("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables")
       .header("Authorization", "Bearer #{accessToken}")
@@ -181,7 +181,7 @@ case class TableActions(
    * There is no limit to the number of users that can fetch tables concurrently.
    */
   val fetchTable: ChainBuilder = exec(
-    http("Fetch Table")
+    http("Fetch single Table")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
@@ -209,7 +209,7 @@ case class TableActions(
    * given namespace, supporting bulk retrieval of table metadata.
    */
   val fetchAllTables: ChainBuilder = exec(
-    http("Fetch all Tables under parent namespace")
+    http("Fetch children Tables")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
@@ -222,8 +222,8 @@ case class TableActions(
    * There is no limit to the number of users that can update table properties concurrently.
    */
   val updateTable: ChainBuilder =
-    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update table metadata")(
-      http("Update table metadata")
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update Table")(
+      http("Update Table")
         .post("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}")
         .header("Authorization", "Bearer #{accessToken}")
         .header("Content-Type", "application/json")

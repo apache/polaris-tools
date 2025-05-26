@@ -147,7 +147,7 @@ case class NamespaceActions(
    * Typically, start 1 user and increase by 1 user every second until some arbitrary maximum value.
    */
   val createNamespace: ChainBuilder =
-    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create namespace")(
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create Namespace")(
       http("Create Namespace")
         .post("/api/catalog/v1/#{catalogName}/namespaces")
         .header("Authorization", "Bearer #{accessToken}")
@@ -173,7 +173,7 @@ case class NamespaceActions(
    * There is no limit to the number of users that can fetch namespaces concurrently.
    */
   val fetchNamespace: ChainBuilder = exec(
-    http("Fetch Namespace")
+    http("Fetch single Namespace")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{namespaceMultipartPath}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
@@ -206,15 +206,15 @@ case class NamespaceActions(
    * structure.
    */
   val fetchAllChildrenNamespaces: ChainBuilder = exec(
-    http("Fetch all Namespaces under specific parent")
+    http("Fetch children Namespaces")
       .get("/api/catalog/v1/#{catalogName}/namespaces?parent=#{namespaceMultipartPath}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
   )
 
   val updateNamespaceProperties: ChainBuilder =
-    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update namespace properties")(
-      http("Update Namespace Properties")
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update Namespace")(
+      http("Update Namespace")
         .post("/api/catalog/v1/#{catalogName}/namespaces/#{namespaceMultipartPath}/properties")
         .header("Authorization", "Bearer #{accessToken}")
         .header("Content-Type", "application/json")

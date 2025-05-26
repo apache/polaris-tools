@@ -134,7 +134,7 @@ case class ViewActions(
       )
     }
 
-  val createView: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create view")(
+  val createView: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create View")(
     http("Create View")
       .post("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views")
       .header("Authorization", "Bearer #{accessToken}")
@@ -171,7 +171,7 @@ case class ViewActions(
   )
 
   val fetchView: ChainBuilder = exec(
-    http("Fetch View")
+    http("Fetch single View")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views/#{viewName}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
@@ -195,7 +195,7 @@ case class ViewActions(
   )
 
   val fetchAllViews: ChainBuilder = exec(
-    http("Fetch all Views under parent namespace")
+    http("Fetch children Views")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
@@ -208,8 +208,8 @@ case class ViewActions(
    * There is no limit to the number of users that can update table properties concurrently.
    */
   val updateView: ChainBuilder =
-    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update View metadata")(
-      http("Update View metadata")
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update View")(
+      http("Update View")
         .post("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views/#{viewName}")
         .header("Authorization", "Bearer #{accessToken}")
         .header("Content-Type", "application/json")
