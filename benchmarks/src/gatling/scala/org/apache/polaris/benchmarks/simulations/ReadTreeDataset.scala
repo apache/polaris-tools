@@ -125,6 +125,7 @@ class ReadTreeDataset extends Simulation {
     .disableCaching
 
   // Get the configured throughput for tables and views
+  private val namespaceThroughput = wp.readTreeDataset.namespaceThroughput
   private val tableThroughput = wp.readTreeDataset.tableThroughput
   private val viewThroughput = wp.readTreeDataset.viewThroughput
 
@@ -133,7 +134,7 @@ class ReadTreeDataset extends Simulation {
     setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
-      .andThen(verifyNamespaces.inject(atOnceUsers(dp.nsDepth)).protocols(httpProtocol))
+      .andThen(verifyNamespaces.inject(atOnceUsers(namespaceThroughput)).protocols(httpProtocol))
       .andThen(verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
       .andThen(verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
