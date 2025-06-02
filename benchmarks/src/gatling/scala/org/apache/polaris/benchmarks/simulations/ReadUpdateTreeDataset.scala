@@ -54,7 +54,6 @@ class ReadUpdateTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   // Helper values
   // --------------------------------------------------------------------------------
-  private val numNamespaces: Int = dp.nAryTree.numberOfNodes
   private val accessToken: AtomicReference[String] = new AtomicReference()
   private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
 
@@ -63,6 +62,21 @@ class ReadUpdateTreeDataset extends Simulation {
   private val nsActions = NamespaceActions(dp, wp, accessToken)
   private val tblActions = TableActions(dp, wp, accessToken)
   private val viewActions = ViewActions(dp, wp, accessToken)
+
+  private val nsListFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
+  private val nsExistsFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
+  private val nsFetchFeeder = new CircularIterator(nsActions.namespaceFetchFeeder)
+  private val nsUpdateFeeder = nsActions.namespacePropertiesUpdateFeeder()
+
+  private val tblListFeeder = new CircularIterator(tblActions.tableIdentityFeeder)
+  private val tblExistsFeeder = new CircularIterator(tblActions.tableIdentityFeeder)
+  private val tblFetchFeeder = new CircularIterator(tblActions.tableFetchFeeder)
+  private val tblUpdateFeeder = tblActions.propertyUpdateFeeder()
+
+  private val viewListFeeder = new CircularIterator(viewActions.viewIdentityFeeder)
+  private val viewExistsFeeder = new CircularIterator(viewActions.viewIdentityFeeder)
+  private val viewFetchFeeder = new CircularIterator(viewActions.viewFetchFeeder)
+  private val viewUpdateFeeder = viewActions.propertyUpdateFeeder()
 
   // --------------------------------------------------------------------------------
   // Authentication related workloads:
@@ -90,21 +104,6 @@ class ReadUpdateTreeDataset extends Simulation {
         shouldRefreshToken.set(false)
         session
       }
-
-  private val nsListFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
-  private val nsExistsFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
-  private val nsFetchFeeder = new CircularIterator(nsActions.namespaceFetchFeeder)
-  private val nsUpdateFeeder = nsActions.namespacePropertiesUpdateFeeder()
-
-  private val tblListFeeder = new CircularIterator(tblActions.tableIdentityFeeder)
-  private val tblExistsFeeder = new CircularIterator(tblActions.tableIdentityFeeder)
-  private val tblFetchFeeder = new CircularIterator(tblActions.tableFetchFeeder)
-  private val tblUpdateFeeder = tblActions.propertyUpdateFeeder()
-
-  private val viewListFeeder = new CircularIterator(viewActions.viewIdentityFeeder)
-  private val viewExistsFeeder = new CircularIterator(viewActions.viewIdentityFeeder)
-  private val viewFetchFeeder = new CircularIterator(viewActions.viewFetchFeeder)
-  private val viewUpdateFeeder = viewActions.propertyUpdateFeeder()
 
   // --------------------------------------------------------------------------------
   // Workload: Randomly read and write entities
