@@ -122,12 +122,12 @@ class CreateCommits extends Simulation {
       .andThen(
         tableUpdateScenario
           .inject(
-            constantUsersPerSec(tableCommitsThroughput).during(durationInMinutes.minutes).randomized
+            constantUsersPerSec(tableCommitsThroughput).during(durationInMinutes.minutes)
           )
           .protocols(httpProtocol),
         viewUpdateScenario
           .inject(
-            constantUsersPerSec(viewCommitsThroughput).during(durationInMinutes.minutes).randomized
+            constantUsersPerSec(viewCommitsThroughput).during(durationInMinutes.minutes)
           )
           .protocols(httpProtocol)
       )
