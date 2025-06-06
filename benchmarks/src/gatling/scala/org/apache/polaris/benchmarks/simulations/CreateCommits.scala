@@ -95,7 +95,8 @@ class CreateCommits extends Simulation {
   val tableUpdateScenario: ScenarioBuilder =
     scenario("Create table commits by updating properties")
       .exec(authActions.restoreAccessTokenInSession)
-      .exec(feed(tableActions.propertyUpdateFeeder()).exec(tableActions.updateTable))
+      .feed(tableActions.propertyUpdateFeeder())
+      .exec(tableActions.updateTable)
 
   // --------------------------------------------------------------------------------
   // Read and write workloads:
@@ -105,7 +106,8 @@ class CreateCommits extends Simulation {
   val viewUpdateScenario: ScenarioBuilder =
     scenario("Create view commits by updating properties")
       .exec(authActions.restoreAccessTokenInSession)
-      .exec(feed(viewActions.propertyUpdateFeeder()).exec(viewActions.updateView))
+      .feed(viewActions.propertyUpdateFeeder())
+      .exec(viewActions.updateView)
 
   private val httpProtocol = http
     .baseUrl(cp.baseUrl)
