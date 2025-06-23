@@ -89,6 +89,7 @@ class TestPolarisRunnerPlugin {
         Arrays.asList(
             "plugins {",
             "    id 'java'",
+            "    id 'jvm-test-suite'",
             "    id 'org.apache.polaris.apprunner'",
             "}",
             "",
@@ -97,13 +98,15 @@ class TestPolarisRunnerPlugin {
             "    mavenCentral()",
             "}",
             "",
-            "test {",
-            "    useJUnitPlatform()",
+            "testing {",
+            "  suites.withType(JvmTestSuite) {",
+            "    useJUnitJupiter('" + junitVersion + "')",
+            "  }",
             "}",
             "",
             "dependencies {",
-            "    testImplementation 'org.junit.jupiter:junit-jupiter-api:" + junitVersion + "'",
-            "    testImplementation 'org.junit.jupiter:junit-jupiter-engine:" + junitVersion + "'",
+            "    testImplementation platform('org.junit:junit-bom:" + junitVersion + "')",
+            "    testImplementation 'org.junit.jupiter:junit-jupiter-api'",
             "    testImplementation 'org.projectnessie.nessie:nessie-client:"
                 + nessieVersionForTest
                 + "'");
