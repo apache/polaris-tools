@@ -21,12 +21,12 @@
 soebes-itf = "0.13.1"
 
 [libraries]
-assertj-core = { module = "org.assertj:assertj-core", version = "3.27.2" }
-errorprone = { module = "com.google.errorprone:error_prone_core", version = "2.36.0" }
+assertj-core = { module = "org.assertj:assertj-core", version = "3.27.3" }
+errorprone = { module = "com.google.errorprone:error_prone_core", version = "2.38.0" }
 maven-core = { module = "org.apache.maven:maven-core", version = "3.9.9" }
 maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version = "3.15.1" }
 jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version = "3.0.0" }
-junit-bom = { module = "org.junit:junit-bom", version = "5.11.4" }
+junit-bom = { module = "org.junit:junit-bom", version = "5.13.1" }
 soebes-itf-assertj = { module = "com.soebes.itf.jupiter.extension:itf-assertj", version.ref = "soebes-itf" }
 soebes-itf-jupiter-extension = { module = "com.soebes.itf.jupiter.extension:itf-jupiter-extension", version.ref = "soebes-itf" }
 
