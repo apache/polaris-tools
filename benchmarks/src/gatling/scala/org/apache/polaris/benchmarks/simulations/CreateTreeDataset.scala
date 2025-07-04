@@ -142,5 +142,9 @@ class CreateTreeDataset extends Simulation {
       .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
       .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+  ).assertions(
+    details("Create Namespace").successfulRequests.count.is(numNamespaces),
+    details("Create Table").successfulRequests.count.is(dp.numTables),
+    details("Create View").successfulRequests.count.is(dp.numViews)
   )
 }
