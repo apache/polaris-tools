@@ -103,7 +103,8 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   private val readerScenarioBuilders: List[ScenarioBuilder] =
     wp.weightedWorkloadOnTreeDataset.readers.zipWithIndex.flatMap { case (dist, i) =>
       (0 until dist.count).map { threadId =>
-        val rnp = RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 1000) + threadId)
+        val rnp =
+          RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 1000) + threadId)
         scenario(s"Reader-$i-$threadId")
           .exec(authActions.restoreAccessTokenInSession)
           .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
@@ -133,7 +134,8 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   private val writerScenarioBuilders: List[ScenarioBuilder] =
     wp.weightedWorkloadOnTreeDataset.writers.zipWithIndex.flatMap { case (dist, i) =>
       (0 until dist.count).map { threadId =>
-        val rnp = RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 2000) + threadId)
+        val rnp =
+          RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 2000) + threadId)
         scenario(s"Writer-$i-$threadId")
           .exec(authActions.restoreAccessTokenInSession)
           .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
