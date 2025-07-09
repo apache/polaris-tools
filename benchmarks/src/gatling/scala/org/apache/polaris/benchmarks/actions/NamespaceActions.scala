@@ -147,7 +147,7 @@ case class NamespaceActions(
    * Typically, start 1 user and increase by 1 user every second until some arbitrary maximum value.
    */
   val createNamespace: ChainBuilder =
-    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create Namespace")(
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Create namespace")(
       http("Create Namespace")
         .post("/api/catalog/v1/#{catalogName}/namespaces")
         .header("Authorization", "Bearer #{accessToken}")
