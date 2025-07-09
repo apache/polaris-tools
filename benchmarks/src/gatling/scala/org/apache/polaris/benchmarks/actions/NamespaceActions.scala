@@ -206,7 +206,7 @@ case class NamespaceActions(
    * structure.
    */
   val fetchAllChildrenNamespaces: ChainBuilder = exec(
-    http("Fetch children Namespaces")
+    http("Fetch child namespaces")
       .get("/api/catalog/v1/#{catalogName}/namespaces?parent=#{namespaceMultipartPath}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
