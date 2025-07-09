@@ -214,7 +214,7 @@ case class NamespaceActions(
 
   val updateNamespaceProperties: ChainBuilder =
     retryOnHttpStatus(maxRetries, retryableHttpCodes, "Update Namespace")(
-      http("Update Namespace")
+      http("Update namespace")
         .post("/api/catalog/v1/#{catalogName}/namespaces/#{namespaceMultipartPath}/properties")
         .header("Authorization", "Bearer #{accessToken}")
         .header("Content-Type", "application/json")
