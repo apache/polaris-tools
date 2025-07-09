@@ -173,7 +173,7 @@ case class NamespaceActions(
    * There is no limit to the number of users that can fetch namespaces concurrently.
    */
   val fetchNamespace: ChainBuilder = exec(
-    http("Fetch single Namespace")
+    http("Fetch single namespace")
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{namespaceMultipartPath}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
