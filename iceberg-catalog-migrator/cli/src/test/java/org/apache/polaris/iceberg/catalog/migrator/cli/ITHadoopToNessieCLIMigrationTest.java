@@ -27,6 +27,7 @@ import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,11 @@ public class ITHadoopToNessieCLIMigrationTest extends AbstractCLIMigrationTest {
   protected static void setup() {
     initializeSourceCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
     initializeTargetCatalog(CatalogMigrationUtil.CatalogType.NESSIE, Collections.emptyMap());
+  }
+
+  @AfterAll
+  protected static void tearDown() throws Exception {
+    dropNamespaces();
   }
 
   @Test

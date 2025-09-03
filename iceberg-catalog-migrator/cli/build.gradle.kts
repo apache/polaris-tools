@@ -128,6 +128,8 @@ dependencies {
   }
   testImplementation("org.apache.hadoop:hadoop-mapreduce-client-core:${libs.versions.hadoop.get()}")
 
+  testImplementation("org.testcontainers:testcontainers:${libs.versions.testcontainers.get()}")
+
   nessieQuarkusServer(
     "org.projectnessie.nessie:nessie-quarkus:${libs.versions.nessie.get()}:runner"
   )

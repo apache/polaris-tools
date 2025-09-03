@@ -55,8 +55,8 @@ public abstract class AbstractTest {
   protected static final Namespace NS_A_B_C_D = Namespace.of("a", "b", "c", "d");
   protected static final Namespace NS_A_B_C_D_E = Namespace.of("a", "b", "c", "d", "e");
 
-  private static String sourceCatalogWarehouse;
-  private static String targetCatalogWarehouse;
+  protected static String sourceCatalogWarehouse;
+  protected static String targetCatalogWarehouse;
 
   protected static Catalog sourceCatalog;
   protected static Catalog targetCatalog;

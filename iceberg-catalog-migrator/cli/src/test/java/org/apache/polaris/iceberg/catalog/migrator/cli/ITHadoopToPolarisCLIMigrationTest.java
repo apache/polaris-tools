@@ -18,21 +18,46 @@
  */
 package org.apache.polaris.iceberg.catalog.migrator.cli;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
+import java.util.Map;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
-public class HadoopCLIMigrationTest extends AbstractCLIMigrationTest {
+public class ITHadoopToPolarisCLIMigrationTest extends AbstractCLIMigrationTest {
+
+  private static PolarisContainer polarisContainer;
 
   @BeforeAll
-  protected static void setup() {
+  protected static void setup() throws Exception {
+    ensureSrcDirectoryExists();
+    polarisContainer = new PolarisContainer(sourceCatalogWarehouse);
+    polarisContainer.start();
+
+    assertThat(polarisContainer.httpGet("/api/management/v1/catalogs"))
+        .contains(PolarisContainer.CATALOG_NAME);
+
     initializeSourceCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
-    initializeTargetCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
+
+    initializeTargetCatalog(
+        CatalogMigrationUtil.CatalogType.REST,
+        Map.of(
+            "uri",
+            polarisContainer.getIcebergApiEndpoint(),
+            "warehouse",
+            PolarisContainer.CATALOG_NAME,
+            "token",
+            polarisContainer.getAccessToken(
+                polarisContainer.getClientId(), polarisContainer.getClientSecret())));
   }
 
   @AfterAll
   protected static void tearDown() throws Exception {
     dropNamespaces();
+    if (polarisContainer != null) {
+      polarisContainer.stop();
+    }
   }
 }

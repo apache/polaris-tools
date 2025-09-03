@@ -23,6 +23,7 @@ import static org.apache.polaris.iceberg.catalog.migrator.cli.BaseRegisterComman
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -38,7 +39,6 @@ import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrator;
 import org.apache.polaris.iceberg.catalog.migrator.api.test.AbstractTest;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -83,6 +83,9 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
       case HIVE:
         properties = hiveCatalogProperties(isSourceCatalog, additionalProp);
         break;
+      case REST:
+        properties = additionalProp;
+        break;
       default:
         throw new UnsupportedOperationException(
             String.format("Unsupported for catalog type: %s", catalogType));
@@ -104,11 +107,6 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
       targetCatalogProperties = propertiesStr;
       targetCatalogType = catalogType.name();
     }
-  }
-
-  @AfterAll
-  protected static void tearDown() throws Exception {
-    dropNamespaces();
   }
 
   @BeforeEach
@@ -492,5 +490,14 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
       argsList.add(0, "migrate");
     }
     return RunCLI.run(argsList.toArray(new String[0]));
+  }
+
+  protected static void ensureSrcDirectoryExists() {
+    File dir = new File(sourceCatalogWarehouse);
+    if (!dir.exists()) {
+      if (!dir.mkdirs()) {
+        throw new RuntimeException("Unable to create source catalog directory");
+      }
+    }
   }
 }

@@ -39,6 +39,7 @@ nessieRunner = "0.32.2"
 picocli = "4.7.6"
 shadowPlugin = "8.1.1"
 slf4j = "1.7.36"
+testcontainers = "1.21.3"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
@@ -75,6 +76,7 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 logcaptor = { module = "io.github.hakky54:logcaptor", version.ref = "logcaptor" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 slf4j = { module = "org.slf4j:log4j-over-slf4j", version.ref = "slf4j" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
 
 [plugins]
 errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }
