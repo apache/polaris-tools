@@ -17,10 +17,13 @@
  * under the License.
  */
 
+import org.nosphere.apache.rat.RatTask
+
 plugins {
   `maven-publish`
   signing
   `build-conventions`
+  alias(libs.plugins.rat)
 }
 
 spotless {
@@ -28,4 +31,46 @@ spotless {
     // Must be repeated :( - there's no "addTarget" or so
     target("*.gradle.kts", "buildSrc/*.gradle.kts")
   }
+}
+
+tasks.named<RatTask>("rat").configure {
+  // Gradle
+  excludes.add("**/build/**")
+  excludes.add("gradle/wrapper/gradle-wrapper*")
+  excludes.add(".gradle")
+  excludes.add("**/kotlin-compiler*")
+
+  excludes.add("ide-name.txt")
+  excludes.add("version.txt")
+
+  excludes.add("LICENSE")
+  excludes.add("DISCLAIMER")
+  excludes.add("NOTICE")
+
+  // Eclipse preference files cannot have comments
+  excludes.add("**/*.prefs")
+
+  // Git & GitHub
+  excludes.add(".git")
+  excludes.add(".github/pull_request_template.md")
+
+  // Misc build artifacts
+  excludes.add("**/.keep")
+  excludes.add("logs/**")
+  excludes.add("**/*.lock")
+
+  // Binary files
+  excludes.add("**/*.jar")
+  excludes.add("**/*.zip")
+  excludes.add("**/*.tar.gz")
+  excludes.add("**/*.tgz")
+  excludes.add("**/*.class")
+
+  // IntelliJ
+  excludes.add(".idea")
+  excludes.add("**/*.iml")
+  excludes.add("**/*.iws")
+
+  // Rat can't scan binary images
+  excludes.add("**/*.png")
 }
