@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.benchmarks.actions
 
 import io.gatling.core.Predef._

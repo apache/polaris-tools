@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.benchmarks.util
 
 class CircularIterator[T](builder: () => Iterator[T]) extends Iterator[T] {

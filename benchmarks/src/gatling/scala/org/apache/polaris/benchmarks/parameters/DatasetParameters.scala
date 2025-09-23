@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.polaris.benchmarks.parameters
 
 import org.apache.polaris.benchmarks.NAryTreeBuilder
