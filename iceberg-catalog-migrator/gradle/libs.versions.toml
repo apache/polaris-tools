@@ -19,22 +19,22 @@
 
 [versions]
 assertj = "3.27.3"
-aws = "2.30.3" # this is in mapping with iceberg repo.
+aws = "2.33.0" # this is in mapping with iceberg repo.
 checkstyle = "10.21.3"
 errorprone = "2.36.0"
 errorproneSlf4j = "0.1.28"
 googleJavaFormat = "1.25.2"
 guava = "33.4.0-jre"
-hadoop = "2.7.3" # this is in mapping with iceberg repo.
-hive = "2.3.9" # this is in mapping with iceberg repo.
-iceberg = "1.7.1"
+hadoop = "3.4.1" # this is in mapping with iceberg repo.
+hive = { strictly = "2.3.10"} # this is in mapping with iceberg repo.
+iceberg = "1.10.0"
 immutables = "2.10.1"
 jacoco = "0.8.12"
 jandex = "3.2.3"
 junit = "5.12.0"
 logback = "1.5.17"
 logcaptor = "2.10.1"
-nessie = "0.101.3"
+nessie = "0.104.5"
 nessieRunner = "0.32.2"
 picocli = "4.7.6"
 shadowPlugin = "8.1.1"
@@ -62,7 +62,7 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 hadoop-aws = { module = "org.apache.hadoop:hadoop-aws", version.ref = "hadoop" }
 hadoop-common = { module = "org.apache.hadoop:hadoop-common", version.ref = "hadoop" }
 iceberg-dell = { module = "org.apache.iceberg:iceberg-dell", version.ref = "iceberg" }
-iceberg-spark-runtime = { module = "org.apache.iceberg:iceberg-spark-runtime-3.3_2.12", version.ref = "iceberg" }
+iceberg-spark-runtime = { module = "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12", version.ref = "iceberg" }
 immutables-builder = { module = "org.immutables:builder", version.ref = "immutables" }
 immutables-value-annotations = { module = "org.immutables:value-annotations", version.ref = "immutables" }
 immutables-value-processor = { module = "org.immutables:value-processor", version.ref = "immutables" }
