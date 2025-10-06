@@ -76,7 +76,6 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 logcaptor = { module = "io.github.hakky54:logcaptor", version.ref = "logcaptor" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 slf4j = { module = "org.slf4j:log4j-over-slf4j", version.ref = "slf4j" }
-testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
 
 [plugins]
 errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }

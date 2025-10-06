@@ -32,7 +32,6 @@ public class ITHadoopToPolarisCLIMigrationTest extends AbstractCLIMigrationTest 
 
   @BeforeAll
   protected static void setup() throws Exception {
-    ensureSrcDirectoryExists();
     polarisContainer = new PolarisContainer(sourceCatalogWarehouse);
     polarisContainer.start();
 

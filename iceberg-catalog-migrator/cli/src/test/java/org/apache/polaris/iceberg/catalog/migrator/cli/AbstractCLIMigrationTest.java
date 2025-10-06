@@ -23,7 +23,6 @@ import static org.apache.polaris.iceberg.catalog.migrator.cli.BaseRegisterComman
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import java.util.Map;
 import nl.altindag.log.LogCaptor;
 import nl.altindag.log.model.LogEvent;
 import org.apache.iceberg.catalog.Catalog;
-import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.exceptions.NoSuchTableException;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrator;
@@ -116,12 +114,6 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
 
   @AfterEach
   protected void afterEach() {
-    // manually refreshing catalog due to missing refresh in Nessie catalog
-    // https://github.com/apache/iceberg/pull/6789
-    // create table will call refresh internally.
-    sourceCatalog.createTable(TableIdentifier.of(BAR, "tblx"), schema).refresh();
-    targetCatalog.createTable(TableIdentifier.of(BAR, "tblx"), schema).refresh();
-
     dropTables();
   }
 
@@ -490,14 +482,5 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
       argsList.add(0, "migrate");
     }
     return RunCLI.run(argsList.toArray(new String[0]));
-  }
-
-  protected static void ensureSrcDirectoryExists() {
-    File dir = new File(sourceCatalogWarehouse);
-    if (!dir.exists()) {
-      if (!dir.mkdirs()) {
-        throw new RuntimeException("Unable to create source catalog directory");
-      }
-    }
   }
 }

@@ -32,8 +32,6 @@ public class ITNessieToPolarisCLIMigrationTest extends AbstractCLIMigrationTest 
 
   @BeforeAll
   protected static void setup() throws Exception {
-    ensureSrcDirectoryExists();
-
     polarisContainer = new PolarisContainer(sourceCatalogWarehouse);
     polarisContainer.start();
     assertThat(polarisContainer.httpGet("/api/management/v1/catalogs"))
