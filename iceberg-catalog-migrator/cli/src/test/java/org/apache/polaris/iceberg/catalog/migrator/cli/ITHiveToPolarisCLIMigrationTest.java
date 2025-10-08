@@ -26,10 +26,8 @@ import org.apache.iceberg.hive.HiveMetastoreExtension;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-@Disabled("Because of https://github.com/apache/polaris/issues/2756")
 public class ITHiveToPolarisCLIMigrationTest extends AbstractCLIMigrationTest {
 
   @RegisterExtension

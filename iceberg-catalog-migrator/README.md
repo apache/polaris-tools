@@ -218,6 +218,10 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 --target-catalog-properties uri=http://localhost:60904/api/catalog,warehouse=test,token=$TOKEN
 ```
 
+Note: Need to configure `ALLOW_UNSTRUCTURED_TABLE_LOCATION` property at the polaris server side as
+HMS creates a namespace folder with ".db" extension. Also need to configure `allowedLocations` to be 
+source catalog directory in `storage_configuration_info`.
+
 ## Migrate all tables from DYNAMODB catalog to Polaris catalog
 ```shell
 java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \

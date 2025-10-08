@@ -68,6 +68,7 @@ public class PolarisContainer extends GenericContainer<PolarisContainer> {
     jvmOptions.put("polaris.readiness.ignore-severe-issues", "true");
     jvmOptions.put("polaris.features.\"SUPPORTED_CATALOG_STORAGE_TYPES\"", "[\"FILE\"]");
     jvmOptions.put("polaris.features.\"ALLOW_INSECURE_STORAGE_TYPES\"", "true");
+    jvmOptions.put("polaris.features.\"ALLOW_UNSTRUCTURED_TABLE_LOCATION\"", "true");
     String jvmOptionsString =
         jvmOptions.entrySet().stream()
             .map(e -> "-D" + e.getKey() + "=" + e.getValue())
