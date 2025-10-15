@@ -28,8 +28,16 @@ plugins {
 dependencies {
   implementation(libs.guava)
   implementation(libs.slf4j)
-  implementation(libs.iceberg.spark.runtime)
-  implementation(libs.iceberg.dell)
+  implementation(platform(libs.iceberg.bom))
+  implementation("org.apache.iceberg:iceberg-api")
+  implementation("org.apache.iceberg:iceberg-core")
+  implementation("org.apache.iceberg:iceberg-common")
+  implementation("org.apache.iceberg:iceberg-aws")
+  implementation("org.apache.iceberg:iceberg-azure")
+  implementation("org.apache.iceberg:iceberg-gcp")
+  implementation("org.apache.iceberg:iceberg-hive-metastore")
+  implementation("org.apache.iceberg:iceberg-nessie")
+  implementation("org.apache.iceberg:iceberg-dell")
   implementation(libs.hadoop.common) {
     exclude("org.apache.avro", "avro")
     exclude("org.slf4j", "slf4j-log4j12")
