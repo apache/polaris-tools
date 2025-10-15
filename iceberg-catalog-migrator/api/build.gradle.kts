@@ -28,7 +28,14 @@ plugins {
 dependencies {
   implementation(libs.guava)
   implementation(libs.slf4j)
-  implementation(libs.iceberg.spark.runtime)
+  implementation(libs.iceberg.api)
+  implementation(libs.iceberg.core)
+  implementation(libs.iceberg.common)
+  implementation(libs.iceberg.aws)
+  implementation(libs.iceberg.azure)
+  implementation(libs.iceberg.gcp)
+  implementation(libs.iceberg.hive.metastore)
+  implementation(libs.iceberg.nessie)
   implementation(libs.iceberg.dell)
   implementation(libs.hadoop.common) {
     exclude("org.apache.avro", "avro")

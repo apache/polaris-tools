@@ -37,7 +37,15 @@ dependencies {
   implementation(libs.slf4j)
   runtimeOnly(libs.logback.classic)
   implementation(libs.picocli)
-  implementation(libs.iceberg.spark.runtime)
+  implementation(libs.iceberg.api)
+  implementation(libs.iceberg.core)
+  implementation(libs.iceberg.common)
+  implementation(libs.iceberg.aws)
+  implementation(libs.iceberg.azure)
+  implementation(libs.iceberg.gcp)
+  implementation(libs.iceberg.hive.metastore)
+  implementation(libs.iceberg.nessie)
+  implementation(libs.iceberg.dell)
   implementation(libs.hadoop.aws) { exclude("com.amazonaws", "aws-java-sdk-bundle") }
   // AWS dependencies based on https://iceberg.apache.org/docs/latest/aws/#enabling-aws-integration
   runtimeOnly(libs.aws.sdk.apache.client)
@@ -150,7 +158,13 @@ val processResources =
 
 val mainClassName = "org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigrationCLI"
 
-val shadowJar = tasks.named<ShadowJar>("shadowJar") { isZip64 = true }
+val shadowJar =
+  tasks.named<ShadowJar>("shadowJar") {
+    isZip64 = true
+
+    // include the LICENSE and NOTICE files for the shaded Jar
+    from(project.projectDir) { include("LICENSE", "NOTICE") }
+  }
 
 shadowJar { manifest { attributes["Main-Class"] = mainClassName } }
 
