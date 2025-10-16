@@ -161,8 +161,6 @@ val mainClassName = "org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigr
 val shadowJar =
   tasks.named<ShadowJar>("shadowJar") {
     isZip64 = true
-
-    // include the LICENSE and NOTICE files for the shaded Jar
     from(project.projectDir) { include("LICENSE", "NOTICE") }
   }
 

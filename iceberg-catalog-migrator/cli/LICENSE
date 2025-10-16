@@ -213,3 +213,798 @@ Home page: https://github.com/gradle/gradle
 License: https://www.apache.org/licenses/LICENSE-2.0
 
 --------------------------------------------------------------------------------
+Group: ant Name: ant Version: 1.6.5
+Project URL: N/A
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: aopalliance Name: aopalliance Version: 1.0
+Project URL: [http://aopalliance.sourceforge.net](http://aopalliance.sourceforge.net)
+License: Public Domain
+
+---
+
+Group: ch.qos.logback Name: logback-classic Version: 1.5.17
+Group: ch.qos.logback Name: logback-core Version: 1.5.17
+Project URL: [http://www.qos.ch](http://www.qos.ch)
+License: GNU Lesser General Public License - [http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+
+---
+
+Group: ch.qos.reload4j Name: reload4j Version: 1.2.22
+Project URL: [https://reload4j.qos.ch/](https://reload4j.qos.ch/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.fasterxml.jackson Name: jackson-bom Version: 2.19.2
+Group: com.fasterxml.jackson.core Name: jackson-annotations Version: 2.19.2
+Group: com.fasterxml.jackson.core Name: jackson-core Version: 2.19.2
+Group: com.fasterxml.jackson.core Name: jackson-databind Version: 2.19.2
+Group: com.fasterxml.jackson.jaxrs Name: jackson-jaxrs-base Version: 2.19.2
+Group: com.fasterxml.jackson.jaxrs Name: jackson-jaxrs-json-provider Version: 2.19.2
+Group: com.fasterxml.jackson.module Name: jackson-module-jaxb-annotations Version: 2.19.2
+Project URL: [https://github.com/FasterXML/jackson-bom](https://github.com/FasterXML/jackson-bom), [https://github.com/FasterXML/jackson](https://github.com/FasterXML/jackson), [https://github.com/FasterXML/jackson-core](https://github.com/FasterXML/jackson-core), [https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-base](https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-base), [https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-json-provider](https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-json-provider), [https://github.com/FasterXML/jackson-modules-base](https://github.com/FasterXML/jackson-modules-base)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.fasterxml.woodstox Name: woodstox-core Version: 5.4.0
+Project URL: [https://github.com/FasterXML/woodstox](https://github.com/FasterXML/woodstox)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.github.ben-manes.caffeine Name: caffeine Version: 2.9.3
+Project URL: [https://github.com/ben-manes/caffeine](https://github.com/ben-manes/caffeine)
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.github.joshelser Name: dropwizard-metrics-hadoop-metrics2-reporter Version: 0.1.2
+Project URL: [https://github.com/joshelser/dropwizard-hadoop-metrics2](https://github.com/joshelser/dropwizard-hadoop-metrics2)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.github.pjfanning Name: jersey-json Version: 1.22.0
+Project URL: [https://github.com/pjfanning/jersey-1.x](https://github.com/pjfanning/jersey-1.x)
+License: CDDL 1.1 - [http://glassfish.java.net/public/CDDL+GPL_1_1.html](http://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+
+---
+
+Group: com.github.stephenc.jcip Name: jcip-annotations Version: 1.0-1
+Project URL: [http://stephenc.github.com/jcip-annotations](http://stephenc.github.com/jcip-annotations)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.code.findbugs Name: jsr305 Version: 3.0.2
+Project URL: [http://findbugs.sourceforge.net/](http://findbugs.sourceforge.net/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.code.gson Name: gson Version: 2.9.0
+Project URL: [https://github.com/google/gson/gson](https://github.com/google/gson/gson)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.errorprone Name: error_prone_annotations Version: 2.36.0
+Project URL: [https://errorprone.info/error_prone_annotations](https://errorprone.info/error_prone_annotations)
+License: Apache 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.guava Name: failureaccess Version: 1.0.2
+Group: com.google.guava Name: guava Version: 33.4.0-jre
+Group: com.google.guava Name: listenablefuture Version: 9999.0-empty-to-avoid-conflict-with-guava
+Project URL: [https://github.com/google/guava/](https://github.com/google/guava/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.inject Name: guice Version: 4.2.3
+Group: com.google.inject.extensions Name: guice-servlet Version: 4.2.3
+Project URL: [https://github.com/google/guice](https://github.com/google/guice)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.j2objc Name: j2objc-annotations Version: 3.0.0
+Project URL: [https://github.com/google/j2objc/](https://github.com/google/j2objc/)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.protobuf Name: protobuf-java Version: 2.5.0
+Project URL: [http://code.google.com/p/protobuf](http://code.google.com/p/protobuf)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.google.re2j Name: re2j Version: 1.1
+Project URL: [http://github.com/google/re2j](http://github.com/google/re2j)
+License: The Go license - [https://golang.org/LICENSE](https://golang.org/LICENSE)
+
+---
+
+Group: com.jcraft Name: jsch Version: 0.1.55
+Project URL: [http://www.jcraft.com/jsch/](http://www.jcraft.com/jsch/)
+License: Revised BSD - [http://www.jcraft.com/jsch/LICENSE.txt](http://www.jcraft.com/jsch/LICENSE.txt)
+
+---
+
+Group: com.jolbox Name: bonecp Version: 0.8.0.RELEASE
+Project URL: [http://jolbox.com](http://jolbox.com)
+License: Apache v2 - [http://www.apache.org/licenses/LICENSE-2.0.html](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+---
+
+Group: com.nimbusds Name: nimbus-jose-jwt Version: 9.37.2
+Project URL: [https://connect2id.com](https://connect2id.com), [https://bitbucket.org/connect2id/nimbus-jose-jwt](https://bitbucket.org/connect2id/nimbus-jose-jwt)
+License: The Apache Software License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: com.sun.jersey Name: jersey-client Version: 1.19.4
+Group: com.sun.jersey Name: jersey-core Version: 1.19.4
+Group: com.sun.jersey Name: jersey-json Version: 1.9
+Group: com.sun.jersey Name: jersey-server Version: 1.19.4
+Group: com.sun.jersey Name: jersey-servlet Version: 1.19.4
+Group: com.sun.jersey.contribs Name: jersey-guice Version: 1.19.4
+Project URL: [http://www.oracle.com/](http://www.oracle.com/)
+License: CDDL 1.1 - [http://glassfish.java.net/public/CDDL+GPL_1_1.html](http://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+
+---
+
+Group: com.sun.xml.bind Name: jaxb-impl Version: 2.2.3-1
+Project URL: [http://jaxb.java.net/](http://jaxb.java.net/)
+License: CDDL 1.1 - [https://glassfish.java.net/public/CDDL+GPL_1_1.html](https://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+
+---
+
+Group: commons-beanutils Name: commons-beanutils Version: 1.9.4
+Project URL: [https://commons.apache.org/proper/commons-beanutils/](https://commons.apache.org/proper/commons-beanutils/)
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-cli Name: commons-cli Version: 1.5.0
+Project URL: [https://commons.apache.org/proper/commons-cli/](https://commons.apache.org/proper/commons-cli/)
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-codec Name: commons-codec Version: 1.17.1
+Project URL: [https://commons.apache.org/proper/commons-codec/](https://commons.apache.org/proper/commons-codec/)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-collections Name: commons-collections Version: 3.2.2
+Project URL: [http://commons.apache.org/collections/](http://commons.apache.org/collections/)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-dbcp Name: commons-dbcp Version: 1.4
+Project URL: [http://commons.apache.org/dbcp/](http://commons.apache.org/dbcp/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-el Name: commons-el Version: 1.0
+Project URL: [http://jakarta.apache.org/commons/el/](http://jakarta.apache.org/commons/el/)
+License: The Apache Software License, Version 2.0 - /LICENSE.txt
+
+---
+
+Group: commons-io Name: commons-io Version: 2.16.1
+Project URL: [https://commons.apache.org/proper/commons-io/](https://commons.apache.org/proper/commons-io/)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-lang Name: commons-lang Version: 2.6
+Project URL: [http://commons.apache.org/lang/](http://commons.apache.org/lang/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-logging Name: commons-logging Version: 1.3.0
+Project URL: [https://commons.apache.org/proper/commons-logging/](https://commons.apache.org/proper/commons-logging/)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-net Name: commons-net Version: 3.9.0
+Project URL: [https://commons.apache.org/proper/commons-net/](https://commons.apache.org/proper/commons-net/)
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: commons-pool Name: commons-pool Version: 1.5.4
+Project URL: [http://commons.apache.org/pool/](http://commons.apache.org/pool/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: dev.failsafe Name: failsafe Version: 3.3.2
+Project URL: N/A
+License: Apache License, Version 2.0 - [http://apache.org/licenses/LICENSE-2.0](http://apache.org/licenses/LICENSE-2.0)
+
+---
+
+Group: dnsjava Name: dnsjava Version: 3.6.1
+Project URL: [https://javadoc.io/doc/dnsjava/dnsjava](https://javadoc.io/doc/dnsjava/dnsjava), [https://github.com/dnsjava/dnsjava](https://github.com/dnsjava/dnsjava)
+License: BSD-3-Clause - [https://opensource.org/licenses/BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+
+---
+
+Group: info.picocli Name: picocli Version: 4.7.6
+Project URL: [https://picocli.info](https://picocli.info)
+License: The Apache Software License, version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: io.airlift Name: aircompressor Version: 0.27
+Project URL: [https://github.com/airlift/aircompressor](https://github.com/airlift/aircompressor)
+License: Apache License 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.html](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+---
+
+Group: io.dropwizard.metrics Name: metrics-core Version: 3.2.4
+Group: io.dropwizard.metrics Name: metrics-json Version: 3.1.0
+Group: io.dropwizard.metrics Name: metrics-jvm Version: 3.1.0
+Project URL: N/A
+License: Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.html](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+---
+
+Group: io.netty Name: netty-all Version: 4.1.100.Final
+Group: io.netty Name: netty-buffer Version: 4.1.124.Final
+Group: io.netty Name: netty-codec Version: 4.1.124.Final
+Group: io.netty Name: netty-codec-dns Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-haproxy Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-http Version: 4.1.124.Final
+Group: io.netty Name: netty-codec-http2 Version: 4.1.124.Final
+Group: io.netty Name: netty-codec-memcache Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-mqtt Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-redis Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-smtp Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-socks Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-stomp Version: 4.1.100.Final
+Group: io.netty Name: netty-codec-xml Version: 4.1.100.Final
+Group: io.netty Name: netty-common Version: 4.1.124.Final
+Group: io.netty Name: netty-handler Version: 4.1.124.Final
+Group: io.netty Name: netty-handler-proxy Version: 4.1.100.Final
+Group: io.netty Name: netty-handler-ssl-ocsp Version: 4.1.100.Final
+Group: io.netty Name: netty-resolver Version: 4.1.124.Final
+Group: io.netty Name: netty-resolver-dns Version: 4.1.100.Final
+Group: io.netty Name: netty-resolver-dns-classes-macos Version: 4.1.100.Final
+Group: io.netty Name: netty-resolver-dns-native-macos Version: 4.1.100.Final
+Group: io.netty Name: netty-transport Version: 4.1.124.Final
+Group: io.netty Name: netty-transport-classes-epoll Version: 4.1.124.Final
+Group: io.netty Name: netty-transport-classes-kqueue Version: 4.1.100.Final
+Group: io.netty Name: netty-transport-native-epoll Version: 4.1.105.Final
+Group: io.netty Name: netty-transport-native-kqueue Version: 4.1.100.Final
+Group: io.netty Name: netty-transport-native-unix-common Version: 4.1.124.Final
+Group: io.netty Name: netty-transport-rxtx Version: 4.1.100.Final
+Group: io.netty Name: netty-transport-sctp Version: 4.1.100.Final
+Group: io.netty Name: netty-transport-udt Version: 4.1.100.Final
+Project URL: [https://netty.io/netty-all/](https://netty.io/netty-all/), [https://netty.io/](https://netty.io/)
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
+---
+
+Group: jakarta.activation Name: jakarta.activation-api Version: 1.2.2
+Project URL: [https://www.eclipse.org](https://www.eclipse.org)
+License: EDL 1.0 - [http://www.eclipse.org/org/documents/edl-v10.php](http://www.eclipse.org/org/documents/edl-v10.php) (Selecting first listed permissive license)
+
+---
+
+Group: javax.annotation Name: javax.annotation-api Version: 1.3.2
+Project URL: [https://javaee.github.io/glassfish](https://javaee.github.io/glassfish), [http://jcp.org/en/jsr/detail?id=250](http://jcp.org/en/jsr/detail?id=250)
+License: CDDL + GPLv2 with classpath exception - [https://github.com/javaee/javax.annotation/blob/master/LICENSE](https://github.com/javaee/javax.annotation/blob/master/LICENSE)
+
+---
+
+Group: javax.inject Name: javax.inject Version: 1
+Project URL: [http://code.google.com/p/atinject/](http://code.google.com/p/atinject/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: javax.jdo Name: jdo-api Version: 3.0.1
+Project URL: [http://db.apache.org/jdo](http://db.apache.org/jdo)
+License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: javax.servlet Name: javax.servlet-api Version: 3.1.0
+Project URL: [https://glassfish.dev.java.net](https://glassfish.dev.java.net), [http://servlet-spec.java.net](http://servlet-spec.java.net)
+License: CDDL + GPLv2 with classpath exception - [https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html](https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html)
+
+---
+
+Group: javax.servlet Name: jsp-api Version: 2.0
+Project URL: N/A
+License: No license information found
+
+---
+
+Group: javax.servlet Name: servlet-api Version: 2.4
+Project URL: N/A
+License: No license information found
+
+---
+
+Group: javax.servlet.jsp Name: jsp-api Version: 2.1
+Project URL: N/A
+License: No license information found
+
+---
+
+Group: javax.transaction Name: jta Version: 1.1
+Project URL: [http://java.sun.com/products/jta](http://java.sun.com/products/jta)
+License: No license information found
+
+---
+
+Group: javax.ws.rs Name: jsr311-api Version: 1.1.1
+Project URL: [https://jsr311.dev.java.net](https://jsr311.dev.java.net)
+License: CDDL License - [http://www.opensource.org/licenses/cddl1.php](http://www.opensource.org/licenses/cddl1.php)
+
+---
+
+Group: javax.xml.bind Name: jaxb-api Version: 2.2.12
+Project URL: [http://www.oracle.com/](http://www.oracle.com/), [http://jaxb.java.net/](http://jaxb.java.net/)
+License: CDDL 1.1 - [https://glassfish.java.net/public/CDDL+GPL_1_1.html](https://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+
+---
+
+Group: javolution Name: javolution Version: 5.5.1
+Project URL: [http://javolution.org](http://javolution.org)
+License: BSD License - [http://javolution.org/LICENSE.txt](http://javolution.org/LICENSE.txt)
+
+---
+
+Group: jline Name: jline Version: 2.12
+Project URL: N/A
+License: The BSD License - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
+
+---
+
+Group: joda-time Name: joda-time Version: 2.8.1
+Project URL: [http://www.joda.org/joda-time/](http://www.joda.org/joda-time/)
+License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: log4j Name: log4j Version: 1.2.17
+Project URL: [http://logging.apache.org/log4j/1.2/](http://logging.apache.org/log4j/1.2/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: net.hydromatic Name: aggdesigner-algorithm Version: 6.0
+Project URL: N/A
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: net.hydromatic Name: eigenbase-properties Version: 1.1.5
+Project URL: [http://www.hydromatic.net](http://www.hydromatic.net), [http://github.com/julianhyde/eigenbase-properties](http://github.com/julianhyde/eigenbase-properties)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: net.sf.opencsv Name: opencsv Version: 2.3
+Project URL: [http://opencsv.sf.net](http://opencsv.sf.net)
+License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.antlr Name: ST4 Version: 4.0.4
+Group: org.antlr Name: antlr-runtime Version: 3.5.2
+Project URL: [http://www.stringtemplate.org](http://www.stringtemplate.org), [http://www.antlr.org](http://www.antlr.org)
+License: BSD licence - [http://antlr.org/license.html](http://antlr.org/license.html)
+
+---
+
+Group: org.apache.ant Name: ant Version: 1.9.1
+Group: org.apache.ant Name: ant-launcher Version: 1.9.1
+Project URL: [http://ant.apache.org/](http://ant.apache.org/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.avro Name: avro Version: 1.12.0
+Project URL: [https://www.apache.org/](https://www.apache.org/), [https://avro.apache.org](https://avro.apache.org)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.commons Name: commons-compress Version: 1.26.2
+Project URL: [https://commons.apache.org/proper/commons-compress/](https://commons.apache.org/proper/commons-compress/)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.commons Name: commons-configuration2 Version: 2.10.1
+Project URL: [https://commons.apache.org/proper/commons-configuration/](https://commons.apache.org/proper/commons-configuration/)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.commons Name: commons-lang3 Version: 3.14.0
+Project URL: [https://commons.apache.org/proper/commons-lang/](https://commons.apache.org/proper/commons-lang/)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.commons Name: commons-math3 Version: 3.6.1
+Project URL: [http://commons.apache.org/proper/commons-math/](http://commons.apache.org/proper/commons-math/)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.commons Name: commons-text Version: 1.11.0
+Project URL: [https://commons.apache.org/proper/commons-text](https://commons.apache.org/proper/commons-text)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.curator Name: apache-curator Version: 2.7.1
+Group: org.apache.curator Name: curator-client Version: 5.2.0
+Group: org.apache.curator Name: curator-framework Version: 5.2.0
+Group: org.apache.curator Name: curator-recipes Version: 5.2.0
+Project URL: [http://curator.apache.org](http://curator.apache.org), [http://www.apache.org/](http://www.apache.org/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.derby Name: derby Version: 10.14.2.0
+Project URL: [http://db.apache.org/derby/](http://db.apache.org/derby/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.hadoop Name: hadoop-annotations Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-auth Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-aws Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-common Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-hdfs-client Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-mapreduce-client-core Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-yarn-api Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-yarn-client Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-yarn-common Version: 3.4.1
+Group: org.apache.hadoop Name: hadoop-yarn-server-applicationhistoryservice Version: 2.7.2
+Group: org.apache.hadoop Name: hadoop-yarn-server-common Version: 2.7.2
+Group: org.apache.hadoop Name: hadoop-yarn-server-resourcemanager Version: 2.7.2
+Group: org.apache.hadoop Name: hadoop-yarn-server-web-proxy Version: 2.7.2
+Group: org.apache.hadoop.thirdparty Name: hadoop-shaded-guava Version: 1.3.0
+Group: org.apache.hadoop.thirdparty Name: hadoop-shaded-protobuf_3_25 Version: 1.3.0
+Project URL: N/A
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.hive Name: hive-common Version: 2.3.10
+Group: org.apache.hive Name: hive-exec Version: 2.3.10
+Group: org.apache.hive Name: hive-metastore Version: 2.3.10
+Group: org.apache.hive Name: hive-serde Version: 2.3.10
+Group: org.apache.hive Name: hive-service-rpc Version: 2.3.10
+Group: org.apache.hive Name: hive-shims Version: 2.3.10
+Group: org.apache.hive Name: hive-vector-code-gen Version: 2.3.10
+Group: org.apache.hive.shims Name: hive-shims-0.23 Version: 2.3.10
+Group: org.apache.hive.shims Name: hive-shims-common Version: 2.3.10
+Group: org.apache.hive.shims Name: hive-shims-scheduler Version: 2.3.10
+Project URL: N/A
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.hive Name: hive-storage-api Version: 2.4.0
+Project URL: N/A
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.httpcomponents Name: httpclient Version: 4.5.13
+Group: org.apache.httpcomponents Name: httpcore Version: 4.4.16
+Group: org.apache.httpcomponents.client5 Name: httpclient5 Version: 5.5
+Group: org.apache.httpcomponents.core5 Name: httpcore5 Version: 5.3.4
+Group: org.apache.httpcomponents.core5 Name: httpcore5-h2 Version: 5.3.4
+Project URL: [http://hc.apache.org/httpcomponents-client](http://hc.apache.org/httpcomponents-client), [http://hc.apache.org/httpcomponents-core-ga](http://hc.apache.org/httpcomponents-core-ga)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.iceberg Name: iceberg-api Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-aws Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-azure Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-bundled-guava Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-common Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-core Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-dell Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-gcp Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-hive-metastore Version: 1.10.0
+Group: org.apache.iceberg Name: iceberg-nessie Version: 1.10.0
+Project URL: [https://iceberg.apache.org](https://iceberg.apache.org)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.ivy Name: ivy Version: 2.4.0
+Project URL: [http://ant.apache.org/ivy/](http://ant.apache.org/ivy/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.kerby Name: kerb-core Version: 2.0.3
+Group: org.apache.kerby Name: kerb-crypto Version: 2.0.3
+Group: org.apache.kerby Name: kerb-util Version: 2.0.3
+Group: org.apache.kerby Name: kerby-asn1 Version: 2.0.3
+Group: org.apache.kerby Name: kerby-config Version: 2.0.3
+Group: org.apache.kerby Name: kerby-pkix Version: 2.0.3
+Group: org.apache.kerby Name: kerby-util Version: 2.0.3
+Project URL: N/A
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.orc Name: orc-core Version: 1.3.4
+Project URL: N/A
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.thrift Name: libfb303 Version: 0.9.3
+Group: org.apache.thrift Name: libthrift Version: 0.14.1
+Project URL: [http://thrift.apache.org](http://thrift.apache.org)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.tomcat Name: tomcat-annotations-api Version: 8.5.46
+Group: org.apache.tomcat.embed Name: tomcat-embed-core Version: 8.5.46
+Project URL: [https://tomcat.apache.org/](https://tomcat.apache.org/)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.velocity Name: velocity Version: 1.5
+Project URL: [http://velocity.apache.org/engine/releases/velocity-1.5/](http://velocity.apache.org/engine/releases/velocity-1.5/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.yetus Name: audience-annotations Version: 0.12.0
+Project URL: N/A
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.apache.zookeeper Name: zookeeper Version: 3.8.4
+Group: org.apache.zookeeper Name: zookeeper-jute Version: 3.8.4
+Project URL: N/A
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.bouncycastle Name: bcprov-jdk18on Version: 1.78.1
+Project URL: [https://www.bouncycastle.org/java.html](https://www.bouncycastle.org/java.html)
+License: Bouncy Castle Licence - [https://www.bouncycastle.org/licence.html](https://www.bouncycastle.org/licence.html)
+
+---
+
+Group: org.checkerframework Name: checker-qual Version: 3.43.0
+Project URL: [https://checkerframework.org/](https://checkerframework.org/)
+License: The MIT License - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+
+---
+
+Group: org.codehaus.groovy Name: groovy-all Version: 2.4.4
+Project URL: [http://groovy-lang.org](http://groovy-lang.org)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.codehaus.jackson Name: jackson-core-asl Version: 1.8.3
+Group: org.codehaus.jackson Name: jackson-mapper-asl Version: 1.8.3
+Project URL: [http://jackson.codehaus.org](http://jackson.codehaus.org)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.codehaus.jackson Name: jackson-jaxrs Version: 1.8.3
+Group: org.codehaus.jackson Name: jackson-xc Version: 1.8.3
+Project URL: [http://jackson.codehaus.org](http://jackson.codehaus.org)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt) (Selecting Apache over LGPL 2.1)
+
+---
+
+Group: org.codehaus.janino Name: commons-compiler Version: 2.7.6
+Group: org.codehaus.janino Name: janino Version: 2.7.6
+Project URL: N/A
+License: New BSD License - [http://dist.codehaus.org/janino/new_bsd_license.txt](http://dist.codehaus.org/janino/new_bsd_license.txt)
+
+---
+
+Group: org.codehaus.jettison Name: jettison Version: 1.5.4
+Project URL: [https://github.com/jettison-json/jettison](https://github.com/jettison-json/jettison)
+License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+---
+
+Group: org.codehaus.woodstox Name: stax2-api Version: 4.2.1
+Project URL: [http://github.com/FasterXML/stax2-api](http://github.com/FasterXML/stax2-api)
+License: The BSD License - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
+
+---
+
+Group: org.datanucleus Name: datanucleus-api-jdo Version: 4.2.4
+Group: org.datanucleus Name: datanucleus-core Version: 4.1.17
+Group: org.datanucleus Name: datanucleus-rdbms Version: 4.1.19
+Group: org.datanucleus Name: javax.jdo Version: 3.2.0-m3
+Project URL: N/A
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.eclipse.jetty Name: jetty-client Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-http Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-io Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-security Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-server Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-servlet Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-util Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-util-ajax Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-webapp Version: 9.4.53.v20231009
+Group: org.eclipse.jetty Name: jetty-xml Version: 9.4.53.v20231009
+Group: org.eclipse.jetty.websocket Name: websocket-api Version: 9.4.53.v20231009
+Group: org.eclipse.jetty.websocket Name: websocket-client Version: 9.4.53.v20231009
+Group: org.eclipse.jetty.websocket Name: websocket-common Version: 9.4.53.v20231009
+Project URL: [https://eclipse.org/jetty](https://eclipse.org/jetty)
+License: Eclipse Public License - Version 1.0 - [https://www.eclipse.org/org/documents/epl-v10.php](https://www.eclipse.org/org/documents/epl-v10.php)
+
+---
+
+Group: org.eclipse.microprofile.openapi Name: microprofile-openapi-api Version: 4.1
+Project URL: [http://microprofile.io/microprofile-openapi-parent/microprofile-openapi-api](http://microprofile.io/microprofile-openapi-parent/microprofile-openapi-api)
+License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.fusesource.leveldbjni Name: leveldbjni-all Version: 1.8
+Project URL: [http://fusesource.com/](http://fusesource.com/)
+License: The BSD 3-Clause License - [http://www.opensource.org/licenses/BSD-3-Clause](http://www.opensource.org/licenses/BSD-3-Clause)
+
+---
+
+Group: org.jline Name: jline Version: 3.9.0
+Project URL: N/A
+License: The BSD License - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
+
+---
+
+Group: org.mortbay.jetty Name: jetty Version: 6.1.26
+Group: org.mortbay.jetty Name: jetty-util Version: 6.1.26
+Project URL: [http://jetty.mortbay.org](http://jetty.mortbay.org)
+License: Eclipse Public License - Version 1.0 - [http://www.eclipse.org/org/documents/epl-v10.php](http://www.eclipse.org/org/documents/epl-v10.php)
+
+---
+
+Group: org.projectnessie.nessie Name: nessie-client Version: 0.104.5
+Group: org.projectnessie.nessie Name: nessie-model Version: 0.104.5
+Project URL: [https://github.com/projectnessie/nessie](https://github.com/projectnessie/nessie)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.reactivestreams Name: reactive-streams Version: 1.0.4
+Project URL: [http://www.reactive-streams.org/](http://www.reactive-streams.org/)
+License: MIT-0 - [https://spdx.org/licenses/MIT-0.html](https://spdx.org/licenses/MIT-0.html)
+
+---
+
+Group: org.roaringbitmap Name: RoaringBitmap Version: 1.3.0
+Project URL: [https://github.com/RoaringBitmap/RoaringBitmap](https://github.com/RoaringBitmap/RoaringBitmap)
+License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: org.slf4j Name: log4j-over-slf4j Version: 1.7.36
+Project URL: [http://www.slf4j.org](http://www.slf4j.org)
+License: MIT License - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
+
+---
+
+Group: org.slf4j Name: slf4j-api Version: 2.0.17
+Group: org.slf4j Name: slf4j-reload4j Version: 1.7.36
+Project URL: [http://www.slf4j.org](http://www.slf4j.org), [http://reload4j.qos.ch](http://reload4j.qos.ch)
+License: MIT - [https://opensource.org/license/mit](https://opensource.org/license/mit)
+
+---
+
+Group: org.wildfly.openssl Name: wildfly-openssl Version: 1.1.3.Final
+Project URL: N/A
+License: Public Domain - [http://repository.jboss.org/licenses/cc0-1.0.txt](http://repository.jboss.org/licenses/cc0-1.0.txt)
+
+---
+
+Group: org.xerial.snappy Name: snappy-java Version: 1.1.10.4
+Project URL: [https://github.com/xerial/snappy-java](https://github.com/xerial/snappy-java)
+License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.html](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+---
+
+Group: oro Name: oro Version: 2.0.8
+Project URL: N/A
+License: No license information found (License file located at: oro-2.0.8.jar/META-INF/LICENSE)
+
+---
+
+Group: software.amazon.awssdk Name: annotations Version: 2.33.0
+Group: software.amazon.awssdk Name: apache-client Version: 2.33.0
+Group: software.amazon.awssdk Name: arns Version: 2.33.0
+Group: software.amazon.awssdk Name: auth Version: 2.33.0
+Group: software.amazon.awssdk Name: aws-core Version: 2.33.0
+Group: software.amazon.awssdk Name: aws-json-protocol Version: 2.33.0
+Group: software.amazon.awssdk Name: aws-query-protocol Version: 2.33.0
+Group: software.amazon.awssdk Name: aws-xml-protocol Version: 2.33.0
+Group: software.amazon.awssdk Name: bundle Version: 2.24.6
+Group: software.amazon.awssdk Name: checksums Version: 2.33.0
+Group: software.amazon.awssdk Name: checksums-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: crt-core Version: 2.33.0
+Group: software.amazon.awssdk Name: dynamodb Version: 2.33.0
+Group: software.amazon.awssdk Name: endpoints-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: glue Version: 2.33.0
+Group: software.amazon.awssdk Name: http-auth Version: 2.33.0
+Group: software.amazon.awssdk Name: http-auth-aws Version: 2.33.0
+Group: software.amazon.awssdk Name: http-auth-aws-eventstream Version: 2.33.0
+Group: software.amazon.awssdk Name: http-auth-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: http-client-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: identity-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: json-utils Version: 2.33.0
+Group: software.amazon.awssdk Name: kms Version: 2.33.0
+Group: software.amazon.awssdk Name: lakeformation Version: 2.33.0
+Group: software.amazon.awssdk Name: metrics-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: netty-nio-client Version: 2.33.0
+Group: software.amazon.awssdk Name: profiles Version: 2.33.0
+Group: software.amazon.awssdk Name: protocol-core Version: 2.33.0
+Group: software.amazon.awssdk Name: regions Version: 2.33.0
+Group: software.amazon.awssdk Name: retries Version: 2.33.0
+Group: software.amazon.awssdk Name: retries-spi Version: 2.33.0
+Group: software.amazon.awssdk Name: s3 Version: 2.33.0
+Group: software.amazon.awssdk Name: sdk-core Version: 2.33.0
+Group: software.amazon.awssdk Name: sts Version: 2.33.0
+Group: software.amazon.awssdk Name: third-party-jackson-core Version: 2.33.0
+Group: software.amazon.awssdk Name: url-connection-client Version: 2.33.0
+Group: software.amazon.awssdk Name: utils Version: 2.33.0
+Project URL: [https://aws.amazon.com/sdkforjava](https://aws.amazon.com/sdkforjava)
+License: Apache License, Version 2.0 - [https://aws.amazon.com/apache2.0](https://aws.amazon.com/apache2.0)
+
+---
+
+Group: software.amazon.eventstream Name: eventstream Version: 1.0.1
+Project URL: [https://github.com/awslabs/aws-eventstream-java](https://github.com/awslabs/aws-eventstream-java)
+License: Apache License, Version 2.0 - [https://aws.amazon.com/apache2.0](https://aws.amazon.com/apache2.0)
+
+---
+
+Group: stax Name: stax-api Version: 1.0.1
+Project URL: [http://stax.codehaus.org/](http://stax.codehaus.org/)
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+---
+
+Group: tomcat Name: jasper-compiler Version: 5.5.23
+Group: tomcat Name: jasper-runtime Version: 5.5.23
+Project URL: N/A
+License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
