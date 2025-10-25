@@ -22,8 +22,9 @@ import { Layout, Input, Col, Row, Image, Menu, Space, Spin, message } from 'antd
 import { Route, Switch } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { UserOutlined, BlockOutlined, SettingOutlined, DeleteOutlined, PlayCircleOutlined, LogoutOutlined, ApartmentOutlined, DashboardOutlined, AreaChartOutlined, NotificationOutlined, SafetyOutlined, TeamOutlined, BuildOutlined, CrownOutlined, ProfileOutlined, CheckSquareOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, BlockOutlined, SettingOutlined, DeleteOutlined, PlayCircleOutlined, LogoutOutlined, ApartmentOutlined, DashboardOutlined, AreaChartOutlined, NotificationOutlined, SafetyOutlined, TeamOutlined, BuildOutlined, CrownOutlined, ProfileOutlined, CheckSquareOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import Home from './home.tsx';
+import Catalog from './catalog.tsx';
 
 function SideMenu(props) {
 
@@ -33,7 +34,7 @@ function SideMenu(props) {
     const bearer = 'Bearer ' + props.token;
 
     const fetchCatalogs = () => {
-        fetch('./api/management/v1/catalogs', {
+        fetch('/api/management/v1/catalogs', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -62,14 +63,14 @@ function SideMenu(props) {
     const catalogElementsMenu = catalogs.map((element) => {
         return({
            key: element.name,
-           label:element.name,
+           label: element.name,
            icon: <ApartmentOutlined/>
         });
     });
     const newCatalogMenu = [
         {
             key: 'catalog/create',
-            label: 'Create New',
+            label: <Link to="/catalog/create">Create</Link>,
             icon: <PlusCircleOutlined/>,
         }
     ];
@@ -77,6 +78,7 @@ function SideMenu(props) {
     const catalogMenu = newCatalogMenu.concat(catalogElementsMenu);
 
     const mainMenu = [
+        { key: 'home', label: <Link to="/">Home</Link>, icon: <HomeOutlined/> },
         { key: 'catalogs', label: 'Catalogs', icon: <BlockOutlined/>, children: catalogMenu },
         { key: 'governance', label: 'Governance', icon: <SafetyOutlined/>, children: [
             { key: 'principals', label: 'Principals', icon: <UserOutlined/> },
@@ -118,7 +120,7 @@ function Header(props) {
     return(
         <Layout.Header style={{ height: "80px", background: "#fff", padding: "5px", margin: "10px" }}>
             <Row align="middle" justify="center" wrap="false">
-                <Col span={3}><Image src="./logo.png" preview={false} width={60}/></Col>
+                <Col span={3}><Image src="/logo.png" preview={false} width={50}/></Col>
                 <Col span={19}><Search /></Col>
                 <Col span={2}><Menu items={userMenu} onClick={(e) => {
                     if (e.key === 'logout') {
@@ -135,7 +137,6 @@ function Header(props) {
 }
 
 export default function Workspace(props) {
-
     return(
         <Layout style={{ height: "105vh" }}>
             <Header user={props.user} setUser={props.setUser} />
@@ -146,6 +147,9 @@ export default function Workspace(props) {
                     <Switch>
                         <Route path="/" key="home" exact={true}>
                             <Home user={props.user} token={props.token} />
+                        </Route>
+                        <Route path="/catalog/create" key="catalog-create" exact={true}>
+                            <Catalog token={props.token} />
                         </Route>
                     </Switch>
                 </Layout.Content>

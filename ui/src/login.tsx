@@ -32,7 +32,7 @@ export default function Login(props) {
                 console.log(values);
 
                 const fetchUser = () => {
-                    fetch('./api/catalog/v1/oauth/tokens', {
+                    fetch('/api/catalog/v1/oauth/tokens', {
                         method: 'POST',
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded"
