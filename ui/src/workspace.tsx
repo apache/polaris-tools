@@ -17,24 +17,67 @@
  * under the License.
 */
 
-import React, { useState } from 'react';
-import { Layout, Input, Col, Row, Image, Menu, Space } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Input, Col, Row, Image, Menu, Space, Spin, message } from 'antd';
 import { Route, Switch } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { UserOutlined, BlockOutlined, SettingOutlined, DeleteOutlined, PlayCircleOutlined, LogoutOutlined, ApartmentOutlined, DashboardOutlined, AreaChartOutlined, NotificationOutlined, SafetyOutlined, TeamOutlined, BuildOutlined, CrownOutlined, ProfileOutlined, CheckSquareOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import Home from './home.tsx';
 
-function SideMenu() {
+function SideMenu(props) {
 
     const[ collapsed, setCollapsed ] = useState(false);
+    const[ catalogs, setCatalogs ] = useState();
+
+    const bearer = 'Bearer ' + props.token;
+
+    const fetchCatalogs = () => {
+        fetch('./api/management/v1/catalogs', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': bearer
+            }
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(response.status);
+            }
+            return response.json();
+        })
+        .then((data) => setCatalogs(data.catalogs))
+        .catch((error) => {
+            message.error('An error occured: ' + error.message);
+            console.error(error);
+        });
+    };
+
+    useEffect(fetchCatalogs, []);
+
+    if (!catalogs) {
+        return(<Spin/>);
+    }
+
+    const catalogElementsMenu = catalogs.map((element) => {
+        return({
+           key: element.name,
+           label:element.name,
+           icon: <ApartmentOutlined/>
+        });
+    });
+    const newCatalogMenu = [
+        {
+            key: 'catalog/create',
+            label: 'Create New',
+            icon: <PlusCircleOutlined/>,
+        }
+    ];
+
+    const catalogMenu = newCatalogMenu.concat(catalogElementsMenu);
 
     const mainMenu = [
-        { key: 'catalogs', label: 'Catalogs', icon: <BlockOutlined/>, children: [
-            { key: 'new', label: 'Create catalog', icon: <PlusCircleOutlined/> },
-            { key: 'default', label: 'Default', icon: <ApartmentOutlined/> },
-            { key: 'my', label: 'My Catalog', icon: <ApartmentOutlined/> }
-        ] },
+        { key: 'catalogs', label: 'Catalogs', icon: <BlockOutlined/>, children: catalogMenu },
         { key: 'governance', label: 'Governance', icon: <SafetyOutlined/>, children: [
             { key: 'principals', label: 'Principals', icon: <UserOutlined/> },
             { key: 'principal_roles', label: 'Principal Roles', icon: <TeamOutlined/> },
@@ -98,7 +141,7 @@ export default function Workspace(props) {
             <Header user={props.user} setUser={props.setUser} />
             <Layout hasSider={true}>
                 <Router>
-                <SideMenu />
+                <SideMenu token={props.token} />
                 <Layout.Content style={{ margin: "15px" }}>
                     <Switch>
                         <Route path="/" key="home" exact={true}>
