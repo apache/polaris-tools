@@ -99,6 +99,8 @@ function Azure() {
 
 export default function Catalog(props) {
 
+    const bearer = 'Bearer ' + props.token;
+
     const [ catalogForm ] = Form.useForm();
 
     const tabItems = [
@@ -123,7 +125,32 @@ export default function Catalog(props) {
     ];
 
     const onFinish = (values) => {
-        console.log(values);
+        const request = {
+          'catalog': {
+            'name': values.name,
+            'properties': {
+                'default-base-location': values.location
+            },
+            'storageConfigInfo': {
+                'storageType': values.storageType,
+                'allowedLocations': values.allowedLocations
+            }
+          }
+        };
+        const createCatalog = () => {
+            fetch('/api/management/v1/catalogs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Polaris-Realm': 'POLARIS',
+                    'Authorization': bearer
+                }
+            })
+            .then((response) => {
+                
+            })
+        };
+        console.log(request);
     };
 
     return(
@@ -134,15 +161,15 @@ export default function Catalog(props) {
             wrapperCol={{ span: 16 }}
             style={{ width: '100%' }}
             onFinish={onFinish}>
-            <Form.Item name="name" label="Name">
+            <Form.Item name="name" label="Name" rules={[{ required: true, message: 'The catalog name is required' }]}>
                 <Input allowClear={true} />
             </Form.Item>
-            <Form.Item name="storageType" label="Storage Type">
+            <Form.Item name="storageType" label="Storage Type" rules={[{ required: true, message: 'The storage type is required' }]}>
                 <Select options={[
-                    { value: 's3', label: 'S3' },
-                    { value: 'gcp', label: 'GCP' },
-                    { value: 'azure', label: 'Azure' },
-                    { value: 'file', label: 'File' }
+                    { value: 'S3', label: 'S3' },
+                    { value: 'GCP', label: 'GCP' },
+                    { value: 'AZURE', label: 'Azure' },
+                    { value: 'FILE', label: 'File' }
                 ]}/>
             </Form.Item>
             <Form.Item name="location" label="Default Base Location">
@@ -152,11 +179,11 @@ export default function Catalog(props) {
                 <Select mode="tags" />
             </Form.Item>
             <Collapse items={[
-                { key: '1', label: 'Storage configuration', children: <Tabs centered items={tabItems} /> }
+                { key: '1', label: 'Storage specific configuration', children: <Tabs centered items={tabItems} /> }
             ]}/>
             <Divider />
             <Collapse items={[
-                { key: '1', label: 'Properties', children: <Form.Item name="properties" label="Additional properties"><Select mode="tags"/></Form.Item> }
+                { key: '1', label: 'Additional properties', children: <Form.Item name="properties" label="Additional properties"><Select mode="tags"/></Form.Item> }
             ]}/>
             <Divider />
             <Form.Item label={null}>
