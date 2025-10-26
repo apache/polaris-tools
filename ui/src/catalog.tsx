@@ -17,8 +17,85 @@
  * under the License.
 */
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Card, Form, Input, Tabs, Collapse, Divider, Button, Space } from 'antd';
+import { Breadcrumb, Card, Form, Input, Select, Tabs, Collapse, Divider, Button, Space } from 'antd';
 import { HomeOutlined, ApartmentOutlined, AmazonOutlined, GoogleOutlined, CloudOutlined, FileSyncOutlined, SaveOutlined, PauseCircleOutlined } from '@ant-design/icons';
+
+function S3() {
+
+    return(
+        <>
+        <Form.Item name="s3.roleArn" label="Role ARN">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.externalId" label="External ID">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.userArn" label="User ARN">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.region" label="Region">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.endpoint" label="Endpoint">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.endpointInternal" label="Endpoint internal">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.pathStyleAccess" label="Path style access">
+            <Select options={[
+                { value: 'true', label: 'Enabled' },
+                { value: 'false', label: 'Disabled' }
+            ]} />
+        </Form.Item>
+        <Form.Item name="s3.stsUnavailable" label="STS">
+            <Select options={[
+                { value: 'false', label: 'Enabled' },
+                { value: 'true', label: 'Disabled' }
+            ]} />
+        </Form.Item>
+        <Form.Item name="s3.stsEndpoint" label="STS endpoint">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.accountId" label="Account ID">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="s3.partition" label="Partition">
+            <Input allowClear={true} />
+        </Form.Item>
+        </>
+    );
+}
+
+function GCP() {
+
+    return(
+        <>
+        <Form.Item name="gcp.serviceAccount" label="Service account">
+            <Input allowClear={true} />
+        </Form.Item>
+        </>
+    );
+
+}
+
+function Azure() {
+
+    return(
+        <>
+        <Form.Item name="azure.tenantId" label="Tenant ID">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="azure.multiTenantAppName" label="Multi tenant app name">
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="azure.consentUrl" label="Consent URL">
+            <Input allowClear={true} />
+        </Form.Item>
+        </>
+    );
+
+}
 
 export default function Catalog(props) {
 
@@ -27,29 +104,27 @@ export default function Catalog(props) {
     const tabItems = [
         {
             key: 's3',
-            label: 'AWS S3',
+            label: 'S3',
             icon: <AmazonOutlined/>,
-            children: <p>S3</p>
+            children: <S3/>
         },
         {
             key: 'gcp',
             label: 'GCP',
             icon: <GoogleOutlined/>,
-            children: <p>GCP</p>
+            children: <GCP/>
         },
         {
             key: 'azure',
             label: 'Azure',
             icon: <CloudOutlined/>,
-            children: <p>Azure</p>
-        },
-        {
-            key: 'local',
-            label: 'Local',
-            icon: <FileSyncOutlined/>,
-            children: <p>File</p>
+            children: <Azure/>
         }
     ];
+
+    const onFinish = (values) => {
+        console.log(values);
+    };
 
     return(
       <>
@@ -57,24 +132,37 @@ export default function Catalog(props) {
       <Card title="Create Catalog" style={{ width: '100%' }}>
         <Form name="catalog" form={catalogForm} labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
-            style={{ width: '100%' }}>
+            style={{ width: '100%' }}
+            onFinish={onFinish}>
             <Form.Item name="name" label="Name">
                 <Input allowClear={true} />
+            </Form.Item>
+            <Form.Item name="storageType" label="Storage Type">
+                <Select options={[
+                    { value: 's3', label: 'S3' },
+                    { value: 'gcp', label: 'GCP' },
+                    { value: 'azure', label: 'Azure' },
+                    { value: 'file', label: 'File' }
+                ]}/>
             </Form.Item>
             <Form.Item name="location" label="Default Base Location">
                 <Input allowClear={true} />
             </Form.Item>
-            <Divider/>
-            <Tabs centered items={tabItems} />
-            <Divider/>
+            <Form.Item name="allowedLocations" label="Allowed locations">
+                <Select mode="tags" />
+            </Form.Item>
             <Collapse items={[
-                { key: '1', label: 'Properties', children: <p>Properties</p> }
+                { key: '1', label: 'Storage configuration', children: <Tabs centered items={tabItems} /> }
             ]}/>
-            <Divider/>
+            <Divider />
+            <Collapse items={[
+                { key: '1', label: 'Properties', children: <Form.Item name="properties" label="Additional properties"><Select mode="tags"/></Form.Item> }
+            ]}/>
+            <Divider />
             <Form.Item label={null}>
                 <Space>
-                    <Button type="primary" icon={<SaveOutlined/>}>Save</Button>
-                    <Button icon={<PauseCircleOutlined/>}>Cancel</Button>
+                    <Button type="primary" icon={<SaveOutlined/>} onClick={() => catalogForm.submit()}>Save</Button>
+                    <Button icon={<PauseCircleOutlined/>} onClick={() => catalogForm.resetFields()}>Cancel</Button>
                 </Space>
             </Form.Item>
         </Form>

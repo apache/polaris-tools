@@ -85,22 +85,12 @@ function SideMenu(props) {
             { key: 'principal_roles', label: 'Principal Roles', icon: <TeamOutlined/> },
             { key: 'catalog_roles', label: 'Catalog Roles', icon: <BuildOutlined/> },
             { key: 'privileges', label: 'Privileges', icon: <CrownOutlined/> }
-        ]},
-        { key: 'policies', label: 'Policies & TMS', icon: <CheckSquareOutlined/> },
-        { key: 'observe', label: 'Observability', icon: <DashboardOutlined/>, children: [
-            { key: 'metrics', label: 'Metrics', icon: <AreaChartOutlined/> },
-            { key: 'events', label: 'Events', icon: <NotificationOutlined/> }
-        ]},
-        { key: 'profiles', label: 'Profiles', icon: <ProfileOutlined/> },
-        { key: 'settings', label: 'Settings', icon: <SettingOutlined/>, children: [
-            { key: 'bootstrap', label: 'Bootstrap', icon: <PlayCircleOutlined/> },
-            { key: 'purge', label: 'Purge', icon: <DeleteOutlined/> }
-        ] }
+        ]}
     ];
 
     return(
         <Layout.Sider collapsible={true} collapsed={collapsed} onCollapse={newValue => setCollapsed(newValue)}>
-            <Menu items={mainMenu} mode="inline"/>
+            <Menu items={mainMenu} mode="inline" defaultOpenKeys={[ 'catalogs', 'governance' ]}/>
         </Layout.Sider>
     );
 
