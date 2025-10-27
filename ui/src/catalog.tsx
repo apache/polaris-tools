@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-import { Link, Redirect } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Breadcrumb, Card, Form, Input, Select, Tabs, Collapse, Divider, Button, Space, message } from 'antd';
 import { HomeOutlined, ApartmentOutlined, AmazonOutlined, GoogleOutlined, CloudOutlined, FileSyncOutlined, SaveOutlined, PauseCircleOutlined } from '@ant-design/icons';
 
@@ -144,6 +145,9 @@ function StorageConfig() {
 
 export default function Catalog(props) {
 
+    const [ catalogName, setCatalogName ] = useState();
+    const [ catalogDetail, setCatalogDetail ] = useState();
+
     const bearer = 'Bearer ' + props.token;
 
     const [ catalogForm ] = Form.useForm();
@@ -180,13 +184,40 @@ export default function Catalog(props) {
         .then((data) => {
             console.log(data);
             message.info('Catalog ' + data.name + ' created.');
-            props.fetchCatalogs();
+            setCatalogName(data.name);
         })
         .catch((error) => {
             message.error('An error occurred: ' + error.message);
             console.error(error);
         });
     };
+
+    if (catalogName) {
+        // get catalog details
+        const fetchCatalogDetail = () => {
+            fetch('/api/management/v1/catalogs/' + catalogName, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Polaris-Realm': 'POLARIS',
+                    'Authorization': bearer
+                }
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(response.status);
+                }
+                return response.json();
+            })
+            .then((data) => setCatalogDetail(data))
+            .catch((error) => {
+                message.error('An error occurred: ' + error.message);
+                console.error(error);
+            });
+        };
+
+        useEffect(fetchCatalogDetail, [catalogName]);
+    }
 
     return(
       <>
@@ -195,7 +226,7 @@ export default function Catalog(props) {
         <Form name="catalog" form={catalogForm} labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             style={{ width: '100%' }}
-            onFinish={onFinish}>
+            onFinish={onFinish} initialValues={catalogDetail}>
             <Form.Item name="name" label="Name" rules={[{ required: true, message: 'The catalog name is required' }]}>
                 <Input allowClear={true} />
             </Form.Item>
