@@ -143,7 +143,7 @@ export default function Workspace(props) {
                             <Catalog token={props.token} fetchCatalogs={fetchCatalogs} />
                         </Route>
                         <Route path="/settings" key="settings" exect={true}>
-                            <Settings realm={realm} realmHeader={realmHeader} />
+                            <Settings realm={realm} realmHeader={realmHeader} setRealm={setRealm} setRealmHeader={setRealmHeader} />
                         </Route>
                     </Switch>
                 </Layout.Content>
