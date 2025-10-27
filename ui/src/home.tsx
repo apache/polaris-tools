@@ -18,7 +18,7 @@
 */
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Card, Row, Col, Space, Button, Table, Spin, message } from 'antd';
+import { Breadcrumb, Card, Row, Col, Space, Button, Table, Spin, Popconfirm, message } from 'antd';
 import { HomeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 export default function Home(props) {
@@ -65,7 +65,12 @@ export default function Home(props) {
             render: (_,record) => (
                 <Space>
                     <Button><EditOutlined/></Button>
-                    <Button><DeleteOutlined onClick={() => deleteCatalog(record.name)}/></Button>
+                    <Popconfirm title="Delete Catalog"
+                        description="Are you sure you want to delete catalog ?"
+                        onConfirm={() => deleteCatalog(record.name)}
+                        okText="Yes" cancelText="No">
+                        <Button danger icon={<DeleteOutlined/>} />
+                    </Popconfirm>
                 </Space>
             )
         }
