@@ -32,9 +32,10 @@ function SideMenu(props) {
     const[ collapsed, setCollapsed ] = useState(false);
 
     const catalogElementsMenu = props.catalogs.map((element) => {
+        const link = "/catalog/" + element.name;
         return({
            key: element.name,
-           label: element.name,
+           label: <Link to={link}>{element.name}</Link>,
            icon: <ApartmentOutlined/>
         });
     });
@@ -141,6 +142,9 @@ export default function Workspace(props) {
                         </Route>
                         <Route path="/catalog/create" key="catalog-create" exact={true}>
                             <Catalog token={props.token} fetchCatalogs={fetchCatalogs} />
+                        </Route>
+                        <Route path="/catalog/:catalogName" key="catalog">
+                            <Catalog token={props.token} fetchCataalogs={fetchCatalogs} />
                         </Route>
                         <Route path="/settings" key="settings" exect={true}>
                             <Settings realm={realm} realmHeader={realmHeader} setRealm={setRealm} setRealmHeader={setRealmHeader} />

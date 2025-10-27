@@ -17,6 +17,7 @@
  * under the License.
 */
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { Breadcrumb, Card, Form, Input, Select, Tabs, Collapse, Divider, Button, Space, message } from 'antd';
 import { HomeOutlined, ApartmentOutlined, AmazonOutlined, GoogleOutlined, CloudOutlined, FileSyncOutlined, SaveOutlined, PauseCircleOutlined } from '@ant-design/icons';
@@ -145,12 +146,13 @@ function StorageConfig() {
 
 export default function Catalog(props) {
 
-    const [ catalogName, setCatalogName ] = useState();
     const [ catalogDetail, setCatalogDetail ] = useState();
 
     const bearer = 'Bearer ' + props.token;
 
     const [ catalogForm ] = Form.useForm();
+
+    let { catalogName } = useParams();
 
     const onFinish = (values) => {
         const request = {
@@ -209,7 +211,10 @@ export default function Catalog(props) {
                 }
                 return response.json();
             })
-            .then((data) => setCatalogDetail(data))
+            .then((data) => {
+                console.log(data);
+                setCatalogDetail(data);
+            })
             .catch((error) => {
                 message.error('An error occurred: ' + error.message);
                 console.error(error);
