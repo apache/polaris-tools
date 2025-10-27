@@ -25,6 +25,7 @@ import { Link } from 'react-router-dom';
 import { HomeOutlined, UserOutlined, BlockOutlined, SettingOutlined, DeleteOutlined, PlayCircleOutlined, LogoutOutlined, ApartmentOutlined, DashboardOutlined, AreaChartOutlined, NotificationOutlined, SafetyOutlined, TeamOutlined, BuildOutlined, CrownOutlined, ProfileOutlined, CheckSquareOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import Home from './home.tsx';
 import Catalog from './catalog.tsx';
+import Settings from './settings.tsx';
 
 function SideMenu(props) {
 
@@ -55,7 +56,8 @@ function SideMenu(props) {
             { key: 'principal_roles', label: 'Principal Roles', icon: <TeamOutlined/> },
             { key: 'catalog_roles', label: 'Catalog Roles', icon: <BuildOutlined/> },
             { key: 'privileges', label: 'Privileges', icon: <CrownOutlined/> }
-        ]}
+        ]},
+        { key: 'settings', label: <Link to="/settings">Settings</Link>, icon: <SettingOutlined/> }
     ];
 
     return(
@@ -72,7 +74,6 @@ function Header(props) {
 
     const userMenu = [
         { key: 'user', label: props.user, icon: <UserOutlined/>, children: [
-            { key: 'preferences', label: 'Preferences', icon: <SettingOutlined/> },
             { key: 'logout', label: 'Logout', icon: <LogoutOutlined/> }
         ] }
     ];
@@ -86,9 +87,6 @@ function Header(props) {
                     if (e.key === 'logout') {
                         props.setUser(null);
                     }
-                    if (e.key === 'preferences') {
-                        console.log(e);
-                    }
                 }} /></Col>
             </Row>
         </Layout.Header>
@@ -98,6 +96,8 @@ function Header(props) {
 
 export default function Workspace(props) {
 
+    const [ realmHeader, setRealmHeader ] = useState("Polaris-Realm");
+    const [ realm, setRealm ] = useState("POLARIS");
     const [ catalogs, setCatalogs ] = useState();
 
     const bearer = 'Bearer ' + props.token;
@@ -141,6 +141,9 @@ export default function Workspace(props) {
                         </Route>
                         <Route path="/catalog/create" key="catalog-create" exact={true}>
                             <Catalog token={props.token} fetchCatalogs={fetchCatalogs} />
+                        </Route>
+                        <Route path="/settings" key="settings" exect={true}>
+                            <Settings realm={realm} realmHeader={realmHeader} />
                         </Route>
                     </Switch>
                 </Layout.Content>
