@@ -29,38 +29,8 @@ import Catalog from './catalog.tsx';
 function SideMenu(props) {
 
     const[ collapsed, setCollapsed ] = useState(false);
-    const[ catalogs, setCatalogs ] = useState();
 
-    const bearer = 'Bearer ' + props.token;
-
-    const fetchCatalogs = () => {
-        fetch('/api/management/v1/catalogs', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': bearer
-            }
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(response.status);
-            }
-            return response.json();
-        })
-        .then((data) => setCatalogs(data.catalogs))
-        .catch((error) => {
-            message.error('An error occured: ' + error.message);
-            console.error(error);
-        });
-    };
-
-    useEffect(fetchCatalogs, []);
-
-    if (!catalogs) {
-        return(<Spin/>);
-    }
-
-    const catalogElementsMenu = catalogs.map((element) => {
+    const catalogElementsMenu = props.catalogs.map((element) => {
         return({
            key: element.name,
            label: element.name,
@@ -127,19 +97,50 @@ function Header(props) {
 }
 
 export default function Workspace(props) {
+
+    const [ catalogs, setCatalogs ] = useState();
+
+    const bearer = 'Bearer ' + props.token;
+    const fetchCatalogs = () => {
+        fetch('/api/management/v1/catalogs', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': bearer
+            }
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(response.status);
+            }
+            return response.json();
+        })
+        .then((data) => setCatalogs(data.catalogs))
+        .catch((error) => {
+            message.error('An error occurred: ' + error.message);
+            console.error(error);
+        });
+    };
+
+    useEffect(fetchCatalogs, []);
+
+    if (!catalogs) {
+        return(<Spin/>);
+    }
+
     return(
         <Layout style={{ height: "105vh" }}>
             <Header user={props.user} setUser={props.setUser} />
             <Layout hasSider={true}>
                 <Router>
-                <SideMenu token={props.token} />
+                <SideMenu catalogs={catalogs} />
                 <Layout.Content style={{ margin: "15px" }}>
                     <Switch>
                         <Route path="/" key="home" exact={true}>
-                            <Home user={props.user} token={props.token} />
+                            <Home catalogs={catalogs} token={props.token} fetchCatalogs={fetchCatalogs} />
                         </Route>
                         <Route path="/catalog/create" key="catalog-create" exact={true}>
-                            <Catalog token={props.token} />
+                            <Catalog token={props.token} fetchCatalogs={fetchCatalogs} />
                         </Route>
                     </Switch>
                 </Layout.Content>

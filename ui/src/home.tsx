@@ -23,46 +23,36 @@ import { HomeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 export default function Home(props) {
 
-    const [ catalogs, setCatalogs] = useState();
-    const [ principals, setPrincipals ] = useState();
-
     const bearer = 'Bearer ' + props.token;
 
-    const fetchCatalogs = () => {
-        fetch('./api/management/v1/catalogs', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': bearer,
-                }
-            })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(response.status);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log(data);
-                setCatalogs(data.catalogs);
-            })
-            .catch((error) => {
-                message.error('An error occurred: ' + error.message);
-                console.error(error);
-            })
+    const deleteCatalog = (catalog) => {
+        fetch('/api/management/v1/catalogs/' + catalog, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': bearer
+            }
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(response.status);
+            }
+            return response;
+        })
+        .then((data) => {
+            message.info('Catalog ' + catalog + ' has been removed');
+            props.fetchCatalogs();
+        })
+        .catch((error) => {
+            message.error('An error occurred: ' + error.message);
+            console.error(error);
+        })
     };
-
-    useEffect(fetchCatalogs, []);
-
-    if (!catalogs) {
-        return(<Spin/>);
-    }
 
     const catalogColumns = [
         {
             title: 'Catalog',
-            dataIndex: 'catalog',
-            key: 'catalog'
+            dataIndex: 'name',
+            key: 'name'
         },
         {
             title: 'Type',
@@ -70,17 +60,12 @@ export default function Home(props) {
             key: 'type'
         },
         {
-            title: 'Base Location',
-            dataIndex: 'location',
-            key: 'location'
-        },
-        {
             title: '',
             key: 'action',
             render: (_,record) => (
                 <Space>
                     <Button><EditOutlined/></Button>
-                    <Button><DeleteOutlined/></Button>
+                    <Button><DeleteOutlined onClick={() => deleteCatalog(record.name)}/></Button>
                 </Space>
             )
         }
@@ -92,7 +77,7 @@ export default function Home(props) {
         <Card title="Overview" style={{ width: '100%' }}>
             <Row gutter={[16,16]}>
                 <Col span={24}>
-                    <Table columns={catalogColumns} dataSource={catalogs} />
+                    <Table columns={catalogColumns} dataSource={props.catalogs} />
                 </Col>
             </Row>
         </Card>

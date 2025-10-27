@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-import { Link } from 'react-router-dom';
-import { Breadcrumb, Card, Form, Input, Select, Tabs, Collapse, Divider, Button, Space } from 'antd';
+import { Link, Redirect } from 'react-router-dom';
+import { Breadcrumb, Card, Form, Input, Select, Tabs, Collapse, Divider, Button, Space, message } from 'antd';
 import { HomeOutlined, ApartmentOutlined, AmazonOutlined, GoogleOutlined, CloudOutlined, FileSyncOutlined, SaveOutlined, PauseCircleOutlined } from '@ant-design/icons';
 
 function S3() {
@@ -97,11 +97,7 @@ function Azure() {
 
 }
 
-export default function Catalog(props) {
-
-    const bearer = 'Bearer ' + props.token;
-
-    const [ catalogForm ] = Form.useForm();
+function StorageConfig() {
 
     const tabItems = [
         {
@@ -124,10 +120,39 @@ export default function Catalog(props) {
         }
     ];
 
+    return(
+        <>
+        <Form.Item name="storageType" label="Storage Type" rules={[{ required: true, message: 'The storage type is required' }]}>
+            <Select options={[
+                { value: 'S3', label: 'S3' },
+                { value: 'GCP', label: 'GCP' },
+                { value: 'AZURE', label: 'Azure' },
+                { value: 'FILE', label: 'File' }
+            ]}/>
+        </Form.Item>
+        <Form.Item name="location" label="Default Base Location" rules={[{ required: true, message: 'The storage location is required' }]}>
+            <Input allowClear={true} />
+        </Form.Item>
+        <Form.Item name="allowedLocations" label="Allowed locations">
+            <Select mode="tags" />
+        </Form.Item>
+        <Tabs centered items={tabItems} />
+        </>
+    );
+
+}
+
+export default function Catalog(props) {
+
+    const bearer = 'Bearer ' + props.token;
+
+    const [ catalogForm ] = Form.useForm();
+
     const onFinish = (values) => {
         const request = {
           'catalog': {
             'name': values.name,
+            'type': values.type,
             'properties': {
                 'default-base-location': values.location
             },
@@ -137,20 +162,30 @@ export default function Catalog(props) {
             }
           }
         };
-        const createCatalog = () => {
-            fetch('/api/management/v1/catalogs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Polaris-Realm': 'POLARIS',
-                    'Authorization': bearer
-                }
-            })
-            .then((response) => {
-                
-            })
-        };
-        console.log(request);
+        fetch('/api/management/v1/catalogs', {
+            method: 'POST',
+            body: JSON.stringify(request),
+            headers: {
+                'Content-Type': 'application/json',
+                'Polaris-Realm': 'POLARIS',
+                'Authorization': bearer
+            }
+        })
+        .then((response) => {
+            if(!response.ok) {
+                throw new Error(response.status);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log(data);
+            message.info('Catalog ' + data.name + ' created.');
+            props.fetchCatalogs();
+        })
+        .catch((error) => {
+            message.error('An error occurred: ' + error.message);
+            console.error(error);
+        });
     };
 
     return(
@@ -164,22 +199,14 @@ export default function Catalog(props) {
             <Form.Item name="name" label="Name" rules={[{ required: true, message: 'The catalog name is required' }]}>
                 <Input allowClear={true} />
             </Form.Item>
-            <Form.Item name="storageType" label="Storage Type" rules={[{ required: true, message: 'The storage type is required' }]}>
+            <Form.Item name="type" label="Type" rules={[{ required: true, message: 'The catalog type is required' }]}>
                 <Select options={[
-                    { value: 'S3', label: 'S3' },
-                    { value: 'GCP', label: 'GCP' },
-                    { value: 'AZURE', label: 'Azure' },
-                    { value: 'FILE', label: 'File' }
+                    { value: 'INTERNAL', label: 'Internal' },
+                    { value: 'EXTERNAL', label: 'External' }
                 ]}/>
             </Form.Item>
-            <Form.Item name="location" label="Default Base Location">
-                <Input allowClear={true} />
-            </Form.Item>
-            <Form.Item name="allowedLocations" label="Allowed locations">
-                <Select mode="tags" />
-            </Form.Item>
             <Collapse items={[
-                { key: '1', label: 'Storage specific configuration', children: <Tabs centered items={tabItems} /> }
+                { key: '1', label: 'Storage specific configuration', children: <StorageConfig /> }
             ]}/>
             <Divider />
             <Collapse items={[
