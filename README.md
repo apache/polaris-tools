@@ -17,9 +17,12 @@
   - under the License.
   -->
 
-This repo has the tools developed by [Apache polaris community](https://polaris.apache.org/)
+# Apache Polaris (Incubating) Tools
 
-Read more about the following tools:
+Apache Polaris Tools provide a set of tools to help users of [Apache Polaris (Incubating)](https://github.com/apache/polaris) to perform various tasks.
+This repository is maintained by the [Apache Polaris community](https://polaris.apache.org/).
 
-1. Benchmarks: [README.md](/benchmarks/README.md)
-2. Iceberg catalog migrator: [README.md](/iceberg-catalog-migrator/README.md)
+There are three tools:
+1. [Benchmarks](/benchmarks/README.md): Performance benchmarks for Polaris.
+2. [Iceberg Catalog Migrator](/iceberg-catalog-migrator/README.md): A command-line tool to migrate Iceberg tables from one Iceberg catalog to another.
+3. [Polaris Synchronizer](/polaris-synchronizer/README.md): A tool to migrate entities from one Polaris instance to another.
