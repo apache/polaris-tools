@@ -40,6 +40,15 @@ Launch the MCP server (which reads from stdin and writes to stdout):
 uv run polaris-mcp
 ```
 
+## Testing
+
+Install dependencies (one-time) and run the Python unit tests with `uv` so the locked environment is used:
+
+```bash
+uv sync
+uv run python -m unittest discover -s tests
+```
+
 Example interaction:
 
 ```json
