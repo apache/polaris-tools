@@ -90,6 +90,13 @@ class ServerHelpersTest(unittest.TestCase):
         ):
             self.assertEqual(server._resolve_base_url(), "https://secondary/")
 
+        with mock.patch.dict(
+                os.environ,
+                { "POLARIS_BASE_URL": "  ","POLARIS_REST_BASE_URL": "https://secondary/"},
+                clear=True,
+        ):
+            self.assertEqual(server._resolve_base_url(), "https://secondary/")
+
         with mock.patch.dict(os.environ, {}, clear=True):
             self.assertEqual(server._resolve_base_url(), server.DEFAULT_BASE_URL)
 

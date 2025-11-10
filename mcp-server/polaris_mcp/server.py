@@ -355,6 +355,7 @@ def _copy_mapping(
 
 
 def _coerce_body(body: Any) -> Any:
+    """Return plain dicts for mapping objects so downstream JSON encoding succeeds."""
     if isinstance(body, Mapping):
         return dict(body)
     return body
