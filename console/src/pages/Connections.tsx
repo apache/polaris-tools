@@ -4,6 +4,7 @@ import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 import { Link as LinkIcon, Plus, RefreshCw, Search, MoreVertical } from "lucide-react"
 import { principalsApi } from "@/api/management/principals"
+import { getErrorMessage } from "@/lib/errorHandler"
 import type { Principal } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,12 +33,18 @@ import {
 } from "@/components/ui/dialog"
 import { ConfigureConnectionModal } from "@/components/forms/ConfigureConnectionModal"
 import { CredentialsModal } from "@/components/forms/CredentialsModal"
+import { PrincipalDetailsModal } from "@/components/users/PrincipalDetailsModal"
+import { EditPrincipalModal } from "@/components/forms/EditPrincipalModal"
+import { ResetCredentialsModal } from "@/components/forms/ResetCredentialsModal"
 
 export function Connections() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isConfigureModalOpen, setIsConfigureModalOpen] = useState(false)
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false)
   const [connectionToDelete, setConnectionToDelete] = useState<string | null>(null)
+  const [connectionToReset, setConnectionToReset] = useState<string | null>(null)
+  const [principalToView, setPrincipalToView] = useState<Principal | null>(null)
+  const [principalToEdit, setPrincipalToEdit] = useState<Principal | null>(null)
   const [generatedCredentials, setGeneratedCredentials] = useState<{
     clientId: string
     clientSecret: string
@@ -57,9 +64,15 @@ export function Connections() {
       queryClient.invalidateQueries({ queryKey: ["principals"] })
       setConnectionToDelete(null)
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
+      const errorMsg = getErrorMessage(
+        error,
+        "Failed to delete connection",
+        "connection",
+        "delete"
+      )
       toast.error("Failed to delete connection", {
-        description: error.message || "An error occurred",
+        description: errorMsg,
       })
     },
   })
@@ -76,12 +89,25 @@ export function Connections() {
       setIsCredentialsModalOpen(true)
       queryClient.invalidateQueries({ queryKey: ["principals"] })
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
+      const errorMsg = getErrorMessage(
+        error,
+        "Failed to rotate credentials",
+        "credentials",
+        "rotate"
+      )
       toast.error("Failed to rotate credentials", {
-        description: error.message || "An error occurred",
+        description: errorMsg,
       })
     },
   })
+
+  const handleResetSuccess = (credentials: { clientId: string; clientSecret: string }) => {
+    setGeneratedCredentials(credentials)
+    setIsCredentialsModalOpen(true)
+    queryClient.invalidateQueries({ queryKey: ["principals"] })
+    setConnectionToReset(null)
+  }
 
   const filteredPrincipals = principals.filter((principal) =>
     principal.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -200,14 +226,14 @@ export function Connections() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
-                            // TODO: Implement view details
+                            setPrincipalToView(principal)
                           }}
                         >
                           View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
-                            // TODO: Implement edit
+                            setPrincipalToEdit(principal)
                           }}
                         >
                           Edit
@@ -221,7 +247,7 @@ export function Connections() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
-                            // TODO: Implement reset
+                            setConnectionToReset(principal.name)
                           }}
                         >
                           Reset Credentials
@@ -256,6 +282,34 @@ export function Connections() {
         onOpenChange={setIsCredentialsModalOpen}
         credentials={generatedCredentials}
       />
+      {principalToView && (
+        <PrincipalDetailsModal
+          open={!!principalToView}
+          onOpenChange={(open) => !open && setPrincipalToView(null)}
+          principal={principalToView}
+        />
+      )}
+      {principalToEdit && (
+        <EditPrincipalModal
+          open={!!principalToEdit}
+          onOpenChange={(open) => !open && setPrincipalToEdit(null)}
+          principal={principalToEdit}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["principals"] })
+            setPrincipalToEdit(null)
+          }}
+        />
+      )}
+
+      {/* Reset Credentials Modal */}
+      {connectionToReset && (
+        <ResetCredentialsModal
+          open={!!connectionToReset}
+          onOpenChange={(open) => !open && setConnectionToReset(null)}
+          principalName={connectionToReset}
+          onSuccess={handleResetSuccess}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog

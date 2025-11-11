@@ -12,7 +12,7 @@ import { Connections } from "@/pages/Connections"
 import { Catalogs } from "@/pages/Catalogs"
 import { CatalogDetails } from "@/pages/CatalogDetails"
 import { NamespaceDetails } from "@/pages/NamespaceDetails"
-import { Users } from "@/pages/Users"
+import { AccessControl } from "@/pages/AccessControl"
 import { TableDetails } from "@/pages/TableDetails"
 
 function ThemedToaster() {
@@ -51,7 +51,7 @@ function App() {
                   <Route path="/catalogs/:catalogName" element={<CatalogDetails />} />
                   <Route path="/catalogs/:catalogName/namespaces/:namespace" element={<NamespaceDetails />} />
                   <Route path="/catalogs/:catalogName/namespaces/:namespace/tables/:tableName" element={<TableDetails />} />
-                  <Route path="/users" element={<Users />} />
+                  <Route path="/access-control" element={<AccessControl />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

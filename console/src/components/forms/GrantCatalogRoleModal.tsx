@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ import {
 import { catalogRolesApi } from "@/api/management/catalog-roles"
 import { principalRolesApi } from "@/api/management/principal-roles"
 import { getErrorMessage } from "@/lib/errorHandler"
-import type { CatalogRole, PrincipalRole } from "@/types/api"
+import type { CatalogRole } from "@/types/api"
 
 interface GrantCatalogRoleModalProps {
   open: boolean

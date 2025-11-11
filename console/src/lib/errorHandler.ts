@@ -12,19 +12,22 @@ import type { AxiosError } from "axios"
 export function extractErrorMessage(error: unknown, defaultMessage: string): string {
   // Handle Axios errors
   if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError<{ error?: { message?: string }; message?: string }>
+    const axiosError = error as AxiosError<unknown>
     
-    // Check for error message in response data
+    // Check for error message in response data first
     if (axiosError.response?.data) {
-      const data = axiosError.response.data
+      const data = axiosError.response.data as Record<string, unknown>
       
-      // Try nested error.message first
-      if (data.error?.message) {
-        return data.error.message
+      // Try nested error.message first (e.g., { error: { message: "..." } })
+      if (data && typeof data === 'object' && 'error' in data) {
+        const errorObj = data.error as Record<string, unknown>
+        if (errorObj && typeof errorObj === 'object' && 'message' in errorObj && typeof errorObj.message === 'string') {
+          return errorObj.message
+        }
       }
       
-      // Try top-level message
-      if (data.message) {
+      // Try top-level message (e.g., { message: "..." })
+      if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
         return data.message
       }
     }
@@ -95,24 +98,44 @@ export function getErrorMessage(
   resource?: string,
   action?: string
 ): string {
-  // First try to get status-based message
-  if (axios.isAxiosError(error) && error.response?.status) {
-    const statusMessage = getStatusErrorMessage(
-      error.response.status,
-      resource,
-      action
-    )
+  // First, try to extract message from HTTP response (prioritizes response data over axios error message)
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<unknown>
     
-    // If we have a more specific message from the response, use it
-    const extractedMessage = extractErrorMessage(error, "")
-    if (extractedMessage && extractedMessage !== error.message) {
-      return extractedMessage
+    // Check for error message in HTTP response data first
+    if (axiosError.response?.data) {
+      const data = axiosError.response.data as Record<string, unknown>
+      
+      // Try nested error.message first (e.g., { error: { message: "..." } })
+      if (data && typeof data === 'object' && 'error' in data) {
+        const errorObj = data.error as Record<string, unknown>
+        if (errorObj && typeof errorObj === 'object' && 'message' in errorObj && typeof errorObj.message === 'string') {
+          return errorObj.message
+        }
+      }
+      
+      // Try top-level message (e.g., { message: "..." })
+      if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
+        return data.message
+      }
     }
     
-    return statusMessage
+    // If no message in response data, fallback to axios error message
+    if (axiosError.message) {
+      return axiosError.message
+    }
+    
+    // If we have a status code but no specific message, use status-based message
+    if (axiosError.response?.status) {
+      return getStatusErrorMessage(
+        axiosError.response.status,
+        resource,
+        action
+      )
+    }
   }
   
-  // Fall back to extracting message
+  // Fall back to extracting message (handles non-Axios errors)
   return extractErrorMessage(error, defaultMessage)
 }
 
