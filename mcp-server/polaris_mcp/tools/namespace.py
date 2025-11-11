@@ -23,13 +23,12 @@ from __future__ import annotations
 
 import copy
 from typing import Any, Dict, List, Optional, Set
-from urllib.parse import quote
 
 import urllib3
 
 from ..authorization import AuthorizationProvider
 from ..base import JSONDict, McpTool, ToolExecutionResult
-from ..rest import PolarisRestTool
+from ..rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisNamespaceTool(McpTool):
@@ -133,7 +132,7 @@ class PolarisNamespaceTool(McpTool):
         operation = self._require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
-        catalog = self._encode_segment(self._require_text(arguments, "catalog"))
+        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
         delegate_args: JSONDict = {}
         self._copy_if_object(arguments.get("query"), delegate_args, "query")
         self._copy_if_object(arguments.get("headers"), delegate_args, "headers")
@@ -270,7 +269,7 @@ class PolarisNamespaceTool(McpTool):
     def _resolve_namespace_path(self, arguments: Dict[str, Any]) -> str:
         parts = self._resolve_namespace_array(arguments)
         joined = ".".join(parts)
-        return self._encode_segment(joined)
+        return encode_path_segment(joined)
 
     def _copy_if_object(self, source: Any, target: JSONDict, field: str) -> None:
         if isinstance(source, dict):
@@ -298,6 +297,3 @@ class PolarisNamespaceTool(McpTool):
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"Missing required field: {field}")
         return value.strip()
-
-    def _encode_segment(self, value: str) -> str:
-        return quote(value, safe="").replace("+", "%20")

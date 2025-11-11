@@ -27,7 +27,7 @@ import urllib3
 
 from ..authorization import AuthorizationProvider
 from ..base import JSONDict, McpTool, ToolExecutionResult
-from ..rest import PolarisRestTool
+from ..rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisPrincipalRoleTool(McpTool):
@@ -172,7 +172,7 @@ class PolarisPrincipalRoleTool(McpTool):
             )
         elif normalized == "revoke-catalog-role":
             delegate_args["method"] = "DELETE"
-            catalog_role = self._require_text(arguments, "catalogRole")
+            catalog_role = encode_path_segment(self._require_text(arguments, "catalogRole"))
             delegate_args["path"] = (
                 f"{self._principal_role_catalog_path(arguments)}/{catalog_role}"
             )
@@ -183,11 +183,11 @@ class PolarisPrincipalRoleTool(McpTool):
         return self._maybe_augment_error(raw, normalized)
 
     def _principal_role_path(self, arguments: Dict[str, Any]) -> str:
-        role = self._require_text(arguments, "principalRole")
+        role = encode_path_segment(self._require_text(arguments, "principalRole"))
         return f"principal-roles/{role}"
 
     def _principal_role_catalog_path(self, arguments: Dict[str, Any]) -> str:
-        catalog = self._require_text(arguments, "catalog")
+        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
         return f"{self._principal_role_path(arguments)}/catalog-roles/{catalog}"
 
     def _require_object(self, arguments: Dict[str, Any], field: str, description: str) -> Dict[str, Any]:

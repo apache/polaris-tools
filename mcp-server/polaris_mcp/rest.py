@@ -24,7 +24,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
-from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit
+from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit, quote
 
 import urllib3
 
@@ -33,6 +33,13 @@ from .base import JSONDict, ToolExecutionResult
 
 
 DEFAULT_TIMEOUT = urllib3.Timeout(connect=30.0, read=30.0)
+
+
+def encode_path_segment(value: str) -> str:
+    """URL-encode a string for safe use as an HTTP path component."""
+
+    # urllib encodes spaces as "+" by default; convert to %20 to keep literal path semantics.
+    return quote(value, safe="").replace("+", "%20")
 
 
 def _ensure_trailing_slash(url: str) -> str:

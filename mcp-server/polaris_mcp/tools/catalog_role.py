@@ -23,12 +23,11 @@ from __future__ import annotations
 
 import copy
 from typing import Any, Dict, Optional, Set
-
 import urllib3
 
 from ..authorization import AuthorizationProvider
 from ..base import JSONDict, McpTool, ToolExecutionResult
-from ..rest import PolarisRestTool
+from ..rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisCatalogRoleTool(McpTool):
@@ -128,7 +127,7 @@ class PolarisCatalogRoleTool(McpTool):
         operation = self._require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
-        catalog = self._require_text(arguments, "catalog")
+        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
         delegate_args: JSONDict = {}
         self._copy_if_object(arguments.get("query"), delegate_args, "query")
         self._copy_if_object(arguments.get("headers"), delegate_args, "headers")
@@ -177,7 +176,7 @@ class PolarisCatalogRoleTool(McpTool):
         return f"catalogs/{catalog}/catalog-roles"
 
     def _catalog_role_path(self, base_path: str, arguments: Dict[str, Any]) -> str:
-        role = self._require_text(arguments, "catalogRole")
+        role = encode_path_segment(self._require_text(arguments, "catalogRole"))
         return f"{base_path}/{role}"
 
     def _require_object(self, arguments: Dict[str, Any], field: str, description: str) -> Dict[str, Any]:

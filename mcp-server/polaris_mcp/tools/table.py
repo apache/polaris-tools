@@ -23,13 +23,12 @@ from __future__ import annotations
 
 import copy
 from typing import Any, Dict, Optional, Set
-from urllib.parse import quote
 
 import urllib3
 
 from ..authorization import AuthorizationProvider
 from ..base import JSONDict, McpTool, ToolExecutionResult
-from ..rest import PolarisRestTool
+from ..rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisTableTool(McpTool):
@@ -126,8 +125,8 @@ class PolarisTableTool(McpTool):
         operation = self._require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
-        catalog = self._encode_segment(self._require_text(arguments, "catalog"))
-        namespace = self._encode_segment(self._resolve_namespace(arguments.get("namespace")))
+        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
+        namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
 
         delegate_args: JSONDict = {}
         self._copy_if_object(arguments.get("query"), delegate_args, "query")
@@ -159,7 +158,7 @@ class PolarisTableTool(McpTool):
         catalog: str,
         namespace: str,
     ) -> None:
-        table = self._encode_segment(
+        table = encode_path_segment(
             self._require_text(arguments, "table", "Table name is required for get operations.")
         )
         delegate_args["method"] = "GET"
@@ -193,7 +192,7 @@ class PolarisTableTool(McpTool):
             raise ValueError(
                 "Commit operations require a request body that matches the CommitTableRequest schema."
             )
-        table = self._encode_segment(
+        table = encode_path_segment(
             self._require_text(arguments, "table", "Table name is required for commit operations.")
         )
         delegate_args["method"] = "POST"
@@ -207,7 +206,7 @@ class PolarisTableTool(McpTool):
         catalog: str,
         namespace: str,
     ) -> None:
-        table = self._encode_segment(
+        table = encode_path_segment(
             self._require_text(arguments, "table", "Table name is required for delete operations.")
         )
         delegate_args["method"] = "DELETE"
@@ -246,8 +245,6 @@ class PolarisTableTool(McpTool):
         if isinstance(source, dict):
             target[field] = copy.deepcopy(source)
 
-    def _encode_segment(self, value: str) -> str:
-        return quote(value, safe="").replace("+", "%20")
 
     def _require_text(self, node: Dict[str, Any], field: str, message: Optional[str] = None) -> str:
         value = node.get(field)

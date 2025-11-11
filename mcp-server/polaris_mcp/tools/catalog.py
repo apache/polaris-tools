@@ -27,7 +27,7 @@ import urllib3
 
 from ..authorization import AuthorizationProvider
 from ..base import JSONDict, McpTool, ToolExecutionResult
-from ..rest import PolarisRestTool
+from ..rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisCatalogTool(McpTool):
@@ -119,7 +119,7 @@ class PolarisCatalogTool(McpTool):
             delegate_args["method"] = "GET"
             delegate_args["path"] = "catalogs"
         elif normalized == "get":
-            catalog_name = self._require_text(arguments, "catalog")
+            catalog_name = encode_path_segment(self._require_text(arguments, "catalog"))
             delegate_args["method"] = "GET"
             delegate_args["path"] = f"catalogs/{catalog_name}"
         elif normalized == "create":
@@ -132,7 +132,7 @@ class PolarisCatalogTool(McpTool):
             delegate_args["path"] = "catalogs"
             delegate_args["body"] = copy.deepcopy(body)
         elif normalized == "update":
-            catalog_name = self._require_text(arguments, "catalog")
+            catalog_name = encode_path_segment(self._require_text(arguments, "catalog"))
             body = arguments.get("body")
             if not isinstance(body, dict):
                 raise ValueError(
@@ -142,7 +142,7 @@ class PolarisCatalogTool(McpTool):
             delegate_args["path"] = f"catalogs/{catalog_name}"
             delegate_args["body"] = copy.deepcopy(body)
         elif normalized == "delete":
-            catalog_name = self._require_text(arguments, "catalog")
+            catalog_name = encode_path_segment(self._require_text(arguments, "catalog"))
             delegate_args["method"] = "DELETE"
             delegate_args["path"] = f"catalogs/{catalog_name}"
         else:  # pragma: no cover

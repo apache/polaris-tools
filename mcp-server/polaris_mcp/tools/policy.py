@@ -23,13 +23,12 @@ from __future__ import annotations
 
 import copy
 from typing import Any, Dict, Optional, Set
-from urllib.parse import quote
 
 import urllib3
 
 from ..authorization import AuthorizationProvider
 from ..base import JSONDict, McpTool, ToolExecutionResult
-from ..rest import PolarisRestTool
+from ..rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisPolicyTool(McpTool):
@@ -131,12 +130,12 @@ class PolarisPolicyTool(McpTool):
         operation = self._require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
-        catalog = self._encode_segment(self._require_text(arguments, "catalog"))
+        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
         namespace: Optional[str] = None
         if normalized != "applicable":
-            namespace = self._encode_segment(self._resolve_namespace(arguments.get("namespace")))
+            namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
         elif arguments.get("namespace") is not None:
-            namespace = self._encode_segment(self._resolve_namespace(arguments.get("namespace")))
+            namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
 
         delegate_args: JSONDict = {}
         self._copy_if_object(arguments.get("query"), delegate_args, "query")
@@ -182,7 +181,7 @@ class PolarisPolicyTool(McpTool):
         catalog: str,
         namespace: str,
     ) -> None:
-        policy = self._encode_segment(
+        policy = encode_path_segment(
             self._require_text(arguments, "policy", "Policy name is required for get operations.")
         )
         delegate_args["method"] = "GET"
@@ -216,7 +215,7 @@ class PolarisPolicyTool(McpTool):
             raise ValueError(
                 "Update operations require a request body that matches the UpdatePolicyRequest schema."
             )
-        policy = self._encode_segment(
+        policy = encode_path_segment(
             self._require_text(arguments, "policy", "Policy name is required for update operations.")
         )
         delegate_args["method"] = "PUT"
@@ -230,7 +229,7 @@ class PolarisPolicyTool(McpTool):
         catalog: str,
         namespace: str,
     ) -> None:
-        policy = self._encode_segment(
+        policy = encode_path_segment(
             self._require_text(arguments, "policy", "Policy name is required for delete operations.")
         )
         delegate_args["method"] = "DELETE"
@@ -248,7 +247,7 @@ class PolarisPolicyTool(McpTool):
             raise ValueError(
                 "Attach operations require a request body that matches the AttachPolicyRequest schema."
             )
-        policy = self._encode_segment(
+        policy = encode_path_segment(
             self._require_text(arguments, "policy", "Policy name is required for attach operations.")
         )
         delegate_args["method"] = "PUT"
@@ -267,7 +266,7 @@ class PolarisPolicyTool(McpTool):
             raise ValueError(
                 "Detach operations require a request body that matches the DetachPolicyRequest schema."
             )
-        policy = self._encode_segment(
+        policy = encode_path_segment(
             self._require_text(arguments, "policy", "Policy name is required for detach operations.")
         )
         delegate_args["method"] = "POST"
@@ -372,6 +371,3 @@ class PolarisPolicyTool(McpTool):
         if not isinstance(namespace, str) or not namespace.strip():
             raise ValueError("Namespace must be a non-empty string.")
         return namespace.strip()
-
-    def _encode_segment(self, value: str) -> str:
-        return quote(value, safe="").replace("+", "%20")
