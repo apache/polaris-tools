@@ -23,14 +23,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -56,7 +48,7 @@ import {
 } from "@/components/ui/tooltip"
 
 // Extended grant type with metadata for display
-interface GrantWithMetadata extends GrantResource {
+type GrantWithMetadata = GrantResource & {
   catalogName: string
   catalogRoleName: string
 }
