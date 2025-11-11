@@ -174,7 +174,8 @@ class PolarisTableTool(McpTool):
         body = arguments.get("body")
         if not isinstance(body, dict):
             raise ValueError(
-                "Create operations require a request body that matches the CreateTableRequest schema."
+                "Create operations require a request body that matches the CreateTableRequest schema. See CreateTableRequest in "
+                "https://raw.githubusercontent.com/apache/polaris/apache-polaris-1.2.0-incubating/spec/generated/bundled-polaris-catalog-service.yaml"
             )
         delegate_args["method"] = "POST"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables"
