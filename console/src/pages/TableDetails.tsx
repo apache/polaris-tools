@@ -23,29 +23,34 @@ export function TableDetails() {
 
   const navigate = useNavigate()
 
-  if (!catalogName || !namespaceParam || !tableName) {
-    return <div>Catalog, namespace, and table name are required</div>
-  }
-
-  const namespaceArray = namespaceParam.split(".")
+  const namespaceArray = namespaceParam?.split(".") || []
 
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],
-    queryFn: () => catalogsApi.get(catalogName),
+    queryFn: () => catalogsApi.get(catalogName!),
     enabled: !!catalogName,
   })
 
   const namespaceQuery = useQuery({
     queryKey: ["namespace", catalogName, namespaceArray],
-    queryFn: () => namespacesApi.get(catalogName, namespaceArray),
+    queryFn: () => namespacesApi.get(catalogName!, namespaceArray),
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
   const tableQuery = useQuery({
     queryKey: ["table", catalogName, namespaceArray.join("."), tableName],
-    queryFn: () => tablesApi.get(catalogName, namespaceArray, tableName),
+    queryFn: () => tablesApi.get(catalogName!, namespaceArray, tableName!),
     enabled: !!catalogName && namespaceArray.length > 0 && !!tableName,
   })
+
+  // Modals
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [editPropsOpen, setEditPropsOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+
+  if (!catalogName || !namespaceParam || !tableName) {
+    return <div>Catalog, namespace, and table name are required</div>
+  }
 
   const nsPath = namespaceArray.join(".")
   const refreshDisabled = tableQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
@@ -54,11 +59,6 @@ export function TableDetails() {
   const currentSchema = tableData?.metadata.schemas.find(
     (s) => s["schema-id"] === tableData.metadata["current-schema-id"]
   )
-
-  // Modals
-  const [renameOpen, setRenameOpen] = useState(false)
-  const [editPropsOpen, setEditPropsOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
 
   return (
     <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
@@ -223,23 +223,6 @@ export function TableDetails() {
           </Dialog>
         </>
       )}
-    </div>
-  )
-}
-
-function InfoRow({
-  label,
-  value,
-  mono,
-}: {
-  label: string
-  value: string
-  mono?: boolean
-}) {
-  return (
-    <div>
-      <label className="text-sm font-medium text-muted-foreground">{label}</label>
-      <p className={`mt-1 text-sm ${mono ? "font-mono break-all" : ""}`}>{value}</p>
     </div>
   )
 }
