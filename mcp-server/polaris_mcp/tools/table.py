@@ -27,7 +27,7 @@ from typing import Any, Dict, Optional, Set
 import urllib3
 
 from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult
+from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
 from ..rest import PolarisRestTool, encode_path_segment
 
 
@@ -122,15 +122,15 @@ class PolarisTableTool(McpTool):
         if not isinstance(arguments, dict):
             raise ValueError("Tool arguments must be a JSON object.")
 
-        operation = self._require_text(arguments, "operation").lower().strip()
+        operation = require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
-        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
+        catalog = encode_path_segment(require_text(arguments, "catalog"))
         namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
 
         delegate_args: JSONDict = {}
-        self._copy_if_object(arguments.get("query"), delegate_args, "query")
-        self._copy_if_object(arguments.get("headers"), delegate_args, "headers")
+        copy_if_object(arguments.get("query"), delegate_args, "query")
+        copy_if_object(arguments.get("headers"), delegate_args, "headers")
 
         if normalized == "list":
             self._handle_list(delegate_args, catalog, namespace)
@@ -159,7 +159,7 @@ class PolarisTableTool(McpTool):
         namespace: str,
     ) -> None:
         table = encode_path_segment(
-            self._require_text(arguments, "table", "Table name is required for get operations.")
+            require_text(arguments, "table", "Table name is required for get operations.")
         )
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables/{table}"
@@ -194,7 +194,7 @@ class PolarisTableTool(McpTool):
                 "Commit operations require a request body that matches the CommitTableRequest schema."
             )
         table = encode_path_segment(
-            self._require_text(arguments, "table", "Table name is required for commit operations.")
+            require_text(arguments, "table", "Table name is required for commit operations.")
         )
         delegate_args["method"] = "POST"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables/{table}"
@@ -208,7 +208,7 @@ class PolarisTableTool(McpTool):
         namespace: str,
     ) -> None:
         table = encode_path_segment(
-            self._require_text(arguments, "table", "Table name is required for delete operations.")
+            require_text(arguments, "table", "Table name is required for delete operations.")
         )
         delegate_args["method"] = "DELETE"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables/{table}"
@@ -241,16 +241,3 @@ class PolarisTableTool(McpTool):
         if not isinstance(namespace, str) or not namespace.strip():
             raise ValueError("Namespace must be a non-empty string.")
         return namespace.strip()
-
-    def _copy_if_object(self, source: Any, target: JSONDict, field: str) -> None:
-        if isinstance(source, dict):
-            target[field] = copy.deepcopy(source)
-
-
-    def _require_text(self, node: Dict[str, Any], field: str, message: Optional[str] = None) -> str:
-        value = node.get(field)
-        if not isinstance(value, str) or not value.strip():
-            if message is None:
-                message = f"Missing required field: {field}"
-            raise ValueError(message)
-        return value.strip()

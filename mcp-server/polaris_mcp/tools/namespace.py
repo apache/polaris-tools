@@ -27,7 +27,7 @@ from typing import Any, Dict, List, Optional, Set
 import urllib3
 
 from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult
+from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
 from ..rest import PolarisRestTool, encode_path_segment
 
 
@@ -129,13 +129,13 @@ class PolarisNamespaceTool(McpTool):
         if not isinstance(arguments, dict):
             raise ValueError("Tool arguments must be a JSON object.")
 
-        operation = self._require_text(arguments, "operation").lower().strip()
+        operation = require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
-        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
+        catalog = encode_path_segment(require_text(arguments, "catalog"))
         delegate_args: JSONDict = {}
-        self._copy_if_object(arguments.get("query"), delegate_args, "query")
-        self._copy_if_object(arguments.get("headers"), delegate_args, "headers")
+        copy_if_object(arguments.get("query"), delegate_args, "query")
+        copy_if_object(arguments.get("headers"), delegate_args, "headers")
 
         if normalized == "list":
             self._handle_list(delegate_args, catalog)
@@ -271,10 +271,6 @@ class PolarisNamespaceTool(McpTool):
         joined = ".".join(parts)
         return encode_path_segment(joined)
 
-    def _copy_if_object(self, source: Any, target: JSONDict, field: str) -> None:
-        if isinstance(source, dict):
-            target[field] = copy.deepcopy(source)
-
     def _normalize_operation(self, operation: str) -> str:
         if operation in self.LIST_ALIASES:
             return "list"
@@ -291,9 +287,3 @@ class PolarisNamespaceTool(McpTool):
         if operation in self.DELETE_ALIASES:
             return "delete"
         raise ValueError(f"Unsupported operation: {operation}")
-
-    def _require_text(self, node: Dict[str, Any], field: str) -> str:
-        value = node.get(field)
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError(f"Missing required field: {field}")
-        return value.strip()

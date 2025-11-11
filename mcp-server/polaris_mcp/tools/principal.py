@@ -27,7 +27,7 @@ from typing import Any, Dict, Optional, Set
 import urllib3
 
 from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult
+from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
 from ..rest import PolarisRestTool, encode_path_segment
 
 
@@ -131,12 +131,12 @@ class PolarisPrincipalTool(McpTool):
         if not isinstance(arguments, dict):
             raise ValueError("Tool arguments must be a JSON object.")
 
-        operation = self._require_text(arguments, "operation").lower().strip()
+        operation = require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
         delegate_args: JSONDict = {}
-        self._copy_if_object(arguments.get("query"), delegate_args, "query")
-        self._copy_if_object(arguments.get("headers"), delegate_args, "headers")
+        copy_if_object(arguments.get("query"), delegate_args, "query")
+        copy_if_object(arguments.get("headers"), delegate_args, "headers")
 
         if normalized == "list":
             self._handle_list(delegate_args)
@@ -177,12 +177,12 @@ class PolarisPrincipalTool(McpTool):
         delegate_args["body"] = copy.deepcopy(body)
 
     def _handle_get(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"principals/{principal}"
 
     def _handle_update(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         body = arguments.get("body")
         if not isinstance(body, dict):
             raise ValueError("Update principal requires a body matching UpdatePrincipalRequest.")
@@ -191,29 +191,29 @@ class PolarisPrincipalTool(McpTool):
         delegate_args["body"] = copy.deepcopy(body)
 
     def _handle_delete(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         delegate_args["method"] = "DELETE"
         delegate_args["path"] = f"principals/{principal}"
 
     def _handle_rotate(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         delegate_args["method"] = "POST"
         delegate_args["path"] = f"principals/{principal}/rotate"
 
     def _handle_reset(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         delegate_args["method"] = "POST"
         delegate_args["path"] = f"principals/{principal}/reset"
         if isinstance(arguments.get("body"), dict):
             delegate_args["body"] = copy.deepcopy(arguments["body"])
 
     def _handle_list_roles(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"principals/{principal}/principal-roles"
 
     def _handle_assign_role(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
         body = arguments.get("body")
         if not isinstance(body, dict):
             raise ValueError(
@@ -224,8 +224,8 @@ class PolarisPrincipalTool(McpTool):
         delegate_args["body"] = copy.deepcopy(body)
 
     def _handle_revoke_role(self, arguments: Dict[str, Any], delegate_args: JSONDict) -> None:
-        principal = encode_path_segment(self._require_text(arguments, "principal"))
-        role = encode_path_segment(self._require_text(arguments, "principalRole"))
+        principal = encode_path_segment(require_text(arguments, "principal"))
+        role = encode_path_segment(require_text(arguments, "principalRole"))
         delegate_args["method"] = "DELETE"
         delegate_args["path"] = f"principals/{principal}/principal-roles/{role}"
 
@@ -283,13 +283,3 @@ class PolarisPrincipalTool(McpTool):
         if operation in self.REVOKE_ROLE_ALIASES:
             return "revoke-principal-role"
         raise ValueError(f"Unsupported operation: {operation}")
-
-    def _copy_if_object(self, source: Any, target: JSONDict, field: str) -> None:
-        if isinstance(source, dict):
-            target[field] = copy.deepcopy(source)
-
-    def _require_text(self, node: Dict[str, Any], field: str) -> str:
-        value = node.get(field)
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError(f"Missing required field: {field}")
-        return value.strip()

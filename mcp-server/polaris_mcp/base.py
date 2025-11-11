@@ -21,11 +21,28 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Protocol
 
 
 JSONDict = Dict[str, Any]
+
+
+def copy_if_object(source: Any, target: Dict[str, Any], field: str) -> None:
+    """Deep copy dict-like values into target when present."""
+
+    if isinstance(source, dict):
+        target[field] = copy.deepcopy(source)
+
+
+def require_text(node: Dict[str, Any], field: str, message: Optional[str] = None) -> str:
+    """Return a trimmed string field, raising ValueError when missing or blank."""
+
+    value = node.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(message or f"Missing required field: {field}")
+    return value.strip()
 
 
 @dataclass(frozen=True)

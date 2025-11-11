@@ -26,7 +26,7 @@ from typing import Any, Dict, Optional, Set
 import urllib3
 
 from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult
+from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
 from ..rest import PolarisRestTool, encode_path_segment
 
 
@@ -130,12 +130,12 @@ class PolarisPrincipalRoleTool(McpTool):
         if not isinstance(arguments, dict):
             raise ValueError("Tool arguments must be a JSON object.")
 
-        operation = self._require_text(arguments, "operation").lower().strip()
+        operation = require_text(arguments, "operation").lower().strip()
         normalized = self._normalize_operation(operation)
 
         delegate_args: JSONDict = {}
-        self._copy_if_object(arguments.get("query"), delegate_args, "query")
-        self._copy_if_object(arguments.get("headers"), delegate_args, "headers")
+        copy_if_object(arguments.get("query"), delegate_args, "query")
+        copy_if_object(arguments.get("headers"), delegate_args, "headers")
 
         if normalized == "list":
             delegate_args["method"] = "GET"
@@ -172,7 +172,7 @@ class PolarisPrincipalRoleTool(McpTool):
             )
         elif normalized == "revoke-catalog-role":
             delegate_args["method"] = "DELETE"
-            catalog_role = encode_path_segment(self._require_text(arguments, "catalogRole"))
+            catalog_role = encode_path_segment(require_text(arguments, "catalogRole"))
             delegate_args["path"] = (
                 f"{self._principal_role_catalog_path(arguments)}/{catalog_role}"
             )
@@ -183,11 +183,11 @@ class PolarisPrincipalRoleTool(McpTool):
         return self._maybe_augment_error(raw, normalized)
 
     def _principal_role_path(self, arguments: Dict[str, Any]) -> str:
-        role = encode_path_segment(self._require_text(arguments, "principalRole"))
+        role = encode_path_segment(require_text(arguments, "principalRole"))
         return f"principal-roles/{role}"
 
     def _principal_role_catalog_path(self, arguments: Dict[str, Any]) -> str:
-        catalog = encode_path_segment(self._require_text(arguments, "catalog"))
+        catalog = encode_path_segment(require_text(arguments, "catalog"))
         return f"{self._principal_role_path(arguments)}/catalog-roles/{catalog}"
 
     def _require_object(self, arguments: Dict[str, Any], field: str, description: str) -> Dict[str, Any]:
@@ -243,13 +243,3 @@ class PolarisPrincipalRoleTool(McpTool):
         if operation in self.REVOKE_CATALOG_ROLE_ALIASES:
             return "revoke-catalog-role"
         raise ValueError(f"Unsupported operation: {operation}")
-
-    def _copy_if_object(self, source: Any, target: JSONDict, field: str) -> None:
-        if isinstance(source, dict):
-            target[field] = copy.deepcopy(source)
-
-    def _require_text(self, node: Dict[str, Any], field: str) -> str:
-        value = node.get(field)
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError(f"Missing required field: {field}")
-        return value.strip()
