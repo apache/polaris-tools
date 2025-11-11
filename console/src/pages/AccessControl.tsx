@@ -7,7 +7,7 @@ import { PrincipalRolesTab } from "@/components/users/PrincipalRolesTab"
 import { CatalogRolesTab } from "@/components/users/CatalogRolesTab"
 import { PrivilegesTab } from "@/components/users/PrivilegesTab"
 
-export function Users() {
+export function AccessControl() {
   const [searchParams, setSearchParams] = useSearchParams()
   const activeTab = searchParams.get("tab") || "principals"
 

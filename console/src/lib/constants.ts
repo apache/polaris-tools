@@ -25,6 +25,6 @@ export const NAV_ITEMS = [
   { path: "/", label: "Home", icon: "Home" },
   { path: "/connections", label: "Connections", icon: "Link" },
   { path: "/catalogs", label: "Catalogs", icon: "Database" },
-  { path: "/users", label: "Users", icon: "Shield" },
+  { path: "/access-control", label: "Access Control", icon: "Shield" },
 ] as const
 
