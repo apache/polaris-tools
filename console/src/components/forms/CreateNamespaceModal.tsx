@@ -47,7 +47,7 @@ const schema = z.object({
         // Basic validation: should look like a URL or file path
         // Accepts: s3://, https://, http://, file://, gs://, azure://, or absolute paths
         const urlPattern = /^(s3|https?|file|gs|azure|abfss?):\/\//i
-        const absolutePathPattern = /^\/[^\/]/
+        const absolutePathPattern = /^\/[^/]/
         return urlPattern.test(val.trim()) || absolutePathPattern.test(val.trim())
       },
       {
