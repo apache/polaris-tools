@@ -1,67 +1,88 @@
-<!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+# Polaris Web UI
 
-# Apache Polaris Console
+A modern web interface for Apache Polaris Catalog, built with React, TypeScript, TanStack Query, and Tailwind CSS.
 
-The Apache Polaris Console is a web console allowing you to manage a Polaris server.
-It allows you to manage Polaris catalogs, principals, catalog roles, ...
+## Getting Started
 
-You can also browse the catalog entities (namespaces, tables, ...).
+### Prerequisites
+- Node.js 18+ and npm
 
-## Prerequisite
+### Installation
 
-The Polaris Console is using `yarn` or `npm` to be built.
+```bash
+# Install dependencies
+npm install
 
-You have to install `yarn` or `npm` using your OS package manager (e.g. `brew install yarn`).
+# Start development server
+npm run dev
 
-## Configuring the Polaris Console to connect to a Polaris server
-
-By default, the Polaris Console connects to a local Polaris server on the port 8181 (`http://localhost:8181`).
-
-If the Polaris server is not located on `localhost:8181`, you have to update the Console `proxy` configuration in the `package.json`:
-
-```
-"proxy": "http://localhost:8181"
+# Build for production
+npm run build
 ```
 
-## Downloading the Polaris Console dependencies
+### Environment Variables
 
-The Polaris Console uses React (https://react.dev/) and Ant Design (https://ant.design/) frameworks, with transitive dependencies.
+Create a `.env` file based on `.env.example`:
 
-To download the Polaris Console dependencies, you can just do:
-
-```
-yarn
-```
-
-## Starting the Polaris Console
-
-```
-yarn start
+```env
+VITE_POLARIS_API_URL=http://localhost:8181
+VITE_POLARIS_REALM=POLARIS 
+VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/v1/oauth/tokens  # optional
 ```
 
-## Building static Polaris Console
+## Project Structure
 
 ```
-yarn build
+src/
+├── api/              # API client and endpoints
+│   ├── client.ts     # Axios instance with interceptors
+│   ├── auth.ts       # Authentication API
+│   └── management/   # Management Service APIs
+├── components/        # React components
+│   ├── ui/           # Shadcn UI components
+│   ├── layout/       # Layout components
+│   └── forms/        # Form components
+├── hooks/            # Custom React hooks
+├── lib/              # Utilities
+├── pages/            # Page components
+├── types/            # TypeScript type definitions
+└── App.tsx           # Main app component
 ```
 
-## Polaris Console Docker image and Helm Charts
+## Technology Stack
 
-TODO
+- **Framework**: React 19 with TypeScript
+- **Routing**: React Router v7
+- **State Management**: TanStack Query (React Query)
+- **Tables**: TanStack Table (React Table)
+- **Styling**: Tailwind CSS
+- **Components**: Shadcn UI (Radix UI primitives)
+- **Forms**: React Hook Form with Zod validation
+- **HTTP Client**: Axios
+- **Icons**: Lucide React
+
+
+
+## Development
+
+The project uses:
+- Vite for fast development and building
+- ESLint for code linting
+- TypeScript for type safety
+
+To start developing:
+
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`
+
+## Building
+
+```bash
+npm run build
+```
+
+Output will be in the `dist/` directory.
+

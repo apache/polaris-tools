@@ -1,43 +1,42 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
 .logo {
-    height: 48px;
-    margin: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    color: white;
-    font-size: large;
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-.logo > a {
-    text-decoration: none;
-    color: white;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.site-layout .site-layout-background {
-    background: #fff;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
-.layout {
-    min-height: 100vh !important;
+
+.card {
+  padding: 2em;
 }
-.site-layout {
-    padding: 0 50px !important;
-}
-.ant-layout-header {
-    padding: 10px;
-}
-.ant-layout-sider {
-    background: #fff;
-}
-.ant-layout-sider-children > svg {
-    margin: auto;
-}
-.ant-breadcrumb {
-    margin: 16px 0px !important;
-}
-.site-layout-background {
-    padding: 24px !important;
-    min-height: 360px !important;
-}
-.ant-layout-footer {
-    text-align: center !important;
+
+.read-the-docs {
+  color: #888;
 }

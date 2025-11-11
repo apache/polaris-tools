@@ -1,0 +1,7 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Teal background -->
+  <rect width="32" height="32" fill="#0F766E"/>
+  <!-- White four-pointed star -->
+  <path d="M16 4L19.5 12.5L28 16L19.5 19.5L16 28L12.5 19.5L4 16L12.5 12.5L16 4Z" fill="white"/>
+</svg>
+

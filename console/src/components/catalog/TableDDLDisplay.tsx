@@ -1,0 +1,144 @@
+import { useState } from "react"
+import { Copy, Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import type { TableMetadata } from "@/types/api"
+import { cn } from "@/lib/utils"
+
+interface TableDDLDisplayProps {
+  catalogName: string
+  namespace: string[]
+  tableName: string
+  metadata: TableMetadata
+}
+
+export function TableDDLDisplay({
+  catalogName,
+  namespace,
+  tableName,
+  metadata,
+}: TableDDLDisplayProps) {
+  const [copied, setCopied] = useState(false)
+  const ddl = generateDDL(catalogName, namespace, tableName, metadata)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(ddl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error("Failed to copy:", err)
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-semibold">DDL</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopy}
+          className="h-7 px-2"
+        >
+          {copied ? (
+            <Check className="h-3 w-3 mr-1" />
+          ) : (
+            <Copy className="h-3 w-3 mr-1" />
+          )}
+          {copied ? "Copied" : "Copy"}
+        </Button>
+      </div>
+      <div className="border rounded-md bg-muted/30 p-3">
+        <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap break-words">
+          <code>{ddl}</code>
+        </pre>
+      </div>
+    </div>
+  )
+}
+
+function generateDDL(
+  catalogName: string,
+  namespace: string[],
+  tableName: string,
+  metadata: TableMetadata
+): string {
+  const lines: string[] = []
+  
+  // CREATE TABLE statement
+  lines.push(`CREATE TABLE ${catalogName}.${namespace.length > 0 ? namespace.join(".") + "." : ""}${tableName} (`)
+  
+  // Schema fields
+  const currentSchema = metadata.schemas.find(
+    (s) => s["schema-id"] === metadata["current-schema-id"]
+  )
+  
+  if (currentSchema?.fields && currentSchema.fields.length > 0) {
+    const fieldDefs = currentSchema.fields.map((field) => {
+      const typeStr = formatFieldTypeForDDL(field)
+      const nullable = field.required ? "NOT NULL" : ""
+      return `  ${field.name} ${typeStr}${nullable ? " " + nullable : ""}`
+    })
+    lines.push(fieldDefs.join(",\n"))
+  }
+  
+  lines.push(")")
+  
+  // Properties
+  if (metadata.properties && Object.keys(metadata.properties).length > 0) {
+    lines.push("TBLPROPERTIES (")
+    const propEntries = Object.entries(metadata.properties).map(
+      ([key, value]) => `  '${key}' = '${value}'`
+    )
+    lines.push(propEntries.join(",\n"))
+    lines.push(")")
+  }
+  
+  // Location
+  if (metadata.location) {
+    lines.push(`LOCATION '${metadata.location}'`)
+  }
+  
+  return lines.join("\n")
+}
+
+function formatFieldTypeForDDL(field: {
+  type: string | { type: string; [key: string]: unknown }
+  [key: string]: unknown
+}): string {
+  if (typeof field.type === "string") {
+    // Handle primitive types
+    return field.type.toUpperCase()
+  }
+  
+  if (typeof field.type === "object" && field.type !== null) {
+    if (field.type.type === "list") {
+      const elementType = formatFieldTypeForDDL({
+        type: (field.type as { element?: unknown }).element || "unknown",
+      })
+      return `ARRAY<${elementType}>`
+    }
+    
+    if (field.type.type === "map") {
+      const keyType = formatFieldTypeForDDL({
+        type: (field.type as { key?: unknown }).key || "unknown",
+      })
+      const valueType = formatFieldTypeForDDL({
+        type: (field.type as { value?: unknown }).value || "unknown",
+      })
+      return `MAP<${keyType}, ${valueType}>`
+    }
+    
+    if (field.type.type === "struct") {
+      const structFields = (field.type as { fields?: Array<{ name: string; type: unknown }> })
+        .fields || []
+      const fieldDefs = structFields.map(
+        (f) => `${f.name}: ${formatFieldTypeForDDL({ type: f.type })}`
+      )
+      return `STRUCT<${fieldDefs.join(", ")}>`
+    }
+  }
+  
+  return "STRING"
+}
+
