@@ -16,7 +16,7 @@ export default defineConfig({
         target: process.env.VITE_POLARIS_API_URL || 'http://localhost:8181',
         changeOrigin: true,
         secure: false,
-        configure: (proxy, _options) => {
+        configure: (proxy) => {
           // Only log in development mode
           if (process.env.NODE_ENV === 'development') {
             proxy.on('error', (err) => {

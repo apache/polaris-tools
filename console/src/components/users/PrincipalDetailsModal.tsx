@@ -8,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { principalsApi } from "@/api/management/principals"
-import type { Principal, PrincipalWithCredentials } from "@/types/api"
-import { Badge } from "@/components/ui/badge"
+import type { Principal } from "@/types/api"
 
 // Extended Principal type that includes fields that may be present in API responses
 type ExtendedPrincipal = Principal & {

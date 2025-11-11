@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select"
 import { principalsApi } from "@/api/management/principals"
 import { principalRolesApi } from "@/api/management/principal-roles"
-import type { Principal, PrincipalRole } from "@/types/api"
+import type { PrincipalRole } from "@/types/api"
 
 interface GrantRoleModalProps {
   open: boolean
@@ -42,6 +42,13 @@ export function GrantRoleModal({
     queryKey: ["principals"],
     queryFn: principalsApi.list,
     enabled: open,
+  })
+
+  // Fetch principals that already have this role
+  const principalsWithRoleQuery = useQuery({
+    queryKey: ["principal-roles", principalRole?.name, "principals"],
+    queryFn: () => principalRolesApi.listPrincipals(principalRole!.name),
+    enabled: open && !!principalRole?.name,
   })
 
   const grantMutation = useMutation({
@@ -71,9 +78,10 @@ export function GrantRoleModal({
   }
 
   // Get principals that don't already have this role
-  const availablePrincipals = principalsQuery.data?.filter((p) => {
-    // We'll filter on the client side, but ideally we'd check server-side
-    return true
+  const availablePrincipals = principalsQuery.data?.filter((principal) => {
+    // Filter out principals that already have this role
+    const principalsWithRole = principalsWithRoleQuery.data || []
+    return !principalsWithRole.some((p) => p.name === principal.name)
   }) || []
 
   return (
@@ -94,13 +102,15 @@ export function GrantRoleModal({
                 <SelectValue placeholder="Select a principal" />
               </SelectTrigger>
               <SelectContent>
-                {principalsQuery.isLoading ? (
+                {principalsQuery.isLoading || principalsWithRoleQuery.isLoading ? (
                   <SelectItem value="loading" disabled>
                     Loading principals...
                   </SelectItem>
                 ) : availablePrincipals.length === 0 ? (
                   <SelectItem value="none" disabled>
-                    No principals available
+                    {principalsQuery.data && principalsQuery.data.length > 0
+                      ? "All principals already have this role"
+                      : "No principals available"}
                   </SelectItem>
                 ) : (
                   availablePrincipals.map((principal) => (

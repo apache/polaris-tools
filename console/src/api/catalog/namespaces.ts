@@ -13,12 +13,6 @@ function encodeNamespace(namespace: string[]): string {
   return namespace.join("\x1F")
 }
 
-/**
- * Decodes a namespace string from URL format to array.
- */
-function decodeNamespace(namespaceStr: string): string[] {
-  return namespaceStr.split("\x1F")
-}
 
 export const namespacesApi = {
   /**

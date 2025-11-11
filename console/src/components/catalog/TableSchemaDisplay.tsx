@@ -1,5 +1,4 @@
 import type { TableSchema } from "@/types/api"
-import { cn } from "@/lib/utils"
 
 interface TableSchemaDisplayProps {
   schema: TableSchema

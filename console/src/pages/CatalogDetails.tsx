@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Database, ArrowLeft, Edit, Plus, Folder, RefreshCw } from "lucide-react"
 import { catalogsApi } from "@/api/management/catalogs"
 import { namespacesApi } from "@/api/catalog/namespaces"
-import type { Catalog, Namespace } from "@/types/api"
+import type { Namespace } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,20 +27,21 @@ export function CatalogDetails() {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isCreateNamespaceOpen, setIsCreateNamespaceOpen] = useState(false)
 
-  if (!catalogName) {
-    return <div>Catalog name is required</div>
-  }
-
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],
-    queryFn: () => catalogsApi.get(catalogName),
+    queryFn: () => catalogsApi.get(catalogName!),
+    enabled: !!catalogName,
   })
 
   const namespacesQuery = useQuery({
     queryKey: ["namespaces", catalogName],
-    queryFn: () => namespacesApi.list(catalogName),
+    queryFn: () => namespacesApi.list(catalogName!),
     enabled: !!catalogName,
   })
+
+  if (!catalogName) {
+    return <div>Catalog name is required</div>
+  }
 
   const catalog = catalogQuery.data
   const namespaces = namespacesQuery.data ?? []

@@ -148,7 +148,6 @@ export function PrincipalsTab() {
         "credentials",
         "rotate credentials"
       )
-      setErrorMessage(errorMsg)
       toast.error("Failed to rotate credentials", {
         description: errorMsg,
       })

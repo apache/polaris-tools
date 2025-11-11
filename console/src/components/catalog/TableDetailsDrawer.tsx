@@ -146,7 +146,7 @@ export function TableDetailsDrawer({
                     Partition Specifications
                   </h3>
                   <div className="space-y-2">
-                    {tableData.metadata["partition-specs"].map((spec, idx) => (
+                    {tableData.metadata["partition-specs"].map((spec) => (
                       <div
                         key={spec["spec-id"]}
                         className="border rounded-md p-3 text-sm"

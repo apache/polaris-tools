@@ -1,13 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { ArrowLeft, Database, Folder, Table as TableIcon, RefreshCw, Trash2, Plus } from "lucide-react"
+import { ArrowLeft, Folder, Table as TableIcon, RefreshCw, Trash2, Plus } from "lucide-react"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { tablesApi } from "@/api/catalog/tables"
 import { catalogsApi } from "@/api/management/catalogs"
-import type { Namespace } from "@/types/api"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
@@ -25,7 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { formatDistanceToNow } from "date-fns"
 import { useState } from "react"
 
 export function NamespaceDetails() {
@@ -37,40 +34,36 @@ export function NamespaceDetails() {
   const queryClient = useQueryClient()
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
-  if (!catalogName || !namespaceParam) {
-    return <div>Catalog name and namespace are required</div>
-  }
-
   // Parse namespace from URL (e.g., "accounting.tax" -> ["accounting", "tax"])
-  const namespaceArray = namespaceParam.split(".")
+  const namespaceArray = namespaceParam?.split(".") || []
 
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],
-    queryFn: () => catalogsApi.get(catalogName),
+    queryFn: () => catalogsApi.get(catalogName!),
     enabled: !!catalogName,
   })
 
   const namespaceQuery = useQuery({
     queryKey: ["namespace", catalogName, namespaceArray],
-    queryFn: () => namespacesApi.get(catalogName, namespaceArray),
+    queryFn: () => namespacesApi.get(catalogName!, namespaceArray),
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
   const tablesQuery = useQuery({
     queryKey: ["tables", catalogName, namespaceArray],
-    queryFn: () => tablesApi.list(catalogName, namespaceArray),
+    queryFn: () => tablesApi.list(catalogName!, namespaceArray),
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
   const deleteMutation = useMutation({
-    mutationFn: () => namespacesApi.delete(catalogName, namespaceArray),
+    mutationFn: () => namespacesApi.delete(catalogName!, namespaceArray),
     onSuccess: () => {
       toast.success("Namespace deleted successfully")
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["namespaces", catalogName] })
       queryClient.invalidateQueries({ queryKey: ["catalog", catalogName] })
       // Navigate back to catalog details
-      navigate(`/catalogs/${encodeURIComponent(catalogName)}`)
+      navigate(`/catalogs/${encodeURIComponent(catalogName!)}`)
     },
     onError: (error: Error) => {
       toast.error("Failed to delete namespace", {
@@ -84,6 +77,7 @@ export function NamespaceDetails() {
   const tables = tablesQuery.data ?? []
 
   const handleTableClick = (tableName: string) => {
+    if (!catalogName || !namespaceParam) return
     navigate(
       `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespaceParam)}/tables/${encodeURIComponent(tableName)}`
     )
@@ -91,6 +85,10 @@ export function NamespaceDetails() {
 
   const handleDelete = () => {
     deleteMutation.mutate()
+  }
+
+  if (!catalogName || !namespaceParam) {
+    return <div>Catalog name and namespace are required</div>
   }
 
   const namespacePath = namespaceArray.join(".")

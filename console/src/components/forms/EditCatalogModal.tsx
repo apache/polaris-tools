@@ -82,7 +82,6 @@ export function EditCatalogModal({
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
     control,
     watch,
@@ -142,7 +141,7 @@ export function EditCatalogModal({
           if (typeof parsed === "object" && parsed !== null) {
             properties = parsed
           }
-        } catch (e) {
+        } catch {
           // If JSON is invalid, try to parse as key=value pairs
           const lines = values.propertiesJson.split("\n")
           for (const line of lines) {

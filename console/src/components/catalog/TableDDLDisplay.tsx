@@ -2,7 +2,6 @@ import { useState } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { TableMetadata } from "@/types/api"
-import { cn } from "@/lib/utils"
 
 interface TableDDLDisplayProps {
   catalogName: string

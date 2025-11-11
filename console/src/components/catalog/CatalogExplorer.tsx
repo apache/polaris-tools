@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 import { CatalogTreeNode, type TreeNode } from "./CatalogTreeNode"
 import { catalogsApi } from "@/api/management/catalogs"
 import { TableDetailsDrawer } from "./TableDetailsDrawer"
-import type { Catalog } from "@/types/api"
 
 interface CatalogExplorerProps {
   selectedCatalogName?: string
@@ -36,7 +35,7 @@ export function CatalogExplorer({
     queryFn: catalogsApi.list,
   })
 
-  const catalogs = catalogsQuery.data || []
+  const catalogs = useMemo(() => catalogsQuery.data || [], [catalogsQuery.data])
 
   const handleToggleExpand = (nodeId: string) => {
     setExpandedNodes((prev) => {
