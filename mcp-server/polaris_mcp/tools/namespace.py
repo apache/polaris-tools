@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import copy
+import string
 from typing import Any, Dict, List, Optional, Set
 
 import urllib3
@@ -38,6 +39,7 @@ class PolarisNamespaceTool(McpTool):
     TOOL_DESCRIPTION = (
         "Manage namespaces in an Iceberg catalog (list, get, create, update properties, delete)."
     )
+    NAMESPACE_DELIMITER = "\x1f"
 
     LIST_ALIASES: Set[str] = {"list"}
     GET_ALIASES: Set[str] = {"get", "load"}
@@ -100,8 +102,8 @@ class PolarisNamespaceTool(McpTool):
                         {"type": "array", "items": {"type": "string"}},
                     ],
                     "description": (
-                        "Namespace identifier. Provide as dot-delimited string (e.g. \"analytics.daily\") "
-                        "or array of path components."
+                        "Namespace identifier. Provide as a string that uses the ASCII Unit Separator (0x1F) "
+                        '(e.g. "analytics\\u001Fdaily") or as an array of path components.'
                     ),
                 },
                 "query": {
@@ -258,17 +260,30 @@ class PolarisNamespaceTool(McpTool):
                 raise ValueError("Namespace array must contain at least one component.")
             parts: List[str] = []
             for element in namespace:
-                if not isinstance(element, str) or not element.strip():
+                if not isinstance(element, str):
                     raise ValueError("Namespace array elements must be non-empty strings.")
-                parts.append(element.strip())
+                candidate = element.strip(string.whitespace)
+                if not candidate:
+                    raise ValueError("Namespace array elements must be non-empty strings.")
+                parts.append(candidate)
             return parts
-        if not isinstance(namespace, str) or not namespace.strip():
+        if not isinstance(namespace, str):
             raise ValueError("Namespace must be a non-empty string.")
-        return namespace.strip().split(".")
+        trimmed = namespace.strip(string.whitespace)
+        if not trimmed:
+            raise ValueError("Namespace must be a non-empty string.")
+        raw_parts = trimmed.split(self.NAMESPACE_DELIMITER)
+        parts: List[str] = []
+        for element in raw_parts:
+            candidate = element.strip(string.whitespace)
+            if not candidate:
+                raise ValueError("Namespace components must be non-empty strings.")
+            parts.append(candidate)
+        return parts
 
     def _resolve_namespace_path(self, arguments: Dict[str, Any]) -> str:
         parts = self._resolve_namespace_array(arguments)
-        joined = ".".join(parts)
+        joined = self.NAMESPACE_DELIMITER.join(parts)
         return encode_path_segment(joined)
 
     def _normalize_operation(self, operation: str) -> str:

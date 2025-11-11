@@ -38,6 +38,7 @@ class PolarisTableTool(McpTool):
     TOOL_DESCRIPTION = (
         "Perform table-centric operations (list, get, create, commit, delete) using the Polaris REST API."
     )
+    NAMESPACE_DELIMITER = "\x1f"
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
@@ -90,8 +91,9 @@ class PolarisTableTool(McpTool):
                         {"type": "array", "items": {"type": "string"}},
                     ],
                     "description": (
-                        "Namespace that contains the target tables. Provide as a dot-delimited string "
-                        '(e.g. "analytics.daily") or an array of strings.'
+                        "Namespace that contains the target tables. Provide as a string that uses the ASCII Unit "
+                        'Separator (0x1F) between hierarchy levels (e.g. "analytics\\u001Fdaily") or as an array of '
+                        "strings."
                     ),
                 },
                 "table": {
@@ -237,7 +239,7 @@ class PolarisTableTool(McpTool):
                 if not isinstance(element, str) or not element.strip():
                     raise ValueError("Namespace array elements must be non-empty strings.")
                 parts.append(element.strip())
-            return ".".join(parts)
+            return self.NAMESPACE_DELIMITER.join(parts)
         if not isinstance(namespace, str) or not namespace.strip():
             raise ValueError("Namespace must be a non-empty string.")
         return namespace.strip()
