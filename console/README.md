@@ -1,11 +1,11 @@
-# Polaris Web UI
+# Polaris Console 
 
-A modern web interface for Apache Polaris Catalog, built with React, TypeScript, TanStack Query, and Tailwind CSS.
+A modern web interface for Apache Polaris, built with React, TypeScript, TanStack Query, and Tailwind CSS.
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 18+ and npm (or yarn)
 
 ### Installation
 
@@ -60,8 +60,6 @@ src/
 - **Forms**: React Hook Form with Zod validation
 - **HTTP Client**: Axios
 - **Icons**: Lucide React
-
-
 
 ## Development
 
