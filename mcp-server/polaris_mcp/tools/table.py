@@ -251,4 +251,4 @@ class PolarisTableTool(McpTool):
             return parts
         if not isinstance(namespace, str):
             raise ValueError("Namespace must be a non-empty string.")
-        return [namespace.strip()]
+        return namespace.strip().split(".")
