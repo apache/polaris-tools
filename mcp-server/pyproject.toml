@@ -19,10 +19,10 @@
 
 [project]
 name = "polaris-mcp"
-version = "1.2.0"
+version = "0.9.0"
 description = "Apache Polaris Model Context Protocol server"
 authors = [
-    {name = "Apache Software Foundation", email = "dev@polaris.apache.org"}
+    {name = "Apache Polaris Community", email = "dev@polaris.apache.org"}
 ]
 readme = "README.md"
 requires-python = ">=3.10,<4.0"
@@ -38,7 +38,7 @@ polaris-mcp = "polaris_mcp.server:main"
 
 [project.urls]
 homepage = "https://polaris.apache.org/"
-repository = "https://github.com/apache/polaris/"
+repository = "https://github.com/apache/polaris-tools/"
 
 [build-system]
 requires = ["setuptools>=68.0"]

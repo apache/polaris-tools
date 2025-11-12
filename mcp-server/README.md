@@ -17,7 +17,7 @@
   under the License.
 -->
 
-# Apache Polaris MCP Server (Python)
+# Apache Polaris MCP Server
 
 This package provides a Python implementation of the [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for Apache Polaris. It wraps the Polaris REST APIs so MCP-compatible clients (IDEs, agents, chat applications) can issue structured requests via JSON-RPC on stdin/stdout.
 
