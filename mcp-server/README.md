@@ -23,12 +23,16 @@ This package provides a Python implementation of the [Model Context Protocol (MC
 
 The implementation is built on top of [FastMCP](https://gofastmcp.com) for streamlined server registration and transport handling.
 
+## Prerequisites
+- Python 3.10 or later
+- [uv](https://docs.astral.sh/uv/) 
+
 ## Installation
 
 From the repository root:
 
 ```bash
-cd client/python-mcp
+cd mcp-server
 uv sync
 ```
 
@@ -67,7 +71,7 @@ For a `tools/call` invocation you will typically set environment variables such 
       "command": "uv",
       "args": [
         "--directory",
-        "/path/to/polaris/client/python-mcp",
+        "/path/to/polaris-tools/mcp-server",
         "run",
         "polaris-mcp"
       ],
