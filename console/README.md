@@ -84,3 +84,14 @@ npm run build
 
 Output will be in the `dist/` directory.
 
+## Production Deployment
+
+After building, you can serve the production files in several ways:
+
+### Quick Test
+```bash
+bun run preview  # or npm run preview
+```
+
+
+

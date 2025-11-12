@@ -3,12 +3,10 @@ import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
 import type { OAuthTokenResponse } from "@/types/api"
 
-// In development, always use relative URL to go through Vite proxy
-// This avoids CORS issues by proxying requests through the dev server
-const TOKEN_URL =
-  import.meta.env.PROD && import.meta.env.VITE_OAUTH_TOKEN_URL
-    ? import.meta.env.VITE_OAUTH_TOKEN_URL
-    : "/api/catalog/v1/oauth/tokens"
+// Always use relative URL to go through the proxy (dev server or production server)
+// This avoids CORS issues by proxying requests through the server
+// The server.ts proxy handles /api routes in production, and Vite handles them in development
+const TOKEN_URL = "/api/catalog/v1/oauth/tokens"
 
 // Log OAuth URL in development only
 if (import.meta.env.DEV) {

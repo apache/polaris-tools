@@ -1,12 +1,10 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios"
 import { navigate } from "@/lib/navigation"
 
-// In development, always use relative URLs to go through Vite proxy
-// This avoids CORS issues by proxying requests through the dev server
-const API_BASE_URL =
-  import.meta.env.PROD && import.meta.env.VITE_POLARIS_API_URL
-    ? import.meta.env.VITE_POLARIS_API_URL
-    : ""
+// Always use relative URLs to go through the proxy (dev server or production server)
+// This avoids CORS issues by proxying requests through the server
+// The server.ts proxy handles /api routes in production, and Vite handles them in development
+const API_BASE_URL = ""
 const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
 const CATALOG_BASE_URL = `${API_BASE_URL}/api/catalog/v1`
 
