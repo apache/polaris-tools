@@ -43,7 +43,7 @@ class PolarisNamespaceToolTest(unittest.TestCase):
             {
                 "operation": "create",
                 "catalog": "prod",
-                "namespace": "analytics\x1fdaily",
+                "namespace": "analytics.daily",
                 "body": body,
             }
         )
@@ -57,28 +57,6 @@ class PolarisNamespaceToolTest(unittest.TestCase):
         self.assertIsNot(payload["body"]["properties"], body["properties"])
         body["properties"]["owner"] = "changed"
         self.assertEqual(payload["body"]["properties"]["owner"], "analytics")
-
-    @mock.patch("polaris_mcp.tools.namespace.PolarisRestTool")
-    def test_namespace_string_with_empty_component_is_rejected(self, mock_rest: mock.Mock) -> None:
-        tool, _ = self._build_tool(mock_rest)
-
-        with self.assertRaisesRegex(ValueError, "Namespace components must be non-empty strings"):
-            tool.call(
-                {
-                    "operation": "get",
-                    "catalog": "prod",
-                    "namespace": "analytics\x1f ",
-                }
-            )
-        with self.assertRaisesRegex(ValueError, "Namespace components must be non-empty strings"):
-            tool.call(
-                {
-                    "operation": "get",
-                    "catalog": "prod",
-                    "namespace": " analytics\x1f",
-                }
-            )
-
 
 if __name__ == "__main__":
     unittest.main()

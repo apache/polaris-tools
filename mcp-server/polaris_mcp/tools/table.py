@@ -22,12 +22,20 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict, Optional, Set
+import string
+from typing import Any, Dict, List, Set
 
 import urllib3
 
 from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from ..base import (
+    JSONDict,
+    McpTool,
+    ToolExecutionResult,
+    copy_if_object,
+    require_text,
+    NAMESPACE_PATH_DELIMITER,
+)
 from ..rest import PolarisRestTool, encode_path_segment
 
 
@@ -38,8 +46,6 @@ class PolarisTableTool(McpTool):
     TOOL_DESCRIPTION = (
         "Perform table-centric operations (list, get, create, commit, delete) using the Polaris REST API."
     )
-    NAMESPACE_DELIMITER = "\x1f"
-
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
@@ -91,9 +97,8 @@ class PolarisTableTool(McpTool):
                         {"type": "array", "items": {"type": "string"}},
                     ],
                     "description": (
-                        "Namespace that contains the target tables. Provide as a string that uses the ASCII Unit "
-                        'Separator (0x1F) between hierarchy levels (e.g. "analytics\\u001Fdaily") or as an array of '
-                        "strings."
+                        "Namespace that contains the target tables. Provide as a string for a single namespace "
+                        'or an array of strings (e.g. ["analytics", "daily"]) for nested namespaces.'
                     ),
                 },
                 "table": {
@@ -128,7 +133,8 @@ class PolarisTableTool(McpTool):
         normalized = self._normalize_operation(operation)
 
         catalog = encode_path_segment(require_text(arguments, "catalog"))
-        namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
+        namespace_parts = self._resolve_namespace(arguments.get("namespace"))
+        namespace = encode_path_segment(NAMESPACE_PATH_DELIMITER.join(namespace_parts))
 
         delegate_args: JSONDict = {}
         copy_if_object(arguments.get("query"), delegate_args, "query")
@@ -228,18 +234,21 @@ class PolarisTableTool(McpTool):
             return "delete"
         raise ValueError(f"Unsupported operation: {operation}")
 
-    def _resolve_namespace(self, namespace: Any) -> str:
+    def _resolve_namespace(self, namespace: Any) -> List[str]:
         if namespace is None:
             raise ValueError("Namespace must be provided.")
         if isinstance(namespace, list):
             if not namespace:
                 raise ValueError("Namespace array must contain at least one element.")
-            parts = []
+            parts: List[str] = []
             for element in namespace:
-                if not isinstance(element, str) or not element.strip():
+                if not isinstance(element, str):
                     raise ValueError("Namespace array elements must be non-empty strings.")
-                parts.append(element.strip())
-            return self.NAMESPACE_DELIMITER.join(parts)
-        if not isinstance(namespace, str) or not namespace.strip():
+                candidate = element.strip(string.whitespace)
+                if not candidate:
+                    raise ValueError("Namespace array elements must be non-empty strings.")
+                parts.append(candidate)
+            return parts
+        if not isinstance(namespace, str):
             raise ValueError("Namespace must be a non-empty string.")
-        return namespace.strip()
+        return [namespace.strip()]

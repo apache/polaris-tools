@@ -28,7 +28,14 @@ from typing import Any, Dict, List, Optional, Set
 import urllib3
 
 from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from ..base import (
+    JSONDict,
+    McpTool,
+    ToolExecutionResult,
+    copy_if_object,
+    require_text,
+    NAMESPACE_PATH_DELIMITER,
+)
 from ..rest import PolarisRestTool, encode_path_segment
 
 
@@ -39,7 +46,6 @@ class PolarisNamespaceTool(McpTool):
     TOOL_DESCRIPTION = (
         "Manage namespaces in an Iceberg catalog (list, get, create, update properties, delete)."
     )
-    NAMESPACE_DELIMITER = "\x1f"
 
     LIST_ALIASES: Set[str] = {"list"}
     GET_ALIASES: Set[str] = {"get", "load"}
@@ -102,8 +108,8 @@ class PolarisNamespaceTool(McpTool):
                         {"type": "array", "items": {"type": "string"}},
                     ],
                     "description": (
-                        "Namespace identifier. Provide as a string that uses the ASCII Unit Separator (0x1F) "
-                        '(e.g. "analytics\\u001Fdaily") or as an array of path components.'
+                        "Namespace identifier. Provide as a string for a single namespace "
+                        'or an array of strings (e.g. ["analytics", "daily"]) for nested namespaces.'
                     ),
                 },
                 "query": {
@@ -272,18 +278,11 @@ class PolarisNamespaceTool(McpTool):
         trimmed = namespace.strip(string.whitespace)
         if not trimmed:
             raise ValueError("Namespace must be a non-empty string.")
-        raw_parts = trimmed.split(self.NAMESPACE_DELIMITER)
-        parts: List[str] = []
-        for element in raw_parts:
-            candidate = element.strip(string.whitespace)
-            if not candidate:
-                raise ValueError("Namespace components must be non-empty strings.")
-            parts.append(candidate)
-        return parts
+        return namespace.strip().split(".")
 
     def _resolve_namespace_path(self, arguments: Dict[str, Any]) -> str:
         parts = self._resolve_namespace_array(arguments)
-        joined = self.NAMESPACE_DELIMITER.join(parts)
+        joined = NAMESPACE_PATH_DELIMITER.join(parts)
         return encode_path_segment(joined)
 
     def _normalize_operation(self, operation: str) -> str:

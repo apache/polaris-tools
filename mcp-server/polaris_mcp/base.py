@@ -28,6 +28,7 @@ from typing import Any, Dict, Optional, Protocol
 
 JSONDict = Dict[str, Any]
 
+NAMESPACE_PATH_DELIMITER = "\x1f"
 
 def copy_if_object(source: Any, target: Dict[str, Any], field: str) -> None:
     """Deep copy dict-like values into target when present."""
