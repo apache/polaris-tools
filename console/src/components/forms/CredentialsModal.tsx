@@ -39,6 +39,7 @@ export function CredentialsModal({
   }
 
   const copyJsonToClipboard = async () => {
+    if (!credentials) return
     const json = JSON.stringify(
       {
         clientId: credentials.clientId,

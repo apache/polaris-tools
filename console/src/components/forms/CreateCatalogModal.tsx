@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { catalogsApi } from "@/api/management/catalogs"
-import type { CreateCatalogRequest, Catalog, ConnectionConfigInfo } from "@/types/api"
+import type { CreateCatalogRequest, Catalog, ConnectionConfigInfo, StorageConfigInfo } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,11 +27,9 @@ import {
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
-  type: z.enum(["INTERNAL", "EXTERNAL"], { required_error: "Select a type" }),
+  type: z.enum(["INTERNAL", "EXTERNAL"]),
   defaultBaseLocation: z.string().min(1, "Default base location is required"),
-  storageType: z.enum(["S3", "AZURE", "GCS", "FILE"], {
-    required_error: "Select storage provider",
-  }),
+  storageType: z.enum(["S3", "AZURE", "GCS", "FILE"]),
   allowedLocations: z.string().optional(), // comma separated
 
   // S3
@@ -112,7 +110,7 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
         ? values.allowedLocations.split(",").map((s) => s.trim()).filter(Boolean)
         : undefined
 
-      const storageConfigInfo: Record<string, unknown> = {
+      const storageConfigInfo: StorageConfigInfo = {
         storageType: values.storageType,
       }
       if (allowedLocations && allowedLocations.length) storageConfigInfo.allowedLocations = allowedLocations

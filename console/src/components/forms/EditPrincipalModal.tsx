@@ -80,9 +80,7 @@ export function EditPrincipalModal({
         })
       } else {
         return principalsApi.update(principal!.name, {
-          currentEntityVersion: principal?.currentEntityVersion
-            ? parseInt(principal.currentEntityVersion)
-            : undefined,
+          currentEntityVersion: principal?.currentEntityVersion,
           properties: data.properties,
         })
       }

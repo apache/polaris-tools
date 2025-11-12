@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { catalogsApi } from "@/api/management/catalogs"
-import type { Catalog } from "@/types/api"
+import type { Catalog, StorageConfigInfo } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -28,9 +28,7 @@ import {
 
 const schema = z.object({
   defaultBaseLocation: z.string().min(1, "Default base location is required"),
-  storageType: z.enum(["S3", "AZURE", "GCS", "FILE"], {
-    required_error: "Select storage provider",
-  }),
+  storageType: z.enum(["S3", "AZURE", "GCS", "FILE"]),
   allowedLocations: z.string().optional(), // comma separated
 
   // S3
@@ -101,7 +99,7 @@ export function EditCatalogModal({
         : undefined
 
       // Build storage config from form values
-      const storageConfigInfo: Record<string, unknown> = {
+      const storageConfigInfo: StorageConfigInfo = {
         storageType: values.storageType,
       }
       if (allowedLocations && allowedLocations.length)

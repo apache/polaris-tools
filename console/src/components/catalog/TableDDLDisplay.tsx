@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { TableMetadata } from "@/types/api"
+import type { TableMetadata, SchemaField } from "@/types/api"
 
 interface TableDDLDisplayProps {
   catalogName: string
@@ -101,10 +101,7 @@ function generateDDL(
   return lines.join("\n")
 }
 
-function formatFieldTypeForDDL(field: {
-  type: string | { type: string; [key: string]: unknown }
-  [key: string]: unknown
-}): string {
+function formatFieldTypeForDDL(field: SchemaField | { type: string | { type: string; [key: string]: unknown } }): string {
   if (typeof field.type === "string") {
     // Handle primitive types
     return field.type.toUpperCase()
@@ -112,27 +109,30 @@ function formatFieldTypeForDDL(field: {
   
   if (typeof field.type === "object" && field.type !== null) {
     if (field.type.type === "list") {
+      const element = (field.type as { element?: string | { type: string; [key: string]: unknown } }).element
       const elementType = formatFieldTypeForDDL({
-        type: (field.type as { element?: unknown }).element || "unknown",
-      })
+        type: element || "unknown",
+      } as SchemaField)
       return `ARRAY<${elementType}>`
     }
     
     if (field.type.type === "map") {
+      const key = (field.type as { key?: string | { type: string; [key: string]: unknown } }).key
+      const value = (field.type as { value?: string | { type: string; [key: string]: unknown } }).value
       const keyType = formatFieldTypeForDDL({
-        type: (field.type as { key?: unknown }).key || "unknown",
-      })
+        type: key || "unknown",
+      } as SchemaField)
       const valueType = formatFieldTypeForDDL({
-        type: (field.type as { value?: unknown }).value || "unknown",
-      })
+        type: value || "unknown",
+      } as SchemaField)
       return `MAP<${keyType}, ${valueType}>`
     }
     
     if (field.type.type === "struct") {
-      const structFields = (field.type as { fields?: Array<{ name: string; type: unknown }> })
+      const structFields = (field.type as { fields?: Array<{ name: string; type: string | { type: string; [key: string]: unknown } }> })
         .fields || []
       const fieldDefs = structFields.map(
-        (f) => `${f.name}: ${formatFieldTypeForDDL({ type: f.type })}`
+        (f) => `${f.name}: ${formatFieldTypeForDDL({ type: f.type } as SchemaField)}`
       )
       return `STRUCT<${fieldDefs.join(", ")}>`
     }

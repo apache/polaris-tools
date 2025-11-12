@@ -187,7 +187,7 @@ export interface TableSchema {
 export interface SchemaField {
   id: number
   name: string
-  type: string
+  type: string | { type: string; [key: string]: unknown }
   required: boolean
   comment?: string
 }

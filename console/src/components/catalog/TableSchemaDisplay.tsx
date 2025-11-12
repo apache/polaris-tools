@@ -1,4 +1,4 @@
-import type { TableSchema } from "@/types/api"
+import type { TableSchema, SchemaField } from "@/types/api"
 
 interface TableSchemaDisplayProps {
   schema: TableSchema
@@ -46,10 +46,7 @@ export function TableSchemaDisplay({ schema }: TableSchemaDisplayProps) {
   )
 }
 
-function formatFieldType(field: {
-  type: string | { type: string; [key: string]: unknown }
-  [key: string]: unknown
-}): string {
+function formatFieldType(field: SchemaField | { type: string | { type: string; [key: string]: unknown } }): string {
   if (typeof field.type === "string") {
     return field.type
   }
@@ -57,26 +54,29 @@ function formatFieldType(field: {
   if (typeof field.type === "object" && field.type !== null) {
     // Handle nested types like list, map, struct
     if (field.type.type === "list") {
+      const element = (field.type as { element?: string | { type: string; [key: string]: unknown } }).element
       const elementType = formatFieldType({
-        type: (field.type as { element?: unknown }).element || "unknown",
-      })
+        type: element || "unknown",
+      } as SchemaField)
       return `list<${elementType}>`
     }
     
     if (field.type.type === "map") {
+      const key = (field.type as { key?: string | { type: string; [key: string]: unknown } }).key
+      const value = (field.type as { value?: string | { type: string; [key: string]: unknown } }).value
       const keyType = formatFieldType({
-        type: (field.type as { key?: unknown }).key || "unknown",
-      })
+        type: key || "unknown",
+      } as SchemaField)
       const valueType = formatFieldType({
-        type: (field.type as { value?: unknown }).value || "unknown",
-      })
+        type: value || "unknown",
+      } as SchemaField)
       return `map<${keyType}, ${valueType}>`
     }
     
     if (field.type.type === "struct") {
-      const fields = (field.type as { fields?: Array<{ name: string; type: unknown }> })
+      const fields = (field.type as { fields?: Array<{ name: string; type: string | { type: string; [key: string]: unknown } }> })
         .fields || []
-      const fieldTypes = fields.map((f) => `${f.name}: ${formatFieldType({ type: f.type })}`)
+      const fieldTypes = fields.map((f) => `${f.name}: ${formatFieldType({ type: f.type } as SchemaField)}`)
       return `struct<${fieldTypes.join(", ")}>`
     }
     
