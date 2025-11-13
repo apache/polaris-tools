@@ -60,6 +60,10 @@ version.txt
 
 # Python venv
 venv/
+mcp-server/polaris_mcp.egg-info/
+mcp-server/polaris_mcp/__pycache__/
+mcp-server/polaris_mcp/tools/__pycache__/
+mcp-server/tests/__pycache__/
 
 # Maven flatten plugin
 .flattened-pom.xml
