@@ -56,7 +56,7 @@ tasks.named<RatTask>("rat").configure {
 
   // Misc build artifacts
   excludes.add("**/.keep")
-  excludes.add("logs/**")
+  excludes.add("**/logs/**")
   excludes.add("**/*.lock")
 
   // Binary files
