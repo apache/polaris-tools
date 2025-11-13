@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit, quote
 
@@ -266,7 +265,7 @@ class PolarisRestTool:
             "request": {
                 "method": method,
                 "url": target_uri,
-                "headers": dict(header_values),
+                "headers": self._sanitize_headers(dict(header_values)),
             },
             "response": {
                 "status": response.status,
@@ -296,6 +295,19 @@ class PolarisRestTool:
         if not isinstance(path, str) or not path.strip():
             raise ValueError("The 'path' argument must be provided and must not be empty.")
         return path.strip()
+
+    @staticmethod
+    def _sanitize_headers(headers: Dict[str, str]) -> Dict[str, str]:
+        sanitized = {}
+        sensitive_headers = {"authorization", "x-api-key", "cookie", "set-cookie"}
+
+        for key, value in headers.items():
+            if key.lower() in sensitive_headers:
+                sanitized[key] = "[REDACTED]"
+            else:
+                sanitized[key] = value
+
+        return sanitized
 
     def _resolve_target_uri(self, path: str, query: Optional[Dict[str, Any]]) -> str:
         if path.startswith(("http://", "https://")):
