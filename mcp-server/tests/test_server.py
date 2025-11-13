@@ -100,6 +100,23 @@ class ServerHelpersTest(unittest.TestCase):
         with mock.patch.dict(os.environ, {}, clear=True):
             self.assertEqual(server._resolve_base_url(), server.DEFAULT_BASE_URL)
 
+    def test_resolve_base_url_validates_scheme_and_host(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {"POLARIS_BASE_URL": "ftp://legacy"},
+            clear=True,
+        ):
+            with self.assertRaisesRegex(ValueError, "http or https"):
+                server._resolve_base_url()
+
+        with mock.patch.dict(
+            os.environ,
+            {"POLARIS_BASE_URL": "localhost:8181"},
+            clear=True,
+        ):
+            with self.assertRaisesRegex(ValueError, "Polaris base URL must use http or https."):
+                server._resolve_base_url()
+
     def test_first_non_blank_returns_first_usable_value(self) -> None:
         self.assertEqual(server._first_non_blank(None, "  ", "\tvalue", "later"), "value")
         self.assertIsNone(server._first_non_blank(None))

@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import os
 from typing import Any, Mapping, MutableMapping, Sequence
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import urllib3
 from fastmcp import FastMCP
@@ -373,8 +373,17 @@ def _resolve_base_url() -> str:
         os.getenv("POLARIS_REST_BASE_URL"),
     ):
         if candidate and candidate.strip():
-            return candidate.strip()
-    return DEFAULT_BASE_URL
+            return _validate_base_url(candidate.strip())
+    return _validate_base_url(DEFAULT_BASE_URL)
+
+
+def _validate_base_url(value: str) -> str:
+    parsed = urlparse(value)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError("Polaris base URL must use http or https.")
+    if not parsed.netloc:
+        raise ValueError("Polaris base URL must include a hostname.")
+    return value
 
 
 def _resolve_authorization_provider(
