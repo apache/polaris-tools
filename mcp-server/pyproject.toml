@@ -33,6 +33,11 @@ dependencies = [
     "urllib3>=1.25.3,<3.0.0",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.2",
+]
+
 [project.scripts]
 polaris-mcp = "polaris_mcp.server:main"
 

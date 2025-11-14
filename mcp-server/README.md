@@ -25,11 +25,13 @@ The implementation is built on top of [FastMCP](https://gofastmcp.com) for strea
 
 ## Prerequisites
 - Python 3.10 or later
-- [uv](https://docs.astral.sh/uv/) 
+- [uv](https://docs.astral.sh/uv/) 0.9.7 or later 
 
 ## Building and Running 
-- `cd mcp-server && uv sync` - to build
-- `uv run python -m unittest discover -s tests` - to test
+- `cd mcp-server && uv sync` - install runtime dependencies
+- `uv run polaris-mcp` - start the MCP server (stdin/stdout transport)
+- `uv sync --extra test` - install runtime + test dependencies
+- `uv run pytest` - run the test suite
 
 For a `tools/call` invocation you will typically set environment variables such as `POLARIS_BASE_URL` and authentication settings before launching the server.
 
