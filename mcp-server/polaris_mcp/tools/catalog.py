@@ -21,12 +21,18 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict, Optional, Set
+from typing import Any, Optional, Set
 
 import urllib3
 
 from polaris_mcp.authorization import AuthorizationProvider
-from polaris_mcp.base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from polaris_mcp.base import (
+    JSONDict,
+    McpTool,
+    ToolExecutionResult,
+    copy_if_object,
+    require_text,
+)
 from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 
 
@@ -151,7 +157,9 @@ class PolarisCatalogTool(McpTool):
         raw = self._delegate.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
 
-    def _maybe_augment_error(self, result: ToolExecutionResult, operation: str) -> ToolExecutionResult:
+    def _maybe_augment_error(
+        self, result: ToolExecutionResult, operation: str
+    ) -> ToolExecutionResult:
         if not result.is_error:
             return result
         metadata = copy.deepcopy(result.metadata) if result.metadata is not None else {}

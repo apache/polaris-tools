@@ -12,12 +12,16 @@ def _build_tool(mock_rest: mock.Mock) -> tuple[PolarisNamespaceTool, mock.Mock]:
     delegate = mock.Mock()
     delegate.call.return_value = ToolExecutionResult(text="done", is_error=False)
     mock_rest.return_value = delegate
-    tool = PolarisNamespaceTool("https://polaris/", mock.sentinel.http, mock.sentinel.auth)
+    tool = PolarisNamespaceTool(
+        "https://polaris/", mock.sentinel.http, mock.sentinel.auth
+    )
     return tool, delegate
 
 
 @mock.patch("polaris_mcp.tools.namespace.PolarisRestTool")
-def test_get_operation_encodes_namespace_with_unit_separator(mock_rest: mock.Mock) -> None:
+def test_get_operation_encodes_namespace_with_unit_separator(
+    mock_rest: mock.Mock,
+) -> None:
     tool, delegate = _build_tool(mock_rest)
 
     tool.call(
@@ -35,7 +39,9 @@ def test_get_operation_encodes_namespace_with_unit_separator(mock_rest: mock.Moc
 
 
 @mock.patch("polaris_mcp.tools.namespace.PolarisRestTool")
-def test_create_operation_infers_namespace_array_from_string(mock_rest: mock.Mock) -> None:
+def test_create_operation_infers_namespace_array_from_string(
+    mock_rest: mock.Mock,
+) -> None:
     tool, delegate = _build_tool(mock_rest)
     body = {"properties": {"owner": "analytics"}}
 

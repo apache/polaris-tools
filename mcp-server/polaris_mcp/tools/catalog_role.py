@@ -26,7 +26,13 @@ from typing import Any, Dict, Optional, Set
 import urllib3
 
 from polaris_mcp.authorization import AuthorizationProvider
-from polaris_mcp.base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from polaris_mcp.base import (
+    JSONDict,
+    McpTool,
+    ToolExecutionResult,
+    copy_if_object,
+    require_text,
+)
 from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 
 
@@ -41,7 +47,10 @@ class PolarisCatalogRoleTool(McpTool):
     GET_ALIASES: Set[str] = {"get"}
     UPDATE_ALIASES: Set[str] = {"update"}
     DELETE_ALIASES: Set[str] = {"delete", "remove"}
-    LIST_PRINCIPAL_ROLES_ALIASES: Set[str] = {"list-principal-roles", "list-assigned-principal-roles"}
+    LIST_PRINCIPAL_ROLES_ALIASES: Set[str] = {
+        "list-principal-roles",
+        "list-assigned-principal-roles",
+    }
     LIST_GRANTS_ALIASES: Set[str] = {"list-grants"}
     ADD_GRANT_ALIASES: Set[str] = {"add-grant", "grant"}
     REVOKE_GRANT_ALIASES: Set[str] = {"revoke-grant"}
@@ -140,30 +149,44 @@ class PolarisCatalogRoleTool(McpTool):
         elif normalized == "create":
             delegate_args["method"] = "POST"
             delegate_args["path"] = base_path
-            delegate_args["body"] = self._require_object(arguments, "body", "CreateCatalogRoleRequest")
+            delegate_args["body"] = self._require_object(
+                arguments, "body", "CreateCatalogRoleRequest"
+            )
         elif normalized == "get":
             delegate_args["method"] = "GET"
             delegate_args["path"] = self._catalog_role_path(base_path, arguments)
         elif normalized == "update":
             delegate_args["method"] = "PUT"
             delegate_args["path"] = self._catalog_role_path(base_path, arguments)
-            delegate_args["body"] = self._require_object(arguments, "body", "UpdateCatalogRoleRequest")
+            delegate_args["body"] = self._require_object(
+                arguments, "body", "UpdateCatalogRoleRequest"
+            )
         elif normalized == "delete":
             delegate_args["method"] = "DELETE"
             delegate_args["path"] = self._catalog_role_path(base_path, arguments)
         elif normalized == "list-principal-roles":
             delegate_args["method"] = "GET"
-            delegate_args["path"] = f"{self._catalog_role_path(base_path, arguments)}/principal-roles"
+            delegate_args["path"] = (
+                f"{self._catalog_role_path(base_path, arguments)}/principal-roles"
+            )
         elif normalized == "list-grants":
             delegate_args["method"] = "GET"
-            delegate_args["path"] = f"{self._catalog_role_path(base_path, arguments)}/grants"
+            delegate_args["path"] = (
+                f"{self._catalog_role_path(base_path, arguments)}/grants"
+            )
         elif normalized == "add-grant":
             delegate_args["method"] = "PUT"
-            delegate_args["path"] = f"{self._catalog_role_path(base_path, arguments)}/grants"
-            delegate_args["body"] = self._require_object(arguments, "body", "AddGrantRequest")
+            delegate_args["path"] = (
+                f"{self._catalog_role_path(base_path, arguments)}/grants"
+            )
+            delegate_args["body"] = self._require_object(
+                arguments, "body", "AddGrantRequest"
+            )
         elif normalized == "revoke-grant":
             delegate_args["method"] = "POST"
-            delegate_args["path"] = f"{self._catalog_role_path(base_path, arguments)}/grants"
+            delegate_args["path"] = (
+                f"{self._catalog_role_path(base_path, arguments)}/grants"
+            )
             if isinstance(arguments.get("body"), dict):
                 delegate_args["body"] = copy.deepcopy(arguments["body"])
         else:  # pragma: no cover
@@ -176,13 +199,17 @@ class PolarisCatalogRoleTool(McpTool):
         role = encode_path_segment(require_text(arguments, "catalogRole"))
         return f"{base_path}/{role}"
 
-    def _require_object(self, arguments: Dict[str, Any], field: str, description: str) -> Dict[str, Any]:
+    def _require_object(
+        self, arguments: Dict[str, Any], field: str, description: str
+    ) -> Dict[str, Any]:
         node = arguments.get(field)
         if not isinstance(node, dict):
             raise ValueError(f"{description} payload (`{field}`) is required.")
         return copy.deepcopy(node)
 
-    def _maybe_augment_error(self, result: ToolExecutionResult, operation: str) -> ToolExecutionResult:
+    def _maybe_augment_error(
+        self, result: ToolExecutionResult, operation: str
+    ) -> ToolExecutionResult:
         if not result.is_error:
             return result
         metadata = copy.deepcopy(result.metadata) if result.metadata is not None else {}
@@ -194,9 +221,7 @@ class PolarisCatalogRoleTool(McpTool):
         if operation == "create":
             hint = "Create catalog role requires CreateCatalogRoleRequest body."
         elif operation == "update":
-            hint = (
-                "Update catalog role requires UpdateCatalogRoleRequest body with currentEntityVersion."
-            )
+            hint = "Update catalog role requires UpdateCatalogRoleRequest body with currentEntityVersion."
         elif operation == "add-grant":
             hint = "Grant operations require AddGrantRequest body."
 

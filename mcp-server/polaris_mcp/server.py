@@ -70,7 +70,9 @@ def create_server() -> FastMCP:
     table_tool = PolarisTableTool(base_url, http, authorization_provider)
     namespace_tool = PolarisNamespaceTool(base_url, http, authorization_provider)
     principal_tool = PolarisPrincipalTool(base_url, http, authorization_provider)
-    principal_role_tool = PolarisPrincipalRoleTool(base_url, http, authorization_provider)
+    principal_role_tool = PolarisPrincipalRoleTool(
+        base_url, http, authorization_provider
+    )
     catalog_role_tool = PolarisCatalogRoleTool(base_url, http, authorization_provider)
     policy_tool = PolarisPolicyTool(base_url, http, authorization_provider)
     catalog_tool = PolarisCatalogTool(base_url, http, authorization_provider)

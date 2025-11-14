@@ -25,9 +25,9 @@ The implementation is built on top of [FastMCP](https://gofastmcp.com) for strea
 
 ## Prerequisites
 - Python 3.10 or later
-- [uv](https://docs.astral.sh/uv/) 0.9.7 or later 
+- [uv](https://docs.astral.sh/uv/) 0.9.7 or later
 
-## Building and Running 
+## Building and Running
 - `cd mcp-server && uv sync` - install runtime dependencies
 - `uv run polaris-mcp` - start the MCP server (stdin/stdout transport)
 - `uv sync --extra test` - install runtime + test dependencies

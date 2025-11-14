@@ -11,14 +11,18 @@ from polaris_mcp.tools.table import PolarisTableTool
 
 def _build_tool(mock_rest: mock.Mock) -> tuple[PolarisTableTool, mock.Mock]:
     delegate = mock.Mock()
-    delegate.call.return_value = ToolExecutionResult(text="ok", is_error=False, metadata={"k": "v"})
+    delegate.call.return_value = ToolExecutionResult(
+        text="ok", is_error=False, metadata={"k": "v"}
+    )
     mock_rest.return_value = delegate
     tool = PolarisTableTool("https://polaris/", mock.sentinel.http, mock.sentinel.auth)
     return tool, delegate
 
 
 @mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_list_operation_uses_get_and_copies_query_and_headers(mock_rest: mock.Mock) -> None:
+def test_list_operation_uses_get_and_copies_query_and_headers(
+    mock_rest: mock.Mock,
+) -> None:
     tool, delegate = _build_tool(mock_rest)
     arguments = {
         "operation": "LS",

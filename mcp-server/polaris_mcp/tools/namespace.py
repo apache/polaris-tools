@@ -43,15 +43,17 @@ class PolarisNamespaceTool(McpTool):
     """Manage namespaces through the Polaris REST API."""
 
     TOOL_NAME = "polaris-namespace-request"
-    TOOL_DESCRIPTION = (
-        "Manage namespaces in an Iceberg catalog (list, get, create, update properties, delete)."
-    )
+    TOOL_DESCRIPTION = "Manage namespaces in an Iceberg catalog (list, get, create, update properties, delete)."
 
     LIST_ALIASES: Set[str] = {"list"}
     GET_ALIASES: Set[str] = {"get", "load"}
     EXISTS_ALIASES: Set[str] = {"exists", "head"}
     CREATE_ALIASES: Set[str] = {"create"}
-    UPDATE_PROPS_ALIASES: Set[str] = {"update-properties", "set-properties", "properties-update"}
+    UPDATE_PROPS_ALIASES: Set[str] = {
+        "update-properties",
+        "set-properties",
+        "properties-update",
+    }
     GET_PROPS_ALIASES: Set[str] = {"get-properties", "properties"}
     DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
 
@@ -169,7 +171,9 @@ class PolarisNamespaceTool(McpTool):
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces"
 
-    def _handle_get(self, arguments: Dict[str, Any], delegate_args: JSONDict, catalog: str) -> None:
+    def _handle_get(
+        self, arguments: Dict[str, Any], delegate_args: JSONDict, catalog: str
+    ) -> None:
         namespace = self._resolve_namespace_path(arguments)
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}"
@@ -227,7 +231,9 @@ class PolarisNamespaceTool(McpTool):
         delegate_args["method"] = "DELETE"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}"
 
-    def _maybe_augment_error(self, result: ToolExecutionResult, operation: str) -> ToolExecutionResult:
+    def _maybe_augment_error(
+        self, result: ToolExecutionResult, operation: str
+    ) -> ToolExecutionResult:
         if not result.is_error:
             return result
 
@@ -267,10 +273,14 @@ class PolarisNamespaceTool(McpTool):
             parts: List[str] = []
             for element in namespace:
                 if not isinstance(element, str):
-                    raise ValueError("Namespace array elements must be non-empty strings.")
+                    raise ValueError(
+                        "Namespace array elements must be non-empty strings."
+                    )
                 candidate = element.strip(string.whitespace)
                 if not candidate:
-                    raise ValueError("Namespace array elements must be non-empty strings.")
+                    raise ValueError(
+                        "Namespace array elements must be non-empty strings."
+                    )
                 parts.append(candidate)
             return parts
         if not isinstance(namespace, str):

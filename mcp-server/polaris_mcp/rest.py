@@ -110,7 +110,9 @@ def _append_query(url: str, params: List[Tuple[str, str]]) -> str:
         query = "&".join([existing] + extra_parts) if extra_parts else existing
     else:
         query = "&".join(extra_parts)
-    return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, query, parsed.fragment))
+    return urlunsplit(
+        (parsed.scheme, parsed.netloc, parsed.path, query, parsed.fragment)
+    )
 
 
 def _build_query(parameters: Optional[Dict[str, Any]]) -> List[Tuple[str, str]]:
@@ -190,7 +192,10 @@ class PolarisRestTool:
                         "Optional query string parameters. Values can be strings or arrays of strings."
                     ),
                     "additionalProperties": {
-                        "anyOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]
+                        "anyOf": [
+                            {"type": "string"},
+                            {"type": "array", "items": {"type": "string"}},
+                        ]
                     },
                 },
                 "headers": {
@@ -200,7 +205,10 @@ class PolarisRestTool:
                         "automatically when omitted."
                     ),
                     "additionalProperties": {
-                        "anyOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]
+                        "anyOf": [
+                            {"type": "string"},
+                            {"type": "array", "items": {"type": "string"}},
+                        ]
                     },
                 },
                 "body": {
@@ -236,7 +244,9 @@ class PolarisRestTool:
                 header_values["Authorization"] = token
 
         body_text = _serialize_body(body_node)
-        if body_text is not None and not any(name.lower() == "content-type" for name in header_values):
+        if body_text is not None and not any(
+            name.lower() == "content-type" for name in header_values
+        ):
             header_values["Content-Type"] = "application/json"
 
         response = self._http.request(
@@ -293,7 +303,9 @@ class PolarisRestTool:
     def _require_path(self, args: Dict[str, Any]) -> str:
         path = args.get("path")
         if not isinstance(path, str) or not path.strip():
-            raise ValueError("The 'path' argument must be provided and must not be empty.")
+            raise ValueError(
+                "The 'path' argument must be provided and must not be empty."
+            )
         return path.strip()
 
     @staticmethod

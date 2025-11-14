@@ -26,7 +26,13 @@ from typing import Any, Dict, Optional, Set
 import urllib3
 
 from polaris_mcp.authorization import AuthorizationProvider
-from polaris_mcp.base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from polaris_mcp.base import (
+    JSONDict,
+    McpTool,
+    ToolExecutionResult,
+    copy_if_object,
+    require_text,
+)
 from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 
 
@@ -34,9 +40,7 @@ class PolarisPrincipalRoleTool(McpTool):
     """Manage principal roles through the Polaris management API."""
 
     TOOL_NAME = "polaris-principal-role-request"
-    TOOL_DESCRIPTION = (
-        "Manage principal roles (list, get, create, update, delete) and their catalog-role assignments via the Polaris management API."
-    )
+    TOOL_DESCRIPTION = "Manage principal roles (list, get, create, update, delete) and their catalog-role assignments via the Polaris management API."
 
     LIST_ALIASES: Set[str] = {"list"}
     CREATE_ALIASES: Set[str] = {"create"}
@@ -44,9 +48,18 @@ class PolarisPrincipalRoleTool(McpTool):
     UPDATE_ALIASES: Set[str] = {"update"}
     DELETE_ALIASES: Set[str] = {"delete", "remove"}
     LIST_PRINCIPALS_ALIASES: Set[str] = {"list-principals", "list-assignees"}
-    LIST_CATALOG_ROLES_ALIASES: Set[str] = {"list-catalog-roles", "list-mapped-catalog-roles"}
-    ASSIGN_CATALOG_ROLE_ALIASES: Set[str] = {"assign-catalog-role", "grant-catalog-role"}
-    REVOKE_CATALOG_ROLE_ALIASES: Set[str] = {"revoke-catalog-role", "remove-catalog-role"}
+    LIST_CATALOG_ROLES_ALIASES: Set[str] = {
+        "list-catalog-roles",
+        "list-mapped-catalog-roles",
+    }
+    ASSIGN_CATALOG_ROLE_ALIASES: Set[str] = {
+        "assign-catalog-role",
+        "grant-catalog-role",
+    }
+    REVOKE_CATALOG_ROLE_ALIASES: Set[str] = {
+        "revoke-catalog-role",
+        "remove-catalog-role",
+    }
 
     def __init__(
         self,
@@ -190,13 +203,17 @@ class PolarisPrincipalRoleTool(McpTool):
         catalog = encode_path_segment(require_text(arguments, "catalog"))
         return f"{self._principal_role_path(arguments)}/catalog-roles/{catalog}"
 
-    def _require_object(self, arguments: Dict[str, Any], field: str, description: str) -> Dict[str, Any]:
+    def _require_object(
+        self, arguments: Dict[str, Any], field: str, description: str
+    ) -> Dict[str, Any]:
         node = arguments.get(field)
         if not isinstance(node, dict):
             raise ValueError(f"{description} payload (`{field}`) is required.")
         return copy.deepcopy(node)
 
-    def _maybe_augment_error(self, result: ToolExecutionResult, operation: str) -> ToolExecutionResult:
+    def _maybe_augment_error(
+        self, result: ToolExecutionResult, operation: str
+    ) -> ToolExecutionResult:
         if not result.is_error:
             return result
         metadata = copy.deepcopy(result.metadata) if result.metadata is not None else {}
@@ -208,9 +225,7 @@ class PolarisPrincipalRoleTool(McpTool):
         if operation == "create":
             hint = "Create principal role requires CreatePrincipalRoleRequest body."
         elif operation == "update":
-            hint = (
-                "Update principal role requires UpdatePrincipalRoleRequest body with currentEntityVersion."
-            )
+            hint = "Update principal role requires UpdatePrincipalRoleRequest body with currentEntityVersion."
         elif operation == "assign-catalog-role":
             hint = "Provide GrantCatalogRoleRequest body when assigning catalog roles."
 

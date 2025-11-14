@@ -35,8 +35,7 @@ class AuthorizationProvider(ABC):
     """Return Authorization header values for outgoing requests."""
 
     @abstractmethod
-    def authorization_header(self) -> Optional[str]:
-        ...
+    def authorization_header(self) -> Optional[str]: ...
 
 
 class StaticAuthorizationProvider(AuthorizationProvider):

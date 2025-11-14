@@ -30,7 +30,9 @@ from urllib3._collections import HTTPHeaderDict
 from polaris_mcp.rest import DEFAULT_TIMEOUT, PolarisRestTool
 
 
-def _build_response(status: int, body: str, headers: dict[str, object] | None = None) -> SimpleNamespace:
+def _build_response(
+    status: int, body: str, headers: dict[str, object] | None = None
+) -> SimpleNamespace:
     """Return a lightweight stub with the attributes accessed by PolarisRestTool."""
 
     header_dict = HTTPHeaderDict()
@@ -41,7 +43,9 @@ def _build_response(status: int, body: str, headers: dict[str, object] | None = 
                     header_dict.add(key, item)
             else:
                 header_dict.add(key, value)
-    return SimpleNamespace(status=status, data=body.encode("utf-8"), headers=header_dict)
+    return SimpleNamespace(
+        status=status, data=body.encode("utf-8"), headers=header_dict
+    )
 
 
 def _create_tool() -> tuple[PolarisRestTool, mock.Mock, mock.Mock]:
@@ -72,7 +76,10 @@ def test_call_builds_request_and_metadata_with_json_body() -> None:
             "method": "post",
             "path": "namespaces",
             "query": {"page-size": "200", "tag": ["blue", "green"]},
-            "headers": {"Prefer": ["return-minimal", "respond-async"], "Authorization": "Bearer user"},
+            "headers": {
+                "Prefer": ["return-minimal", "respond-async"],
+                "Authorization": "Bearer user",
+            },
             "body": {"name": "analytics"},
         }
     )
@@ -104,7 +111,10 @@ def test_call_builds_request_and_metadata_with_json_body() -> None:
     assert result.metadata["response"]["body"] == {"result": "ok"}
     assert result.metadata["response"]["headers"]["X-Request-Id"] == "abc123"
     assert result.metadata["request"]["headers"]["Authorization"] == "[REDACTED]"
-    assert result.metadata["request"]["headers"]["Prefer"] == "return-minimal, respond-async"
+    assert (
+        result.metadata["request"]["headers"]["Prefer"]
+        == "return-minimal, respond-async"
+    )
 
 
 def test_call_uses_authorization_provider_and_handles_plain_text() -> None:

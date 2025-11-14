@@ -27,7 +27,13 @@ from typing import Any, Dict, Optional, Set
 import urllib3
 
 from polaris_mcp.authorization import AuthorizationProvider
-from polaris_mcp.base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from polaris_mcp.base import (
+    JSONDict,
+    McpTool,
+    ToolExecutionResult,
+    copy_if_object,
+    require_text,
+)
 from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 
 
@@ -35,9 +41,7 @@ class PolarisPolicyTool(McpTool):
     """Expose Polaris policy endpoints via MCP."""
 
     TOOL_NAME = "polaris-policy"
-    TOOL_DESCRIPTION = (
-        "Manage Polaris policies (list, create, update, delete, attach, detach, applicable)."
-    )
+    TOOL_DESCRIPTION = "Manage Polaris policies (list, create, update, delete, attach, detach, applicable)."
 
     LIST_ALIASES: Set[str] = {"list"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
@@ -77,7 +81,16 @@ class PolarisPolicyTool(McpTool):
             "properties": {
                 "operation": {
                     "type": "string",
-                    "enum": ["list", "get", "create", "update", "delete", "attach", "detach", "applicable"],
+                    "enum": [
+                        "list",
+                        "get",
+                        "create",
+                        "update",
+                        "delete",
+                        "attach",
+                        "detach",
+                        "applicable",
+                    ],
                     "description": (
                         "Policy operation to execute. Supported values: list, get, create, update, delete, attach, detach, applicable."
                     ),
@@ -133,9 +146,13 @@ class PolarisPolicyTool(McpTool):
         catalog = encode_path_segment(require_text(arguments, "catalog"))
         namespace: Optional[str] = None
         if normalized != "applicable":
-            namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
+            namespace = encode_path_segment(
+                self._resolve_namespace(arguments.get("namespace"))
+            )
         elif arguments.get("namespace") is not None:
-            namespace = encode_path_segment(self._resolve_namespace(arguments.get("namespace")))
+            namespace = encode_path_segment(
+                self._resolve_namespace(arguments.get("namespace"))
+            )
 
         delegate_args: JSONDict = {}
         copy_if_object(arguments.get("query"), delegate_args, "query")
@@ -170,7 +187,9 @@ class PolarisPolicyTool(McpTool):
         raw = self._delegate.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
 
-    def _handle_list(self, delegate_args: JSONDict, catalog: str, namespace: str) -> None:
+    def _handle_list(
+        self, delegate_args: JSONDict, catalog: str, namespace: str
+    ) -> None:
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/policies"
 
@@ -182,7 +201,9 @@ class PolarisPolicyTool(McpTool):
         namespace: str,
     ) -> None:
         policy = encode_path_segment(
-            require_text(arguments, "policy", "Policy name is required for get operations.")
+            require_text(
+                arguments, "policy", "Policy name is required for get operations."
+            )
         )
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/policies/{policy}"
@@ -216,7 +237,9 @@ class PolarisPolicyTool(McpTool):
                 "Update operations require a request body that matches the UpdatePolicyRequest schema."
             )
         policy = encode_path_segment(
-            require_text(arguments, "policy", "Policy name is required for update operations.")
+            require_text(
+                arguments, "policy", "Policy name is required for update operations."
+            )
         )
         delegate_args["method"] = "PUT"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/policies/{policy}"
@@ -230,7 +253,9 @@ class PolarisPolicyTool(McpTool):
         namespace: str,
     ) -> None:
         policy = encode_path_segment(
-            require_text(arguments, "policy", "Policy name is required for delete operations.")
+            require_text(
+                arguments, "policy", "Policy name is required for delete operations."
+            )
         )
         delegate_args["method"] = "DELETE"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/policies/{policy}"
@@ -248,10 +273,14 @@ class PolarisPolicyTool(McpTool):
                 "Attach operations require a request body that matches the AttachPolicyRequest schema."
             )
         policy = encode_path_segment(
-            require_text(arguments, "policy", "Policy name is required for attach operations.")
+            require_text(
+                arguments, "policy", "Policy name is required for attach operations."
+            )
         )
         delegate_args["method"] = "PUT"
-        delegate_args["path"] = f"{catalog}/namespaces/{namespace}/policies/{policy}/mappings"
+        delegate_args["path"] = (
+            f"{catalog}/namespaces/{namespace}/policies/{policy}/mappings"
+        )
         delegate_args["body"] = copy.deepcopy(body)
 
     def _handle_detach(
@@ -267,17 +296,23 @@ class PolarisPolicyTool(McpTool):
                 "Detach operations require a request body that matches the DetachPolicyRequest schema."
             )
         policy = encode_path_segment(
-            require_text(arguments, "policy", "Policy name is required for detach operations.")
+            require_text(
+                arguments, "policy", "Policy name is required for detach operations."
+            )
         )
         delegate_args["method"] = "POST"
-        delegate_args["path"] = f"{catalog}/namespaces/{namespace}/policies/{policy}/mappings"
+        delegate_args["path"] = (
+            f"{catalog}/namespaces/{namespace}/policies/{policy}/mappings"
+        )
         delegate_args["body"] = copy.deepcopy(body)
 
     def _handle_applicable(self, delegate_args: JSONDict, catalog: str) -> None:
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/applicable-policies"
 
-    def _maybe_augment_error(self, result: ToolExecutionResult, operation: str) -> ToolExecutionResult:
+    def _maybe_augment_error(
+        self, result: ToolExecutionResult, operation: str
+    ) -> ToolExecutionResult:
         if not result.is_error:
             return result
         metadata = copy.deepcopy(result.metadata) if result.metadata is not None else {}
@@ -292,7 +327,7 @@ class PolarisPolicyTool(McpTool):
                 "See CreatePolicyRequest in spec/polaris-catalog-apis/policy-apis.yaml. "
                 "Common types include system.data-compaction, system.metadata-compaction, "
                 "system.orphan-file-removal, and system.snapshot-expiry. "
-                "Example: {\"name\":\"weekly_compaction\",\"type\":\"system.data-compaction\",\"content\":{...}}. "
+                'Example: {"name":"weekly_compaction","type":"system.data-compaction","content":{...}}. '
                 "Reference schema: http://polaris.apache.org/schemas/policies/system/data-compaction/2025-02-03.json"
             )
         elif operation == "update":
@@ -306,9 +341,7 @@ class PolarisPolicyTool(McpTool):
                 "Ensure the policy exists first (create it with operation=create) before attaching."
             )
         elif operation == "detach":
-            hint = (
-                "Detach requests require a body with `targetType`, `targetName`, and optional `parameters`."
-            )
+            hint = "Detach requests require a body with `targetType`, `targetName`, and optional `parameters`."
 
         if not hint:
             return result
@@ -353,7 +386,9 @@ class PolarisPolicyTool(McpTool):
             parts = []
             for element in namespace:
                 if not isinstance(element, str) or not element.strip():
-                    raise ValueError("Namespace array elements must be non-empty strings.")
+                    raise ValueError(
+                        "Namespace array elements must be non-empty strings."
+                    )
                 parts.append(element.strip())
             return ".".join(parts)
         if not isinstance(namespace, str) or not namespace.strip():

@@ -19,11 +19,15 @@ class TestServerHelpers:
         class DummyTool:
             def call(self, arguments: dict[str, object]) -> ToolExecutionResult:
                 captured["arguments"] = arguments
-                return ToolExecutionResult(text="done", is_error=False, metadata={"x": 1})
+                return ToolExecutionResult(
+                    text="done", is_error=False, metadata={"x": 1}
+                )
 
         tool = DummyTool()
         sentinel = object()
-        with mock.patch("polaris_mcp.server._to_tool_result", return_value=sentinel) as mock_to_result:
+        with mock.patch(
+            "polaris_mcp.server._to_tool_result", return_value=sentinel
+        ) as mock_to_result:
             result = server._call_tool(
                 tool,
                 required={"operation": "GET", "catalog": "prod"},
@@ -134,14 +138,19 @@ class TestServerHelpers:
         assert server._coerce_body(sequence) is sequence
 
     def test_to_tool_result_builds_fastmcp_payload_with_metadata(self) -> None:
-        execution = ToolExecutionResult(text="ok", is_error=True, metadata={"foo": "bar"})
+        execution = ToolExecutionResult(
+            text="ok", is_error=True, metadata={"foo": "bar"}
+        )
         text_instance = object()
         fast_instance = object()
-        with mock.patch(
-            "polaris_mcp.server.TextContent", return_value=text_instance
-        ) as mock_text, mock.patch(
-            "polaris_mcp.server.FastMcpToolResult", return_value=fast_instance
-        ) as mock_result:
+        with (
+            mock.patch(
+                "polaris_mcp.server.TextContent", return_value=text_instance
+            ) as mock_text,
+            mock.patch(
+                "polaris_mcp.server.FastMcpToolResult", return_value=fast_instance
+            ) as mock_result,
+        ):
             output = server._to_tool_result(execution)
 
         assert output is fast_instance
@@ -153,9 +162,10 @@ class TestServerHelpers:
 
     def test_to_tool_result_omits_meta_when_not_provided(self) -> None:
         execution = ToolExecutionResult(text="hello", is_error=False, metadata=None)
-        with mock.patch("polaris_mcp.server.TextContent") as mock_text, mock.patch(
-            "polaris_mcp.server.FastMcpToolResult"
-        ) as mock_result:
+        with (
+            mock.patch("polaris_mcp.server.TextContent") as mock_text,
+            mock.patch("polaris_mcp.server.FastMcpToolResult") as mock_result,
+        ):
             server._to_tool_result(execution)
 
         mock_text.assert_called_once_with(type="text", text="hello")
@@ -167,7 +177,8 @@ class TestServerHelpers:
             assert server._resolve_package_version() == "2.0.0"
 
         with mock.patch(
-            "polaris_mcp.server.metadata.version", side_effect=metadata.PackageNotFoundError
+            "polaris_mcp.server.metadata.version",
+            side_effect=metadata.PackageNotFoundError,
         ):
             assert server._resolve_package_version() == "dev"
 
@@ -175,10 +186,13 @@ class TestServerHelpers:
 class TestAuthorizationProviderResolution:
     def test_resolve_authorization_provider_uses_token_when_available(self) -> None:
         fake_http = object()
-        with mock.patch("polaris_mcp.server._resolve_token", return_value="abc"), mock.patch.dict(
-            os.environ, {}, clear=True
+        with (
+            mock.patch("polaris_mcp.server._resolve_token", return_value="abc"),
+            mock.patch.dict(os.environ, {}, clear=True),
         ):
-            provider = server._resolve_authorization_provider("https://base/", fake_http)
+            provider = server._resolve_authorization_provider(
+                "https://base/", fake_http
+            )
 
         assert isinstance(provider, server.StaticAuthorizationProvider)
         assert provider.authorization_header() == "Bearer abc"
@@ -186,19 +200,26 @@ class TestAuthorizationProviderResolution:
     def test_resolve_authorization_provider_uses_client_credentials(self) -> None:
         fake_http = object()
         fake_provider = object()
-        with mock.patch("polaris_mcp.server._resolve_token", return_value=None), mock.patch.dict(
-            os.environ,
-            {
-                "POLARIS_CLIENT_ID": " client ",
-                "POLARIS_CLIENT_SECRET": "secret",
-                "POLARIS_TOKEN_SCOPE": " scope ",
-                "POLARIS_TOKEN_URL": "https://oauth/token",
-            },
-            clear=True,
-        ), mock.patch(
-            "polaris_mcp.server.ClientCredentialsAuthorizationProvider", return_value=fake_provider
-        ) as mock_factory:
-            provider = server._resolve_authorization_provider("https://base/", fake_http)
+        with (
+            mock.patch("polaris_mcp.server._resolve_token", return_value=None),
+            mock.patch.dict(
+                os.environ,
+                {
+                    "POLARIS_CLIENT_ID": " client ",
+                    "POLARIS_CLIENT_SECRET": "secret",
+                    "POLARIS_TOKEN_SCOPE": " scope ",
+                    "POLARIS_TOKEN_URL": "https://oauth/token",
+                },
+                clear=True,
+            ),
+            mock.patch(
+                "polaris_mcp.server.ClientCredentialsAuthorizationProvider",
+                return_value=fake_provider,
+            ) as mock_factory,
+        ):
+            provider = server._resolve_authorization_provider(
+                "https://base/", fake_http
+            )
 
         assert provider is fake_provider
         mock_factory.assert_called_once_with(

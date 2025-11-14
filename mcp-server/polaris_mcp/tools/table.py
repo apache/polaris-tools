@@ -43,9 +43,7 @@ class PolarisTableTool(McpTool):
     """Expose Polaris table REST endpoints through MCP."""
 
     TOOL_NAME = "polaris-iceberg-table"
-    TOOL_DESCRIPTION = (
-        "Perform table-centric operations (list, get, create, commit, delete) using the Polaris REST API."
-    )
+    TOOL_DESCRIPTION = "Perform table-centric operations (list, get, create, commit, delete) using the Polaris REST API."
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
@@ -155,7 +153,9 @@ class PolarisTableTool(McpTool):
 
         return self._delegate.call(delegate_args)
 
-    def _handle_list(self, delegate_args: JSONDict, catalog: str, namespace: str) -> None:
+    def _handle_list(
+        self, delegate_args: JSONDict, catalog: str, namespace: str
+    ) -> None:
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables"
 
@@ -167,7 +167,9 @@ class PolarisTableTool(McpTool):
         namespace: str,
     ) -> None:
         table = encode_path_segment(
-            require_text(arguments, "table", "Table name is required for get operations.")
+            require_text(
+                arguments, "table", "Table name is required for get operations."
+            )
         )
         delegate_args["method"] = "GET"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables/{table}"
@@ -202,7 +204,9 @@ class PolarisTableTool(McpTool):
                 "Commit operations require a request body that matches the CommitTableRequest schema."
             )
         table = encode_path_segment(
-            require_text(arguments, "table", "Table name is required for commit operations.")
+            require_text(
+                arguments, "table", "Table name is required for commit operations."
+            )
         )
         delegate_args["method"] = "POST"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables/{table}"
@@ -216,7 +220,9 @@ class PolarisTableTool(McpTool):
         namespace: str,
     ) -> None:
         table = encode_path_segment(
-            require_text(arguments, "table", "Table name is required for delete operations.")
+            require_text(
+                arguments, "table", "Table name is required for delete operations."
+            )
         )
         delegate_args["method"] = "DELETE"
         delegate_args["path"] = f"{catalog}/namespaces/{namespace}/tables/{table}"
@@ -243,10 +249,14 @@ class PolarisTableTool(McpTool):
             parts: List[str] = []
             for element in namespace:
                 if not isinstance(element, str):
-                    raise ValueError("Namespace array elements must be non-empty strings.")
+                    raise ValueError(
+                        "Namespace array elements must be non-empty strings."
+                    )
                 candidate = element.strip(string.whitespace)
                 if not candidate:
-                    raise ValueError("Namespace array elements must be non-empty strings.")
+                    raise ValueError(
+                        "Namespace array elements must be non-empty strings."
+                    )
                 parts.append(candidate)
             return parts
         if not isinstance(namespace, str):

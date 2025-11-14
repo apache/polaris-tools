@@ -30,6 +30,7 @@ JSONDict = Dict[str, Any]
 
 NAMESPACE_PATH_DELIMITER = "\x1f"
 
+
 def copy_if_object(source: Any, target: Dict[str, Any], field: str) -> None:
     """Deep copy dict-like values into target when present."""
 
@@ -37,7 +38,9 @@ def copy_if_object(source: Any, target: Dict[str, Any], field: str) -> None:
         target[field] = copy.deepcopy(source)
 
 
-def require_text(node: Dict[str, Any], field: str, message: Optional[str] = None) -> str:
+def require_text(
+    node: Dict[str, Any], field: str, message: Optional[str] = None
+) -> str:
     """Return a trimmed string field, raising ValueError when missing or blank."""
 
     value = node.get(field)
