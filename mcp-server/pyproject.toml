@@ -37,6 +37,9 @@ dependencies = [
 test = [
     "pytest>=8.2",
 ]
+dev = [
+    "pre-commit>=3.7",
+]
 
 [project.scripts]
 polaris-mcp = "polaris_mcp.server:main"
