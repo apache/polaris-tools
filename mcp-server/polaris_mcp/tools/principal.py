@@ -26,9 +26,9 @@ from typing import Any, Dict, Optional, Set
 
 import urllib3
 
-from ..authorization import AuthorizationProvider
-from ..base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
-from ..rest import PolarisRestTool, encode_path_segment
+from polaris_mcp.authorization import AuthorizationProvider
+from polaris_mcp.base import JSONDict, McpTool, ToolExecutionResult, copy_if_object, require_text
+from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisPrincipalTool(McpTool):

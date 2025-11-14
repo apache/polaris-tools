@@ -27,8 +27,8 @@ from typing import Any, Dict, List, Optional, Set
 
 import urllib3
 
-from ..authorization import AuthorizationProvider
-from ..base import (
+from polaris_mcp.authorization import AuthorizationProvider
+from polaris_mcp.base import (
     JSONDict,
     McpTool,
     ToolExecutionResult,
@@ -36,7 +36,7 @@ from ..base import (
     require_text,
     NAMESPACE_PATH_DELIMITER,
 )
-from ..rest import PolarisRestTool, encode_path_segment
+from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 
 
 class PolarisNamespaceTool(McpTool):
