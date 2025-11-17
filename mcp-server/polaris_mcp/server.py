@@ -31,14 +31,14 @@ from fastmcp.tools.tool import ToolResult as FastMcpToolResult
 from importlib import metadata
 from mcp.types import TextContent
 
-from .authorization import (
+from polaris_mcp.authorization import (
     AuthorizationProvider,
     ClientCredentialsAuthorizationProvider,
     StaticAuthorizationProvider,
     none,
 )
-from .base import ToolExecutionResult
-from .tools import (
+from polaris_mcp.base import ToolExecutionResult
+from polaris_mcp.tools import (
     PolarisCatalogRoleTool,
     PolarisCatalogTool,
     PolarisNamespaceTool,
