@@ -38,6 +38,7 @@ from polaris_mcp.authorization import (
     none,
 )
 from polaris_mcp.base import ToolExecutionResult
+from polaris_mcp.rest import PolarisRestTool
 from polaris_mcp.tools import (
     PolarisCatalogRoleTool,
     PolarisCatalogTool,
@@ -66,16 +67,38 @@ def create_server() -> FastMCP:
     base_url = _resolve_base_url()
     http = urllib3.PoolManager()
     authorization_provider = _resolve_authorization_provider(base_url, http)
-
-    table_tool = PolarisTableTool(base_url, http, authorization_provider)
-    namespace_tool = PolarisNamespaceTool(base_url, http, authorization_provider)
-    principal_tool = PolarisPrincipalTool(base_url, http, authorization_provider)
-    principal_role_tool = PolarisPrincipalRoleTool(
-        base_url, http, authorization_provider
+    catalog_rest = PolarisRestTool(
+        name="polaris.rest.catalog",
+        description="Shared REST delegate for catalog operations",
+        base_url=base_url,
+        default_path_prefix="api/catalog/v1/",
+        http=http,
+        authorization_provider=authorization_provider,
     )
-    catalog_role_tool = PolarisCatalogRoleTool(base_url, http, authorization_provider)
-    policy_tool = PolarisPolicyTool(base_url, http, authorization_provider)
-    catalog_tool = PolarisCatalogTool(base_url, http, authorization_provider)
+    management_rest = PolarisRestTool(
+        name="polaris.rest.management",
+        description="Shared REST delegate for management operations",
+        base_url=base_url,
+        default_path_prefix="api/management/v1/",
+        http=http,
+        authorization_provider=authorization_provider,
+    )
+    policy_rest = PolarisRestTool(
+        name="polaris.rest.policy",
+        description="Shared REST delegate for policy operations",
+        base_url=base_url,
+        default_path_prefix="api/catalog/polaris/v1/",
+        http=http,
+        authorization_provider=authorization_provider,
+    )
+
+    table_tool = PolarisTableTool(rest_client=catalog_rest)
+    namespace_tool = PolarisNamespaceTool(rest_client=catalog_rest)
+    principal_tool = PolarisPrincipalTool(rest_client=management_rest)
+    principal_role_tool = PolarisPrincipalRoleTool(rest_client=management_rest)
+    catalog_role_tool = PolarisCatalogRoleTool(rest_client=management_rest)
+    policy_tool = PolarisPolicyTool(rest_client=policy_rest)
+    catalog_tool = PolarisCatalogTool(rest_client=management_rest)
 
     server_version = _resolve_package_version()
     mcp = FastMCP(
