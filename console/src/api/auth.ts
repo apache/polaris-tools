@@ -16,7 +16,8 @@ if (import.meta.env.DEV) {
 export const authApi = {
   getToken: async (
     clientId: string,
-    clientSecret: string
+    clientSecret: string,
+    realm?: string
   ): Promise<OAuthTokenResponse> => {
     const formData = new URLSearchParams()
     formData.append("grant_type", "client_credentials")
@@ -24,13 +25,20 @@ export const authApi = {
     formData.append("client_secret", clientSecret)
     formData.append("scope", "PRINCIPAL_ROLE:ALL")
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    // Add realm header if provided
+    if (realm) {
+      headers["Polaris-Realm"] = realm
+    }
+
     const response = await axios.post<OAuthTokenResponse>(
       TOKEN_URL,
       formData,
       {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers,
       }
     )
 
@@ -93,6 +101,7 @@ export const authApi = {
 
   logout: (): void => {
     localStorage.removeItem("polaris_access_token")
+    localStorage.removeItem("polaris_realm")
     // Use a small delay to allow toast to show before redirect
     setTimeout(() => {
       navigate("/login", true)

@@ -34,7 +34,8 @@ class ApiClient {
     // Request interceptor to add auth token
     const requestInterceptor = (config: InternalAxiosRequestConfig) => {
       const token = this.getAccessToken()
-      const realm = import.meta.env.VITE_POLARIS_REALM
+      // Read realm from localStorage, fallback to environment variable for backward compatibility
+      const realm = localStorage.getItem("polaris_realm") || import.meta.env.VITE_POLARIS_REALM
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
@@ -77,6 +78,7 @@ class ApiClient {
 
   clearAccessToken(): void {
     localStorage.removeItem("polaris_access_token")
+    localStorage.removeItem("polaris_realm")
   }
 
   setAccessToken(token: string): void {

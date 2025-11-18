@@ -4,7 +4,7 @@ import { authApi } from "@/api/auth"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  login: (clientId: string, clientSecret: string) => Promise<void>
+  login: (clientId: string, clientSecret: string, realm: string) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -22,9 +22,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false)
   }, [])
 
-  const login = async (clientId: string, clientSecret: string) => {
+  const login = async (clientId: string, clientSecret: string, realm: string) => {
     try {
-      await authApi.getToken(clientId, clientSecret)
+      // Store realm in localStorage
+      if (realm) {
+        localStorage.setItem("polaris_realm", realm)
+      }
+      await authApi.getToken(clientId, clientSecret, realm)
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
@@ -36,6 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast.success("Logged out successfully")
     authApi.logout()
     setIsAuthenticated(false)
+    // Clear realm from localStorage on logout
+    localStorage.removeItem("polaris_realm")
   }
 
   return (

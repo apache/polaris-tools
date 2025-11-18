@@ -10,6 +10,7 @@ import { Logo } from "@/components/layout/Logo"
 export function Login() {
   const [clientId, setClientId] = useState("")
   const [clientSecret, setClientSecret] = useState("")
+  const [realm, setRealm] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -21,7 +22,7 @@ export function Login() {
     setLoading(true)
 
     try {
-      await login(clientId, clientSecret)
+      await login(clientId, clientSecret, realm)
       navigate("/")
     } catch (err) {
       setError(
@@ -69,6 +70,17 @@ export function Login() {
                 onChange={(e) => setClientSecret(e.target.value)}
                 required
                 placeholder="Enter your client secret"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="realm">Realm</Label>
+              <Input
+                id="realm"
+                type="text"
+                value={realm}
+                onChange={(e) => setRealm(e.target.value)}
+                required
+                placeholder="Enter your realm"
               />
             </div>
             {error && (
