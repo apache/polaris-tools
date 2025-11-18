@@ -10,7 +10,8 @@ import { Logo } from "@/components/layout/Logo"
 export function Login() {
   const [clientId, setClientId] = useState("")
   const [clientSecret, setClientSecret] = useState("")
-  const [realm, setRealm] = useState("")
+  // Initialize realm with value from .env file if present
+  const [realm, setRealm] = useState(import.meta.env.VITE_POLARIS_REALM || "")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
