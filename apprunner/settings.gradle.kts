@@ -73,7 +73,7 @@ gradle.beforeProject {
 val isCI = System.getenv("CI") != null
 
 develocity {
-  val isApachePolarisGitHub = "apache/polaris" == System.getenv("GITHUB_REPOSITORY")
+  val isApachePolarisGitHub = "apache/polaris-tools" == System.getenv("GITHUB_REPOSITORY")
   val gitHubRef: String? = System.getenv("GITHUB_REF")
   val isGitHubBranchOrTag =
     gitHubRef != null && (gitHubRef.startsWith("refs/heads/") || gitHubRef.startsWith("refs/tags/"))
