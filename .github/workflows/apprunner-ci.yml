@@ -50,6 +50,8 @@ jobs:
         java-version: [21, 23]
     steps:
       - uses: actions/checkout@v4
+      - name: Gradle setup action cache key config
+        run: echo "GRADLE_BUILD_ACTION_CACHE_KEY_JOB_INSTANCE=Java${{ matrix.java-version }}" >> $GITHUB_ENV
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
