@@ -115,8 +115,6 @@ class TestProcessHandler {
     assertThat(phMock.ph.isAlive()).isFalse();
   }
 
-  static int attempt;
-
   @RetryingTest(maxAttempts = 50, minSuccess = 20)
   // repeat, risk of flakiness
   void processExitsEarly() {
