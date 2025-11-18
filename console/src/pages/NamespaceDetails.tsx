@@ -205,6 +205,9 @@ export function NamespaceDetails() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
+                // TODO: Should be renamed to Iceberg Tables (JB)
+                // TODO: Add Generic Tables view here (JB)  
+                // TODO: Add Policies view here (JB)
                   <CardTitle>Tables</CardTitle>
                   <CardDescription>Tables in this namespace</CardDescription>
                 </div>
