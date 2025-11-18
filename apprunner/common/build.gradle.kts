@@ -19,4 +19,8 @@
 
 plugins { id("polaris-apprunner-java") }
 
-dependencies { compileOnly(libs.jakarta.annotation.api) }
+dependencies {
+  compileOnly(libs.jakarta.annotation.api)
+
+  testImplementation(libs.junit.pioneer)
+}

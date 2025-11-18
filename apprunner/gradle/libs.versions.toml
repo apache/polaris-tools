@@ -27,6 +27,7 @@ maven-core = { module = "org.apache.maven:maven-core", version = "3.9.9" }
 maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version = "3.15.1" }
 jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version = "3.0.0" }
 junit-bom = { module = "org.junit:junit-bom", version = "5.14.1" }
+junit-pioneer = { module = "org.junit-pioneer:junit-pioneer", version = "2.3.0" }
 soebes-itf-assertj = { module = "com.soebes.itf.jupiter.extension:itf-assertj", version.ref = "soebes-itf" }
 soebes-itf-jupiter-extension = { module = "com.soebes.itf.jupiter.extension:itf-jupiter-extension", version.ref = "soebes-itf" }
 

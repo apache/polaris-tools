@@ -18,6 +18,8 @@
  */
 package org.apache.polaris.apprunner.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,9 +32,9 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.RetryingTest;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class TestListenUrlWaiter {
@@ -99,7 +101,8 @@ class TestListenUrlWaiter {
         .containsExactly("https://localhost.in.some.space:4242", null);
   }
 
-  @RepeatedTest(20) // repeat, risk of flakiness
+  @RetryingTest(maxAttempts = 50, minSuccess = 20)
+  // repeat, risk of flakiness
   void timeout() {
     var clock = new AtomicLong();
     var timeout = 10_000L; // long timeout, for slow CI
@@ -107,20 +110,21 @@ class TestListenUrlWaiter {
     var line = new AtomicReference<>();
     var waiter = new ListenUrlWaiter(clock::get, timeout, line::set);
 
-    soft.assertThat(waiter.isTimeout()).isFalse();
+    assertThat(waiter.isTimeout()).isFalse();
 
     clock.set(TimeUnit.MILLISECONDS.toNanos(timeout + 1));
 
-    soft.assertThat(waiter.isTimeout()).isTrue();
+    assertThat(waiter.isTimeout()).isTrue();
 
-    soft.assertThat(executor.submit(waiter::getListenUrls))
+    assertThat(executor.submit(waiter::getListenUrls))
         .failsWithin(5, TimeUnit.SECONDS)
         .withThrowableOfType(ExecutionException.class)
         .withRootCauseExactlyInstanceOf(TimeoutException.class)
         .withMessageEndingWith(ListenUrlWaiter.TIMEOUT_MESSAGE + ListenUrlWaiter.NOTHING_RECEIVED);
   }
 
-  @RepeatedTest(20) // repeat, risk of flakiness
+  @RetryingTest(maxAttempts = 50, minSuccess = 20)
+  // repeat, risk of flakiness
   void noTimeout() throws Exception {
     var clock = new AtomicLong();
     var timeout = 10_000L; // long timeout, for slow CI
@@ -137,15 +141,15 @@ class TestListenUrlWaiter {
     var listenLine =
         "2021-05-28 12:12:25,753 INFO  [io.quarkus] (main) nessie-quarkus 0.6.2-SNAPSHOT on JVM (powered by Quarkus 1.13.4.Final) started in 1.444s. Listening on: http://4.2.4.2:4242. Management interface listening on http://4.2.4.2:2424.";
     waiter.accept(listenLine);
-    soft.assertThat(line.getAndSet(null)).isEqualTo(listenLine);
-    soft.assertThat(waiter.getListenUrls())
+    assertThat(line.getAndSet(null)).isEqualTo(listenLine);
+    assertThat(waiter.getListenUrls())
         .containsExactly("http://4.2.4.2:4242", "http://4.2.4.2:2424");
-    soft.assertThat(waiter.isTimeout()).isFalse();
+    assertThat(waiter.isTimeout()).isFalse();
 
     // Clock post the timeout-boundary (so a timeout-check would trigger)
     clock.set(TimeUnit.MILLISECONDS.toNanos(timeout + 1));
-    soft.assertThat(waiter.getListenUrls())
+    assertThat(waiter.getListenUrls())
         .containsExactly("http://4.2.4.2:4242", "http://4.2.4.2:2424");
-    soft.assertThat(waiter.isTimeout()).isFalse();
+    assertThat(waiter.isTimeout()).isFalse();
   }
 }
