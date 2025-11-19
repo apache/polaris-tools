@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,17 +18,27 @@
 # under the License.
 #
 
-LIBS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Script to update the version.
+#
+# Every tool MUST have an update_version.sh script.
+#
+# Environment variables:
+#   DRY_RUN
+#   RELEASEY_DIR
+#   LIBS_DIR
+#   version_without_rc
+#   (and more)
 
-# Git/SVN repository constants
-APACHE_DIST_URL=${APACHE_DIST_URL:-"https://dist.apache.org/repos/dist"}
-APACHE_DIST_PATH=${APACHE_DIST_PATH:-"/dev/incubator/polaris"}
+source "$LIBS_DIR/_exec.sh"
 
-# Execution mode constants
-DRY_RUN=${DRY_RUN:-1}
+if [[ ${DRY_RUN:-1} -ne 1 ]]; then
+  exec_process echo "$version_without_rc" > version.txt
+else
+  exec_process "echo $version_without_rc > version.txt"
+fi
 
-# Version validation regex patterns
-VERSION_REGEX="([0-9]+)\.([0-9]+)\.([0-9]+)-incubating"
-VERSION_REGEX_GIT_TAG="^apache-polaris-([a-z+]+)-$VERSION_REGEX-rc([0-9]+)$"
-# Branch validation regex pattern for major.minor.x format
-BRANCH_VERSION_REGEX="([0-9]+)\.([0-9]+)\.x"
+exec_process git add version.txt
+            "$VERSION_FILE" \
+            "$HELM_CHART_YAML_FILE" \
+            "$HELM_README_FILE" \
+            "$CHANGELOG_FILE"

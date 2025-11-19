@@ -58,10 +58,11 @@ function validate_and_extract_git_tag_version {
     return 1
   fi
 
-  major="${BASH_REMATCH[1]}"
-  minor="${BASH_REMATCH[2]}"
-  patch="${BASH_REMATCH[3]}"
-  rc_number="${BASH_REMATCH[4]}"
+  tool="${BASH_REMATCH[1]}"
+  major="${BASH_REMATCH[2]}"
+  minor="${BASH_REMATCH[3]}"
+  patch="${BASH_REMATCH[4]}"
+  rc_number="${BASH_REMATCH[5]}"
   version_without_rc="${major}.${minor}.${patch}-incubating"
 
   return 0
@@ -78,44 +79,13 @@ function validate_and_extract_polaris_version {
     return 1
   fi
 
-  major="${BASH_REMATCH[1]}"
-  minor="${BASH_REMATCH[2]}"
-  patch="${BASH_REMATCH[3]}"
+  tool="${BASH_REMATCH[1]}"
+  major="${BASH_REMATCH[2]}"
+  minor="${BASH_REMATCH[3]}"
+  patch="${BASH_REMATCH[4]}"
   version_without_rc="${major}.${minor}.${patch}-incubating"
 
   return 0
-}
-
-function update_version {
-  local version="$1"
-  update_version_txt "${version}"
-  update_helm_version "${version}"
-}
-
-function update_version_txt {
-  local version="$1"
-  # This function is only there for dry-run support.  Because of the
-  # redirection, we cannot use exec_process with the exact command that will be
-  # executed.
-  if [[ ${DRY_RUN:-1} -ne 1 ]]; then
-    exec_process echo "${version}" >$VERSION_FILE
-  else
-    exec_process "echo ${version} > $VERSION_FILE"
-  fi
-}
-
-function update_helm_version {
-  local new_version="$1"
-  exec_process sed -E -i~ "s/^version: .+/version: ${new_version}/g" "$HELM_CHART_YAML_FILE"
-  exec_process sed -E -i~ "s/^appVersion: .+/appVersion: ${new_version}/g" "$HELM_CHART_YAML_FILE"
-  exec_process sed -E -i~ "s/[0-9]+[.][0-9]+([.][0-9]+)?(-incubating)-SNAPSHOT/${new_version}/g" "$HELM_README_FILE"
-  # The readme file may contain version with double dash for shields.io badges
-  # We need a second `sed` command to ensure that the version replacement preserves this double-dash syntax.
-  local current_version_with_dash
-  local version_with_dash
-  current_version_with_dash="${old_version//-/--}"
-  version_with_dash="${version//-/--}"
-  exec_process sed -E -i~ "s/[0-9]+[.][0-9]+([.][0-9]+)?(--incubating)--SNAPSHOT/${version_with_dash}/g" "$HELM_README_FILE"
 }
 
 function find_next_rc_number {
@@ -135,7 +105,7 @@ function find_next_rc_number {
   else
     # Extract the highest RC number and increment
     local highest_rc
-    highest_rc=$(echo "${existing_tags}" | sed "s/apache-polaris-${version_without_rc}-rc//" | sort -n | tail -1)
+    highest_rc=$(echo "${existing_tags}" | sed "s/apache-polaris-${tool}-${version_without_rc}-rc//" | sort -n | tail -1)
     rc_number=$((highest_rc + 1))
   fi
 
@@ -150,7 +120,7 @@ function find_next_patch_number {
   local minor="$2"
 
   # Get all existing tags for this major.minor version
-  local tag_pattern="apache-polaris-${major}.${minor}.*-incubating-rc*"
+  local tag_pattern="apache-polaris-${tool}-${major}.${minor}.*-incubating-rc*"
   local existing_tags
   existing_tags=$(git tag -l "${tag_pattern}" | sort -V)
 
@@ -161,7 +131,7 @@ function find_next_patch_number {
     # Extract all patch numbers and find the highest
     local highest_patch=-1
     while IFS= read -r tag; do
-      if [[ ${tag} =~ apache-polaris-${major}\.${minor}\.([0-9]+)-incubating-rc[0-9]+ ]]; then
+      if [[ ${tag} =~ apache-polaris-${tool}-${major}\.${minor}\.([0-9]+)-incubating-rc[0-9]+ ]]; then
         local current_patch="${BASH_REMATCH[1]}"
         if [[ ${current_patch} -gt ${highest_patch} ]]; then
           highest_patch=${current_patch}
