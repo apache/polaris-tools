@@ -84,8 +84,8 @@ public class PolarisSynchronizer {
   /**
    * Calculates the total number of sync tasks to complete.
    *
-   * @param plan the plan to scan for cahnges
-   * @return the nuber of syncs to perform
+   * @param plan the plan to scan for changes
+   * @return the number of syncs to perform
    */
   private int totalSyncsToComplete(SynchronizationPlan<?> plan) {
     return plan.entitiesToCreate().size()

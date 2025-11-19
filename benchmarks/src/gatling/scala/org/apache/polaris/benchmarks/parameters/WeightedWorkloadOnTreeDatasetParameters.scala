@@ -32,8 +32,8 @@ import scala.util.Random
  * Case class to hold the parameters for the WeightedWorkloadOnTreeDataset simulation.
  *
  * @param seed The RNG seed to use
- * @param readers A seq of distrbutions to use for reading tables
- * @param writers A seq of distrbutions to use for writing to tables
+ * @param readers A seq of distributions to use for reading tables
+ * @param writers A seq of distributions to use for writing to tables
  */
 case class WeightedWorkloadOnTreeDatasetParameters(
     seed: Int,

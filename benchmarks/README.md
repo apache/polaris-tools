@@ -140,10 +140,10 @@ For repeated testing and benchmarking purposes it's convenient to have fixed cli
 ```bash
 # Start Polaris with the fixed client-ID/secret admin/admin
 # DO NEVER EVER USE THE FOLLOWING FOR ANY NON-AIRGAPPED POLARIS INSTANCE !!
-./gradlew :polaris-quarkus-server:quarkusBuild &&  java \
+./gradlew :polaris-server:assemble :polaris-server:quarkusAppPartsBuild && java \
   -Dpolaris.bootstrap.credentials=POLARIS,admin,admin \
   -Djava.security.manager=allow \
-  -jar quarkus/server/build/quarkus-app/quarkus-run.jar
+  -jar runtime/server/build/quarkus-app/quarkus-run.jar
 ```
 
 With the above you can run the benchmarks using a configuration file with `client-id = "admin"` and `client-secret = "admin"` - meant only for convenience in a fully airgapped system.
@@ -170,11 +170,11 @@ $$\text{Total number of namespaces} =
 
 The tables are created under the leaves of the tree. That is, they are put under the namespaces with no child namespace. The number of tables that is created under each leaf namespace is configurable. The total number of tables can easily be calculated with the following formulae, where `N` is the tree width, `D` is the total tree depth, and `T` is the number of tables per leaf namespace:
 
-Total number of tables = *N*<sup>*D* − 1</sup> \* *T*
+Total number of tables = *N*<sup>*D* − 1</sup> \* *T*
 
 The views are created alongside the tables. The number of views that is created under each leaf namespace is also configurable. The total number of views can easily be calculated with the following formulae, where `N` is the tree width, `D` is the total tree depth, `V` is the number of views per leaf namespace:
 
-Total number of tables = *N*<sup>*D* − 1</sup> \* *V*
+Total number of tables = *N*<sup>*D* − 1</sup> \* *V*
 
 ## Binary tree example
 
@@ -192,7 +192,7 @@ Using the formula from the previous section, we can calculate the total number o
 
 $$\text{Total number of namespaces} = \frac{2^{3} - 1}{2 - 1} = 7$$
 
-Total number of tables = 2<sup>3 − 1</sup> \* 5 = 20
+Total number of tables = 2<sup>3 − 1</sup> \* 5 = 20
 
 ## 10-ary tree example
 
@@ -210,7 +210,7 @@ Using the formula from the previous section, we can calculate the total number o
 
 $$\text{Total number of namespaces} = \frac{10^{2} - 1}{10 - 1} = 11$$
 
-Total number of tables = 10<sup>2 − 1</sup> \* 3 = 30
+Total number of tables = 10<sup>2 − 1</sup> \* 3 = 30
 
 ## 1-ary tree example
 
@@ -226,9 +226,9 @@ The diagram below shows an example of a test dataset with the following properti
 
 Using the formula from the previous section, we can calculate the total number of namespaces and the total number of tables as follows:
 
-Total number of namespaces = 1000
+Total number of namespaces = 1000
 
-Total number of tables = 1<sup>1000 − 1</sup> \* 7 = 7
+Total number of tables = 1<sup>1000 − 1</sup> \* 7 = 7
 
 ## Size
 

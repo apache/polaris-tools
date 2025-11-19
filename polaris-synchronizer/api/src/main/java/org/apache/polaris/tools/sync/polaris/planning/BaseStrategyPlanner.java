@@ -78,7 +78,7 @@ public class BaseStrategyPlanner implements SynchronizationPlanner {
    * @param entitiesOnTarget the entities from the target
    * @param requiresOverwrites true if "overwriting" the entity is necessary. Most grant record entities do not need overwriting.
    * @param entityIdentifierSupplier consumes an entity and returns an identifying representation of that entity
-   * @return a {@link SynchronizationPlan} with the entities sorted based on the souce parity strategy
+   * @return a {@link SynchronizationPlan} with the entities sorted based on the source parity strategy
    * @param <T> the type of the entity
    */
   private <T> SynchronizationPlan<T> sortOnIdentifier(
