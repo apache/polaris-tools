@@ -32,5 +32,5 @@ soebes-itf-assertj = { module = "com.soebes.itf.jupiter.extension:itf-assertj", 
 soebes-itf-jupiter-extension = { module = "com.soebes.itf.jupiter.extension:itf-jupiter-extension", version.ref = "soebes-itf" }
 
 [plugins]
-maven-plugin = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
+maven-plugin = { id = "io.freefair.maven-plugin", version = "9.1.0" }
 rat = { id = "org.nosphere.apache.rat", version = "0.8.1" }

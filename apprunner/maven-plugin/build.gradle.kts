@@ -20,22 +20,26 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
+  // Order of maven-plugin + polaris-apprunner-java matters!
+  id("io.freefair.maven-plugin") version "9.1.0"
   id("polaris-apprunner-java")
-  alias(libs.plugins.maven.plugin)
 }
 
-val deps by configurations.creating
 val maven by configurations.creating
 
-configurations.implementation.get().extendsFrom(deps)
-
 dependencies {
-  deps(project(":polaris-apprunner-common"))
-  implementation(libs.maven.core)
+  implementation(project(":polaris-apprunner-common"))
+
+  compileOnly(libs.maven.core)
   compileOnly(libs.maven.plugin.annotations)
   compileOnly(libs.jakarta.annotation.api)
+
+  testImplementation(libs.maven.core)
   testImplementation(libs.soebes.itf.jupiter.extension)
   testImplementation(libs.soebes.itf.assertj)
+  testCompileOnly(libs.maven.plugin.annotations)
+
+  // Maven distribution for integration tests.
   maven(
     mapOf(
       "group" to "org.apache.maven",
@@ -45,13 +49,6 @@ dependencies {
       "ext" to "tar.gz",
     )
   )
-}
-
-mavenPlugin {
-  helpMojoPackage.set("org.apache.polaris.apprunner.maven")
-  artifactId = project.name
-  groupId = project.group.toString()
-  dependencies = deps
 }
 
 // The following stuff is needed by the Maven integration tests.
