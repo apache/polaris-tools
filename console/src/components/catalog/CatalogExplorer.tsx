@@ -17,20 +17,29 @@
  * under the License.
  */
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { PanelLeftClose, PanelLeftOpen, GripVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { CatalogTreeNode, type TreeNode } from "./CatalogTreeNode"
 import { catalogsApi } from "@/api/management/catalogs"
 import { TableDetailsDrawer } from "./TableDetailsDrawer"
+import { useResizableWidth } from "@/hooks/useResizableWidth"
 
 interface CatalogExplorerProps {
   selectedCatalogName?: string
   onSelectCatalog?: (catalogName: string) => void
   className?: string
 }
+
+interface SelectedTable {
+  catalogName: string
+  namespace: string[]
+  tableName: string
+}
+
+const CATALOG_NODE_PREFIX = "catalog."
 
 export function CatalogExplorer({
   selectedCatalogName,
@@ -40,14 +49,11 @@ export function CatalogExplorer({
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
   const [selectedNodeId, setSelectedNodeId] = useState<string>()
   const [isCollapsed, setIsCollapsed] = useState(false)
-  
-  // Table drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedTable, setSelectedTable] = useState<{
-    catalogName: string
-    namespace: string[]
-    tableName: string
-  } | null>(null)
+  const [selectedTable, setSelectedTable] = useState<SelectedTable | null>(null)
+
+  // Use custom hook for resizable width
+  const { width, isResizing, handleMouseDown } = useResizableWidth()
 
   const catalogsQuery = useQuery({
     queryKey: ["catalogs"],
@@ -56,7 +62,7 @@ export function CatalogExplorer({
 
   const catalogs = useMemo(() => catalogsQuery.data || [], [catalogsQuery.data])
 
-  const handleToggleExpand = (nodeId: string) => {
+  const handleToggleExpand = useCallback((nodeId: string) => {
     setExpandedNodes((prev) => {
       const next = new Set(prev)
       if (next.has(nodeId)) {
@@ -66,46 +72,49 @@ export function CatalogExplorer({
       }
       return next
     })
-  }
+  }, [])
 
-  const handleSelectNode = (node: TreeNode) => {
+  const handleSelectNode = useCallback((node: TreeNode) => {
     setSelectedNodeId(node.id)
     if (node.type === "catalog") {
       onSelectCatalog?.(node.name)
     }
-  }
+  }, [onSelectCatalog])
 
-  const handleTableClick = (
+  const handleTableClick = useCallback((
     catalogName: string,
     namespace: string[],
     tableName: string
   ) => {
     setSelectedTable({ catalogName, namespace, tableName })
     setDrawerOpen(true)
-  }
+  }, [])
 
   // Auto-expand selected catalog
-  useMemo(() => {
-    if (selectedCatalogName) {
-      const catalog = catalogs.find((c) => c.name === selectedCatalogName)
-      if (catalog) {
-        const catalogNodeId = `catalog.${catalog.name}`
-        setExpandedNodes((prev) => {
-          const next = new Set(prev)
-          next.add(catalogNodeId)
-          return next
-        })
-        setSelectedNodeId(catalogNodeId)
-      }
-    }
+  useEffect(() => {
+    if (!selectedCatalogName) return
+
+    const catalog = catalogs.find((c) => c.name === selectedCatalogName)
+    if (!catalog) return
+
+    const catalogNodeId = `${CATALOG_NODE_PREFIX}${catalog.name}`
+    setExpandedNodes((prev) => {
+      const next = new Set(prev)
+      next.add(catalogNodeId)
+      return next
+    })
+    setSelectedNodeId(catalogNodeId)
   }, [selectedCatalogName, catalogs])
 
-  const catalogNodes: TreeNode[] = catalogs.map((catalog) => ({
-    type: "catalog",
-    id: `catalog.${catalog.name}`,
-    name: catalog.name,
-    catalogName: catalog.name,
-  }))
+  const catalogNodes: TreeNode[] = useMemo(
+    () => catalogs.map((catalog) => ({
+      type: "catalog" as const,
+      id: `${CATALOG_NODE_PREFIX}${catalog.name}`,
+      name: catalog.name,
+      catalogName: catalog.name,
+    })),
+    [catalogs]
+  )
 
   if (isCollapsed) {
     return (
@@ -125,12 +134,13 @@ export function CatalogExplorer({
     <>
       <div
         className={cn(
-          "flex flex-col h-full border-r bg-card transition-all duration-200",
-          "w-64 md:w-80",
+          "flex flex-col h-full border-r bg-card",
           "fixed md:relative left-0 top-0 z-30 md:z-auto",
           "h-screen",
+          !isResizing && "transition-all duration-200",
           className
         )}
+        style={{ width: isCollapsed ? undefined : `${width}px` }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b bg-card">
@@ -175,6 +185,24 @@ export function CatalogExplorer({
             </div>
           )}
         </div>
+
+        {/* Resize Handle - Desktop only */}
+        {!isCollapsed && (
+          <div
+            onMouseDown={handleMouseDown}
+            className={cn(
+              "hidden md:flex absolute right-0 top-0 bottom-0 w-1 cursor-col-resize",
+              "bg-border hover:bg-primary/50 transition-colors",
+              "group"
+            )}
+            aria-label="Resize catalog explorer"
+            role="separator"
+            aria-orientation="vertical"
+          >
+            <div className="absolute inset-y-0 -right-1 w-3" />
+            <GripVertical className="absolute right-1/2 top-1/2 -translate-y-1/2 translate-x-1/2 h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        )}
       </div>
 
       {/* Overlay for mobile */}

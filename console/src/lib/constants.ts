@@ -53,3 +53,9 @@ export const NAV_ITEMS = [
 export const REALM_HEADER_NAME =
   import.meta.env.VITE_POLARIS_REALM_HEADER_NAME || "Polaris-Realm"
 
+// Catalog Explorer resize configuration
+export const CATALOG_EXPLORER_STORAGE_KEY = "catalog-explorer-width"
+export const CATALOG_EXPLORER_MIN_WIDTH = 200
+export const CATALOG_EXPLORER_MAX_WIDTH = 600
+export const CATALOG_EXPLORER_DEFAULT_WIDTH = 320 // 80 * 4 (w-80 = 20rem = 320px)
+
