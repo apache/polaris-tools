@@ -47,3 +47,9 @@ export const NAV_ITEMS = [
   { path: "/access-control", label: "Access Control", icon: "Shield" },
 ] as const
 
+// Realm header name configuration
+// Defaults to "Polaris-Realm" if not specified in environment variables
+// Can be configured via VITE_POLARIS_REALM_HEADER_NAME environment variable
+export const REALM_HEADER_NAME =
+  import.meta.env.VITE_POLARIS_REALM_HEADER_NAME || "Polaris-Realm"
+

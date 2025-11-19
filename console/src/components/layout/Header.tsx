@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import { useState, useEffect } from "react"
 import { LogOut, ChevronDown, Sun, Moon, Monitor } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
@@ -36,6 +37,13 @@ export function Header() {
   const { logout } = useAuth()
   const { principal, principalRoles, loading } = useCurrentUser()
   const { theme, setTheme } = useTheme()
+  const [realm, setRealm] = useState<string | null>(null)
+
+  // Get realm from localStorage
+  useEffect(() => {
+    const storedRealm = localStorage.getItem("polaris_realm")
+    setRealm(storedRealm)
+  }, [])
 
   // Get display name and role
   const displayName =
@@ -109,6 +117,11 @@ export function Header() {
               <div className="text-xs text-muted-foreground truncate">
                 {loading ? "..." : primaryRole}
               </div>
+              {realm && (
+                <div className="text-xs text-muted-foreground/70 truncate">
+                  Realm: {realm}
+                </div>
+              )}
             </div>
             <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </button>
@@ -119,6 +132,11 @@ export function Header() {
               {displayName}
             </div>
             <div className="text-xs text-muted-foreground truncate">{primaryRole}</div>
+            {realm && (
+              <div className="text-xs text-muted-foreground/70 truncate mt-1">
+                Realm: {realm}
+              </div>
+            )}
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">

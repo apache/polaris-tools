@@ -20,6 +20,7 @@
 import axios from "axios"
 import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
+import { REALM_HEADER_NAME } from "@/lib/constants"
 import type { OAuthTokenResponse } from "@/types/api"
 
 // Always use relative URL to go through the proxy (dev server or production server)
@@ -50,7 +51,7 @@ export const authApi = {
 
     // Add realm header if provided
     if (realm) {
-      headers["Polaris-Realm"] = realm
+      headers[REALM_HEADER_NAME] = realm
     }
 
     const response = await axios.post<OAuthTokenResponse>(

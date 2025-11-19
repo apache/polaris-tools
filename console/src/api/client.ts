@@ -19,6 +19,7 @@
 
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios"
 import { navigate } from "@/lib/navigation"
+import { REALM_HEADER_NAME } from "@/lib/constants"
 
 // Always use relative URLs to go through the proxy (dev server or production server)
 // This avoids CORS issues by proxying requests through the server
@@ -61,7 +62,7 @@ class ApiClient {
       }
 
       if (realm) {
-        config.headers["Polaris-Realm"] = realm
+        config.headers[REALM_HEADER_NAME] = realm
       }
 
       return config
