@@ -26,7 +26,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -127,18 +126,6 @@ export function Header() {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <div className="px-2 py-1.5">
-            <div className="text-sm font-medium text-foreground truncate">
-              {displayName}
-            </div>
-            <div className="text-xs text-muted-foreground truncate">{primaryRole}</div>
-            {realm && (
-              <div className="text-xs text-muted-foreground/70 truncate mt-1">
-                Realm: {realm}
-              </div>
-            )}
-          </div>
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>

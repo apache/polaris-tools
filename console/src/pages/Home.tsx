@@ -48,7 +48,7 @@ export function Home() {
         <CardHeader>
           <CardTitle className="text-xl">
             Easily manage and secure Iceberg tables and catalogs with the{" "}
-            <span className="text-green-600 dark:text-green-400">open source Polaris Catalog</span>.
+            <span className="text-primary">open source Polaris Catalog</span>.
           </CardTitle>
         </CardHeader>
         <CardContent>

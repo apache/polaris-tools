@@ -166,7 +166,7 @@ export function Connections() {
             </Button>
             <Button
               onClick={() => setIsConfigureModalOpen(true)}
-              className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+              variant="default"
             >
               <Plus className="mr-2 h-4 w-4" />
               Connection
