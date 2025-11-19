@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,17 +17,16 @@
 # under the License.
 #
 
-LIBS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${LIBS_DIR}/_exec.sh"
 
-# Git/SVN repository constants
-APACHE_DIST_URL=${APACHE_DIST_URL:-"https://dist.apache.org/repos/dist"}
-APACHE_DIST_PATH=${APACHE_DIST_PATH:-"/dev/incubator/polaris"}
+# Get the commit SHA that the RC tag points to
+rc_commit=$(git rev-parse "${rc_tag}")
+echo "rc_commit=${rc_commit}" >> $GITHUB_ENV
 
-# Execution mode constants
-DRY_RUN=${DRY_RUN:-1}
+exec_process git tag -a "${final_release_tag}" "${rc_commit}" -m "Apache Polaris ${version_without_rc} Release"
+exec_process git push apache "${final_release_tag}"
 
-# Version validation regex patterns
-VERSION_REGEX="([0-9]+)\.([0-9]+)\.([0-9]+)-incubating"
-VERSION_REGEX_GIT_TAG="^apache-polaris-([a-z+]+)-$VERSION_REGEX-rc([0-9]+)$"
-# Branch validation regex pattern for major.minor.x format
-BRANCH_VERSION_REGEX="([0-9]+)\.([0-9]+)\.x"
+cat <<EOT >> $GITHUB_STEP_SUMMARY
+## Git Release Tag
+Final release tag \`${final_release_tag}\` created and pushed
+EOT

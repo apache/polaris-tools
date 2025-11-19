@@ -44,9 +44,6 @@ jobs:
           # Use a token with write permissions
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup test environment
-        uses: ./.github/actions/setup-test-env
-
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
@@ -76,13 +73,19 @@ jobs:
           echo "## Parameters" >> $GITHUB_STEP_SUMMARY
 
           # Validate that we're on a release branch
-          if [[ ! "${current_branch}" =~ ^release/(.+)$ ]]; then
+          if [[ ! "${current_branch}" =~ ^release/([a-z-]+)-(.+)$ ]]; then
             echo "❌ Invalid branch: \`${current_branch}\`. This workflow must be run from a release branch (release/major.minor.x)" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
 
-          # Extract version from release branch name
-          branch_version="${BASH_REMATCH[1]}"
+          # Extract tool name and version from release branch name
+          tool="${BASH_REMATCH[1]}"
+          branch_version="${BASH_REMATCH[2]}"
+
+          if [[ ! -d "${tool}/releasey" ]]; then
+            echo "❌ The directory ${tool}/releasey does not exist." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
           # Validate branch version format and extract components
           if ! validate_and_extract_branch_version "${branch_version}"; then
@@ -100,10 +103,11 @@ jobs:
           find_next_rc_number "${version_without_rc}"
 
           # Build the new release tag
-          release_tag="apache-polaris-${version_without_rc}-rc${rc_number}"
+          release_tag="apache-polaris-${tool}-${version_without_rc}-rc${rc_number}"
 
           # Export all variables for next steps
           echo "release_tag=${release_tag}" >> $GITHUB_ENV
+          echo "tool=${tool}" >> $GITHUB_ENV
           echo "major=${major}" >> $GITHUB_ENV
           echo "minor=${minor}" >> $GITHUB_ENV
           echo "patch=${patch}" >> $GITHUB_ENV
@@ -114,6 +118,7 @@ jobs:
           cat <<EOT >> $GITHUB_STEP_SUMMARY
           | Parameter | Value |
           | --- | --- |
+          | Tool | \`${tool}\` |
           | Release branch | \`${current_branch}\` |
           | Version without RC | \`${version_without_rc}\` |
           | RC number | \`${rc_number}\` |
@@ -149,7 +154,9 @@ jobs:
         run: |
           source "${LIBS_DIR}/_version.sh"
 
-          update_version "${version_without_rc}"
+          # Call tool-specific version update script
+          (cd ${tool} ; ./releasey/update_version.sh)
+
           cat <<EOT >> $GITHUB_STEP_SUMMARY
           ## Version update
           All version files updated to \`${version_without_rc}\`
@@ -157,8 +164,8 @@ jobs:
 
       - name: Update changelog
         run: |
-          source "${LIBS_DIR}/_exec.sh"
-          exec_process ./gradlew patchChangelog
+          # Call tool-specific update changelog script
+          (cd ${tool} ; ./releasey/update_changelog.sh)
 
           cat <<EOT >> $GITHUB_STEP_SUMMARY
           ## Changelog
@@ -171,11 +178,6 @@ jobs:
           source "${LIBS_DIR}/_exec.sh"
 
           # Commit version files and changelog
-          exec_process git add \
-            "$VERSION_FILE" \
-            "$HELM_CHART_YAML_FILE" \
-            "$HELM_README_FILE" \
-            "$CHANGELOG_FILE"
           exec_process git commit -m "[chore] Bump version to ${version_without_rc} for release candidate ${rc_number}"
 
           # Push the changes

@@ -22,6 +22,10 @@ name: Release - 1 - Create Release Branch
 on:
   workflow_dispatch:
     inputs:
+      tool:
+        description: 'The tool directory to release (e.g., apprunner or iceberg-catalog-migrator)'
+        required: true
+        type: string
       version:
         description: 'Release version without RC number (e.g., 1.0.0-incubating)'
         required: true
@@ -48,9 +52,6 @@ jobs:
           # Use a token with write permissions
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup test environment
-        uses: ./.github/actions/setup-test-env
-
       - name: Set up environment variables
         run: |
           echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
@@ -75,9 +76,15 @@ jobs:
           source "${LIBS_DIR}/_version.sh"
 
           # Extract release parameters from workflow inputs
+          tool="${{ github.event.inputs.tool }}"
           version="${{ github.event.inputs.version }}"
 
           echo "## Parameters" >> $GITHUB_STEP_SUMMARY
+
+          if [[ ! -d "${tool}/releasey" ]]; then
+            echo "❌ The directory ${tool}/releasey does not exist." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
           # Validate version format and extract components
           if ! validate_and_extract_polaris_version "${version}"; then
@@ -85,12 +92,14 @@ jobs:
             exit 1
           fi
 
+          echo "Tool: \`${tool}\`" >> $GITHUB_STEP_SUMMARY
           echo "Version: \`${version}\`" >> $GITHUB_STEP_SUMMARY
 
           # Create branch name in major.minor.x format
-          branch_name="${major}.${minor}.x"
+          branch_name="${tool}-${major}.${minor}.x"
 
           # Export parameters for next step
+          echo "tool=${tool}" >> $GITHUB_ENV
           echo "version=${version}" >> $GITHUB_ENV
           echo "branch_name=${branch_name}" >> $GITHUB_ENV
 

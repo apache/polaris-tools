@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,17 +18,16 @@
 # under the License.
 #
 
-LIBS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Script to build Maven artifacts and the source tarball.
+#
+# Environment variables:
+#   DRY_RUN
+#   RELEASEY_DIR
+#   LIBS_DIR
+#   version_without_rc
+#   version_dir           Directory for additional binary artifacts
+#   (and more)
 
-# Git/SVN repository constants
-APACHE_DIST_URL=${APACHE_DIST_URL:-"https://dist.apache.org/repos/dist"}
-APACHE_DIST_PATH=${APACHE_DIST_PATH:-"/dev/incubator/polaris"}
+source "$LIBS_DIR/_exec.sh"
 
-# Execution mode constants
-DRY_RUN=${DRY_RUN:-1}
-
-# Version validation regex patterns
-VERSION_REGEX="([0-9]+)\.([0-9]+)\.([0-9]+)-incubating"
-VERSION_REGEX_GIT_TAG="^apache-polaris-([a-z+]+)-$VERSION_REGEX-rc([0-9]+)$"
-# Branch validation regex pattern for major.minor.x format
-BRANCH_VERSION_REGEX="([0-9]+)\.([0-9]+)\.x"
+exec_process ./gradlew assemble -Prelease -PuseGpgAgent
