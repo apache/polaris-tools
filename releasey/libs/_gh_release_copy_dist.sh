@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,17 +17,20 @@
 # under the License.
 #
 
-LIBS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "::add-mask::$SVN_PASSWORD"
 
-# Git/SVN repository constants
-APACHE_DIST_URL=${APACHE_DIST_URL:-"https://dist.apache.org/repos/dist"}
-APACHE_DIST_PATH=${APACHE_DIST_PATH:-"/dev/incubator/polaris"}
+source "${LIBS_DIR}/_constants.sh"
+source "${LIBS_DIR}/_exec.sh"
 
-# Execution mode constants
-DRY_RUN=${DRY_RUN:-1}
+# Define source and destination URLs
+dev_artifacts_url="${APACHE_DIST_URL}/dev/incubator/polaris-${tool}/${version_without_rc}"
+release_artifacts_url="${APACHE_DIST_URL}/release/incubator/polaris-${tool}/${version_without_rc}"
 
-# Version validation regex patterns
-VERSION_REGEX="([0-9]+)\.([0-9]+)\.([0-9]+)-incubating"
-VERSION_REGEX_GIT_TAG="^apache-polaris-([a-z+]+)-$VERSION_REGEX-rc([0-9]+)$"
-# Branch validation regex pattern for major.minor.x format
-BRANCH_VERSION_REGEX="([0-9]+)\.([0-9]+)\.x"
+exec_process svn mv --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+  "${dev_artifacts_url}" "${release_artifacts_url}" \
+  -m "Release Apache Polaris ${tool} ${version_without_rc}"
+
+cat <<EOT >> $GITHUB_STEP_SUMMARY
+## Distribution
+Artifacts and Helm chart moved from dist dev to dist release
+EOT
