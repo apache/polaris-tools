@@ -26,6 +26,7 @@ import { CatalogTreeNode, type TreeNode } from "./CatalogTreeNode"
 import { catalogsApi } from "@/api/management/catalogs"
 import { TableDetailsDrawer } from "./TableDetailsDrawer"
 import { useResizableWidth } from "@/hooks/useResizableWidth"
+import { CATALOG_NODE_PREFIX } from "@/lib/constants"
 
 interface CatalogExplorerProps {
   selectedCatalogName?: string
@@ -38,8 +39,6 @@ interface SelectedTable {
   namespace: string[]
   tableName: string
 }
-
-const CATALOG_NODE_PREFIX = "catalog."
 
 export function CatalogExplorer({
   selectedCatalogName,
