@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import java.util.Properties
 import com.diffplug.spotless.FormatterFunc
 import java.io.Serializable
+import java.util.Properties
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import publishing.PublishingHelperPlugin

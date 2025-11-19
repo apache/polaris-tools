@@ -28,7 +28,11 @@ spotless {
   kotlinGradle {
     ktfmt().googleStyle()
     licenseHeaderFile(rootProject.file("codestyle/copyright-header-java.txt"), "$")
-    target("*.gradle.kts", "build-logic/*.gradle.kts", "build-logic/src/**/*.kt*")
+    target(
+      "*.gradle.kts",
+      "apprunner-build-logic/*.gradle.kts",
+      "apprunner-build-logic/src/**/*.kt*",
+    )
   }
 }
 
