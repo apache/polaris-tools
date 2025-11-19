@@ -107,7 +107,7 @@ case class NamespaceActions(
       val catalogName = row("catalogName").asInstanceOf[String]
       val namespaceUnixPath = row("namespacePath").asInstanceOf[Seq[String]].mkString("/")
       val location = Map(
-        "location" -> s"${dp.defaultBaseLocation}/$catalogName/$namespaceUnixPath"
+        "location" -> s"${dp.defaultBaseLocation}/$catalogName/$namespaceUnixPath/"
       )
       row ++ Map(
         "location" -> location
