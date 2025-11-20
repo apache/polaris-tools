@@ -23,9 +23,6 @@ from __future__ import annotations
 import copy
 from typing import Any, Optional, Set
 
-import urllib3
-
-from polaris_mcp.authorization import AuthorizationProvider
 from polaris_mcp.base import (
     JSONDict,
     McpTool,
@@ -50,20 +47,8 @@ class PolarisCatalogTool(McpTool):
     UPDATE_ALIASES: Set[str] = {"update"}
     DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
 
-    def __init__(
-        self,
-        base_url: str,
-        http: urllib3.PoolManager,
-        authorization_provider: AuthorizationProvider,
-    ) -> None:
-        self._delegate = PolarisRestTool(
-            name="polaris.catalog.delegate",
-            description="Internal delegate for catalog operations",
-            base_url=base_url,
-            default_path_prefix="api/management/v1/",
-            http=http,
-            authorization_provider=authorization_provider,
-        )
+    def __init__(self, rest_client: PolarisRestTool) -> None:
+        self._rest_client = rest_client
 
     @property
     def name(self) -> str:
@@ -154,7 +139,7 @@ class PolarisCatalogTool(McpTool):
         else:  # pragma: no cover
             raise ValueError(f"Unsupported operation: {operation}")
 
-        raw = self._delegate.call(delegate_args)
+        raw = self._rest_client.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
 
     def _maybe_augment_error(

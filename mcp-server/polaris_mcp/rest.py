@@ -27,8 +27,8 @@ from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit, quote
 
 import urllib3
 
-from .authorization import AuthorizationProvider, none
-from .base import JSONDict, ToolExecutionResult
+from polaris_mcp.authorization import AuthorizationProvider, none
+from polaris_mcp.base import JSONDict, ToolExecutionResult
 
 
 DEFAULT_TIMEOUT = urllib3.Timeout(connect=30.0, read=30.0)

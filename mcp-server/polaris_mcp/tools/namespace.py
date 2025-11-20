@@ -25,9 +25,6 @@ import copy
 import string
 from typing import Any, Dict, List, Optional, Set
 
-import urllib3
-
-from polaris_mcp.authorization import AuthorizationProvider
 from polaris_mcp.base import (
     JSONDict,
     McpTool,
@@ -57,20 +54,8 @@ class PolarisNamespaceTool(McpTool):
     GET_PROPS_ALIASES: Set[str] = {"get-properties", "properties"}
     DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
 
-    def __init__(
-        self,
-        base_url: str,
-        http: urllib3.PoolManager,
-        authorization_provider: AuthorizationProvider,
-    ) -> None:
-        self._delegate = PolarisRestTool(
-            name="polaris.namespace.delegate",
-            description="Internal delegate for namespace operations",
-            base_url=base_url,
-            default_path_prefix="api/catalog/v1/",
-            http=http,
-            authorization_provider=authorization_provider,
-        )
+    def __init__(self, rest_client: PolarisRestTool) -> None:
+        self._rest_client = rest_client
 
     @property
     def name(self) -> str:
@@ -164,7 +149,7 @@ class PolarisNamespaceTool(McpTool):
         else:  # pragma: no cover - normalize guarantees cases
             raise ValueError(f"Unsupported operation: {operation}")
 
-        raw = self._delegate.call(delegate_args)
+        raw = self._rest_client.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
 
     def _handle_list(self, delegate_args: JSONDict, catalog: str) -> None:
