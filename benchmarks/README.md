@@ -52,6 +52,7 @@ dataset.tree {
   view-properties = 10                           # Number of properties to add to each view
   max-tables = -1                                # Cap on total tables (-1 for no cap). Must be less than N^(D-1) * tables-per-namespace
   max-views = -1                                 # Cap on total views (-1 for no cap). Must be less than N^(D-1) * views-per-namespace
+  mangle-names = false                           # Whether to replace entity names with MD5 hashes (default: false uses NS_0, T_0, V_0 patterns)
 }
 ```
 
@@ -202,7 +203,7 @@ The dataset has a tree shape. At the root of the tree is a Polaris realm that mu
 
 An arbitrary number of catalogs can be created under the realm. However, only the first catalog (`C_0`) is used for the rest of the dataset.
 
-The namespaces part of the dataset is a complete `N`-ary tree. That is, it starts with a root namespace (`NS_0`) and then, each namespace contains exactly `0` or `N` children namespaces. The width as well as the depth of the namespaces tree are configurable. The total number of namespaces can easily be calculated with the following formulae, where `N` is the tree width and `D` is the total tree depth, including the root:
+The namespaces part of the dataset is a complete `N`-ary tree. That is, it starts with a root namespace (by default named `NS_0`) and then, each namespace contains exactly `0` or `N` children namespaces. The width as well as the depth of the namespaces tree are configurable. The total number of namespaces can easily be calculated with the following formulae, where `N` is the tree width and `D` is the total tree depth, including the root:
 
 $$\text{Total number of namespaces} =
 \begin{cases}
@@ -285,3 +286,17 @@ The diagram below shows sample catalog, namespace and table definition given the
 -   Number of table properties: `59`
 
 ![Dataset size example showing catalog, namespace, and table definitions](docs/dataset-size.svg)
+
+## Entity Naming Conventions
+
+By default, entities are named using simple, predictable patterns:
+- **Namespaces**: `NS_0`, `NS_1`, `NS_2`, etc.
+- **Tables**: `T_0`, `T_1`, `T_2`, etc.
+- **Views**: `V_0`, `V_1`, `V_2`, etc.
+
+When the `mangle-names` configuration parameter is set to `true`, entity names are replaced with MD5 hashes (32 hexadecimal characters) to test compression-unfriendly names and edge cases in name handling. For example:
+- `NS_0` becomes `f5a4d86558ed1f7fddec42ce11d8ee3a`
+- `T_0` becomes `ab4ffa55f688360e0c12aef543c18351`
+- `V_0` becomes `9ef5db61af0c0d69875ff753a249bd2f`
+
+All documentation examples in this file use the default naming pattern for clarity.

@@ -27,6 +27,7 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   HttpRequestBuilderWithStatusSave
 }
 import org.apache.polaris.benchmarks.parameters.{DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.util.Mangler
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
@@ -52,6 +53,7 @@ case class TableActions(
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
   private val logger = LoggerFactory.getLogger(getClass)
+  private val mangler = Mangler(dp.mangleNames)
 
   /**
    * Creates a base Gatling Feeder that generates table identities. Each row contains the basic
@@ -65,7 +67,7 @@ case class TableActions(
       val positionInLevel = namespaceId - dp.nAryTree.lastLevelOrdinals.head
       val parentNamespacePath: Seq[String] = dp.nAryTree
         .pathToRoot(namespaceId)
-        .map(ordinal => s"NS_$ordinal")
+        .map(mangler.maybeMangleNs)
       Range(0, dp.numTablesPerNs)
         .map { j =>
           val tableId = positionInLevel * dp.numTablesPerNs + j
@@ -73,7 +75,7 @@ case class TableActions(
             "catalogName" -> "C_0",
             "parentNamespacePath" -> parentNamespacePath,
             "multipartNamespace" -> parentNamespacePath.mkString("%1F"),
-            "tableName" -> s"T_$tableId"
+            "tableName" -> mangler.maybeMangleTable(tableId)
           )
         }
     }
