@@ -32,7 +32,7 @@ gradle/wrapper/gradle-wrapper-*.sha256
 
 # Gradle
 .gradle/
-/apprunner-build-logic/.kotlin
+/build-logic/.kotlin
 **/build/
 !src/**/build/
 
