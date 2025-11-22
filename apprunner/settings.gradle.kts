@@ -67,7 +67,9 @@ dependencyResolutionManagement {
 
 gradle.beforeProject {
   version = baseVersion
-  group = "org.apache.polaris.tools.apprunner"
+  // Note: the Gradle plugin ID is the group ID here. Both should be "aligned",
+  // so that the plugin ID is within this group.
+  group = "org.apache.polaris.apprunner"
 }
 
 val isCI = System.getenv("CI") != null

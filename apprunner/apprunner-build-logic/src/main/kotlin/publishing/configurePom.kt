@@ -21,9 +21,8 @@ package publishing
 
 import groovy.util.Node
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.component.ModuleComponentSelector
-import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 
 /**
  * Configures the content of the generated `pom.xml` files.
@@ -42,9 +41,9 @@ import org.gradle.api.publish.maven.MavenPublication
  * must be exactly the same when built by a release manager and by someone else to verify the built
  * artifact(s).
  */
-internal fun configurePom(project: Project, mavenPublication: MavenPublication, task: Task) =
-  mavenPublication.run {
-    pom {
+internal fun configurePom(project: Project, task: GenerateMavenPom) =
+  task.actions.addFirst {
+    with(task.pom) {
       if (project != project.rootProject) {
         // Add the license to every pom to make it easier for downstream projects to retrieve the
         // license.
@@ -68,56 +67,54 @@ internal fun configurePom(project: Project, mavenPublication: MavenPublication, 
       } else {
         val mavenPom = this
 
-        task.doFirst {
-          mavenPom.run {
-            val prj = EffectiveAsfProject.forProject(project)
-            val asfProjectId = prj.asfProject.apacheId
+        mavenPom.run {
+          val prj = EffectiveAsfProject.forProject(project)
+          val asfProjectId = prj.asfProject.apacheId
 
-            organization {
-              name.set("The Apache Software Foundation")
-              url.set("https://www.apache.org/")
-            }
-            licenses {
-              license {
-                name.set("Apache-2.0") // SPDX identifier
-                url.set(prj.asfProject.licenseUrl)
-              }
-            }
-            mailingLists {
-              prj.publishingHelperExtension.mailingLists
-                .get()
-                .map { id -> prj.mailingList(id) }
-                .forEach { ml ->
-                  mailingList {
-                    name.set(ml.name())
-                    subscribe.set(ml.subscribe())
-                    unsubscribe.set(ml.unsubscribe())
-                    post.set(ml.post())
-                    archive.set(ml.archive())
-                  }
-                }
-            }
-
-            scm {
-              val codeRepoString: String = prj.codeRepoUrl().get()
-              connection.set("scm:git:$codeRepoString")
-              developerConnection.set("scm:git:$codeRepoString")
-              url.set("$codeRepoString/tree/main")
-              val version = project.version.toString()
-              if (!version.endsWith("-SNAPSHOT")) {
-                val tagPrefix: String = prj.tagPrefix().get()
-                tag.set("$tagPrefix-$version")
-              }
-            }
-            issueManagement { url.set(prj.issueTracker()) }
-
-            name.set(prj.fullName())
-            description.set(prj.description())
-            url.set(prj.projectUrl())
-            inceptionYear.set(prj.asfProject.inceptionYear.toString())
-
-            developers { developer { url.set("https://$asfProjectId.apache.org/community/") } }
+          organization {
+            name.set("The Apache Software Foundation")
+            url.set("https://www.apache.org/")
           }
+          licenses {
+            license {
+              name.set("Apache-2.0") // SPDX identifier
+              url.set(prj.asfProject.licenseUrl)
+            }
+          }
+          mailingLists {
+            prj.publishingHelperExtension.mailingLists
+              .get()
+              .map { id -> prj.mailingList(id) }
+              .forEach { ml ->
+                mailingList {
+                  name.set(ml.name())
+                  subscribe.set(ml.subscribe())
+                  unsubscribe.set(ml.unsubscribe())
+                  post.set(ml.post())
+                  archive.set(ml.archive())
+                }
+              }
+          }
+
+          scm {
+            val codeRepoString: String = prj.codeRepoUrl().get()
+            connection.set("scm:git:$codeRepoString")
+            developerConnection.set("scm:git:$codeRepoString")
+            url.set("$codeRepoString/tree/main")
+            val version = project.version.toString()
+            if (!version.endsWith("-SNAPSHOT")) {
+              val tagPrefix: String = prj.tagPrefix().get()
+              tag.set("$tagPrefix-$version")
+            }
+          }
+          issueManagement { url.set(prj.issueTracker()) }
+
+          name.set(prj.fullName())
+          description.set(prj.description())
+          url.set(prj.projectUrl())
+          inceptionYear.set(prj.asfProject.inceptionYear.toString())
+
+          developers { developer { url.set("https://$asfProjectId.apache.org/community/") } }
         }
       }
     }

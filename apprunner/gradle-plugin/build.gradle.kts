@@ -17,9 +17,12 @@
  * under the License.
  */
 
+import java.io.OutputStream
+
 plugins {
-  id("polaris-apprunner-java")
+  // Order of java-gradle-plugin + polaris-apprunner-java matters!
   `java-gradle-plugin`
+  id("polaris-apprunner-java")
 }
 
 dependencies {
@@ -30,7 +33,10 @@ dependencies {
 gradlePlugin {
   plugins {
     register("polaris-apprunner") {
-      id = "org.apache.polaris.apprunner"
+      // This ID becomes the Maven group ID of the Gradle plugin marker artifact.
+      // The artifact ID of the Gradle plugin marker artifact is ID + ".gradle.plugin"
+      // (the defined plugin marker suffix).
+      id = project.group.toString()
       implementationClass = "org.apache.polaris.apprunner.plugin.PolarisRunnerPlugin"
       displayName = "Polaris Runner"
       description = "Start and stop a Polaris server for integration testing"
@@ -45,3 +51,52 @@ tasks.named<Test>("test") {
   systemProperty("polaris-version", version)
   systemProperty("junit-version", libs.junit.bom.get().version.toString())
 }
+
+// Test to ensure that the plugin works from a local Maven repository publication.
+val smokeTest by
+  tasks.registering(Exec::class) {
+    // GenerateMavenPom + publishing tasks are not cacheable, so we cannot this task at all.
+
+    // polaris-apprunner parent pom
+    dependsOn(":publishToMavenLocal")
+    // polaris-apprunner-common pom + jar
+    dependsOn(":polaris-apprunner-common:publishToMavenLocal")
+    // polaris-apprunner-gradle-plugin pom + jar
+    dependsOn("publishToMavenLocal")
+
+    workingDir = projectDir.resolve("src/smoketest")
+    // Listing the tasks is enough to "configure everything",
+    // including the apprunner plugin configuration code.
+    commandLine("./gradlew", "tasks", "--all", "--stacktrace")
+
+    val logFile = layout.buildDirectory.file("reports/smoketest/smoketest.log")
+
+    isIgnoreExitValue = true
+
+    var outStream: OutputStream? = null
+    doFirst {
+      workingDir.resolve("gradle.properties").writeText("apprunnerVersion=$version\n")
+
+      logFile.get().asFile.parentFile.mkdirs()
+      outStream = logFile.get().asFile.outputStream()
+      standardOutput = outStream
+      errorOutput = outStream
+    }
+
+    doLast {
+      outStream?.close()
+
+      if (executionResult.get().exitValue != 0) {
+        throw GradleException(
+          """
+                |Gradle plugin smoke test failed
+                |
+                |${logFile.get().asFile.readText()}
+                """
+            .trimMargin()
+        )
+      }
+    }
+  }
+
+tasks.named("check") { dependsOn(smokeTest) }

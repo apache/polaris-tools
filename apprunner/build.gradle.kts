@@ -77,7 +77,9 @@ tasks.named<RatTask>("rat").configure {
   excludes.add(".java-version")
   excludes.add("**/.keep")
 
-  excludes.add("gradle/wrapper/gradle-wrapper*.jar*")
+  excludes.add("**/gradle/wrapper/gradle-wrapper*.jar*")
+  // This gradle.properties is git-ignored and generated during the build
+  excludes.add("gradle-plugin/src/smoketest/gradle.properties")
 
   excludes.add("**/*.iml")
   excludes.add("**/*.iws")
