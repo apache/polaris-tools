@@ -333,7 +333,7 @@ class TestServerRetry:
             mock_retry.assert_called_once_with(
                 total=3,
                 backoff_factor=0.5,
-                status_forcelist=server.CLIENT_RETRIES_STATUS_FORCELIST,
+                status_forcelist=server.HTTP_RETRIES_STATUS_FORCELIST,
             )
             mock_pool_manager.assert_called_once_with(retries=mock_retry.return_value)
 
@@ -356,6 +356,6 @@ class TestServerRetry:
         mock_retry.assert_called_once_with(
             total=10,
             backoff_factor=1.0,
-            status_forcelist=server.CLIENT_RETRIES_STATUS_FORCELIST,
+            status_forcelist=server.HTTP_RETRIES_STATUS_FORCELIST,
         )
         mock_pool_manager.assert_called_once_with(retries=mock_retry.return_value)

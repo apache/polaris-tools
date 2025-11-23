@@ -104,7 +104,7 @@ def create_server() -> FastMCP:
     retry_strategy = urllib3.Retry(
         total=total_retries,
         backoff_factor=backoff_factor,
-        status_forcelist=CLIENT_RETRIES_STATUS_FORCELIST,
+        status_forcelist=HTTP_RETRIES_STATUS_FORCELIST,
     )
     http = urllib3.PoolManager(retries=retry_strategy)
     authorization_provider = _resolve_authorization_provider(base_url, http)
