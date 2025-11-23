@@ -24,7 +24,7 @@ from __future__ import annotations
 import logging
 import logging.config
 import os
-from typing import Any, Mapping, MutableMapping, Sequence
+from typing import Any, Mapping, MutableMapping, Sequence, Optional
 from urllib.parse import urljoin, urlparse
 
 import urllib3
@@ -62,6 +62,7 @@ OUTPUT_SCHEMA = {
     "additionalProperties": True,
 }
 DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS = 60.0
+DEFAULT_HTTP_TIMEOUT = 30.0
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -82,11 +83,13 @@ LOGGING_CONFIG = {
 logger = logging.getLogger(__name__)
 
 
+
 def create_server() -> FastMCP:
     """Construct a FastMCP server with Polaris tools."""
     base_url = _resolve_base_url()
+    timeout = _resolve_http_timeout()
     http = urllib3.PoolManager()
-    authorization_provider = _resolve_authorization_provider(base_url, http)
+    authorization_provider = _resolve_authorization_provider(base_url, http, timeout)
     catalog_rest = PolarisRestTool(
         name="polaris.rest.catalog",
         description="Shared REST delegate for catalog operations",
@@ -94,6 +97,7 @@ def create_server() -> FastMCP:
         default_path_prefix="api/catalog/v1/",
         http=http,
         authorization_provider=authorization_provider,
+        timeout=timeout,
     )
     management_rest = PolarisRestTool(
         name="polaris.rest.management",
@@ -102,6 +106,7 @@ def create_server() -> FastMCP:
         default_path_prefix="api/management/v1/",
         http=http,
         authorization_provider=authorization_provider,
+        timeout=timeout,
     )
     policy_rest = PolarisRestTool(
         name="polaris.rest.policy",
@@ -110,6 +115,7 @@ def create_server() -> FastMCP:
         default_path_prefix="api/catalog/polaris/v1/",
         http=http,
         authorization_provider=authorization_provider,
+        timeout=timeout,
     )
 
     table_tool = PolarisTableTool(rest_client=catalog_rest)
@@ -434,8 +440,30 @@ def _validate_base_url(value: str) -> str:
     return value
 
 
+def _resolve_http_timeout() -> urllib3.Timeout:
+    def parse_timeout(raw: Optional[str]) -> Optional[float]:
+        try:
+            return float(raw.strip()) if raw and raw.strip() else None
+        except ValueError:
+            return None
+
+    default_timeout = parse_timeout(os.getenv("POLARIS_HTTP_TIMEOUT_SECONDS"))
+    connect_timeout = (
+        parse_timeout(os.getenv("POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS"))
+        or default_timeout
+        or DEFAULT_HTTP_TIMEOUT
+    )
+    read_timeout = (
+        parse_timeout(os.getenv("POLARIS_HTTP_READ_TIMEOUT_SECONDS"))
+        or default_timeout
+        or DEFAULT_HTTP_TIMEOUT
+    )
+
+    return urllib3.Timeout(connect=connect_timeout, read=read_timeout)
+
+
 def _resolve_authorization_provider(
-    base_url: str, http: urllib3.PoolManager
+    base_url: str, http: urllib3.PoolManager, timeout: urllib3.Timeout
 ) -> AuthorizationProvider:
     token = _resolve_token()
     if token:
@@ -466,6 +494,7 @@ def _resolve_authorization_provider(
             scope=scope,
             http=http,
             refresh_buffer_seconds=refresh_buffer_seconds,
+            timeout=timeout,
         )
 
     return none()

@@ -31,9 +31,6 @@ from polaris_mcp.authorization import AuthorizationProvider, none
 from polaris_mcp.base import JSONDict, ToolExecutionResult
 
 
-DEFAULT_TIMEOUT = urllib3.Timeout(connect=30.0, read=30.0)
-
-
 def encode_path_segment(value: str) -> str:
     """URL-encode a string for safe use as an HTTP path component."""
 
@@ -150,6 +147,7 @@ class PolarisRestTool:
         base_url: str,
         default_path_prefix: str,
         http: urllib3.PoolManager,
+        timeout: urllib3.Timeout,
         authorization_provider: Optional[AuthorizationProvider] = None,
     ) -> None:
         self._name = name
@@ -158,6 +156,7 @@ class PolarisRestTool:
         self._path_prefix = _normalize_prefix(default_path_prefix)
         self._http = http
         self._authorization = authorization_provider or none()
+        self._timeout = timeout
 
     @property
     def name(self) -> str:
@@ -254,7 +253,7 @@ class PolarisRestTool:
             target_uri,
             body=body_text.encode("utf-8") if body_text is not None else None,
             headers=header_values,
-            timeout=DEFAULT_TIMEOUT,
+            timeout=self._timeout,
         )
 
         response_body = response.data.decode("utf-8") if response.data else ""
