@@ -33,6 +33,7 @@ def _build_tool() -> tuple[PolarisNamespaceTool, mock.Mock]:
     tool = PolarisNamespaceTool(rest_client=rest_client)
     return tool, rest_client
 
+
 def test_get_operation_encodes_namespace_with_unit_separator() -> None:
     tool, delegate = _build_tool()
 
