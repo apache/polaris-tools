@@ -36,6 +36,7 @@ def _build_tool() -> tuple[PolarisTableTool, mock.Mock]:
     tool = PolarisTableTool(rest_client=rest_client)
     return tool, rest_client
 
+
 def test_list_operation_uses_get_and_copies_query_and_headers() -> None:
     tool, delegate = _build_tool()
     arguments = {

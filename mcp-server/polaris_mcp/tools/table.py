@@ -48,7 +48,7 @@ class PolarisTableTool(McpTool):
     DELETE_ALIASES: Set[str] = {"delete", "drop"}
 
     def __init__(self, rest_client: PolarisRestTool) -> None:
-        self._rest_client = rest_client\
+        self._rest_client = rest_client
 
     @property
     def name(self) -> str:
