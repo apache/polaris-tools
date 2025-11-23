@@ -65,6 +65,7 @@ def test_client_credentials_fetches_and_caches_tokens(
         client_secret="secret",
         scope=None,
         http=http,
+        refresh_buffer_seconds=0.0,
     )
 
     with mock.patch("time.time", return_value=now):
@@ -94,6 +95,63 @@ def test_client_credentials_fetches_and_caches_tokens(
     http.request.assert_called_once()
 
 
+def test_client_credentials_refresh_buffer() -> None:
+    http = mock.Mock()
+    now = time.time()
+    expires_in = 120
+    refresh_buffer = 30.0
+
+    response = SimpleNamespace(
+        status=200,
+        data=json.dumps({"access_token": "initial", "expires_in": expires_in}).encode(
+            "utf-8"
+        ),
+    )
+    http.request.return_value = response
+
+    provider = ClientCredentialsAuthorizationProvider(
+        token_endpoint="https://auth/token",
+        client_id="client",
+        client_secret="secret",
+        scope=None,
+        http=http,
+        refresh_buffer_seconds=refresh_buffer,
+    )
+
+    # Initial valid token
+    with mock.patch("time.time", return_value=now):
+        header1 = provider.authorization_header()
+    assert header1 == "Bearer initial"
+    http.request.assert_called_once()
+    http.request.reset_mock()
+
+    # Valid token before refresh
+    with mock.patch("time.time", return_value=now + (expires_in - refresh_buffer - 1)):
+        header2 = provider.authorization_header()
+    assert header2 == "Bearer initial"
+    http.request.assert_not_called()
+
+    # Refresh token once reached refresh buffer
+    refreshed_response = SimpleNamespace(
+        status=200,
+        data=json.dumps({"access_token": "refreshed", "expires_in": expires_in}).encode(
+            "utf-8"
+        ),
+    )
+    http.request.return_value = refreshed_response
+    with mock.patch("time.time", return_value=now + (expires_in - refresh_buffer)):
+        header3 = provider.authorization_header()
+    assert header3 == "Bearer refreshed"
+    http.request.assert_called_once()
+    http.request.reset_mock()
+
+    # Force expiry to trigger a refresh
+    with mock.patch("time.time", return_value=now + expires_in + 1):
+        header4 = provider.authorization_header()
+    assert header4 == "Bearer refreshed"
+    http.request.assert_not_called()
+
+
 @pytest.mark.parametrize(
     "payload,expected_message",
     [
@@ -118,6 +176,7 @@ def test_client_credentials_rejects_invalid_responses(
         client_secret="secret",
         scope=None,
         http=http,
+        refresh_buffer_seconds=0.0,
     )
 
     with pytest.raises(RuntimeError, match=expected_message):
@@ -134,6 +193,7 @@ def test_client_credentials_errors_on_non_200_status() -> None:
         client_secret="secret",
         scope=None,
         http=http,
+        refresh_buffer_seconds=0.0,
     )
 
     with pytest.raises(RuntimeError, match="500"):

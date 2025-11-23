@@ -59,6 +59,7 @@ OUTPUT_SCHEMA = {
     "required": ["isError"],
     "additionalProperties": True,
 }
+DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS = 60.0
 
 
 def create_server() -> FastMCP:
@@ -429,12 +430,20 @@ def _resolve_authorization_provider(
         scope = _first_non_blank(os.getenv("POLARIS_TOKEN_SCOPE"))
         token_url = _first_non_blank(os.getenv("POLARIS_TOKEN_URL"))
         endpoint = token_url or urljoin(base_url, "api/catalog/v1/oauth/tokens")
+        refresh_buffer_seconds = DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS
+        refresh_buffer_seconds_str = os.getenv("POLARIS_TOKEN_REFRESH_BUFFER_SECONDS")
+        if refresh_buffer_seconds_str:
+            try:
+                refresh_buffer_seconds = float(refresh_buffer_seconds_str.strip())
+            except ValueError:
+                pass
         return ClientCredentialsAuthorizationProvider(
             token_endpoint=endpoint,
             client_id=client_id,
             client_secret=client_secret,
             scope=scope,
             http=http,
+            refresh_buffer_seconds=refresh_buffer_seconds,
         )
 
     return none()
