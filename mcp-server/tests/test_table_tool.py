@@ -1,3 +1,22 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
 """Unit tests for ``polaris_mcp.tools.table``."""
 
 from __future__ import annotations
@@ -9,21 +28,17 @@ from polaris_mcp.base import ToolExecutionResult
 from polaris_mcp.tools.table import PolarisTableTool
 
 
-def _build_tool(mock_rest: mock.Mock) -> tuple[PolarisTableTool, mock.Mock]:
-    delegate = mock.Mock()
-    delegate.call.return_value = ToolExecutionResult(
+def _build_tool() -> tuple[PolarisTableTool, mock.Mock]:
+    rest_client = mock.Mock()
+    rest_client.call.return_value = ToolExecutionResult(
         text="ok", is_error=False, metadata={"k": "v"}
     )
-    mock_rest.return_value = delegate
-    tool = PolarisTableTool("https://polaris/", mock.sentinel.http, mock.sentinel.auth)
-    return tool, delegate
+    tool = PolarisTableTool(rest_client=rest_client)
+    return tool, rest_client
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_list_operation_uses_get_and_copies_query_and_headers(
-    mock_rest: mock.Mock,
-) -> None:
-    tool, delegate = _build_tool(mock_rest)
+def test_list_operation_uses_get_and_copies_query_and_headers() -> None:
+    tool, delegate = _build_tool()
     arguments = {
         "operation": "LS",
         "catalog": "prod west",
@@ -45,9 +60,8 @@ def test_list_operation_uses_get_and_copies_query_and_headers(
     assert payload["headers"] is not arguments["headers"]
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_get_operation_accepts_alias_and_encodes_table(mock_rest: mock.Mock) -> None:
-    tool, delegate = _build_tool(mock_rest)
+def test_get_operation_accepts_alias_and_encodes_table() -> None:
+    tool, delegate = _build_tool()
     arguments = {
         "operation": "fetch",
         "catalog": "prod",
@@ -64,17 +78,15 @@ def test_get_operation_accepts_alias_and_encodes_table(mock_rest: mock.Mock) -> 
     assert "body" not in payload
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_get_operation_requires_table_argument(mock_rest: mock.Mock) -> None:
-    tool, _ = _build_tool(mock_rest)
+def test_get_operation_requires_table_argument() -> None:
+    tool, _ = _build_tool()
 
     with pytest.raises(ValueError, match="Table name is required"):
         tool.call({"operation": "get", "catalog": "prod", "namespace": "analytics"})
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_create_operation_deep_copies_request_body(mock_rest: mock.Mock) -> None:
-    tool, delegate = _build_tool(mock_rest)
+def test_create_operation_deep_copies_request_body() -> None:
+    tool, delegate = _build_tool()
     body = {"table": "t1", "properties": {"schema-id": 1}}
     tool.call(
         {
@@ -97,17 +109,15 @@ def test_create_operation_deep_copies_request_body(mock_rest: mock.Mock) -> None
     assert payload["body"]["properties"]["schema-id"] == 1
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_create_operation_requires_body(mock_rest: mock.Mock) -> None:
-    tool, _ = _build_tool(mock_rest)
+def test_create_operation_requires_body() -> None:
+    tool, _ = _build_tool()
 
     with pytest.raises(ValueError, match="Create operations require"):
         tool.call({"operation": "create", "catalog": "prod", "namespace": "analytics"})
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_commit_operation_requires_table_and_body(mock_rest: mock.Mock) -> None:
-    tool, _ = _build_tool(mock_rest)
+def test_commit_operation_requires_table_and_body() -> None:
+    tool, _ = _build_tool()
 
     with pytest.raises(ValueError, match="Table name is required"):
         tool.call(
@@ -130,9 +140,8 @@ def test_commit_operation_requires_table_and_body(mock_rest: mock.Mock) -> None:
         )
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_commit_operation_post_request_with_body_copy(mock_rest: mock.Mock) -> None:
-    tool, delegate = _build_tool(mock_rest)
+def test_commit_operation_post_request_with_body_copy() -> None:
+    tool, delegate = _build_tool()
     body = {"changes": [{"type": "append", "snapshot-id": 5}]}
 
     tool.call(
@@ -157,9 +166,8 @@ def test_commit_operation_post_request_with_body_copy(mock_rest: mock.Mock) -> N
     assert payload["body"]["changes"][0]["snapshot-id"] == 5
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_delete_operation_uses_alias_and_encodes_table(mock_rest: mock.Mock) -> None:
-    tool, delegate = _build_tool(mock_rest)
+def test_delete_operation_uses_alias_and_encodes_table() -> None:
+    tool, delegate = _build_tool()
 
     tool.call(
         {
@@ -176,9 +184,8 @@ def test_delete_operation_uses_alias_and_encodes_table(mock_rest: mock.Mock) -> 
     assert payload["path"] == "prod/namespaces/analytics/tables/fact%20daily"
 
 
-@mock.patch("polaris_mcp.tools.table.PolarisRestTool")
-def test_namespace_validation_rejects_blank_values(mock_rest: mock.Mock) -> None:
-    tool, _ = _build_tool(mock_rest)
+def test_namespace_validation_rejects_blank_values() -> None:
+    tool, _ = _build_tool()
 
     with pytest.raises(ValueError, match="Namespace must be provided"):
         tool.call({"operation": "list", "catalog": "prod", "namespace": None})

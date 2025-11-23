@@ -24,9 +24,6 @@ from __future__ import annotations
 import copy
 from typing import Any, Dict, Optional, Set
 
-import urllib3
-
-from polaris_mcp.authorization import AuthorizationProvider
 from polaris_mcp.base import (
     JSONDict,
     McpTool,
@@ -57,20 +54,8 @@ class PolarisPrincipalTool(McpTool):
     ASSIGN_ROLE_ALIASES: Set[str] = {"assign-principal-role", "assign-role"}
     REVOKE_ROLE_ALIASES: Set[str] = {"revoke-principal-role", "revoke-role"}
 
-    def __init__(
-        self,
-        base_url: str,
-        http: urllib3.PoolManager,
-        authorization_provider: AuthorizationProvider,
-    ) -> None:
-        self._delegate = PolarisRestTool(
-            name="polaris.principal.delegate",
-            description="Internal delegate for principal operations",
-            base_url=base_url,
-            default_path_prefix="api/management/v1/",
-            http=http,
-            authorization_provider=authorization_provider,
-        )
+    def __init__(self, rest_client: PolarisRestTool) -> None:
+        self._rest_client = rest_client
 
     @property
     def name(self) -> str:
@@ -167,7 +152,7 @@ class PolarisPrincipalTool(McpTool):
         else:  # pragma: no cover
             raise ValueError(f"Unsupported operation: {operation}")
 
-        raw = self._delegate.call(delegate_args)
+        raw = self._rest_client.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
 
     def _handle_list(self, delegate_args: JSONDict) -> None:
