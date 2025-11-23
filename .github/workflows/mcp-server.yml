@@ -29,8 +29,14 @@ name: MCP Server CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'mcp-server/**'
+      - '.github/**'    
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'mcp-server/**'
+      - '.github/**'
 
 env:
   GRADLE_TOS_ACCEPTED: ${{ vars.GRADLE_TOS_ACCEPTED }}
@@ -53,6 +59,22 @@ jobs:
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            21
+            ${{ matrix.java-version != '21' && matrix.java-version || '' }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check
+        run: |
+          cd mcp-server
+          ./gradlew rat
 
       - name: Install uv
         run: |

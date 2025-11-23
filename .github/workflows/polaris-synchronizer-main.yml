@@ -17,17 +17,17 @@
 # under the License.
 #
 
-name: Iceberg Catalog Migrator CI
+name: Polaris Synchronizer CI
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'iceberg-catalog-migrator/**'
+      - 'polaris-synchronizer/**'
       - '.github/**'
   pull_request:
     paths:
-      - 'iceberg-catalog-migrator/**'
+      - 'polaris-synchronizer/**'
       - '.github/**'
 
 jobs:
@@ -56,7 +56,7 @@ jobs:
 
       - name: Build & Check
         run: |
-          cd iceberg-catalog-migrator
+          cd polaris-synchronizer
           ./gradlew --rerun-tasks assemble ${{ env.ADDITIONAL_GRADLE_OPTS }} check
 
       - name: Capture test results
