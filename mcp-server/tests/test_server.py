@@ -319,3 +319,43 @@ class TestServerConfiguration:
             timeout = server._resolve_http_timeout()
             assert timeout.connect_timeout == server.DEFAULT_HTTP_TIMEOUT
             assert timeout.read_timeout == server.DEFAULT_HTTP_TIMEOUT
+
+
+class TestServerRetry:
+    def test_create_server_default_retry(self) -> None:
+        """Verify that the HTTP client is created with a default retry strategy."""
+        with (
+            mock.patch("polaris_mcp.server.urllib3.PoolManager") as mock_pool_manager,
+            mock.patch("polaris_mcp.server.urllib3.Retry") as mock_retry,
+        ):
+            server.create_server()
+
+            mock_retry.assert_called_once_with(
+                total=3,
+                backoff_factor=0.5,
+                status_forcelist=server.CLIENT_RETRIES_STATUS_FORCELIST,
+            )
+            mock_pool_manager.assert_called_once_with(retries=mock_retry.return_value)
+
+    def test_create_server_custom_retry(self) -> None:
+        """Verify that the HTTP client is created with a custom retry strategy from environment variables."""
+        with (
+            mock.patch("polaris_mcp.server.urllib3.PoolManager") as mock_pool_manager,
+            mock.patch("polaris_mcp.server.urllib3.Retry") as mock_retry,
+            mock.patch.dict(
+                os.environ,
+                {
+                    "POLARIS_HTTP_RETRIES_TOTAL": "10",
+                    "POLARIS_HTTP_RETRIES_BACKOFF_FACTOR": "1.0",
+                },
+                clear=True,
+            ),
+        ):
+            server.create_server()
+
+        mock_retry.assert_called_once_with(
+            total=10,
+            backoff_factor=1.0,
+            status_forcelist=server.CLIENT_RETRIES_STATUS_FORCELIST,
+        )
+        mock_pool_manager.assert_called_once_with(retries=mock_retry.return_value)

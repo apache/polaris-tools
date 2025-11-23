@@ -77,7 +77,8 @@ Please note: `--directory` specifies a local directory. It is not needed when we
 | `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.              | `30.0`                                           |
 | `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.          | `30.0`                                           |
 | `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                 | `30.0`                                           |
-
+| `POLARIS_HTTP_RETRIES_TOTAL`                                   | Total number of retries for HTTP requests.                     | `3`                                              |
+| `POLARIS_HTTP_RETRIES_BACKOFF_FACTOR`                          | Factor for exponential backoff between retries.                | `0.5`                                            |
 
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
 
