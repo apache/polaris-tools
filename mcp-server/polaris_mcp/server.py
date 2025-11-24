@@ -21,6 +21,8 @@
 
 from __future__ import annotations
 
+import logging
+import logging.config
 import os
 from typing import Any, Mapping, MutableMapping, Sequence
 from urllib.parse import urljoin, urlparse
@@ -60,11 +62,28 @@ OUTPUT_SCHEMA = {
     "additionalProperties": True,
 }
 DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS = 60.0
+LOGGING_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": "pythonjsonlogger.json.JsonFormatter",
+            "format": "%(asctime)s %(name)s %(levelname)s %(message)s",
+        }
+    },
+    "handlers": {
+        "json": {
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+        }
+    },
+    "root": {"handlers": ["json"], "level": "INFO"},
+}
+logger = logging.getLogger(__name__)
 
 
 def create_server() -> FastMCP:
     """Construct a FastMCP server with Polaris tools."""
-
     base_url = _resolve_base_url()
     http = urllib3.PoolManager()
     authorization_provider = _resolve_authorization_provider(base_url, http)
@@ -358,6 +377,9 @@ def _to_tool_result(result: ToolExecutionResult) -> FastMcpToolResult:
     structured = {"isError": result.is_error}
     if result.metadata is not None:
         structured["meta"] = result.metadata
+
+    logger.info("Tool call result", extra=structured)
+
     return FastMcpToolResult(
         content=[TextContent(type="text", text=result.text)],
         structured_content=structured,
@@ -473,7 +495,7 @@ def _resolve_package_version() -> str:
 
 def main() -> None:
     """Script entry point."""
-
+    logging.config.dictConfig(LOGGING_CONFIG)
     server = create_server()
     server.run()
 
