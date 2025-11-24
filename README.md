@@ -23,7 +23,6 @@ Apache Polaris Tools provide a set of tools to help users of [Apache Polaris (In
 This repository is maintained by the [Apache Polaris community](https://polaris.apache.org/).
 
 ## Tools
-There are three tools:
 1. [Benchmarks](/benchmarks/README.md): Performance benchmarks for Polaris.
 2. [Iceberg Catalog Migrator](/iceberg-catalog-migrator/README.md): A command-line tool to migrate Iceberg tables from one Iceberg catalog to another.
 3. [Polaris Synchronizer](/polaris-synchronizer/README.md): A tool to migrate entities from one Polaris instance to another.
