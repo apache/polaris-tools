@@ -74,6 +74,10 @@ Please note: `--directory` specifies a local directory. It is not needed when we
 | `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                            | _unset_                                          |
 | `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                  | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
 | `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds. | `60.0`                                           |
+| `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.              | `30.0`                                           |
+| `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.          | `30.0`                                           |
+| `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                 | `30.0`                                           |
+
 
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
 

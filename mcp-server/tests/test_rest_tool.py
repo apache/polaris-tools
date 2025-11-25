@@ -27,7 +27,7 @@ from unittest import mock
 import pytest
 from urllib3._collections import HTTPHeaderDict
 
-from polaris_mcp.rest import DEFAULT_TIMEOUT, PolarisRestTool
+from polaris_mcp.rest import PolarisRestTool
 
 
 def _build_response(
@@ -59,6 +59,7 @@ def _create_tool() -> tuple[PolarisRestTool, mock.Mock, mock.Mock]:
         default_path_prefix="api/catalog/v1/",
         http=http,
         authorization_provider=auth,
+        timeout=mock.sentinel.timeout,
     )
     return tool, http, auth
 
@@ -97,7 +98,7 @@ def test_call_builds_request_and_metadata_with_json_body() -> None:
         expected_url,
         body=b'{"name": "analytics"}',
         headers=expected_headers,
-        timeout=DEFAULT_TIMEOUT,
+        timeout=mock.sentinel.timeout,
     )
     auth.authorization_header.assert_not_called()
 
@@ -148,7 +149,7 @@ def test_call_uses_authorization_provider_and_handles_plain_text() -> None:
         expected_url,
         body=b"payload",
         headers=expected_headers,
-        timeout=DEFAULT_TIMEOUT,
+        timeout=mock.sentinel.timeout,
     )
     auth.authorization_header.assert_called_once()
 

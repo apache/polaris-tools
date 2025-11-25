@@ -66,6 +66,7 @@ def test_client_credentials_fetches_and_caches_tokens(
         scope=None,
         http=http,
         refresh_buffer_seconds=0.0,
+        timeout=mock.sentinel.timeout,
     )
 
     with mock.patch("time.time", return_value=now):
@@ -116,6 +117,7 @@ def test_client_credentials_refresh_buffer() -> None:
         scope=None,
         http=http,
         refresh_buffer_seconds=refresh_buffer,
+        timeout=mock.sentinel.timeout,
     )
 
     # Initial valid token
@@ -177,6 +179,7 @@ def test_client_credentials_rejects_invalid_responses(
         scope=None,
         http=http,
         refresh_buffer_seconds=0.0,
+        timeout=mock.sentinel.timeout,
     )
 
     with pytest.raises(RuntimeError, match=expected_message):
@@ -194,6 +197,7 @@ def test_client_credentials_errors_on_non_200_status() -> None:
         scope=None,
         http=http,
         refresh_buffer_seconds=0.0,
+        timeout=mock.sentinel.timeout,
     )
 
     with pytest.raises(RuntimeError, match="500"):

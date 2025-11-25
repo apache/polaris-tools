@@ -210,7 +210,7 @@ class TestAuthorizationProviderResolution:
             mock.patch.dict(os.environ, {}, clear=True),
         ):
             provider = server._resolve_authorization_provider(
-                "https://base/", fake_http
+                "https://base/", fake_http, mock.sentinel.timeout
             )
 
         assert isinstance(provider, server.StaticAuthorizationProvider)
@@ -237,7 +237,7 @@ class TestAuthorizationProviderResolution:
             ) as mock_factory,
         ):
             provider = server._resolve_authorization_provider(
-                "https://base/", fake_http
+                "https://base/", fake_http, mock.sentinel.timeout
             )
 
         assert provider is fake_provider
@@ -248,4 +248,74 @@ class TestAuthorizationProviderResolution:
             scope="scope",
             http=fake_http,
             refresh_buffer_seconds=60.0,
+            timeout=mock.sentinel.timeout,
         )
+
+
+class TestServerConfiguration:
+    def test_resolve_http_timeout_defaults(self) -> None:
+        with mock.patch.dict(os.environ, {}, clear=True):
+            timeout = server._resolve_http_timeout()
+            assert timeout.connect_timeout == server.DEFAULT_HTTP_TIMEOUT
+            assert timeout.read_timeout == server.DEFAULT_HTTP_TIMEOUT
+
+    def test_resolve_http_timeout_global(self) -> None:
+        with mock.patch.dict(
+            os.environ, {"POLARIS_HTTP_TIMEOUT_SECONDS": "60.0"}, clear=True
+        ):
+            timeout = server._resolve_http_timeout()
+            assert timeout.connect_timeout == 60.0
+            assert timeout.read_timeout == 60.0
+
+    def test_resolve_http_timeout_specific_overrides(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {
+                "POLARIS_HTTP_TIMEOUT_SECONDS": "60.0",
+                "POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS": "10.0",
+                "POLARIS_HTTP_READ_TIMEOUT_SECONDS": "120.0",
+            },
+            clear=True,
+        ):
+            timeout = server._resolve_http_timeout()
+            assert timeout.connect_timeout == 10.0
+            assert timeout.read_timeout == 120.0
+
+    def test_resolve_http_timeout_partial_overrides(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {
+                "POLARIS_HTTP_TIMEOUT_SECONDS": "60.0",
+                "POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS": "10.0",
+            },
+            clear=True,
+        ):
+            timeout = server._resolve_http_timeout()
+            assert timeout.connect_timeout == 10.0
+            assert timeout.read_timeout == 60.0
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "POLARIS_HTTP_TIMEOUT_SECONDS": "60.0",
+                "POLARIS_HTTP_READ_TIMEOUT_SECONDS": "120.0",
+            },
+            clear=True,
+        ):
+            timeout = server._resolve_http_timeout()
+            assert timeout.connect_timeout == 60.0
+            assert timeout.read_timeout == 120.0
+
+    def test_resolve_http_timeout_invalid_values(self) -> None:
+        with mock.patch.dict(
+            os.environ,
+            {
+                "POLARIS_HTTP_TIMEOUT_SECONDS": "invalid",
+                "POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS": "bad",
+                "POLARIS_HTTP_READ_TIMEOUT_SECONDS": "N/A",
+            },
+            clear=True,
+        ):
+            timeout = server._resolve_http_timeout()
+            assert timeout.connect_timeout == server.DEFAULT_HTTP_TIMEOUT
+            assert timeout.read_timeout == server.DEFAULT_HTTP_TIMEOUT

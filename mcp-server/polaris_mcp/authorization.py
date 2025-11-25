@@ -60,12 +60,14 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
         scope: Optional[str],
         http: urllib3.PoolManager,
         refresh_buffer_seconds: float,
+        timeout: urllib3.Timeout,
     ) -> None:
         self._token_endpoint = token_endpoint
         self._client_id = client_id
         self._client_secret = client_secret
         self._scope = scope
         self._http = http
+        self._timeout = timeout
         self._lock = threading.Lock()
         self._cached: Optional[tuple[str, float]] = None  # (token, expires_at_epoch)
         self._refresh_buffer_seconds = max(refresh_buffer_seconds, 0.0)
@@ -102,7 +104,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
             self._token_endpoint,
             body=encoded,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
-            timeout=urllib3.Timeout(connect=20.0, read=20.0),
+            timeout=self._timeout,
         )
 
         if response.status != 200:
