@@ -90,8 +90,6 @@ def create_server() -> FastMCP:
     """Construct a FastMCP server with Polaris tools."""
     base_url = _resolve_base_url()
     timeout = _resolve_http_timeout()
-    http = urllib3.PoolManager()
-    authorization_provider = _resolve_authorization_provider(base_url, http, timeout)
     total_retries = int(
         os.getenv("POLARIS_HTTP_RETRIES_TOTAL", DEFAULT_HTTP_RETRIES_TOTAL)
     )
@@ -107,7 +105,7 @@ def create_server() -> FastMCP:
         status_forcelist=HTTP_RETRIES_STATUS_FORCELIST,
     )
     http = urllib3.PoolManager(retries=retry_strategy)
-    authorization_provider = _resolve_authorization_provider(base_url, http)
+    authorization_provider = _resolve_authorization_provider(base_url, http, timeout)
     catalog_rest = PolarisRestTool(
         name="polaris.rest.catalog",
         description="Shared REST delegate for catalog operations",
