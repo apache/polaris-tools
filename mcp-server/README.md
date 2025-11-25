@@ -65,14 +65,15 @@ Please note: `--directory` specifies a local directory. It is not needed when we
 
 ## Configuration
 
-| Variable                                                       | Description                                              | Default                                          |
-|----------------------------------------------------------------|----------------------------------------------------------|--------------------------------------------------|
-| `POLARIS_BASE_URL`                                             | Base URL for all Polaris REST calls.                     | `http://localhost:8181/`                         |
-| `POLARIS_API_TOKEN` / `POLARIS_BEARER_TOKEN` / `POLARIS_TOKEN` | Static bearer token (if supplied, overrides other auth). | _unset_                                          |
-| `POLARIS_CLIENT_ID`                                            | OAuth client id for client-credential flow.              | _unset_                                          |
-| `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                     | _unset_                                          |
-| `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                      | _unset_                                          |
-| `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.            | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
+| Variable                                                       | Description                                                    | Default                                          |
+|----------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------|
+| `POLARIS_BASE_URL`                                             | Base URL for all Polaris REST calls.                           | `http://localhost:8181/`                         |
+| `POLARIS_API_TOKEN` / `POLARIS_BEARER_TOKEN` / `POLARIS_TOKEN` | Static bearer token (if supplied, overrides other auth).       | _unset_                                          |
+| `POLARIS_CLIENT_ID`                                            | OAuth client id for client-credential flow.                    | _unset_                                          |
+| `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                           | _unset_                                          |
+| `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                            | _unset_                                          |
+| `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                  | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
+| `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds. | `60.0`                                           |
 
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
 

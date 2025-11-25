@@ -59,6 +59,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
         client_secret: str,
         scope: Optional[str],
         http: urllib3.PoolManager,
+        refresh_buffer_seconds: float,
     ) -> None:
         self._token_endpoint = token_endpoint
         self._client_id = client_id
@@ -67,6 +68,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
         self._http = http
         self._lock = threading.Lock()
         self._cached: Optional[tuple[str, float]] = None  # (token, expires_at_epoch)
+        self._refresh_buffer_seconds = max(refresh_buffer_seconds, 0.0)
 
     def authorization_header(self) -> Optional[str]:
         token = self._current_token()
@@ -75,10 +77,13 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
     def _current_token(self) -> Optional[str]:
         now = time.time()
         cached = self._cached
-        if not cached or cached[1] - 60 <= now:
+        if not cached or cached[1] - self._refresh_buffer_seconds <= now:
             with self._lock:
                 cached = self._cached
-                if not cached or cached[1] - 60 <= time.time():
+                if (
+                    not cached
+                    or cached[1] - self._refresh_buffer_seconds <= time.time()
+                ):
                     self._cached = cached = self._fetch_token()
         return cached[0] if cached else None
 
@@ -119,7 +124,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
             ttl = float(expires_in)
         except (TypeError, ValueError):
             ttl = 3600.0
-        ttl = max(ttl, 60.0)
+        ttl = max(ttl, self._refresh_buffer_seconds)
         expires_at = time.time() + ttl
         return token, expires_at
 

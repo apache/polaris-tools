@@ -247,4 +247,5 @@ class TestAuthorizationProviderResolution:
             client_secret="secret",
             scope="scope",
             http=fake_http,
+            refresh_buffer_seconds=60.0,
         )
