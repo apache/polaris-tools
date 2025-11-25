@@ -83,7 +83,6 @@ LOGGING_CONFIG = {
 logger = logging.getLogger(__name__)
 
 
-
 def create_server() -> FastMCP:
     """Construct a FastMCP server with Polaris tools."""
     base_url = _resolve_base_url()
