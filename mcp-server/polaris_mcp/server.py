@@ -63,6 +63,9 @@ OUTPUT_SCHEMA = {
 }
 DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS = 60.0
 DEFAULT_HTTP_TIMEOUT = 30.0
+DEFAULT_HTTP_RETRIES_TOTAL = 3
+DEFAULT_HTTP_RETRIES_BACKOFF_FACTOR = 0.5
+HTTP_RETRIES_STATUS_FORCELIST = [401, 409, 429]
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -87,7 +90,21 @@ def create_server() -> FastMCP:
     """Construct a FastMCP server with Polaris tools."""
     base_url = _resolve_base_url()
     timeout = _resolve_http_timeout()
-    http = urllib3.PoolManager()
+    total_retries = int(
+        os.getenv("POLARIS_HTTP_RETRIES_TOTAL", DEFAULT_HTTP_RETRIES_TOTAL)
+    )
+    backoff_factor = float(
+        os.getenv(
+            "POLARIS_HTTP_RETRIES_BACKOFF_FACTOR",
+            DEFAULT_HTTP_RETRIES_BACKOFF_FACTOR,
+        )
+    )
+    retry_strategy = urllib3.Retry(
+        total=total_retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=HTTP_RETRIES_STATUS_FORCELIST,
+    )
+    http = urllib3.PoolManager(retries=retry_strategy)
     authorization_provider = _resolve_authorization_provider(base_url, http, timeout)
     catalog_rest = PolarisRestTool(
         name="polaris.rest.catalog",
