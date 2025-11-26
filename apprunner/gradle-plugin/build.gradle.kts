@@ -18,8 +18,9 @@
  */
 
 plugins {
-  id("polaris-apprunner-java")
+  // Order of java-gradle-plugin + polaris-apprunner-java matters!
   `java-gradle-plugin`
+  id("polaris-apprunner-java")
 }
 
 dependencies {
@@ -30,7 +31,10 @@ dependencies {
 gradlePlugin {
   plugins {
     register("polaris-apprunner") {
-      id = "org.apache.polaris.apprunner"
+      // This ID becomes the Maven group ID of the Gradle plugin marker artifact.
+      // The artifact ID of the Gradle plugin marker artifact is ID + ".gradle.plugin"
+      // (the defined plugin marker suffix).
+      id = project.group.toString()
       implementationClass = "org.apache.polaris.apprunner.plugin.PolarisRunnerPlugin"
       displayName = "Polaris Runner"
       description = "Start and stop a Polaris server for integration testing"
