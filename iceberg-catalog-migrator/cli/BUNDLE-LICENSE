@@ -213,798 +213,1054 @@ Home page: https://github.com/gradle/gradle
 License: https://www.apache.org/licenses/LICENSE-2.0
 
 --------------------------------------------------------------------------------
-Group: ant Name: ant Version: 1.6.5
-Project URL: N/A
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
----
+This artifact bundles Apache Tez.
 
-Group: aopalliance Name: aopalliance Version: 1.0
-Project URL: [http://aopalliance.sourceforge.net](http://aopalliance.sourceforge.net)
+Project URL: https://tez.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Iceberg.
+
+Project URL: https://iceberg.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Facebook fb303.
+
+Project URL: https://github.com/facebook/fb303
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Ant.
+
+Project URL: https://ant.apache.org/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Pentaho Aggregate Designer Core (jhyde).
+
+Project URL: https://github.com/pentaho
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Fusesource HawtJNI.
+
+Project URL: https://github.com/fusesource/hawtjni
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles aopalliance.
+
+Project URL: http://aopalliance.sourceforge.net
 License: Public Domain
 
----
+--------------------------------------------------------------------------------
 
-Group: ch.qos.logback Name: logback-classic Version: 1.5.17
-Group: ch.qos.logback Name: logback-core Version: 1.5.17
-Project URL: [http://www.qos.ch](http://www.qos.ch)
-License: GNU Lesser General Public License - [http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+This artifact bundles Logback.
 
----
+Project URL: http://www.qos.ch
+License: Eclipse Public License - Version 1.0 - https://www.eclipse.org/org/documents/epl-v10.php
 
-Group: ch.qos.reload4j Name: reload4j Version: 1.2.22
-Project URL: [https://reload4j.qos.ch/](https://reload4j.qos.ch/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Reload4j.
 
-Group: com.fasterxml.jackson Name: jackson-bom Version: 2.19.2
-Group: com.fasterxml.jackson.core Name: jackson-annotations Version: 2.19.2
-Group: com.fasterxml.jackson.core Name: jackson-core Version: 2.19.2
-Group: com.fasterxml.jackson.core Name: jackson-databind Version: 2.19.2
-Group: com.fasterxml.jackson.jaxrs Name: jackson-jaxrs-base Version: 2.19.2
-Group: com.fasterxml.jackson.jaxrs Name: jackson-jaxrs-json-provider Version: 2.19.2
-Group: com.fasterxml.jackson.module Name: jackson-module-jaxb-annotations Version: 2.19.2
-Project URL: [https://github.com/FasterXML/jackson-bom](https://github.com/FasterXML/jackson-bom), [https://github.com/FasterXML/jackson](https://github.com/FasterXML/jackson), [https://github.com/FasterXML/jackson-core](https://github.com/FasterXML/jackson-core), [https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-base](https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-base), [https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-json-provider](https://github.com/FasterXML/jackson-jaxrs-providers/jackson-jaxrs-json-provider), [https://github.com/FasterXML/jackson-modules-base](https://github.com/FasterXML/jackson-modules-base)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://reload4j.qos.ch/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: com.fasterxml.woodstox Name: woodstox-core Version: 5.4.0
-Project URL: [https://github.com/FasterXML/woodstox](https://github.com/FasterXML/woodstox)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Woodstox Core.
 
----
+Project URL: https://github.com/FasterXML/woodstox
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: com.github.ben-manes.caffeine Name: caffeine Version: 2.9.3
-Project URL: [https://github.com/ben-manes/caffeine](https://github.com/ben-manes/caffeine)
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Caffeine.
 
-Group: com.github.joshelser Name: dropwizard-metrics-hadoop-metrics2-reporter Version: 0.1.2
-Project URL: [https://github.com/joshelser/dropwizard-hadoop-metrics2](https://github.com/joshelser/dropwizard-hadoop-metrics2)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://github.com/ben-manes/caffeine
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: com.github.pjfanning Name: jersey-json Version: 1.22.0
-Project URL: [https://github.com/pjfanning/jersey-1.x](https://github.com/pjfanning/jersey-1.x)
-License: CDDL 1.1 - [http://glassfish.java.net/public/CDDL+GPL_1_1.html](http://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+This artifact bundles Joshelser Dropwizard Metrics Hadoop reporter.
 
----
+Project URL: https://github.com/joshelser/dropwizard-hadoop-metrics2
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: com.github.stephenc.jcip Name: jcip-annotations Version: 1.0-1
-Project URL: [http://stephenc.github.com/jcip-annotations](http://stephenc.github.com/jcip-annotations)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles PJ Fanning jersey json.
 
-Group: com.google.code.findbugs Name: jsr305 Version: 3.0.2
-Project URL: [http://findbugs.sourceforge.net/](http://findbugs.sourceforge.net/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://github.com/pjfanning/jersey-1.x
+License: CDDL 1.1 - http://glassfish.java.net/public/CDDL+GPL_1_1.html
 
----
+--------------------------------------------------------------------------------
 
-Group: com.google.code.gson Name: gson Version: 2.9.0
-Project URL: [https://github.com/google/gson/gson](https://github.com/google/gson/gson)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Stephenc JCIP Annotations.
 
----
+Project URL: http://stephenc.github.com/jcip-annotations
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: com.google.errorprone Name: error_prone_annotations Version: 2.36.0
-Project URL: [https://errorprone.info/error_prone_annotations](https://errorprone.info/error_prone_annotations)
-License: Apache 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Gson.
 
-Group: com.google.guava Name: failureaccess Version: 1.0.2
-Group: com.google.guava Name: guava Version: 33.4.0-jre
-Group: com.google.guava Name: listenablefuture Version: 9999.0-empty-to-avoid-conflict-with-guava
-Project URL: [https://github.com/google/guava/](https://github.com/google/guava/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://github.com/google/gson/gson
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: com.google.inject Name: guice Version: 4.2.3
-Group: com.google.inject.extensions Name: guice-servlet Version: 4.2.3
-Project URL: [https://github.com/google/guice](https://github.com/google/guice)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Google ErrorProne.
 
----
+Project URL: https://errorprone.info/error_prone_annotations
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: com.google.j2objc Name: j2objc-annotations Version: 3.0.0
-Project URL: [https://github.com/google/j2objc/](https://github.com/google/j2objc/)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Guava.
 
-Group: com.google.protobuf Name: protobuf-java Version: 2.5.0
-Project URL: [http://code.google.com/p/protobuf](http://code.google.com/p/protobuf)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://github.com/google/guava
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: com.google.re2j Name: re2j Version: 1.1
-Project URL: [http://github.com/google/re2j](http://github.com/google/re2j)
-License: The Go license - [https://golang.org/LICENSE](https://golang.org/LICENSE)
+This artifact bundles Guice.
 
----
+Project URL: https://github.com/google/guice
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: com.jcraft Name: jsch Version: 0.1.55
-Project URL: [http://www.jcraft.com/jsch/](http://www.jcraft.com/jsch/)
-License: Revised BSD - [http://www.jcraft.com/jsch/LICENSE.txt](http://www.jcraft.com/jsch/LICENSE.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Google j2objc.
 
-Group: com.jolbox Name: bonecp Version: 0.8.0.RELEASE
-Project URL: [http://jolbox.com](http://jolbox.com)
-License: Apache v2 - [http://www.apache.org/licenses/LICENSE-2.0.html](http://www.apache.org/licenses/LICENSE-2.0.html)
+Project URL: https://github.com/google/j2objc/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: com.nimbusds Name: nimbus-jose-jwt Version: 9.37.2
-Project URL: [https://connect2id.com](https://connect2id.com), [https://bitbucket.org/connect2id/nimbus-jose-jwt](https://bitbucket.org/connect2id/nimbus-jose-jwt)
-License: The Apache Software License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Protobuf Java.
 
----
+Project URL: http://code.google.com/p/protobuf
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: com.sun.jersey Name: jersey-client Version: 1.19.4
-Group: com.sun.jersey Name: jersey-core Version: 1.19.4
-Group: com.sun.jersey Name: jersey-json Version: 1.9
-Group: com.sun.jersey Name: jersey-server Version: 1.19.4
-Group: com.sun.jersey Name: jersey-servlet Version: 1.19.4
-Group: com.sun.jersey.contribs Name: jersey-guice Version: 1.19.4
-Project URL: [http://www.oracle.com/](http://www.oracle.com/)
-License: CDDL 1.1 - [http://glassfish.java.net/public/CDDL+GPL_1_1.html](http://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Google re2j.
 
-Group: com.sun.xml.bind Name: jaxb-impl Version: 2.2.3-1
-Project URL: [http://jaxb.java.net/](http://jaxb.java.net/)
-License: CDDL 1.1 - [https://glassfish.java.net/public/CDDL+GPL_1_1.html](https://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
+Project URL: http://github.com/google/re2j
+License: The Go license
+| This is a work derived from Russ Cox's RE2 in Go, whose license
+| http://golang.org/LICENSE is as follows:
+| 
+| Copyright (c) 2009 The Go Authors. All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|    * Redistributions of source code must retain the above copyright
+|      notice, this list of conditions and the following disclaimer.
+| 
+|    * Redistributions in binary form must reproduce the above copyright
+|      notice, this list of conditions and the following disclaimer in
+|      the documentation and/or other materials provided with the
+|      distribution.
+| 
+|    * Neither the name of Google Inc. nor the names of its contributors
+|      may be used to endorse or promote products derived from this
+|      software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Jcraft jsch.
+
+Project URL: http://www.jcraft.com/jsch/
+License: BSD License
+| JSch 0.0.* was released under the GNU LGPL license.  Later, we have switched 
+| over to a BSD-style license. 
+| 
+| ------------------------------------------------------------------------------
+| Copyright (c) 2002-2015 Atsuhiko Yamanaka, JCraft,Inc. 
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+|   1. Redistributions of source code must retain the above copyright notice,
+|      this list of conditions and the following disclaimer.
+| 
+|   2. Redistributions in binary form must reproduce the above copyright 
+|      notice, this list of conditions and the following disclaimer in 
+|      the documentation and/or other materials provided with the distribution.
+| 
+|   3. The names of the authors may not be used to endorse or promote products
+|      derived from this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+| INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+| FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JCRAFT,
+| INC. OR ANY CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
+| INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+| OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+| LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+| NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+| EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
----
+--------------------------------------------------------------------------------
 
-Group: commons-beanutils Name: commons-beanutils Version: 1.9.4
-Project URL: [https://commons.apache.org/proper/commons-beanutils/](https://commons.apache.org/proper/commons-beanutils/)
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Jolbox BoneCP.
 
----
+Project URL: http://jolbox.com
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: commons-cli Name: commons-cli Version: 1.5.0
-Project URL: [https://commons.apache.org/proper/commons-cli/](https://commons.apache.org/proper/commons-cli/)
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Nimbus JOSE JWT.
 
-Group: commons-codec Name: commons-codec Version: 1.17.1
-Project URL: [https://commons.apache.org/proper/commons-codec/](https://commons.apache.org/proper/commons-codec/)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://bitbucket.org/connect2id/nimbus-jose-jwt
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: commons-collections Name: commons-collections Version: 3.2.2
-Project URL: [http://commons.apache.org/collections/](http://commons.apache.org/collections/)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Jersey.
 
----
+Project URL: http://www.oracle.com/
+License: CDDL 1.1 - http://glassfish.java.net/public/CDDL+GPL_1_1.html
 
-Group: commons-dbcp Name: commons-dbcp Version: 1.4
-Project URL: [http://commons.apache.org/dbcp/](http://commons.apache.org/dbcp/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles JAXB Bind.
 
-Group: commons-el Name: commons-el Version: 1.0
-Project URL: [http://jakarta.apache.org/commons/el/](http://jakarta.apache.org/commons/el/)
-License: The Apache Software License, Version 2.0 - /LICENSE.txt
+Project URL: http://jaxb.java.net/
+License: CDDL 1.1 - http://glassfish.java.net/public/CDDL+GPL_1_1.html
 
----
+--------------------------------------------------------------------------------
 
-Group: commons-io Name: commons-io Version: 2.16.1
-Project URL: [https://commons.apache.org/proper/commons-io/](https://commons.apache.org/proper/commons-io/)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Commons Beanutils.
 
----
+Project URL: https://commons.apache.org/proper/commons-beanutils/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: commons-lang Name: commons-lang Version: 2.6
-Project URL: [http://commons.apache.org/lang/](http://commons.apache.org/lang/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons CLI.
 
-Group: commons-logging Name: commons-logging Version: 1.3.0
-Project URL: [https://commons.apache.org/proper/commons-logging/](https://commons.apache.org/proper/commons-logging/)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://commons.apache.org/proper/commons-cli/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: commons-net Name: commons-net Version: 3.9.0
-Project URL: [https://commons.apache.org/proper/commons-net/](https://commons.apache.org/proper/commons-net/)
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artfiact bundles Apache Commons Codec.
+Project URL: https://commons.apache.org/proper/commons-codec/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: commons-pool Name: commons-pool Version: 1.5.4
-Project URL: [http://commons.apache.org/pool/](http://commons.apache.org/pool/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Commons Collections.
 
----
+Project URL: http://commons.apache.org/collections/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: dev.failsafe Name: failsafe Version: 3.3.2
-Project URL: N/A
-License: Apache License, Version 2.0 - [http://apache.org/licenses/LICENSE-2.0](http://apache.org/licenses/LICENSE-2.0)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons DBCP.
 
-Group: dnsjava Name: dnsjava Version: 3.6.1
-Project URL: [https://javadoc.io/doc/dnsjava/dnsjava](https://javadoc.io/doc/dnsjava/dnsjava), [https://github.com/dnsjava/dnsjava](https://github.com/dnsjava/dnsjava)
-License: BSD-3-Clause - [https://opensource.org/licenses/BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause)
+Project URL: http://commons.apache.org/dbcp/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: info.picocli Name: picocli Version: 4.7.6
-Project URL: [https://picocli.info](https://picocli.info)
-License: The Apache Software License, version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Commons EL.
 
----
+Project URL: http://jakarta.apache.org/commons/el/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: io.airlift Name: aircompressor Version: 0.27
-Project URL: [https://github.com/airlift/aircompressor](https://github.com/airlift/aircompressor)
-License: Apache License 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.html](https://www.apache.org/licenses/LICENSE-2.0.html)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons IO.
 
-Group: io.dropwizard.metrics Name: metrics-core Version: 3.2.4
-Group: io.dropwizard.metrics Name: metrics-json Version: 3.1.0
-Group: io.dropwizard.metrics Name: metrics-jvm Version: 3.1.0
-Project URL: N/A
-License: Apache License 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.html](http://www.apache.org/licenses/LICENSE-2.0.html)
+Project URL: https://commons.apache.org/proper/commons-io/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: io.netty Name: netty-all Version: 4.1.100.Final
-Group: io.netty Name: netty-buffer Version: 4.1.124.Final
-Group: io.netty Name: netty-codec Version: 4.1.124.Final
-Group: io.netty Name: netty-codec-dns Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-haproxy Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-http Version: 4.1.124.Final
-Group: io.netty Name: netty-codec-http2 Version: 4.1.124.Final
-Group: io.netty Name: netty-codec-memcache Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-mqtt Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-redis Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-smtp Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-socks Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-stomp Version: 4.1.100.Final
-Group: io.netty Name: netty-codec-xml Version: 4.1.100.Final
-Group: io.netty Name: netty-common Version: 4.1.124.Final
-Group: io.netty Name: netty-handler Version: 4.1.124.Final
-Group: io.netty Name: netty-handler-proxy Version: 4.1.100.Final
-Group: io.netty Name: netty-handler-ssl-ocsp Version: 4.1.100.Final
-Group: io.netty Name: netty-resolver Version: 4.1.124.Final
-Group: io.netty Name: netty-resolver-dns Version: 4.1.100.Final
-Group: io.netty Name: netty-resolver-dns-classes-macos Version: 4.1.100.Final
-Group: io.netty Name: netty-resolver-dns-native-macos Version: 4.1.100.Final
-Group: io.netty Name: netty-transport Version: 4.1.124.Final
-Group: io.netty Name: netty-transport-classes-epoll Version: 4.1.124.Final
-Group: io.netty Name: netty-transport-classes-kqueue Version: 4.1.100.Final
-Group: io.netty Name: netty-transport-native-epoll Version: 4.1.105.Final
-Group: io.netty Name: netty-transport-native-kqueue Version: 4.1.100.Final
-Group: io.netty Name: netty-transport-native-unix-common Version: 4.1.124.Final
-Group: io.netty Name: netty-transport-rxtx Version: 4.1.100.Final
-Group: io.netty Name: netty-transport-sctp Version: 4.1.100.Final
-Group: io.netty Name: netty-transport-udt Version: 4.1.100.Final
-Project URL: [https://netty.io/netty-all/](https://netty.io/netty-all/), [https://netty.io/](https://netty.io/)
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+This artifact bundles Apache Commons Lang.
 
----
+Project URL: https://commons.apache.org/proper/commons-lang/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: jakarta.activation Name: jakarta.activation-api Version: 1.2.2
-Project URL: [https://www.eclipse.org](https://www.eclipse.org)
-License: EDL 1.0 - [http://www.eclipse.org/org/documents/edl-v10.php](http://www.eclipse.org/org/documents/edl-v10.php) (Selecting first listed permissive license)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons Logging.
 
-Group: javax.annotation Name: javax.annotation-api Version: 1.3.2
-Project URL: [https://javaee.github.io/glassfish](https://javaee.github.io/glassfish), [http://jcp.org/en/jsr/detail?id=250](http://jcp.org/en/jsr/detail?id=250)
-License: CDDL + GPLv2 with classpath exception - [https://github.com/javaee/javax.annotation/blob/master/LICENSE](https://github.com/javaee/javax.annotation/blob/master/LICENSE)
+Project URL: https://commons.apache.org/proper/commons-logging/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: javax.inject Name: javax.inject Version: 1
-Project URL: [http://code.google.com/p/atinject/](http://code.google.com/p/atinject/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Commons Net.
 
----
+Project URL: https://commons.apache.org/proper/commons-net/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: javax.jdo Name: jdo-api Version: 3.0.1
-Project URL: [http://db.apache.org/jdo](http://db.apache.org/jdo)
-License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons Pool.
 
-Group: javax.servlet Name: javax.servlet-api Version: 3.1.0
-Project URL: [https://glassfish.dev.java.net](https://glassfish.dev.java.net), [http://servlet-spec.java.net](http://servlet-spec.java.net)
-License: CDDL + GPLv2 with classpath exception - [https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html](https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html)
+Project URL: http://commons.apache.org/pool/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+
+This artifact bundles Failsafe.
+
+Project URL: https://github.com/failsafe-lib/failsafe
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles dnsjava.
+
+Project URL: https://github.com/dnsjava/dnsjava
+License: BSD-3-Clause
+| Copyright (c) 1998-2019, Brian Wellington
+| Copyright (c) 2005 VeriSign. All rights reserved.
+| Copyright (c) 2019-2023, dnsjava authors
+| 
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+| 1. Redistributions of source code must retain the above copyright notice, this
+|    list of conditions and the following disclaimer.
+| 
+| 2. Redistributions in binary form must reproduce the above copyright notice,
+|    this list of conditions and the following disclaimer in the documentation
+|    and/or other materials provided with the distribution.
+| 
+| 3. Neither the name of the copyright holder nor the names of its
+|    contributors may be used to endorse or promote products derived from
+|    this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+| AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+| IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+| DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+| FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+| DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+| SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+| CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+| OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Picocli.
+
+Project URL: https://picocli.info
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Airlift Aircompressor.
+
+Project URL: https://github.com/airlift/aircompressor
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Dropwizard.
+
+Project URL: https://github.com/dropwizard/dropwizard
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles The Netty Project.
+
+Project URL: https://netty.io/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles jakarta.activation-api.
+
+Project URL: https://jakarta.ee/specifications/activation
+License: EDL 1.0 - http://www.eclipse.org/org/documents/edl-v10.php
+
+--------------------------------------------------------------------------------
+
+This artifact bundles javax.annotation.
+
+Project URL: https://javaee.github.io/glassfish
+License: CDDL 1.1 - https://github.com/javaee/javax.annotation/blob/master/LICENSE
+
+--------------------------------------------------------------------------------
+
+This artifact bundles javax.inject.
+
+Project URL: http://code.google.com/p/atinject/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles javax.jdo.
+
+Project URL: http://db.apache.org/jdo
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles javax.servlet-api.
+
+Project URL: https://jcp.org/en/jsr/detail?id=315
+License: CDDL 1.1 - http://glassfish.java.net/public/CDDL+GPL_1_1.html
+
+--------------------------------------------------------------------------------
 
 Group: javax.servlet Name: jsp-api Version: 2.0
 Project URL: N/A
 License: No license information found
 
----
+--------------------------------------------------------------------------------
 
 Group: javax.servlet Name: servlet-api Version: 2.4
 Project URL: N/A
 License: No license information found
 
----
+--------------------------------------------------------------------------------
 
 Group: javax.servlet.jsp Name: jsp-api Version: 2.1
 Project URL: N/A
 License: No license information found
 
----
+--------------------------------------------------------------------------------
 
-Group: javax.transaction Name: jta Version: 1.1
-Project URL: [http://java.sun.com/products/jta](http://java.sun.com/products/jta)
-License: No license information found
+This artifact bundles javax.transaction.
 
----
+Project URL: http://java.sun.com/products/jta
+License: CDDL 1.1 - http://glassfish.java.net/public/CDDL+GPL_1_1.html
 
-Group: javax.ws.rs Name: jsr311-api Version: 1.1.1
-Project URL: [https://jsr311.dev.java.net](https://jsr311.dev.java.net)
-License: CDDL License - [http://www.opensource.org/licenses/cddl1.php](http://www.opensource.org/licenses/cddl1.php)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles JSR311 API.
+
+Project URL: https://jsr311.dev.java.net
+License: CDDL 1.1 - http://glassfish.java.net/public/CDDL+GPL_1_1.html
+
+--------------------------------------------------------------------------------
 
 Group: javax.xml.bind Name: jaxb-api Version: 2.2.12
 Project URL: [http://www.oracle.com/](http://www.oracle.com/), [http://jaxb.java.net/](http://jaxb.java.net/)
 License: CDDL 1.1 - [https://glassfish.java.net/public/CDDL+GPL_1_1.html](https://glassfish.java.net/public/CDDL+GPL_1_1.html) (Selecting CDDL as per instruction)
 
----
+--------------------------------------------------------------------------------
 
-Group: javolution Name: javolution Version: 5.5.1
-Project URL: [http://javolution.org](http://javolution.org)
-License: BSD License - [http://javolution.org/LICENSE.txt](http://javolution.org/LICENSE.txt)
+This artifact bundles Javolution.
 
----
+Project URL: http://javolution.org
+License: BSD License
+| Javolution - Java(tm) Solution for Real-Time and Embedded Systems
+| Copyright (c) 2012, Javolution (http://javolution.org/)
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+|    1. Redistributions of source code must retain the above copyright
+|       notice, this list of conditions and the following disclaimer.
+| 
+|    2. Redistributions in binary form must reproduce the above copyright
+|       notice, this list of conditions and the following disclaimer in the
+|       documentation and/or other materials provided with the distribution.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+| CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+| EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+| PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+| PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+| LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+| NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+| SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Group: jline Name: jline Version: 2.12
-Project URL: N/A
-License: The BSD License - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles JLine.
 
-Group: joda-time Name: joda-time Version: 2.8.1
-Project URL: [http://www.joda.org/joda-time/](http://www.joda.org/joda-time/)
-License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://github.com/jline/jline3
+License: BSD 3-Clause
+| Copyright (c) 2002-2023, the original author or authors.
+| All rights reserved.
+| 
+| https://opensource.org/licenses/BSD-3-Clause
+| 
+| Redistribution and use in source and binary forms, with or
+| without modification, are permitted provided that the following
+| conditions are met:
+| 
+| Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+| 
+| Redistributions in binary form must reproduce the above copyright
+| notice, this list of conditions and the following disclaimer
+| in the documentation and/or other materials provided with
+| the distribution.
+| 
+| Neither the name of JLine nor the names of its contributors
+| may be used to endorse or promote products derived from this
+| software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+| BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+| AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+| EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+| FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+| OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+| PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+| AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+| LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+| IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+| OF THE POSSIBILITY OF SUCH DAMAGE.
 
----
+--------------------------------------------------------------------------------
 
-Group: log4j Name: log4j Version: 1.2.17
-Project URL: [http://logging.apache.org/log4j/1.2/](http://logging.apache.org/log4j/1.2/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Joda Time.
 
----
+Project URL: http://www.joda.org/joda-time/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: net.hydromatic Name: aggdesigner-algorithm Version: 6.0
-Project URL: N/A
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Log4j.
+Project URL: http://logging.apache.org/log4j/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: net.hydromatic Name: eigenbase-properties Version: 1.1.5
-Project URL: [http://www.hydromatic.net](http://www.hydromatic.net), [http://github.com/julianhyde/eigenbase-properties](http://github.com/julianhyde/eigenbase-properties)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Eigenbase Properties.
 
-Group: net.sf.opencsv Name: opencsv Version: 2.3
-Project URL: [http://opencsv.sf.net](http://opencsv.sf.net)
-License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: http://github.com/julianhyde/eigenbase-properties
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.antlr Name: ST4 Version: 4.0.4
-Group: org.antlr Name: antlr-runtime Version: 3.5.2
-Project URL: [http://www.stringtemplate.org](http://www.stringtemplate.org), [http://www.antlr.org](http://www.antlr.org)
-License: BSD licence - [http://antlr.org/license.html](http://antlr.org/license.html)
+This artifact bundles OpenCSV.
 
----
+Project URL: http://opencsv.sf.net
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.ant Name: ant Version: 1.9.1
-Group: org.apache.ant Name: ant-launcher Version: 1.9.1
-Project URL: [http://ant.apache.org/](http://ant.apache.org/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles StringTemplate.
 
-Group: org.apache.avro Name: avro Version: 1.12.0
-Project URL: [https://www.apache.org/](https://www.apache.org/), [https://avro.apache.org](https://avro.apache.org)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: http://www.stringtemplate.org
+License: BSD licence
+| [The "BSD license"]
+| Copyright (c) 2011-2022 Terence Parr
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions
+| are met:
+| 
+|  1. Redistributions of source code must retain the above copyright
+|     notice, this list of conditions and the following disclaimer.
+|  2. Redistributions in binary form must reproduce the above copyright
+|     notice, this list of conditions and the following disclaimer in the
+|     documentation and/or other materials provided with the distribution.
+|  3. The name of the author may not be used to endorse or promote products
+|     derived from this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+| IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+| OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+| IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+| INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+| NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+| THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.commons Name: commons-compress Version: 1.26.2
-Project URL: [https://commons.apache.org/proper/commons-compress/](https://commons.apache.org/proper/commons-compress/)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Antlr.
 
----
+Project URL: https://github.com/antlr/antlr4
+License: BSD 3-Clause
+| Copyright (c) 2012-2022 The ANTLR Project. All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions
+| are met:
+| 
+| 1. Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+| 
+| 2. Redistributions in binary form must reproduce the above copyright
+| notice, this list of conditions and the following disclaimer in the
+| documentation and/or other materials provided with the distribution.
+| 
+| 3. Neither name of copyright holders nor the names of its contributors
+| may be used to endorse or promote products derived from this software
+| without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
+| CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+| EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+| PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+| PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+| LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+| NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+| SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Group: org.apache.commons Name: commons-configuration2 Version: 2.10.1
-Project URL: [https://commons.apache.org/proper/commons-configuration/](https://commons.apache.org/proper/commons-configuration/)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Avro.
 
-Group: org.apache.commons Name: commons-lang3 Version: 3.14.0
-Project URL: [https://commons.apache.org/proper/commons-lang/](https://commons.apache.org/proper/commons-lang/)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://avro.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.commons Name: commons-math3 Version: 3.6.1
-Project URL: [http://commons.apache.org/proper/commons-math/](http://commons.apache.org/proper/commons-math/)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Commons Compress.
 
----
+Project URL: https://commons.apache.org/proper/commons-compress/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.commons Name: commons-text Version: 1.11.0
-Project URL: [https://commons.apache.org/proper/commons-text](https://commons.apache.org/proper/commons-text)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons Configuration2.
 
-Group: org.apache.curator Name: apache-curator Version: 2.7.1
-Group: org.apache.curator Name: curator-client Version: 5.2.0
-Group: org.apache.curator Name: curator-framework Version: 5.2.0
-Group: org.apache.curator Name: curator-recipes Version: 5.2.0
-Project URL: [http://curator.apache.org](http://curator.apache.org), [http://www.apache.org/](http://www.apache.org/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://commons.apache.org/proper/commons-configuration/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.derby Name: derby Version: 10.14.2.0
-Project URL: [http://db.apache.org/derby/](http://db.apache.org/derby/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Commons Math.
 
----
+Project URL: http://commons.apache.org/proper/commons-math/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.hadoop Name: hadoop-annotations Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-auth Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-aws Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-common Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-hdfs-client Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-mapreduce-client-core Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-yarn-api Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-yarn-client Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-yarn-common Version: 3.4.1
-Group: org.apache.hadoop Name: hadoop-yarn-server-applicationhistoryservice Version: 2.7.2
-Group: org.apache.hadoop Name: hadoop-yarn-server-common Version: 2.7.2
-Group: org.apache.hadoop Name: hadoop-yarn-server-resourcemanager Version: 2.7.2
-Group: org.apache.hadoop Name: hadoop-yarn-server-web-proxy Version: 2.7.2
-Group: org.apache.hadoop.thirdparty Name: hadoop-shaded-guava Version: 1.3.0
-Group: org.apache.hadoop.thirdparty Name: hadoop-shaded-protobuf_3_25 Version: 1.3.0
-Project URL: N/A
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Commons Text.
 
-Group: org.apache.hive Name: hive-common Version: 2.3.10
-Group: org.apache.hive Name: hive-exec Version: 2.3.10
-Group: org.apache.hive Name: hive-metastore Version: 2.3.10
-Group: org.apache.hive Name: hive-serde Version: 2.3.10
-Group: org.apache.hive Name: hive-service-rpc Version: 2.3.10
-Group: org.apache.hive Name: hive-shims Version: 2.3.10
-Group: org.apache.hive Name: hive-vector-code-gen Version: 2.3.10
-Group: org.apache.hive.shims Name: hive-shims-0.23 Version: 2.3.10
-Group: org.apache.hive.shims Name: hive-shims-common Version: 2.3.10
-Group: org.apache.hive.shims Name: hive-shims-scheduler Version: 2.3.10
-Project URL: N/A
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://commons.apache.org/proper/commons-text
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.hive Name: hive-storage-api Version: 2.4.0
-Project URL: N/A
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artfifact bundles Apache Curator.
 
----
+Project URL: https://curator.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.httpcomponents Name: httpclient Version: 4.5.13
-Group: org.apache.httpcomponents Name: httpcore Version: 4.4.16
-Group: org.apache.httpcomponents.client5 Name: httpclient5 Version: 5.5
-Group: org.apache.httpcomponents.core5 Name: httpcore5 Version: 5.3.4
-Group: org.apache.httpcomponents.core5 Name: httpcore5-h2 Version: 5.3.4
-Project URL: [http://hc.apache.org/httpcomponents-client](http://hc.apache.org/httpcomponents-client), [http://hc.apache.org/httpcomponents-core-ga](http://hc.apache.org/httpcomponents-core-ga)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Derby.
 
-Group: org.apache.iceberg Name: iceberg-api Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-aws Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-azure Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-bundled-guava Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-common Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-core Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-dell Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-gcp Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-hive-metastore Version: 1.10.0
-Group: org.apache.iceberg Name: iceberg-nessie Version: 1.10.0
-Project URL: [https://iceberg.apache.org](https://iceberg.apache.org)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: http://db.apache.org/derby/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.ivy Name: ivy Version: 2.4.0
-Project URL: [http://ant.apache.org/ivy/](http://ant.apache.org/ivy/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Hadoop.
 
----
+Project URL: httsp://hadoop.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.kerby Name: kerb-core Version: 2.0.3
-Group: org.apache.kerby Name: kerb-crypto Version: 2.0.3
-Group: org.apache.kerby Name: kerb-util Version: 2.0.3
-Group: org.apache.kerby Name: kerby-asn1 Version: 2.0.3
-Group: org.apache.kerby Name: kerby-config Version: 2.0.3
-Group: org.apache.kerby Name: kerby-pkix Version: 2.0.3
-Group: org.apache.kerby Name: kerby-util Version: 2.0.3
-Project URL: N/A
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Hive.
 
-Group: org.apache.orc Name: orc-core Version: 1.3.4
-Project URL: N/A
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://hive.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.thrift Name: libfb303 Version: 0.9.3
-Group: org.apache.thrift Name: libthrift Version: 0.14.1
-Project URL: [http://thrift.apache.org](http://thrift.apache.org)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache HttpComponent and HttpClient.
 
----
+Project URL: http://hc.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.tomcat Name: tomcat-annotations-api Version: 8.5.46
-Group: org.apache.tomcat.embed Name: tomcat-embed-core Version: 8.5.46
-Project URL: [https://tomcat.apache.org/](https://tomcat.apache.org/)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artiifact bundles Apache Iceberg.
 
-Group: org.apache.velocity Name: velocity Version: 1.5
-Project URL: [http://velocity.apache.org/engine/releases/velocity-1.5/](http://velocity.apache.org/engine/releases/velocity-1.5/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://iceberg.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.apache.yetus Name: audience-annotations Version: 0.12.0
-Project URL: N/A
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache Ivy.
 
----
+Project URL: https://ant.apache.org/ivy/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.apache.zookeeper Name: zookeeper Version: 3.8.4
-Group: org.apache.zookeeper Name: zookeeper-jute Version: 3.8.4
-Project URL: N/A
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Apache Kerby.
 
+Project URL: https://directory.apache.org/kerby/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache ORC.
+
+Project URL: https://orc.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Thrift.
+
+Project URL: http://thrift.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Velocity.
+
+Project URL: http://velocity.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Yetus.
+
+Project URL: https://yetus.apache.org/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Zookeeper.
+
+Project URL: https://zookeeper.apache.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles bouncycastle.
 Group: org.bouncycastle Name: bcprov-jdk18on Version: 1.78.1
-Project URL: [https://www.bouncycastle.org/java.html](https://www.bouncycastle.org/java.html)
-License: Bouncy Castle Licence - [https://www.bouncycastle.org/licence.html](https://www.bouncycastle.org/licence.html)
+Project URL: https://www.bouncycastle.org/java.html
+License: MIT License
+| Please note the Bouncy Caste License should be read in the same way as the MIT license.
+| 
+| Please also note this licensing model is made possible through funding from donations and the sale of support contracts.
+| 
+| Bouncy Castle License
+| Copyright (c) 2000 - 2024 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
+| 
+| Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+| 
+| The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+| 
+| Third party licenses
+| The OpenPGP library and the MLS library both make use of additional open source code:
+| 
+| openpgp - includes modified BZIP2 library which is licensed under the Apache Software License, Version 2.0.
+| MLS - The MLS Client makes use of io.grpc licensed under Apache Software License, Version 2.0, and com.google.protobuf which is licensed under the 3-Clause BSD License.
 
----
+--------------------------------------------------------------------------------
 
-Group: org.checkerframework Name: checker-qual Version: 3.43.0
-Project URL: [https://checkerframework.org/](https://checkerframework.org/)
-License: The MIT License - [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
+This artifact bundles checker-qual.
 
----
+Project URL: https://checkerframework.org/
+License: The MIT License
+| Permission is hereby granted, free of charge, to any person obtaining a copy
+| of this software and associated documentation files (the "Software"), to deal
+| in the Software without restriction, including without limitation the rights
+| to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+| copies of the Software, and to permit persons to whom the Software is
+| furnished to do so, subject to the following conditions:
+| 
+| The above copyright notice and this permission notice shall be included in
+| all copies or substantial portions of the Software.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+| IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+| FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+| AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+| LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+| OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+| THE SOFTWARE.
 
-Group: org.codehaus.groovy Name: groovy-all Version: 2.4.4
-Project URL: [http://groovy-lang.org](http://groovy-lang.org)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Groovy.
 
-Group: org.codehaus.jackson Name: jackson-core-asl Version: 1.8.3
-Group: org.codehaus.jackson Name: jackson-mapper-asl Version: 1.8.3
-Project URL: [http://jackson.codehaus.org](http://jackson.codehaus.org)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: http://groovy-lang.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: org.codehaus.jackson Name: jackson-jaxrs Version: 1.8.3
-Group: org.codehaus.jackson Name: jackson-xc Version: 1.8.3
-Project URL: [http://jackson.codehaus.org](http://jackson.codehaus.org)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt) (Selecting Apache over LGPL 2.1)
+This artifact bundles Jackson JSON Parser.
 
----
+Project URL: http://jackson.codehaus.org
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.codehaus.janino Name: commons-compiler Version: 2.7.6
-Group: org.codehaus.janino Name: janino Version: 2.7.6
-Project URL: N/A
-License: New BSD License - [http://dist.codehaus.org/janino/new_bsd_license.txt](http://dist.codehaus.org/janino/new_bsd_license.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Janino.
 
-Group: org.codehaus.jettison Name: jettison Version: 1.5.4
-Project URL: [https://github.com/jettison-json/jettison](https://github.com/jettison-json/jettison)
-License: Apache License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+Project URL: https://www.janino.net/
+License: BSD License
+| Janino - An embedded Java[TM] compiler
+| 
+| Copyright (c) 2001-2016, Arno Unkrig
+| Copyright (c) 2015-2016  TIBCO Software Inc.
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions
+| are met:
+| 
+|    1. Redistributions of source code must retain the above copyright
+|       notice, this list of conditions and the following disclaimer.
+|    2. Redistributions in binary form must reproduce the above
+|       copyright notice, this list of conditions and the following
+|       disclaimer in the documentation and/or other materials
+|       provided with the distribution.
+|    3. Neither the name of JANINO nor the names of its contributors
+|       may be used to endorse or promote products derived from this
+|       software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+| AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+| IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+| ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+| LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+| CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+| SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+| INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+| IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+| OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+| IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
----
+--------------------------------------------------------------------------------
 
-Group: org.codehaus.woodstox Name: stax2-api Version: 4.2.1
-Project URL: [http://github.com/FasterXML/stax2-api](http://github.com/FasterXML/stax2-api)
-License: The BSD License - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
+This artifact bundles Jettison.
 
----
+Project URL: https://github.com/jettison-json/jettison
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.datanucleus Name: datanucleus-api-jdo Version: 4.2.4
-Group: org.datanucleus Name: datanucleus-core Version: 4.1.17
-Group: org.datanucleus Name: datanucleus-rdbms Version: 4.1.19
-Group: org.datanucleus Name: javax.jdo Version: 3.2.0-m3
-Project URL: N/A
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Stax2 API.
 
-Group: org.eclipse.jetty Name: jetty-client Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-http Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-io Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-security Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-server Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-servlet Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-util Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-util-ajax Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-webapp Version: 9.4.53.v20231009
-Group: org.eclipse.jetty Name: jetty-xml Version: 9.4.53.v20231009
-Group: org.eclipse.jetty.websocket Name: websocket-api Version: 9.4.53.v20231009
-Group: org.eclipse.jetty.websocket Name: websocket-client Version: 9.4.53.v20231009
-Group: org.eclipse.jetty.websocket Name: websocket-common Version: 9.4.53.v20231009
-Project URL: [https://eclipse.org/jetty](https://eclipse.org/jetty)
-License: Eclipse Public License - Version 1.0 - [https://www.eclipse.org/org/documents/epl-v10.php](https://www.eclipse.org/org/documents/epl-v10.php)
+Project URL: http://github.com/FasterXML/stax2-api
+License: BSD 2-Clause
+| BSD 2-Clause License
+| 
+| Copyright (c) 2008+, FasterXML, LLC
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+| * Redistributions of source code must retain the above copyright notice, this
+|   list of conditions and the following disclaimer.
+| 
+| * Redistributions in binary form must reproduce the above copyright notice,
+|   this list of conditions and the following disclaimer in the documentation
+|   and/or other materials provided with the distribution.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+| AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+| IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+| DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+| FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+| DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+| SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+| CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+| OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
----
+--------------------------------------------------------------------------------
 
-Group: org.eclipse.microprofile.openapi Name: microprofile-openapi-api Version: 4.1
-Project URL: [http://microprofile.io/microprofile-openapi-parent/microprofile-openapi-api](http://microprofile.io/microprofile-openapi-parent/microprofile-openapi-api)
-License: Apache License, Version 2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles DataNucleaus.
 
----
+Project URL: https://www.datanucleus.org/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.fusesource.leveldbjni Name: leveldbjni-all Version: 1.8
-Project URL: [http://fusesource.com/](http://fusesource.com/)
-License: The BSD 3-Clause License - [http://www.opensource.org/licenses/BSD-3-Clause](http://www.opensource.org/licenses/BSD-3-Clause)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Eclipse Jetty.
 
-Group: org.jline Name: jline Version: 3.9.0
-Project URL: N/A
-License: The BSD License - [http://www.opensource.org/licenses/bsd-license.php](http://www.opensource.org/licenses/bsd-license.php)
+Project URL: https://eclipse.org/jetty
+License: Eclipse Public License - Version 1.0 - https://www.eclipse.org/org/documents/epl-v10.php
 
----
+--------------------------------------------------------------------------------
 
-Group: org.mortbay.jetty Name: jetty Version: 6.1.26
-Group: org.mortbay.jetty Name: jetty-util Version: 6.1.26
-Project URL: [http://jetty.mortbay.org](http://jetty.mortbay.org)
-License: Eclipse Public License - Version 1.0 - [http://www.eclipse.org/org/documents/epl-v10.php](http://www.eclipse.org/org/documents/epl-v10.php)
+This artifact bundles Eclipse Microprofile OpenAPI.
 
----
+Project URL: http://microprofile.io/microprofile-openapi-parent/microprofile-openapi-api
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.projectnessie.nessie Name: nessie-client Version: 0.104.5
-Group: org.projectnessie.nessie Name: nessie-model Version: 0.104.5
-Project URL: [https://github.com/projectnessie/nessie](https://github.com/projectnessie/nessie)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.txt](https://www.apache.org/licenses/LICENSE-2.0.txt)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Fusesource LevelDBJNI.
 
-Group: org.reactivestreams Name: reactive-streams Version: 1.0.4
-Project URL: [http://www.reactive-streams.org/](http://www.reactive-streams.org/)
-License: MIT-0 - [https://spdx.org/licenses/MIT-0.html](https://spdx.org/licenses/MIT-0.html)
+Project URL: https://github.com/fusesource/leveldbjni
+License: BSD 3-Clause
+| Copyright (c) 2011 FuseSource Corp. All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|    * Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+|    * Redistributions in binary form must reproduce the above
+| copyright notice, this list of conditions and the following disclaimer
+| in the documentation and/or other materials provided with the
+| distribution.
+|    * Neither the name of FuseSource Corp. nor the names of its
+| contributors may be used to endorse or promote products derived from
+| this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
----
+--------------------------------------------------------------------------------
 
-Group: org.roaringbitmap Name: RoaringBitmap Version: 1.3.0
-Project URL: [https://github.com/RoaringBitmap/RoaringBitmap](https://github.com/RoaringBitmap/RoaringBitmap)
-License: Apache 2 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Project Nessie.
 
----
+Project URL: https://github.com/projectnessie/nessie
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.slf4j Name: log4j-over-slf4j Version: 1.7.36
-Project URL: [http://www.slf4j.org](http://www.slf4j.org)
-License: MIT License - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Reactive Streams.
 
-Group: org.slf4j Name: slf4j-api Version: 2.0.17
-Group: org.slf4j Name: slf4j-reload4j Version: 1.7.36
-Project URL: [http://www.slf4j.org](http://www.slf4j.org), [http://reload4j.qos.ch](http://reload4j.qos.ch)
-License: MIT - [https://opensource.org/license/mit](https://opensource.org/license/mit)
+Project URL: http://www.reactive-streams.org/
+License: MIT
+| MIT No Attribution
+| 
+| Copyright 2014 Reactive Streams
+| 
+| Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
----
+--------------------------------------------------------------------------------
 
-Group: org.wildfly.openssl Name: wildfly-openssl Version: 1.1.3.Final
-Project URL: N/A
-License: Public Domain - [http://repository.jboss.org/licenses/cc0-1.0.txt](http://repository.jboss.org/licenses/cc0-1.0.txt)
+This artifact bundles RoaringBitmap.
 
----
+Project URL: https://github.com/RoaringBitmap/RoaringBitmap
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: org.xerial.snappy Name: snappy-java Version: 1.1.10.4
-Project URL: [https://github.com/xerial/snappy-java](https://github.com/xerial/snappy-java)
-License: Apache-2.0 - [https://www.apache.org/licenses/LICENSE-2.0.html](https://www.apache.org/licenses/LICENSE-2.0.html)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles slf4j.
 
-Group: oro Name: oro Version: 2.0.8
-Project URL: N/A
-License: No license information found (License file located at: oro-2.0.8.jar/META-INF/LICENSE)
+Project URL: http://www.slf4j.org
+License: MIT License
+| Copyright (c) 2004-2022 QOS.ch Sarl (Switzerland)
+| All rights reserved.
+| 
+| Permission is hereby granted, free  of charge, to any person obtaining
+| a  copy  of this  software  and  associated  documentation files  (the
+| "Software"), to  deal in  the Software without  restriction, including
+| without limitation  the rights to  use, copy, modify,  merge, publish,
+| distribute,  sublicense, and/or sell  copies of  the Software,  and to
+| permit persons to whom the Software  is furnished to do so, subject to
+| the following conditions:
+| 
+| The  above  copyright  notice  and  this permission  notice  shall  be
+| included in all copies or substantial portions of the Software.
+| 
+| THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
+| EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
+| MERCHANTABILITY,    FITNESS    FOR    A   PARTICULAR    PURPOSE    AND
+| NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+| LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+| OF CONTRACT, TORT OR OTHERWISE,  ARISING FROM, OUT OF OR IN CONNECTION
+| WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
----
+--------------------------------------------------------------------------------
 
-Group: software.amazon.awssdk Name: annotations Version: 2.33.0
-Group: software.amazon.awssdk Name: apache-client Version: 2.33.0
-Group: software.amazon.awssdk Name: arns Version: 2.33.0
-Group: software.amazon.awssdk Name: auth Version: 2.33.0
-Group: software.amazon.awssdk Name: aws-core Version: 2.33.0
-Group: software.amazon.awssdk Name: aws-json-protocol Version: 2.33.0
-Group: software.amazon.awssdk Name: aws-query-protocol Version: 2.33.0
-Group: software.amazon.awssdk Name: aws-xml-protocol Version: 2.33.0
-Group: software.amazon.awssdk Name: bundle Version: 2.24.6
-Group: software.amazon.awssdk Name: checksums Version: 2.33.0
-Group: software.amazon.awssdk Name: checksums-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: crt-core Version: 2.33.0
-Group: software.amazon.awssdk Name: dynamodb Version: 2.33.0
-Group: software.amazon.awssdk Name: endpoints-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: glue Version: 2.33.0
-Group: software.amazon.awssdk Name: http-auth Version: 2.33.0
-Group: software.amazon.awssdk Name: http-auth-aws Version: 2.33.0
-Group: software.amazon.awssdk Name: http-auth-aws-eventstream Version: 2.33.0
-Group: software.amazon.awssdk Name: http-auth-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: http-client-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: identity-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: json-utils Version: 2.33.0
-Group: software.amazon.awssdk Name: kms Version: 2.33.0
-Group: software.amazon.awssdk Name: lakeformation Version: 2.33.0
-Group: software.amazon.awssdk Name: metrics-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: netty-nio-client Version: 2.33.0
-Group: software.amazon.awssdk Name: profiles Version: 2.33.0
-Group: software.amazon.awssdk Name: protocol-core Version: 2.33.0
-Group: software.amazon.awssdk Name: regions Version: 2.33.0
-Group: software.amazon.awssdk Name: retries Version: 2.33.0
-Group: software.amazon.awssdk Name: retries-spi Version: 2.33.0
-Group: software.amazon.awssdk Name: s3 Version: 2.33.0
-Group: software.amazon.awssdk Name: sdk-core Version: 2.33.0
-Group: software.amazon.awssdk Name: sts Version: 2.33.0
-Group: software.amazon.awssdk Name: third-party-jackson-core Version: 2.33.0
-Group: software.amazon.awssdk Name: url-connection-client Version: 2.33.0
-Group: software.amazon.awssdk Name: utils Version: 2.33.0
-Project URL: [https://aws.amazon.com/sdkforjava](https://aws.amazon.com/sdkforjava)
-License: Apache License, Version 2.0 - [https://aws.amazon.com/apache2.0](https://aws.amazon.com/apache2.0)
+This artifact bundles Wildfly OpenSSL.
 
----
+Project URL: https://github.com/wildfly-security/wildfly-openssl
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Group: software.amazon.eventstream Name: eventstream Version: 1.0.1
-Project URL: [https://github.com/awslabs/aws-eventstream-java](https://github.com/awslabs/aws-eventstream-java)
-License: Apache License, Version 2.0 - [https://aws.amazon.com/apache2.0](https://aws.amazon.com/apache2.0)
+--------------------------------------------------------------------------------
 
----
+This artifact bundles Snappy Java.
 
-Group: stax Name: stax-api Version: 1.0.1
-Project URL: [http://stax.codehaus.org/](http://stax.codehaus.org/)
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Project URL: https://github.com/xerial/snappy-java
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
----
+--------------------------------------------------------------------------------
 
-Group: tomcat Name: jasper-compiler Version: 5.5.23
-Group: tomcat Name: jasper-runtime Version: 5.5.23
-Project URL: N/A
-License: The Apache Software License, Version 2.0 - [http://www.apache.org/licenses/LICENSE-2.0.txt](http://www.apache.org/licenses/LICENSE-2.0.txt)
+This artifact bundles Apache ORO.
+
+Project URL: https://jakarta.apache.org/oro/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Amazon AWS SDK.
+
+Project URL: https://aws.amazon.com/sdkforjava
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Stax API.
+
+Project URL: http://stax.codehaus.org/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Apache Tomcat.
+
+Project URL: https://tomcat.apache.org/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
