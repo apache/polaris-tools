@@ -62,7 +62,7 @@ def test_config_loading_precedence(tmp_path) -> None:
     )
     
     with (
-        mock.patch("polaris_mcp.server.create_server") as mock_create_server,
+        mock.patch("polaris_mcp.server.create_server"),
         mock.patch.dict(os.environ, {
             "POLARIS_CONFIG_FILE": str(config_file),
             "POLARIS_BASE_URL": "http://localhost:8181/",
