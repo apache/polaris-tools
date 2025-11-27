@@ -41,3 +41,6 @@ hs_err_pid*
 
 # macOS
 *.DS_Store
+
+# Development Experience
+application.conf
