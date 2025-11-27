@@ -24,6 +24,7 @@ import textwrap
 from unittest import mock
 from polaris_mcp import server
 
+
 def test_main_loads_dotenv() -> None:
     with (
         mock.patch("polaris_mcp.server.load_dotenv") as mock_load_dotenv,
@@ -31,26 +32,30 @@ def test_main_loads_dotenv() -> None:
         mock.patch.dict(os.environ, {}, clear=True),
     ):
         mock_server_instance = mock_create_server.return_value
-        
+
         server.main()
-        
+
         mock_load_dotenv.assert_called_once_with(dotenv_path=None)
         mock_create_server.assert_called_once()
         mock_server_instance.run.assert_called_once()
+
 
 def test_main_loads_custom_config_file() -> None:
     with (
         mock.patch("polaris_mcp.server.load_dotenv") as mock_load_dotenv,
         mock.patch("polaris_mcp.server.create_server") as mock_create_server,
-        mock.patch.dict(os.environ, {"POLARIS_CONFIG_FILE": "/path/to/config.env"}, clear=True),
+        mock.patch.dict(
+            os.environ, {"POLARIS_CONFIG_FILE": "/path/to/config.env"}, clear=True
+        ),
     ):
         mock_server_instance = mock_create_server.return_value
-        
+
         server.main()
-        
+
         mock_load_dotenv.assert_called_once_with(dotenv_path="/path/to/config.env")
         mock_create_server.assert_called_once()
         mock_server_instance.run.assert_called_once()
+
 
 def test_config_loading_precedence(tmp_path) -> None:
     config_file = tmp_path / "test_config.env"
@@ -60,16 +65,19 @@ def test_config_loading_precedence(tmp_path) -> None:
             POLARIS_CLIENT_ID=file-client-id
         """).strip()
     )
-    
+
     with (
         mock.patch("polaris_mcp.server.create_server"),
-        mock.patch.dict(os.environ, {
-            "POLARIS_CONFIG_FILE": str(config_file),
-            "POLARIS_BASE_URL": "http://localhost:8181/",
-        }, clear=True),
+        mock.patch.dict(
+            os.environ,
+            {
+                "POLARIS_CONFIG_FILE": str(config_file),
+                "POLARIS_BASE_URL": "http://localhost:8181/",
+            },
+            clear=True,
+        ),
     ):
         server.main()
         # Env vars take precedence over config file values
         assert os.environ["POLARIS_BASE_URL"] == "http://localhost:8181/"
         assert os.environ["POLARIS_CLIENT_ID"] == "file-client-id"
-
