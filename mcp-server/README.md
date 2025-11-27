@@ -53,10 +53,7 @@ For a `tools/call` invocation you will typically set environment variables such 
         "polaris-mcp"
       ],
       "env": {
-        "POLARIS_BASE_URL": "http://localhost:8181/",
-        "POLARIS_CLIENT_ID": "root",
-        "POLARIS_CLIENT_SECRET": "s3cr3t",
-        "POLARIS_TOKEN_SCOPE": "PRINCIPAL_ROLE:ALL"
+        "POLARIS_CONFIG_FILE": "/path/to/polaris-tools/mcp-server/.env"
       }
     }
   }
@@ -67,20 +64,23 @@ Please note: `--directory` specifies a local directory. It is not needed when we
 
 ## Configuration
 
-| Variable                                                       | Description                                                    | Default                                          |
-|----------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------|
-| `POLARIS_BASE_URL`                                             | Base URL for all Polaris REST calls.                           | `http://localhost:8181/`                         |
-| `POLARIS_API_TOKEN` / `POLARIS_BEARER_TOKEN` / `POLARIS_TOKEN` | Static bearer token (if supplied, overrides other auth).       | _unset_                                          |
-| `POLARIS_CLIENT_ID`                                            | OAuth client id for client-credential flow.                    | _unset_                                          |
-| `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                           | _unset_                                          |
-| `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                            | _unset_                                          |
-| `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                  | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
-| `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds. | `60.0`                                           |
-| `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.              | `30.0`                                           |
-| `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.          | `30.0`                                           |
-| `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                 | `30.0`                                           |
-| `POLARIS_HTTP_RETRIES_TOTAL`                                   | Total number of retries for HTTP requests.                     | `3`                                              |
-| `POLARIS_HTTP_RETRIES_BACKOFF_FACTOR`                          | Factor for exponential backoff between retries.                | `0.5`                                            |
+| Variable                                                       | Description                                                      | Default                                          |
+|----------------------------------------------------------------|------------------------------------------------------------------|--------------------------------------------------|
+| `POLARIS_BASE_URL`                                             | Base URL for all Polaris REST calls.                             | `http://localhost:8181/`                         |
+| `POLARIS_API_TOKEN` / `POLARIS_BEARER_TOKEN` / `POLARIS_TOKEN` | Static bearer token (if supplied, overrides other auth).         | _unset_                                          |
+| `POLARIS_CLIENT_ID`                                            | OAuth client id for client-credential flow.                      | _unset_                                          |
+| `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                             | _unset_                                          |
+| `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                              | _unset_                                          |
+| `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                    | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
+| `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds.   | `60.0`                                           |
+| `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.                | `30.0`                                           |
+| `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.            | `30.0`                                           |
+| `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                   | `30.0`                                           |
+| `POLARIS_HTTP_RETRIES_TOTAL`                                   | Total number of retries for HTTP requests.                       | `3`                                              |
+| `POLARIS_HTTP_RETRIES_BACKOFF_FACTOR`                          | Factor for exponential backoff between retries.                  | `0.5`                                            |
+| `POLARIS_CONFIG_FILE`                                          | Path to a configuration file containing configuration variables. | `.env` in current working directory              |
+
+**Note:** Environment variables always take precedence over values defined in the configuration file.
 
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
 

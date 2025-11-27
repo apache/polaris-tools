@@ -32,6 +32,7 @@ dependencies = [
     "fastmcp>=2.13.0.2",
     "urllib3>=1.25.3,<3.0.0",
     "python-json-logger>=4.0.0",
+    "python-dotenv>=1.2.1",
 ]
 
 [project.optional-dependencies]

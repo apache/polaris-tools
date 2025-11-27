@@ -32,6 +32,7 @@ from fastmcp import FastMCP
 from fastmcp.tools.tool import ToolResult as FastMcpToolResult
 from importlib import metadata
 from mcp.types import TextContent
+from dotenv import load_dotenv
 
 from polaris_mcp.authorization import (
     AuthorizationProvider,
@@ -540,6 +541,10 @@ def _resolve_package_version() -> str:
 
 def main() -> None:
     """Script entry point."""
+    # Load configuration from file if specified, otherwise look for .env
+    config_file = os.getenv("POLARIS_CONFIG_FILE")
+    load_dotenv(dotenv_path=config_file)
+
     logging.config.dictConfig(LOGGING_CONFIG)
     server = create_server()
     server.run()
