@@ -82,7 +82,7 @@ workload {
 }
 ```
 
-## Running the Benchmarks
+## Configuring the Benchmarks
 
 The benchmark uses [typesafe-config](https://github.com/lightbend/config) for configuration management. Default settings are in `src/gatling/resources/benchmark-defaults.conf`. This file should not be modified directly.
 
@@ -106,24 +106,31 @@ workload {
 }
 ```
 
+### Example of configuration for using AWS S3 as a catalog store
+
+```hocon
+dataset.tree {
+  default-base-location = "s3://polaris-demo/benchmarks"
+  storage-config-info = "{\"storageType\": \"S3\", \"roleArn\": \"arn:aws:iam::123456789012:role/polaris-demo-role\", \"allowedLocations\": [\"s3://polaris-demo/benchmarks\"], \"region\": \"eu-central-1\"}"
+}
+```
+
+## Running the Benchmarks
+
 Run benchmarks with your configuration:
 
 ```bash
 # Dataset creation
-./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDataset \
-  -Dconfig.file=./application.conf
+make create-dataset-simulation
 
 # Read/Update operations
-./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset \
-  -Dconfig.file=./application.conf
+make read-update-simulation
 
 # Read-only operations
-./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.ReadTreeDataset \
-  -Dconfig.file=./application.conf
+make read-simulation
 
 # Commits creation
-./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateCommits \
-  -Dconfig.file=./application.conf
+make create-commits-simulation
 ```
 
 A message will show the location of the Gatling report:
