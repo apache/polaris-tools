@@ -177,7 +177,7 @@ val shadowJar =
     // being excluded due to the exclude pattern matching used above.
     from("${projectDir}/BUNDLE-LICENSE") { rename { "LICENSE" } }
     from("${projectDir}/BUNDLE-NOTICE") { rename { "NOTICE" } }
-    from("${projectDIr}/../DISCLAIMER") { rename { "DISCLAIMER" } }
+    from("${projectDir}/../DISCLAIMER") { rename { "DISCLAIMER" } }
   }
 
 shadowJar { manifest { attributes["Main-Class"] = mainClassName } }
