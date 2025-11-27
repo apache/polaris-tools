@@ -1,0 +1,165 @@
+Apache Polaris (incubating)
+Copyright 2025 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+The initial code for the iceberg catalog migrator project was donated
+to the ASF by Dremio Corporation. (https://www.dremio.com/) copyright 2022.
+
+-------------------------------------------------------------------------
+
+This artifact bundles reload4j with the following in its NOTICE:
+| Apache log4j
+| Copyright 2007 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+
+-------------------------------------------------------------------------
+
+This artifact bundles Jackson JSON Parser with the following in its NOTICE:
+| # Jackson JSON processor
+| 
+| Jackson is a high-performance, Free/Open Source JSON processing library.
+| It was originally written by Tatu Saloranta (tatu.saloranta@iki.fi), and has
+| been in development since 2007.
+| It is currently developed by a community of developers.
+| 
+| ## Copyright
+| 
+| Copyright 2007-, Tatu Saloranta (tatu.saloranta@iki.fi)
+| 
+| ## Licensing
+| 
+| Jackson 2.x core and extension components are licensed under Apache License 2.0
+| To find the details that apply to this artifact see the accompanying LICENSE file.
+| 
+| ## Credits
+| 
+| A list of contributors may be found from CREDITS(-2.x) file, which is included
+| in some artifacts (usually source distributions); but is always available
+| from the source code management (SCM) system project uses.
+
+-------------------------------------------------------------------------
+
+This artifact bundles Joshelser Dropwizard Metrics Hadoop reporter with the followinig in its NOTICE:
+| Copyright 2016 Josh Elser
+
+-------------------------------------------------------------------------
+
+This artifact bundles Guice with the following in its NOTICE:
+| Google Guice - Core Library
+| Copyright 2006-2020 Google, Inc.
+| 
+| 
+| Google Guice - Extensions - Servlet
+| Copyright 2006-2020 Google, Inc.
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+
+-------------------------------------------------------------------------
+
+This artifact bundles javax.jdo with the following in its NOTICE:
+| Apache Java Data Objects (JDO)
+| Copyright 2005-2006 The Apache Software Foundation
+| 
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+
+-------------------------------------------------------------------------
+
+This artifact bundles Joda Time with the following in its NOTICE:
+| This product includes software developed by
+| Joda.org (http://www.joda.org/).
+
+-------------------------------------------------------------------------
+
+This artifact bundles DataNucleaus with the following in its NOTICE:
+| ===================================================================
+| This product includes software developed by many individuals,
+| including the following:
+| ===================================================================
+| Erik Bengtson
+| Andy Jefferson
+| 
+| 
+| ===================================================================
+| This product has included contributions from some individuals,
+| including the following:
+| ===================================================================
+| Joerg von Frantzius
+| Thomas Marti
+| Barry Haddow
+| Marco Schulze
+| Ralph Ullrich
+| David Ezzio
+| Brendan de Beer
+| David Eaves
+| Martin Taal
+| Tony Lai
+| Roland Szabo
+| Marcus Mennemeier
+| Xuan Baldauf
+| Eric Sultan
+| 
+| ===================================================================
+| This product also includes software developed by the TJDO project
+| (http://tjdo.sourceforge.net/).
+| 
+
+-------------------------------------------------------------------------
+
+This artifact bundles Eclipse Microprofile OpenAPI with the following in its NOTICE:
+| The majority of this software were originally based on the following:
+| * Swagger Core
+|   https://github.com/swagger-api/swagger-core
+|   under Apache License, v2.0
+| 
+| 
+| SPDXVersion: SPDX-2.1
+| PackageName: Eclipse MicroProfile
+| PackageHomePage: http://www.eclipse.org/microprofile
+| PackageLicenseDeclared: Apache-2.0
+| 
+| PackageCopyrightText: <text>
+| Arthur De Magalhaes arthurdm@ca.ibm.com
+| </text>
+
+-------------------------------------------------------------------------
+
+This artifact bundles Project Nessie with the following in its NOTICE:
+| Nessie
+| Copyright 2015-2025 Dremio Corporation
+
+-------------------------------------------------------------------------
+
+This artifact bundles Amazon AWS SDK with the following in its NOTICE:
+| AWS SDK for Java 2.0
+| Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+| 
+| This product includes software developed by
+| Amazon Technologies, Inc (http://www.amazon.com/).
+| 
+| **********************
+| THIRD PARTY COMPONENTS
+| **********************
+| This software includes third party software subject to the following copyrights:
+| - XML parsing and utility functions from JetS3t - Copyright 2006-2009 James Murty.
+| - PKCS#1 PEM encoded private key parsing and utility functions from oauth.googlecode.com - Copyright 1998-2010 AOL Inc.
+| - Apache Commons Lang - https://github.com/apache/commons-lang
+| - Netty Reactive Streams - https://github.com/playframework/netty-reactive-streams
+| - Jackson-core - https://github.com/FasterXML/jackson-core
+| - Jackson-dataformat-cbor - https://github.com/FasterXML/jackson-dataformats-binary
+| 
+| The licenses for these third party components are included in LICENSE.txt
+| 
+| - For Apache Commons Lang see also this required NOTICE:
+|   Apache Commons Lang
+|   Copyright 2001-2020 The Apache Software Foundation
+| 
+|   This product includes software developed at
+|   The Apache Software Foundation (https://www.apache.org/).
+
+-------------------------------------------------------------------------
