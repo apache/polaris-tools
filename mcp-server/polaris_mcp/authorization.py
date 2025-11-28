@@ -81,10 +81,10 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
 
         cache_key = realm or ""
         token = self._cached.get(cache_key)
-        # Cached not expired
+        # Token not expired
         if not needs_refresh(token):
             return token[0]
-        # Acquire lock and verify again if expired
+        # Acquire lock and verify again if token expired
         with self._lock:
             token = self._cached.get(cache_key)
             if needs_refresh(token):
