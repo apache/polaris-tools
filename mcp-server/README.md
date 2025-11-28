@@ -157,6 +157,11 @@ uv run client.py http://localhost:8000/mcp \
 | `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                             | _unset_                                          |
 | `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                              | _unset_                                          |
 | `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                    | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
+| `POLARIS_REALM_{realm}_CLIENT_ID`                              | OAuth client id for a specific realm.                            | _unset_                                          |
+| `POLARIS_REALM_{realm}_CLIENT_SECRET`                          | OAuth client secret for a specific realm.                        | _unset_                                          |
+| `POLARIS_REALM_{realm}_TOKEN_SCOPE`                            | OAuth scope for a specific realm.                                | _unset_                                          |
+| `POLARIS_REALM_{realm}_TOKEN_URL`                              | Token endpoint URL for a specific realm.                         | _unset_                                          |
+| `POLARIS_REALM_CONTEXT_HEADER_NAME`                            | Header name used for realm context.                              | `Polaris-Realm`                                  |
 | `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds.   | `60.0`                                           |
 | `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.                | `30.0`                                           |
 | `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.            | `30.0`                                           |
@@ -166,8 +171,8 @@ uv run client.py http://localhost:8000/mcp \
 | `POLARIS_CONFIG_FILE`                                          | Path to a configuration file containing configuration variables. | `.polaris_mcp.env` in current working directory  |
 
 
-
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
+Realm-specific variables (e.g., `POLARIS_REALM_${realm}_CLIENT_ID`) override the global settings for a given realm for client ID, client secret, token scope, and token URL.
 
 ## Tools
 
