@@ -135,6 +135,10 @@ class PolarisPrincipalRoleTool(McpTool):
         copy_if_object(arguments.get("query"), delegate_args, "query")
         copy_if_object(arguments.get("headers"), delegate_args, "headers")
 
+        realm = arguments.get("realm")
+        if isinstance(realm, str) and realm.strip():
+            delegate_args["realm"] = realm
+
         if normalized == "list":
             delegate_args["method"] = "GET"
             delegate_args["path"] = "principal-roles"
