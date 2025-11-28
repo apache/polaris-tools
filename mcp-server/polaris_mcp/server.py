@@ -25,7 +25,7 @@ import logging
 import logging.config
 import os
 from typing import Any, Mapping, MutableMapping, Sequence, Optional
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import urllib3
 from fastmcp import FastMCP
@@ -161,6 +161,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             table_tool,
@@ -174,6 +175,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "namespace": _normalize_namespace,
@@ -195,6 +197,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             namespace_tool,
@@ -207,6 +210,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "namespace": _normalize_namespace,
@@ -228,6 +232,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             principal_tool,
@@ -238,6 +243,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -259,6 +265,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             principal_role_tool,
@@ -270,6 +277,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -290,6 +298,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             catalog_role_tool,
@@ -302,6 +311,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -323,6 +333,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             policy_tool,
@@ -336,6 +347,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "namespace": _normalize_namespace,
@@ -356,6 +368,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             catalog_tool,
@@ -365,6 +378,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -479,23 +493,21 @@ def _resolve_http_timeout() -> urllib3.Timeout:
 
 
 def _resolve_authorization_provider(
-    base_url: str, http: urllib3.PoolManager, timeout: urllib3.Timeout
+    base_url: str,
+    http: urllib3.PoolManager,
+    timeout: urllib3.Timeout,
 ) -> AuthorizationProvider:
     token = _resolve_token()
     if token:
         return StaticAuthorizationProvider(token)
 
-    client_id = _first_non_blank(
-        os.getenv("POLARIS_CLIENT_ID"),
-    )
-    client_secret = _first_non_blank(
-        os.getenv("POLARIS_CLIENT_SECRET"),
+    client_id = _first_non_blank(os.getenv("POLARIS_CLIENT_ID"))
+    client_secret = _first_non_blank(os.getenv("POLARIS_CLIENT_SECRET"))
+    has_realm_credentials = any(
+        key.startswith("POLARIS_REALM_") for key in os.environ.keys()
     )
 
-    if client_id and client_secret:
-        scope = _first_non_blank(os.getenv("POLARIS_TOKEN_SCOPE"))
-        token_url = _first_non_blank(os.getenv("POLARIS_TOKEN_URL"))
-        endpoint = token_url or urljoin(base_url, "api/catalog/v1/oauth/tokens")
+    if client_id and client_secret or has_realm_credentials:
         refresh_buffer_seconds = DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS
         refresh_buffer_seconds_str = os.getenv("POLARIS_TOKEN_REFRESH_BUFFER_SECONDS")
         if refresh_buffer_seconds_str:
@@ -504,10 +516,7 @@ def _resolve_authorization_provider(
             except ValueError:
                 pass
         return ClientCredentialsAuthorizationProvider(
-            token_endpoint=endpoint,
-            client_id=client_id,
-            client_secret=client_secret,
-            scope=scope,
+            base_url=base_url,
             http=http,
             refresh_buffer_seconds=refresh_buffer_seconds,
             timeout=timeout,

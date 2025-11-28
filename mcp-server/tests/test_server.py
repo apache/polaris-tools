@@ -242,10 +242,7 @@ class TestAuthorizationProviderResolution:
 
         assert provider is fake_provider
         mock_factory.assert_called_once_with(
-            token_endpoint="https://oauth/token",
-            client_id="client",
-            client_secret="secret",
-            scope="scope",
+            base_url="https://base/",
             http=fake_http,
             refresh_buffer_seconds=60.0,
             timeout=mock.sentinel.timeout,
