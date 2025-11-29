@@ -47,7 +47,9 @@ def _get_arg_type(schema: dict) -> str:
     return "string"
 
 
-async def _prompt_for_argument(arg_name: str, schema_property: dict, is_required: bool) -> Any:
+async def _prompt_for_argument(
+    arg_name: str, schema_property: dict, is_required: bool
+) -> Any:
     description = schema_property.get("description", "")
     arg_type = _get_arg_type(schema_property)
     enum_values = schema_property.get("enum")
