@@ -36,11 +36,20 @@ async def _prompt(prompt: str) -> str:
     return user_input.strip()
 
 
-async def _prompt_for_argument(
-    arg_name: str, schema_property: dict, is_required: bool
-) -> Any:
+def _get_arg_type(schema: dict) -> str:
+    if "type" in schema:
+        return schema["type"]
+    if "anyOf" in schema:
+        for sub_schema in schema["anyOf"]:
+            sub_type = _get_arg_type(sub_schema)
+            if sub_type == "object":
+                return sub_type
+    return "string"
+
+
+async def _prompt_for_argument(arg_name: str, schema_property: dict, is_required: bool) -> Any:
     description = schema_property.get("description", "")
-    arg_type = schema_property.get("type", "string")
+    arg_type = _get_arg_type(schema_property)
     enum_values = schema_property.get("enum")
     enum_str = ", ".join(enum_values) if enum_values else ""
 
@@ -63,7 +72,6 @@ async def _prompt_for_argument(
                 return json.loads(value)
             except json.JSONDecodeError:
                 print("Invalid JSON. Please try again.")
-
     # Handle primitive types
     while True:
         value = await _prompt(prompt)

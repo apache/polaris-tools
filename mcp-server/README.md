@@ -81,6 +81,72 @@ You can also run client directly from the command line with non-interactive mode
 uv run client.py http://localhost:8000/mcp --tool polaris-catalog-request --args '{"operation": "list"}'
 ```
 
+Here are sample client commands:
+```bash
+# Create catalog
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-catalog-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "catalog": {
+        "name": "quickstart_catalog",
+        "type": "INTERNAL",
+        "readOnly": false,
+        "properties": {
+          "default-base-location": "s3://bucket123"
+        },
+        "storageConfigInfo": {
+          "storageType": "S3",
+          "allowedLocations": ["s3://bucket123"],
+          "endpoint": "http://localhost:9000",
+          "pathStyleAccess": true
+        }
+      }
+    }
+  }'
+# List catalog
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-catalog-request \
+  --args '{"operation": "list"}'
+# Create principal
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "principal": {
+        "name": "quickstart_user",
+        "properties": {}
+      }
+    }
+  }'
+# Create principal role
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-role-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "principalRole": {
+        "name": "quickstart_user_role",
+        "properties": {}
+      }
+    }
+  }'
+# Assign principal role
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-request \
+  --args '{
+    "operation": "assign-principal-role",
+    "principal": "quickstart_user",
+    "body": {
+      "principalRole": {
+        "name": "quickstart_user_role"
+      }
+    }
+  }'
+```
+
 ## Configuration
 
 | Variable                                                       | Description                                                    | Default                                          |
