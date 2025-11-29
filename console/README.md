@@ -35,9 +35,6 @@ npm install
 # Start development server
 npm run dev
 
-# Start simple server
-npm start
-
 # Build for production
 npm run build
 ```
