@@ -17,23 +17,24 @@
  * under the License.
  */
 
-import { Outlet } from "react-router-dom"
-import { Sidebar } from "./Sidebar"
-import { Header } from "./Header"
-import { Footer } from "./Footer"
+export function Footer() {
+  const currentYear = new Date().getFullYear()
 
-export function Layout() {
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
-        <Footer />
-      </div>
-    </div>
+    <footer className="flex h-12 items-center justify-center border-t bg-background px-6">
+      <p className="text-sm text-muted-foreground">
+        © {currentYear} The Apache Software Foundation. Licensed under the{" "}
+        <a
+          href="http://www.apache.org/licenses/LICENSE-2.0"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline"
+        >
+          Apache License, Version 2.0
+        </a>
+        .
+      </p>
+    </footer>
   )
 }
 

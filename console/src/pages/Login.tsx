@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Logo } from "@/components/layout/Logo"
+import { Footer } from "@/components/layout/Footer"
 
 export function Login() {
   const [clientId, setClientId] = useState("")
@@ -56,64 +57,62 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-      {/* Logo at top */}
-      {/* <div className="absolute top-8 left-8">
-        <Logo clickable={false} />
-      </div> */}
-
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center">
-            <Logo clickable={false} />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="clientId">Client ID</Label>
-              <Input
-                id="clientId"
-                type="text"
-                value={clientId}
-                onChange={(e) => setClientId(e.target.value)}
-                required
-                placeholder="Enter your client ID"
-              />
+    <div className="flex min-h-screen flex-col bg-background">
+      <div className="flex flex-1 items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex justify-center">
+              <Logo clickable={false} />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="clientSecret">Client Secret</Label>
-              <Input
-                id="clientSecret"
-                type="password"
-                value={clientSecret}
-                onChange={(e) => setClientSecret(e.target.value)}
-                required
-                placeholder="Enter your client secret"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="realm">Realm</Label>
-              <Input
-                id="realm"
-                type="text"
-                value={realm}
-                onChange={(e) => setRealm(e.target.value)}
-                required
-                placeholder="Enter your realm"
-              />
-            </div>
-            {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="clientId">Client ID</Label>
+                <Input
+                  id="clientId"
+                  type="text"
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  required
+                  placeholder="Enter your client ID"
+                />
               </div>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="clientSecret">Client Secret</Label>
+                <Input
+                  id="clientSecret"
+                  type="password"
+                  value={clientSecret}
+                  onChange={(e) => setClientSecret(e.target.value)}
+                  required
+                  placeholder="Enter your client secret"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="realm">Realm</Label>
+                <Input
+                  id="realm"
+                  type="text"
+                  value={realm}
+                  onChange={(e) => setRealm(e.target.value)}
+                  required
+                  placeholder="Enter your realm"
+                />
+              </div>
+              {error && (
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in..." : "Sign in"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+      <Footer />
     </div>
   )
 }

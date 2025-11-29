@@ -34,13 +34,13 @@ export function Logo({ variant = "default", showText = true, className = "", cli
       {/* Logo Icon - Star logo */}
       <img
         src="/polaris-logo-star.svg"
-        alt="Apache Polaris Logo"
+        alt=" (incubating) Logo"
         className={isCompact ? "h-6 w-6" : "h-8 w-8"}
       />
       {showText && (
         <div className="flex flex-col">
           <span className={`font-bold text-foreground ${isCompact ? "text-sm" : "text-base"}`}>
-            Apache Polaris
+            Apache Polaris (incubating)
           </span>
         
         </div>
@@ -53,7 +53,7 @@ export function Logo({ variant = "default", showText = true, className = "", cli
       <Link
         to="/"
         className={`flex items-center gap-2 ${className}`}
-        aria-label="Apache Polaris"
+        aria-label="Apache Polaris (incubating)"
       >
         {logoContent}
       </Link>
@@ -61,7 +61,7 @@ export function Logo({ variant = "default", showText = true, className = "", cli
   }
 
   return (
-    <div className={`flex items-center gap-2 ${className}`} aria-label="Apache Polaris">
+    <div className={`flex items-center gap-2 ${className}`} aria-label="Apache Polaris (incubating)">
       {logoContent}
     </div>
   )
