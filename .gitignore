@@ -64,6 +64,7 @@ mcp-server/polaris_mcp.egg-info/
 mcp-server/polaris_mcp/__pycache__/
 mcp-server/polaris_mcp/tools/__pycache__/
 mcp-server/tests/__pycache__/
+mcp-server/__pycache__/
 
 # Maven flatten plugin
 .flattened-pom.xml

@@ -21,8 +21,10 @@
 
 from __future__ import annotations
 
+import sys
 import logging
 import logging.config
+import argparse
 import os
 from typing import Any, Mapping, MutableMapping, Sequence, Optional
 from urllib.parse import urljoin, urlparse
@@ -542,7 +544,43 @@ def main() -> None:
     """Script entry point."""
     logging.config.dictConfig(LOGGING_CONFIG)
     server = create_server()
-    server.run()
+
+    parser = argparse.ArgumentParser(description="Run Apache Polaris MCP Server")
+    parser.add_argument(
+        "--transport",
+        choices=["stdio", "sse", "http"],
+        default="stdio",
+        help="Transport type to use (default: stdio)",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Host for SSE/HTTP transportS (default: 127.0.0.1)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port for SSE/HTTP transports (default: 8000)",
+    )
+    args = parser.parse_args()
+
+    if args.transport == "stdio":
+        logger.info("Starting Apache Polaris MCP server using STDIO transport")
+        server.run()
+    elif args.transport == "sse":
+        logger.info(
+            f"Starting Apache Polaris MCP server using SSE transport on http://{args.host}:{args.port}/sse"
+        )
+        server.run(transport="sse", host=args.host, port=args.port)
+    elif args.transport == "http":
+        logger.info(
+            f"Starting Apache Polaris MCP server using HTTP transport on http://{args.host}:{args.port}/mcp"
+        )
+        server.run(transport="http", host=args.host, port=args.port, path="/mcp")
+    else:
+        logger.error(f"Unknown transport: {args.transport}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":  # pragma: no cover
