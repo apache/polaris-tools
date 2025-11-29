@@ -63,7 +63,7 @@ For a `tools/call` invocation you will typically set environment variables such 
 
 Please note: `--directory` specifies a local directory. It is not needed when we pull `polaris-mcp` from PyPI package.
 
-### Interactive Client
+### MCP Client
 
 For quick local testing without configuring a full client like Claude Desktop, you can use the included `client.py` script.
 
