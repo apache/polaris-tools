@@ -27,21 +27,18 @@ import sys
 from typing import Any, Optional
 
 
-async def _prompt(prompt: str, parse_json: bool = False) -> Optional[Any]:
-    while True:
-        user_input = await asyncio.to_thread(input, f"{prompt}: ")
-        user_input = user_input.strip()
-        if not user_input:
-            return None
-        if not parse_json:
-            return user_input
-        try:
-            return json.loads(user_input)
-        except json.JSONDecodeError:
-            print("Invalid JSON. Please try again.")
+class McpClientError(Exception):
+    pass
 
 
-async def _prompt_for_argument(arg_name: str, schema_property: dict, is_required: bool) -> Any:
+async def _prompt(prompt: str) -> str:
+    user_input = await asyncio.to_thread(input, f"{prompt}: ")
+    return user_input.strip()
+
+
+async def _prompt_for_argument(
+    arg_name: str, schema_property: dict, is_required: bool
+) -> Any:
     description = schema_property.get("description", "")
     arg_type = schema_property.get("type", "string")
     enum_values = schema_property.get("enum")
@@ -58,19 +55,45 @@ async def _prompt_for_argument(arg_name: str, schema_property: dict, is_required
     prompt = " ".join(parts)
     # Handle JSON input
     if arg_type == "object":
-        return await _prompt(prompt, parse_json=True)
+        while True:
+            value = await _prompt(prompt)
+            if not value:
+                return None
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                print("Invalid JSON. Please try again.")
+
     # Handle primitive types
     while True:
         value = await _prompt(prompt)
-        if is_required and not value:
-            print(f"{arg_name} is required.")
-            continue
-        if value and enum_values:
-            if value in enum_values:
-                return value
+        if not value:
+            if is_required:
+                print(f"{arg_name} is required.")
+                continue
+            return None
+
+        if enum_values and value not in enum_values:
             print(f"Invalid option. Please choose from: {enum_str}")
             continue
         return value
+
+
+def _load_json_from_str_or_file(
+    json_str: Optional[str], json_file: Optional[str]
+) -> dict:
+    if json_str:
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError:
+            raise McpClientError("Error: Invalid JSON string provided.")
+    elif json_file:
+        try:
+            with open(json_file) as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            raise McpClientError(f"Error reading JSON file: {e}")
+    return {}
 
 
 async def _display(result: Any) -> None:
@@ -89,26 +112,12 @@ async def _run_session(session: Any, args: argparse.Namespace) -> None:
 
     # CLI mode
     if args.tool:
-        tool_args = {}
-        if args.args:
-            try:
-                tool_args = json.loads(args.args)
-            except json.JSONDecodeError:
-                print("Error: --args must be a valid JSON string.")
-                sys.exit(1)
-        elif args.args_file:
-            try:
-                with open(args.args_file) as f:
-                    tool_args = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                print(f"Error reading args file: {e}")
-                sys.exit(1)
+        tool_args = _load_json_from_str_or_file(args.args, args.args_file)
         try:
             result = await session.call_tool(args.tool, tool_args)
             await _display(result)
         except Exception as e:
-            print(f"Error running tool '{args.tool}': {e}")
-            sys.exit(1)
+            raise McpClientError(f"Error running tool '{args.tool}': {e}")
         return
     # Interactive mode
     tools = await session.list_tools()
@@ -117,8 +126,10 @@ async def _run_session(session: Any, args: argparse.Namespace) -> None:
         return
     list_tools(tools)
     while True:
-        print("-"*20)
-        print("Select a tool by name, 'r' to refresh, 'q' to quit: ", end="", flush=True)
+        print("-" * 20)
+        print(
+            "Select a tool by name, 'r' to refresh, 'q' to quit: ", end="", flush=True
+        )
         choice = (await asyncio.to_thread(sys.stdin.readline)).strip()
         if choice.lower() == "q":
             break
@@ -145,7 +156,7 @@ async def _run_session(session: Any, args: argparse.Namespace) -> None:
                 value = await _prompt_for_argument(arg_name, schema, is_required=True)
                 if value:
                     arguments[arg_name] = value
-        optional_args = {k:v for k, v in props.items() if k not in required}
+        optional_args = {k: v for k, v in props.items() if k not in required}
         if optional_args:
             print("\n--- Optional Arguments ---")
             for arg_name, schema in optional_args.items():
@@ -165,21 +176,31 @@ async def _run_session(session: Any, args: argparse.Namespace) -> None:
 
 async def run():
     parser = argparse.ArgumentParser(description="Polaris MCP Client")
-    parser.add_argument("server", help="MCP server. Can be a local .py file, or an HTTP/SSE URL.")
+    parser.add_argument(
+        "server", help="MCP server. Can be a local .py file, or an HTTP/SSE URL."
+    )
     parser.add_argument("--tool", help="Tool to run directly (skips interactive mode).")
-    parser.add_argument("--args", help="JSON string of arguments for the tool (used with --tool).")
-    parser.add_argument("--args-file", help="Path to JSON file with arguments for the tool (used with --tool).")
+    parser.add_argument(
+        "--args", help="JSON string of arguments for the tool (used with --tool)."
+    )
+    parser.add_argument(
+        "--args-file",
+        help="Path to JSON file with arguments for the tool (used with --tool).",
+    )
     args = parser.parse_args()
     server = args.server.strip()
     if not (server.endswith(".py") or server.startswith(("http://", "https://"))):
-        print(f"Error: '{server}' must be a .py file or an URL.")
-        sys.exit(1)
+        raise McpClientError(f"Error: '{server}' must be a .py file or an URL.")
     async with Client(server) as session:
         await _run_session(session, args)
+
 
 if __name__ == "__main__":
     try:
         asyncio.run(run())
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, McpClientError) as e:
+        if isinstance(e, McpClientError):
+            print(e, file=sys.stderr)
+            sys.exit(1)
         print("\nExiting...")
         sys.exit(0)
