@@ -63,6 +63,24 @@ For a `tools/call` invocation you will typically set environment variables such 
 
 Please note: `--directory` specifies a local directory. It is not needed when we pull `polaris-mcp` from PyPI package.
 
+### Interactive Client
+
+For quick local testing without configuring a full client like Claude Desktop, you can use the included `client.py` script.
+
+```bash
+# Start service in HTTP mode
+## Make sure you have set necessary environment variables (POLARIS_BASE_URL, etc.)
+uv run polaris-mcp --transport http
+# Start client in interactative mode
+uv run client.py http://localhost:8000/mcp
+```
+
+You can also run client directly from the command line with non-interactive mode:
+
+```bash
+uv run client.py http://localhost:8000/mcp --tool polaris-catalog-request --args '{"operation": "list"}'
+```
+
 ## Configuration
 
 | Variable                                                       | Description                                                    | Default                                          |
