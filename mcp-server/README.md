@@ -82,6 +82,7 @@ uv run client.py http://localhost:8000/mcp --tool polaris-catalog-request --args
 ```
 
 Here are sample client commands:
+
 ```bash
 # Create catalog
 uv run client.py http://localhost:8000/mcp \
