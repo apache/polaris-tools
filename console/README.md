@@ -113,5 +113,18 @@ After building, you can serve the production files in several ways:
 bun run preview  # or npm run preview
 ```
 
+## Docker image
 
+You can build Polaris Console docker image using:
 
+```
+docker build -t apache/polaris-console:latest .
+```
+
+Then, you run Polaris Console using:
+
+```
+docker run -p 8080:80 apache/polaris-console:latest
+```
+
+NB: Hopefully, the Apache Polaris official docker image will be available soon.
