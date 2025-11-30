@@ -225,7 +225,7 @@ export function Connections() {
                     <TableCell className="font-medium">{principal.name}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">
-                        {principal.properties?.serviceType || "Apache Spark"}
+                        {principal.properties?.serviceType || "apache-spark"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
