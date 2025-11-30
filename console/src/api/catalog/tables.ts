@@ -22,6 +22,7 @@ import type {
   Table,
   ListTablesResponse,
   CreateTableRequest,
+  CreateGenericTableRequest,
   LoadTableResult,
 } from "@/types/api"
 
@@ -191,6 +192,27 @@ export const tablesApi = {
       ...id,
       type: "Generic",
     }))
+  },
+
+  /**
+   * Create a generic table.
+   * @param prefix - The catalog name
+   * @param namespace - Namespace array
+   * @param request - Generic table creation request
+   */
+  createGeneric: async (
+    prefix: string,
+    namespace: string[],
+    request: CreateGenericTableRequest
+  ): Promise<unknown> => {
+    const namespaceStr = encodeNamespace(namespace)
+    const response = await apiClient
+      .getPolarisClient()
+      .post<unknown>(
+        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/generic-tables`,
+        request
+      )
+    return response.data
   },
 }
 

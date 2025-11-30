@@ -43,6 +43,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState } from "react"
 
 export function NamespaceDetails() {
@@ -53,6 +55,13 @@ export function NamespaceDetails() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [createGenericTableOpen, setCreateGenericTableOpen] = useState(false)
+  const [genericTableForm, setGenericTableForm] = useState({
+    name: "",
+    format: "",
+    "base-location": "",
+    doc: "",
+  })
 
   // Parse namespace from URL (e.g., "accounting.tax" -> ["accounting", "tax"])
   const namespaceArray = namespaceParam?.split(".") || []
@@ -99,6 +108,38 @@ export function NamespaceDetails() {
     },
     onError: (error: Error) => {
       toast.error("Failed to delete namespace", {
+        description: error.message || "An error occurred",
+      })
+    },
+  })
+
+  const createGenericTableMutation = useMutation({
+    mutationFn: () => {
+      const request: {
+        name: string
+        format: string
+        "base-location"?: string
+        doc?: string
+      } = {
+        name: genericTableForm.name,
+        format: genericTableForm.format,
+      }
+      if (genericTableForm["base-location"]) {
+        request["base-location"] = genericTableForm["base-location"]
+      }
+      if (genericTableForm.doc) {
+        request.doc = genericTableForm.doc
+      }
+      return tablesApi.createGeneric(catalogName!, namespaceArray, request)
+    },
+    onSuccess: () => {
+      toast.success("Generic table created successfully")
+      setCreateGenericTableOpen(false)
+      setGenericTableForm({ name: "", format: "", "base-location": "", doc: "" })
+      queryClient.invalidateQueries({ queryKey: ["generic-tables", catalogName, namespaceArray] })
+    },
+    onError: (error: Error) => {
+      toast.error("Failed to create generic table", {
         description: error.message || "An error occurred",
       })
     },
@@ -300,7 +341,7 @@ export function NamespaceDetails() {
                   }}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Table
+                  Iceberg Table
                 </Button>
               </div>
             </CardHeader>
@@ -370,10 +411,21 @@ export function NamespaceDetails() {
       {/* Polaris Generic Tables Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Generic Tables</CardTitle>
-          <CardDescription>
-            Generic tables in this namespace
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Generic Tables</CardTitle>
+              <CardDescription>
+                Generic tables in this namespace
+              </CardDescription>
+            </div>
+            <Button
+              onClick={() => setCreateGenericTableOpen(true)}
+              disabled={!namespace}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Generic Table
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {polarisGenericTablesQuery?.isLoading ? (
@@ -442,6 +494,86 @@ export function NamespaceDetails() {
           )}
         </CardContent>
       </Card>
+
+      {/* Create Generic Table Dialog */}
+      <Dialog open={createGenericTableOpen} onOpenChange={setCreateGenericTableOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Generic Table</DialogTitle>
+            <DialogDescription>
+              Create a new generic table in the namespace "{namespacePath}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="table-name">Table Name *</Label>
+              <Input
+                id="table-name"
+                placeholder="my_table"
+                value={genericTableForm.name}
+                onChange={(e) =>
+                  setGenericTableForm({ ...genericTableForm, name: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="table-format">Format *</Label>
+              <Input
+                id="table-format"
+                placeholder="delta, csv, parquet, etc."
+                value={genericTableForm.format}
+                onChange={(e) =>
+                  setGenericTableForm({ ...genericTableForm, format: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="base-location">Base Location (Optional)</Label>
+              <Input
+                id="base-location"
+                placeholder="s3://bucket/path/to/table"
+                value={genericTableForm["base-location"]}
+                onChange={(e) =>
+                  setGenericTableForm({ ...genericTableForm, "base-location": e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="table-doc">Description (Optional)</Label>
+              <Input
+                id="table-doc"
+                placeholder="Table description"
+                value={genericTableForm.doc}
+                onChange={(e) =>
+                  setGenericTableForm({ ...genericTableForm, doc: e.target.value })
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCreateGenericTableOpen(false)
+                setGenericTableForm({ name: "", format: "", "base-location": "", doc: "" })
+              }}
+              disabled={createGenericTableMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => createGenericTableMutation.mutate()}
+              disabled={
+                !genericTableForm.name ||
+                !genericTableForm.format ||
+                createGenericTableMutation.isPending
+              }
+            >
+              {createGenericTableMutation.isPending ? "Creating..." : "Create"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>

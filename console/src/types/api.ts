@@ -218,6 +218,14 @@ export interface CreateTableRequest {
   properties?: Record<string, string>
 }
 
+export interface CreateGenericTableRequest {
+  name: string
+  format: string
+  "base-location"?: string
+  doc?: string
+  properties?: Record<string, string>
+}
+
 export interface ListTablesResponse {
   identifiers: Array<{
     namespace: string[]
