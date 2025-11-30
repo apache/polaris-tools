@@ -170,5 +170,27 @@ export const tablesApi = {
         body
       )
   },
+
+  /**
+   * List generic tables in a namespace.
+   * @param prefix - The catalog name (prefix)
+   * @param namespace - Namespace array (e.g., ["accounting", "tax"])
+   */
+  listGeneric: async (
+    prefix: string,
+    namespace: string[]
+  ): Promise<Array<{ namespace: string[]; name: string; type?: string; createTime?: string }>> => {
+    const namespaceStr = encodeNamespace(namespace)
+    const response = await apiClient
+      .getPolarisClient()
+      .get<ListTablesResponse>(
+        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/generic-tables`
+      )
+    const identifiers = response.data.identifiers || []
+    return identifiers.map((id) => ({
+      ...id,
+      type: "Generic",
+    }))
+  },
 }
 

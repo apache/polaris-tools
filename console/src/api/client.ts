@@ -27,10 +27,12 @@ import { REALM_HEADER_NAME } from "@/lib/constants"
 const API_BASE_URL = ""
 const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
 const CATALOG_BASE_URL = `${API_BASE_URL}/api/catalog/v1`
+const POLARIS_BASE_URL = `${API_BASE_URL}/polaris/v1`
 
 class ApiClient {
   private managementClient: AxiosInstance
   private catalogClient: AxiosInstance
+  private polarisClient: AxiosInstance
 
   constructor() {
     this.managementClient = axios.create({
@@ -42,6 +44,13 @@ class ApiClient {
 
     this.catalogClient = axios.create({
       baseURL: CATALOG_BASE_URL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    this.polarisClient = axios.create({
+      baseURL: POLARIS_BASE_URL,
       headers: {
         "Content-Type": "application/json",
       },
@@ -82,11 +91,16 @@ class ApiClient {
 
     this.managementClient.interceptors.request.use(requestInterceptor)
     this.catalogClient.interceptors.request.use(requestInterceptor)
+    this.polarisClient.interceptors.request.use(requestInterceptor)
     this.managementClient.interceptors.response.use(
       (response) => response,
       responseErrorInterceptor
     )
     this.catalogClient.interceptors.response.use(
+      (response) => response,
+      responseErrorInterceptor
+    )
+    this.polarisClient.interceptors.response.use(
       (response) => response,
       responseErrorInterceptor
     )
@@ -111,6 +125,10 @@ class ApiClient {
 
   getCatalogClient(): AxiosInstance {
     return this.catalogClient
+  }
+
+  getPolarisClient(): AxiosInstance {
+    return this.polarisClient
   }
 }
 

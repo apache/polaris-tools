@@ -20,6 +20,7 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
+import { formatDistanceToNow } from "date-fns"
 import { ArrowLeft, Folder, Table as TableIcon, RefreshCw, Trash2, Plus } from "lucide-react"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { tablesApi } from "@/api/catalog/tables"
@@ -80,6 +81,12 @@ export function NamespaceDetails() {
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
+  const polarisGenericTablesQuery = useQuery({
+    queryKey: ["generic-tables", catalogName, namespaceArray],
+    queryFn: () => tablesApi.listGeneric(catalogName!, namespaceArray),
+    enabled: !!catalogName && namespaceArray.length > 0,
+  })
+
   const deleteMutation = useMutation({
     mutationFn: () => namespacesApi.delete(catalogName!, namespaceArray),
     onSuccess: () => {
@@ -106,6 +113,14 @@ export function NamespaceDetails() {
     if (!catalogName || !namespaceParam) return
     navigate(
       `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespaceParam)}/tables/${encodeURIComponent(tableName)}`
+    )
+  }
+
+  const handlePolarisGenericTableClick = (table: { namespace: string[]; name: string }) => {
+    if (!catalogName) return
+    const tableNamespace = table.namespace.join(".")
+    navigate(
+      `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(tableNamespace)}/tables/${encodeURIComponent(table.name)}`
     )
   }
 
@@ -146,8 +161,9 @@ export function NamespaceDetails() {
               tablesQuery.refetch()
               catalogQuery.refetch()
               childrenNamespacesQuery.refetch()
+              polarisGenericTablesQuery.refetch()
             }}
-            disabled={namespaceQuery.isFetching || tablesQuery.isFetching || childrenNamespacesQuery.isFetching}
+            disabled={namespaceQuery.isFetching || tablesQuery.isFetching || childrenNamespacesQuery.isFetching || polarisGenericTablesQuery.isFetching}
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
@@ -268,15 +284,14 @@ export function NamespaceDetails() {
           </Card>
 
           {/* Tables Section */
-           // TODO: add Generic Tables view here (JB)
            // TODO: add Policies view here (JB) 
           }
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Tables</CardTitle>
-                  <CardDescription>Tables in this namespace</CardDescription>
+                  <CardTitle>Iceberg Tables</CardTitle>
+                  <CardDescription>Iceberg tables in this namespace</CardDescription>
                 </div>
                 <Button
                   onClick={() => {
@@ -298,7 +313,7 @@ export function NamespaceDetails() {
                 </div>
               ) : tables.length === 0 ? (
                 <div className="text-center text-muted-foreground py-8">
-                  No tables found in this namespace.
+                  No Iceberg tables found in this namespace.
                 </div>
               ) : (
                 <div className="rounded-md border">
@@ -351,6 +366,82 @@ export function NamespaceDetails() {
           </Card>
         </>
       )}
+
+      {/* Polaris Generic Tables Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Generic Tables</CardTitle>
+          <CardDescription>
+            Generic tables in this namespace
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {polarisGenericTablesQuery?.isLoading ? (
+            <div>Loading Polaris generic tables...</div>
+          ) : polarisGenericTablesQuery?.error ? (
+            <div className="text-red-600">
+              Error: {polarisGenericTablesQuery.error.message}
+            </div>
+          ) : !polarisGenericTablesQuery?.data || polarisGenericTablesQuery.data.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              No generic tables found in this namespace.
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {polarisGenericTablesQuery.data?.map((table: any, idx: number) => (
+                    <TableRow
+                      key={idx}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handlePolarisGenericTableClick(table)}
+                    >
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <TableIcon className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">{table.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-muted-foreground text-sm">
+                          {table.type || "Generic"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-muted-foreground text-sm">
+                          {table.createTime
+                            ? formatDistanceToNow(new Date(table.createTime), { addSuffix: true })
+                            : "Unknown"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={e => {
+                            e.stopPropagation()
+                            handlePolarisGenericTableClick(table)
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
