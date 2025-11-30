@@ -74,6 +74,12 @@ export function NamespaceDetails() {
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
+  const childrenNamespacesQuery = useQuery({
+    queryKey: ["namespaces", catalogName, namespaceArray],
+    queryFn: () => namespacesApi.list(catalogName!, namespaceArray),
+    enabled: !!catalogName && namespaceArray.length > 0,
+  })
+
   const deleteMutation = useMutation({
     mutationFn: () => namespacesApi.delete(catalogName!, namespaceArray),
     onSuccess: () => {
@@ -94,6 +100,7 @@ export function NamespaceDetails() {
   const catalog = catalogQuery.data
   const namespace = namespaceQuery.data
   const tables = tablesQuery.data ?? []
+  const childrenNamespaces = childrenNamespacesQuery.data ?? []
 
   const handleTableClick = (tableName: string) => {
     if (!catalogName || !namespaceParam) return
@@ -138,8 +145,9 @@ export function NamespaceDetails() {
               namespaceQuery.refetch()
               tablesQuery.refetch()
               catalogQuery.refetch()
+              childrenNamespacesQuery.refetch()
             }}
-            disabled={namespaceQuery.isFetching || tablesQuery.isFetching}
+            disabled={namespaceQuery.isFetching || tablesQuery.isFetching || childrenNamespacesQuery.isFetching}
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
@@ -200,14 +208,73 @@ export function NamespaceDetails() {
             </CardContent>
           </Card>
 
-          {/* Tables Section */}
+          {/* Children Namespaces Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Child Namespaces</CardTitle>
+              <CardDescription>Namespaces nested within this namespace</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {childrenNamespacesQuery?.isLoading ? (
+                <div>Loading child namespaces...</div>
+              ) : childrenNamespacesQuery?.error ? (
+                <div className="text-red-600">
+                  Error loading child namespaces: {childrenNamespacesQuery.error.message}
+                </div>
+              ) : childrenNamespaces?.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  No child namespaces found.
+                </div>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Location</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {childrenNamespaces?.map((child, idx) => {
+                        const childNamespacePath = child.namespace?.join(".") ?? "";
+                        return (
+                          <TableRow
+                            key={idx}
+                            className="cursor-pointer hover:bg-muted/50"
+                            onClick={() =>
+                              navigate(
+                                `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(childNamespacePath)}`
+                              )
+                            }
+                          >
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{childNamespacePath}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-muted-foreground font-mono text-sm">
+                                {child.properties?.location || "Not set"}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tables Section */
+           // TODO: add Generic Tables view here (JB)
+           // TODO: add Policies view here (JB) 
+          }
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                // TODO: Should be renamed to Iceberg Tables (JB)
-                // TODO: Add Generic Tables view here (JB)  
-                // TODO: Add Policies view here (JB)
                   <CardTitle>Tables</CardTitle>
                   <CardDescription>Tables in this namespace</CardDescription>
                 </div>
