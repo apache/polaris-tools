@@ -27,6 +27,34 @@ wheels = [
 ]
 
 [[package]]
+name = "apache-polaris-mcp"
+version = "0.9.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastmcp" },
+    { name = "python-json-logger" },
+    { name = "urllib3" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pre-commit" },
+]
+test = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastmcp", specifier = ">=2.13.0.2" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.7" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.2" },
+    { name = "python-json-logger", specifier = ">=4.0.0" },
+    { name = "urllib3", specifier = ">=1.25.3,<3.0.0" },
+]
+provides-extras = ["test", "dev"]
+
+[[package]]
 name = "attrs"
 version = "25.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -781,34 +809,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538, upload-time = "2025-05-15T12:30:06.134Z" },
 ]
-
-[[package]]
-name = "polaris-mcp"
-version = "0.9.0"
-source = { editable = "." }
-dependencies = [
-    { name = "fastmcp" },
-    { name = "python-json-logger" },
-    { name = "urllib3" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "pre-commit" },
-]
-test = [
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastmcp", specifier = ">=2.13.0.2" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.7" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.2" },
-    { name = "python-json-logger", specifier = ">=4.0.0" },
-    { name = "urllib3", specifier = ">=1.25.3,<3.0.0" },
-]
-provides-extras = ["test", "dev"]
 
 [[package]]
 name = "pre-commit"
