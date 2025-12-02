@@ -128,3 +128,60 @@ docker run -p 8080:80 apache/polaris-console:latest
 ```
 
 NB: Hopefully, the Apache Polaris official docker image will be available soon.
+
+## Kubernetes Deployment with Helm
+
+### Quick Start with Minikube
+
+1. **Start Minikube and build the image:**
+   ```bash
+   minikube start
+   eval $(minikube docker-env)
+   make build-docker
+   ```
+
+2. **Deploy with Helm:**
+   ```bash
+   helm install polaris-console ./helm
+   ```
+
+3. **Access the console:**
+   ```bash
+   kubectl port-forward svc/polaris-console 8080:80
+   ```
+   Open http://localhost:8080 in your browser.
+
+### Configuration
+
+Customize the deployment by creating a `values.yaml` file:
+
+```yaml
+env:
+  polarisApiUrl: "http://polaris:8181"
+  polarisRealm: "POLARIS"
+  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+
+service:
+  type: ClusterIP
+  port: 80
+
+replicaCount: 1
+```
+
+Then deploy with:
+```bash
+helm install polaris-console ./helm -f values.yaml
+```
+
+### Useful Commands
+
+```bash
+# Upgrade deployment
+helm upgrade polaris-console ./helm
+
+# Uninstall
+helm uninstall polaris-console
+
+# View logs
+kubectl logs -l app.kubernetes.io/name=polaris-console
+```
