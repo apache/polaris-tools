@@ -24,7 +24,7 @@ A modern web interface for Apache Polaris, built with React, TypeScript, TanStac
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm (or yarn)
+- Node.js 20.19+ (or 22.12+) and npm (or yarn)
 
 ### Installation
 
