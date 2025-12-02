@@ -117,38 +117,45 @@ bun run preview  # or npm run preview
 
 You can build Polaris Console docker image using:
 
-```
-docker build -t apache/polaris-console:latest .
+```bash
+make build-docker
 ```
 
 Then, you run Polaris Console using:
 
-```
-docker run -p 8080:80 apache/polaris-console:latest
+```bash
+docker run -p 8080:80 \
+  -e VITE_POLARIS_API_URL=http://polaris:8181 \
+  -e VITE_POLARIS_REALM=POLARIS \
+  apache/polaris-console:latest
 ```
 
 NB: Hopefully, the Apache Polaris official docker image will be available soon.
 
-## Kubernetes Deployment with Helm
+## K8S Deployment with Helm
 
-You can check this documentation and start Apache Polaris instance in `polaris` namespace.
-https://github.com/apache/polaris/tree/main/helm/polaris
+You can check [the Apache Polaris documentation](https://github.com/apache/polaris/tree/main/helm/polaris) 
+and start Polaris instance in `polaris` namespace via helm.
 
 ### Quick Start with Minikube
 
-1. **Start Minikube and build the image:**
+1. **Start Minikube:**
    ```bash
    minikube start
    eval $(minikube docker-env)
+   ```
+
+2. **Build the image:**
+    ```bash
    make build-docker
    ```
 
-2. **Deploy with Helm:**
+3. **Deploy with Helm:**
    ```bash
    helm install polaris-console ./helm -n polaris
    ```
 
-3. **Access the console:**
+4. **Access the console:**
    ```bash
    kubectl port-forward svc/polaris-console 4000:80 -n polaris
    ```
