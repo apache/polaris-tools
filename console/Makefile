@@ -5,4 +5,4 @@ DOCKER_IMAGE_TAG ?= latest
 
 .PHONY: build-docker
 build-docker:
-	@$(DOCKER) build -f Dockerfile -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG) .
+	@$(DOCKER) build -f docker/Dockerfile -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG) .
