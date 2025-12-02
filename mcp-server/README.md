@@ -29,11 +29,13 @@ The implementation is built on top of [FastMCP](https://gofastmcp.com) for strea
 
 ## Building and Running
 Run the following commands from the `mcp-server` directory:
-- `uv sync` — install runtime dependencies
-- `uv run polaris-mcp` — start the MCP server (stdin/stdout transport)
-- `uv sync --extra test --extra dev` — install runtime, test and dev dependencies
-- `uv run pytest` — run the test suite
-- `uv run pre-commit run --all-files` — lint all files
+- `uv sync` - install runtime dependencies
+- `uv run polaris-mcp` - start the MCP server (stdin/stdout transport)
+- `uv sync --extra test --extra dev` - install runtime, test and dev dependencies
+- `uv run pytest` - run the test suite
+- `uv run pre-commit run --all-files` - lint all files
+- `uv build && uv publish --index testpypi --token [Pypi-API-token]` - Publish a nightly to test.pypi.org
+- `uv build && uv publish --index pypi --token [Pypi-API-token]` - Publish a formal binary release to pypi.org
 
 For a `tools/call` invocation you will typically set environment variables such as `POLARIS_BASE_URL` and authentication settings before launching the server.
 

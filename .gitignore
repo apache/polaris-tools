@@ -78,7 +78,7 @@ version.txt
 
 # Python venv
 venv/
-mcp-server/polaris_mcp.egg-info/
+mcp-server/apache_polaris_mcp.egg-info/
 mcp-server/polaris_mcp/__pycache__/
 mcp-server/polaris_mcp/tools/__pycache__/
 mcp-server/tests/__pycache__/
