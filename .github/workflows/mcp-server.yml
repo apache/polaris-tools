@@ -29,8 +29,14 @@ name: MCP Server CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'mcp-server/**'
+      - '.github/**'    
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'mcp-server/**'
+      - '.github/**'    
 
 env:
   GRADLE_TOS_ACCEPTED: ${{ vars.GRADLE_TOS_ACCEPTED }}
