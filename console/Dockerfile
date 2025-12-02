@@ -21,10 +21,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json ./
 
 # Install dependencies
-RUN npm ci --only=production=false
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -45,6 +45,10 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
+
+ENV VITE_POLARIS_API_URL=http://polaris:8181
+ENV VITE_POLARIS_REALM=POLARIS
+ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
 
 # Expose port 80
 EXPOSE 80
