@@ -341,3 +341,32 @@ def test_with_custom_realm_header(
     call_args = http.request.call_args
     headers = call_args[1]["headers"]
     assert headers["X-Polaris-Realm"] == realm_name
+
+
+def test_two_realms_one_incomplete(monkeypatch: pytest.MonkeyPatch) -> None:
+    realm1_name = "TEST_REALM"
+    realm2_name = "TEST2_REALM"
+    http = mock.Mock()
+    provider = ClientCredentialsAuthorizationProvider(
+        base_url="https://polaris/",
+        http=http,
+        refresh_buffer_seconds=60.0,
+        timeout=mock.sentinel.timeout,
+    )
+    # Realm 1 – complete credentials
+    monkeypatch.setenv(f"POLARIS_REALM_{realm1_name}_CLIENT_ID", "client")
+    monkeypatch.setenv(f"POLARIS_REALM_{realm1_name}_CLIENT_SECRET", "secret")
+    # Realm 2 – missing secret
+    monkeypatch.setenv(f"POLARIS_REALM_{realm2_name}_CLIENT_ID", "client2")
+    # Mock response for realm 1
+    http.request.return_value = SimpleNamespace(
+        status=200,
+        data=json.dumps({"access_token": "token", "expires_in": 3600}).encode("utf-8"),
+    )
+    # Realm 1 should succeed
+    assert provider.authorization_header(realm=f"{realm1_name}") == "Bearer token"
+    assert http.request.call_count == 1
+    # Realm 2 should return None and not trigger an HTTP request
+    http.request.reset_mock()
+    assert provider.authorization_header(realm=f"{realm2_name}") is None
+    assert http.request.call_count == 0

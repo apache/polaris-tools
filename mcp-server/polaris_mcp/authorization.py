@@ -111,11 +111,16 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
                 "token_url": get_env(f"{prefix}TOKEN_URL"),
             }
 
-        # Try realm specific first then global
-        for _ in (realm, None):
-            creds = load_creds(_)
+        # Only use realm-specific credentials
+        if realm:
+            creds = load_creds(realm)
             if creds["client_id"] and creds["client_secret"]:
                 return creds
+            return None
+        # No realm specified, use global credentials
+        creds = load_creds()
+        if creds["client_id"] and creds["client_secret"]:
+            return creds
         return None
 
     def _fetch_token(

@@ -172,7 +172,7 @@ uv run client.py http://localhost:8000/mcp \
 
 
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
-Realm-specific variables (e.g., `POLARIS_REALM_${realm}_CLIENT_ID`) override the global settings for a given realm for client ID, client secret, token scope, and token URL.
+Realm-specific variables (e.g., `POLARIS_REALM_${realm}_CLIENT_ID`) override the global settings for a given realm for client ID, client secret, token scope, and token URL. If realm-specific credentials are provided but incomplete, the server will not fall back to global credentials for that realm.
 
 ## Tools
 
