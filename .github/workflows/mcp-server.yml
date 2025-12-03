@@ -60,6 +60,21 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            21
+            ${{ matrix.java-version != '21' && matrix.java-version || '' }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check
+        run: |
+          cd mcp-server
+          ./gradlew rat
+
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
