@@ -62,6 +62,91 @@ For a `tools/call` invocation you will typically set environment variables such 
 
 Please note: `--directory` specifies a local directory. It is not needed when we pull `polaris-mcp` from PyPI package.
 
+### MCP Client
+
+For quick local testing without configuring a full client like Claude Desktop, you can use the included `client.py` script.
+
+```bash
+# Start service in HTTP mode
+## Make sure you have set necessary environment variables (POLARIS_BASE_URL, etc.)
+uv run polaris-mcp --transport http
+# Start client in interactative mode
+uv run int_test/client.py http://localhost:8000/mcp
+```
+
+You can also run client directly from the command line with non-interactive mode:
+
+```bash
+uv run int_test/client.py http://localhost:8000/mcp --tool polaris-catalog-request --args '{"operation": "list"}'
+```
+
+Here are sample client commands:
+
+```bash
+# Create catalog
+uv run int_test/client.py http://localhost:8000/mcp \
+  --tool polaris-catalog-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "catalog": {
+        "name": "quickstart_catalog",
+        "type": "INTERNAL",
+        "readOnly": false,
+        "properties": {
+          "default-base-location": "s3://bucket123"
+        },
+        "storageConfigInfo": {
+          "storageType": "S3",
+          "allowedLocations": ["s3://bucket123"],
+          "endpoint": "http://localhost:9000",
+          "pathStyleAccess": true
+        }
+      }
+    }
+  }'
+# List catalog
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-catalog-request \
+  --args '{"operation": "list"}'
+# Create principal
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "principal": {
+        "name": "quickstart_user",
+        "properties": {}
+      }
+    }
+  }'
+# Create principal role
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-role-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "principalRole": {
+        "name": "quickstart_user_role",
+        "properties": {}
+      }
+    }
+  }'
+# Assign principal role
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-request \
+  --args '{
+    "operation": "assign-principal-role",
+    "principal": "quickstart_user",
+    "body": {
+      "principalRole": {
+        "name": "quickstart_user_role"
+      }
+    }
+  }'
+```
+
 ## Configuration
 
 | Variable                                                       | Description                                                      | Default                                          |
