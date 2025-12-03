@@ -72,20 +72,20 @@ For quick local testing without configuring a full client like Claude Desktop, y
 ## Make sure you have set necessary environment variables (POLARIS_BASE_URL, etc.)
 uv run polaris-mcp --transport http
 # Start client in interactative mode
-uv run client.py http://localhost:8000/mcp
+uv run int_test/client.py http://localhost:8000/mcp
 ```
 
 You can also run client directly from the command line with non-interactive mode:
 
 ```bash
-uv run client.py http://localhost:8000/mcp --tool polaris-catalog-request --args '{"operation": "list"}'
+uv run int_test/client.py http://localhost:8000/mcp --tool polaris-catalog-request --args '{"operation": "list"}'
 ```
 
 Here are sample client commands:
 
 ```bash
 # Create catalog
-uv run client.py http://localhost:8000/mcp \
+uv run int_test/client.py http://localhost:8000/mcp \
   --tool polaris-catalog-request \
   --args '{
     "operation": "create",
