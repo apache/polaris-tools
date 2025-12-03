@@ -37,7 +37,7 @@ Run the following commands from the `mcp-server` directory:
 - `uv build && uv publish --index testpypi --token [Pypi-API-token]` - Publish a nightly to test.pypi.org
 - `uv build && uv publish --index pypi --token [Pypi-API-token]` - Publish a formal binary release to pypi.org
 
-For a `tools/call` invocation you will typically set environment variables such as `POLARIS_BASE_URL` and authentication settings before launching the server. A default `.env` file is included on the tool root directory, and any of the configuration variables can be specified in this file. After adding configuration variables to the `.env` file, explicitly setting these is no longer needed. However, shell environment variables will always take precedence if provided.
+For a `tools/call` invocation you will typically set environment variables such as `POLARIS_BASE_URL` and authentication settings before launching the server. A default `.polaris_mcp.env` file is included on the tool root directory, and any of the configuration variables can be specified in this file. After adding configuration variables to the `.polaris_mcp.env` file, explicitly setting these is no longer needed. However, shell environment variables will always take precedence if provided.
 
 ### Claude Desktop configuration
 
@@ -53,7 +53,7 @@ For a `tools/call` invocation you will typically set environment variables such 
         "polaris-mcp"
       ],
       "env": {
-        "POLARIS_CONFIG_FILE": "/path/to/polaris-tools/mcp-server/.env"
+        "POLARIS_CONFIG_FILE": "/path/to/polaris-tools/mcp-server/.polaris_mcp.env"
       }
     }
   }
@@ -78,7 +78,7 @@ Please note: `--directory` specifies a local directory. It is not needed when we
 | `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                   | `30.0`                                           |
 | `POLARIS_HTTP_RETRIES_TOTAL`                                   | Total number of retries for HTTP requests.                       | `3`                                              |
 | `POLARIS_HTTP_RETRIES_BACKOFF_FACTOR`                          | Factor for exponential backoff between retries.                  | `0.5`                                            |
-| `POLARIS_CONFIG_FILE`                                          | Path to a configuration file containing configuration variables. | `.env` in current working directory              |
+| `POLARIS_CONFIG_FILE`                                          | Path to a configuration file containing configuration variables. | `.polaris_mcp.env` in current working directory  |
 
 
 

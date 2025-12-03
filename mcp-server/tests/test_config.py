@@ -25,23 +25,29 @@ from unittest import mock
 from polaris_mcp import server
 
 
-def test_main_loads_dotenv() -> None:
+def test_main_loads_default_config_file() -> None:
     with (
+        mock.patch("polaris_mcp.server.find_dotenv") as mock_find_dotenv,
         mock.patch("polaris_mcp.server.load_dotenv") as mock_load_dotenv,
         mock.patch("polaris_mcp.server.create_server") as mock_create_server,
         mock.patch.dict(os.environ, {}, clear=True),
     ):
         mock_server_instance = mock_create_server.return_value
+        mock_find_dotenv.return_value = "/path/to/.polaris_mcp.env"
 
         server.main()
 
-        mock_load_dotenv.assert_called_once_with(dotenv_path=None)
+        mock_find_dotenv.assert_called_once_with(".polaris_mcp.env")
+        mock_load_dotenv.assert_called_once_with(
+            dotenv_path="/path/to/.polaris_mcp.env"
+        )
         mock_create_server.assert_called_once()
         mock_server_instance.run.assert_called_once()
 
 
 def test_main_loads_custom_config_file() -> None:
     with (
+        mock.patch("polaris_mcp.server.find_dotenv") as mock_find_dotenv,
         mock.patch("polaris_mcp.server.load_dotenv") as mock_load_dotenv,
         mock.patch("polaris_mcp.server.create_server") as mock_create_server,
         mock.patch.dict(
@@ -52,6 +58,7 @@ def test_main_loads_custom_config_file() -> None:
 
         server.main()
 
+        mock_find_dotenv.assert_not_called()
         mock_load_dotenv.assert_called_once_with(dotenv_path="/path/to/config.env")
         mock_create_server.assert_called_once()
         mock_server_instance.run.assert_called_once()
