@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit, quote
 
@@ -230,6 +231,7 @@ class PolarisRestTool:
         query_params = arguments.get("query")
         headers_param = arguments.get("headers")
         body_node = arguments.get("body")
+        realm = arguments.get("realm")
 
         query = query_params if isinstance(query_params, dict) else None
         headers = headers_param if isinstance(headers_param, dict) else None
@@ -238,9 +240,14 @@ class PolarisRestTool:
 
         header_values = _merge_headers(headers)
         if not any(name.lower() == "authorization" for name in header_values):
-            token = self._authorization.authorization_header()
+            token = self._authorization.authorization_header(realm)
             if token:
                 header_values["Authorization"] = token
+        header_name = os.getenv("POLARIS_REALM_CONTEXT_HEADER_NAME", "Polaris-Realm")
+        if realm and not any(
+            name.lower() == header_name.lower() for name in header_values
+        ):
+            header_values[header_name] = realm
 
         body_text = _serialize_body(body_node)
         if body_text is not None and not any(
