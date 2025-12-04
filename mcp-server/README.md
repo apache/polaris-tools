@@ -29,13 +29,15 @@ The implementation is built on top of [FastMCP](https://gofastmcp.com) for strea
 
 ## Building and Running
 Run the following commands from the `mcp-server` directory:
-- `uv sync` — install runtime dependencies
-- `uv run polaris-mcp` — start the MCP server (stdin/stdout transport)
-- `uv sync --extra test --extra dev` — install runtime, test and dev dependencies
-- `uv run pytest` — run the test suite
-- `uv run pre-commit run --all-files` — lint all files
+- `uv sync` - install runtime dependencies
+- `uv run polaris-mcp` - start the MCP server (stdin/stdout transport)
+- `uv sync --extra test --extra dev` - install runtime, test and dev dependencies
+- `uv run pytest` - run the test suite
+- `uv run pre-commit run --all-files` - lint all files
+- `uv build && uv publish --index testpypi --token [Pypi-API-token]` - Publish a nightly to test.pypi.org
+- `uv build && uv publish --index pypi --token [Pypi-API-token]` - Publish a formal binary release to pypi.org
 
-For a `tools/call` invocation you will typically set environment variables such as `POLARIS_BASE_URL` and authentication settings before launching the server.
+For a `tools/call` invocation you will typically set environment variables such as `POLARIS_BASE_URL` and authentication settings before launching the server. A default `.polaris_mcp.env` file is included on the tool root directory, and any of the configuration variables can be specified in this file. After adding configuration variables to the `.polaris_mcp.env` file, explicitly setting these is no longer needed. However, shell environment variables will always take precedence if provided.
 
 ### Claude Desktop configuration
 
@@ -51,10 +53,7 @@ For a `tools/call` invocation you will typically set environment variables such 
         "polaris-mcp"
       ],
       "env": {
-        "POLARIS_BASE_URL": "http://localhost:8181/",
-        "POLARIS_CLIENT_ID": "root",
-        "POLARIS_CLIENT_SECRET": "s3cr3t",
-        "POLARIS_TOKEN_SCOPE": "PRINCIPAL_ROLE:ALL"
+        "POLARIS_CONFIG_FILE": "/path/to/polaris-tools/mcp-server/.polaris_mcp.env"
       }
     }
   }
@@ -63,24 +62,117 @@ For a `tools/call` invocation you will typically set environment variables such 
 
 Please note: `--directory` specifies a local directory. It is not needed when we pull `polaris-mcp` from PyPI package.
 
+### MCP Client
+
+For quick local testing without configuring a full client like Claude Desktop, you can use the included `client.py` script.
+
+```bash
+# Start service in HTTP mode
+## Make sure you have set necessary environment variables (POLARIS_BASE_URL, etc.)
+uv run polaris-mcp --transport http
+# Start client in interactative mode
+uv run int_test/client.py http://localhost:8000/mcp
+```
+
+You can also run client directly from the command line with non-interactive mode:
+
+```bash
+uv run int_test/client.py http://localhost:8000/mcp --tool polaris-catalog-request --args '{"operation": "list"}'
+```
+
+Here are sample client commands:
+
+```bash
+# Create catalog
+uv run int_test/client.py http://localhost:8000/mcp \
+  --tool polaris-catalog-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "catalog": {
+        "name": "quickstart_catalog",
+        "type": "INTERNAL",
+        "readOnly": false,
+        "properties": {
+          "default-base-location": "s3://bucket123"
+        },
+        "storageConfigInfo": {
+          "storageType": "S3",
+          "allowedLocations": ["s3://bucket123"],
+          "endpoint": "http://localhost:9000",
+          "pathStyleAccess": true
+        }
+      }
+    }
+  }'
+# List catalog
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-catalog-request \
+  --args '{"operation": "list"}'
+# Create principal
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "principal": {
+        "name": "quickstart_user",
+        "properties": {}
+      }
+    }
+  }'
+# Create principal role
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-role-request \
+  --args '{
+    "operation": "create",
+    "body": {
+      "principalRole": {
+        "name": "quickstart_user_role",
+        "properties": {}
+      }
+    }
+  }'
+# Assign principal role
+uv run client.py http://localhost:8000/mcp \
+  --tool polaris-principal-request \
+  --args '{
+    "operation": "assign-principal-role",
+    "principal": "quickstart_user",
+    "body": {
+      "principalRole": {
+        "name": "quickstart_user_role"
+      }
+    }
+  }'
+```
+
 ## Configuration
 
-| Variable                                                       | Description                                                    | Default                                          |
-|----------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------|
-| `POLARIS_BASE_URL`                                             | Base URL for all Polaris REST calls.                           | `http://localhost:8181/`                         |
-| `POLARIS_API_TOKEN` / `POLARIS_BEARER_TOKEN` / `POLARIS_TOKEN` | Static bearer token (if supplied, overrides other auth).       | _unset_                                          |
-| `POLARIS_CLIENT_ID`                                            | OAuth client id for client-credential flow.                    | _unset_                                          |
-| `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                           | _unset_                                          |
-| `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                            | _unset_                                          |
-| `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                  | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
-| `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds. | `60.0`                                           |
-| `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.              | `30.0`                                           |
-| `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.          | `30.0`                                           |
-| `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                 | `30.0`                                           |
-| `POLARIS_HTTP_RETRIES_TOTAL`                                   | Total number of retries for HTTP requests.                     | `3`                                              |
-| `POLARIS_HTTP_RETRIES_BACKOFF_FACTOR`                          | Factor for exponential backoff between retries.                | `0.5`                                            |
+| Variable                                                       | Description                                                      | Default                                          |
+|----------------------------------------------------------------|------------------------------------------------------------------|--------------------------------------------------|
+| `POLARIS_BASE_URL`                                             | Base URL for all Polaris REST calls.                             | `http://localhost:8181/`                         |
+| `POLARIS_API_TOKEN` / `POLARIS_BEARER_TOKEN` / `POLARIS_TOKEN` | Static bearer token (if supplied, overrides other auth).         | _unset_                                          |
+| `POLARIS_CLIENT_ID`                                            | OAuth client id for client-credential flow.                      | _unset_                                          |
+| `POLARIS_CLIENT_SECRET`                                        | OAuth client secret.                                             | _unset_                                          |
+| `POLARIS_TOKEN_SCOPE`                                          | OAuth scope string.                                              | _unset_                                          |
+| `POLARIS_TOKEN_URL`                                            | Optional override for the token endpoint URL.                    | `${POLARIS_BASE_URL}api/catalog/v1/oauth/tokens` |
+| `POLARIS_REALM_{realm}_CLIENT_ID`                              | OAuth client id for a specific realm.                            | _unset_                                          |
+| `POLARIS_REALM_{realm}_CLIENT_SECRET`                          | OAuth client secret for a specific realm.                        | _unset_                                          |
+| `POLARIS_REALM_{realm}_TOKEN_SCOPE`                            | OAuth scope for a specific realm.                                | _unset_                                          |
+| `POLARIS_REALM_{realm}_TOKEN_URL`                              | Token endpoint URL for a specific realm.                         | _unset_                                          |
+| `POLARIS_REALM_CONTEXT_HEADER_NAME`                            | Header name used for realm context.                              | `Polaris-Realm`                                  |
+| `POLARIS_TOKEN_REFRESH_BUFFER_SECONDS`                         | Minimum remaining token lifetime before refreshing in seconds.   | `60.0`                                           |
+| `POLARIS_HTTP_TIMEOUT_SECONDS`                                 | Default timeout in seconds for all HTTP requests.                | `30.0`                                           |
+| `POLARIS_HTTP_CONNECT_TIMEOUT_SECONDS`                         | Timeout in seconds for establishing HTTP connections.            | `30.0`                                           |
+| `POLARIS_HTTP_READ_TIMEOUT_SECONDS`                            | Timeout in seconds for reading HTTP responses.                   | `30.0`                                           |
+| `POLARIS_HTTP_RETRIES_TOTAL`                                   | Total number of retries for HTTP requests.                       | `3`                                              |
+| `POLARIS_HTTP_RETRIES_BACKOFF_FACTOR`                          | Factor for exponential backoff between retries.                  | `0.5`                                            |
+| `POLARIS_CONFIG_FILE`                                          | Path to a configuration file containing configuration variables. | `.polaris_mcp.env` in current working directory  |
+
 
 When OAuth variables are supplied, the server automatically acquires and refreshes tokens using the client credentials flow; otherwise a static bearer token is used if provided.
+Realm-specific variables (e.g., `POLARIS_REALM_${realm}_CLIENT_ID`) override the global settings for a given realm for client ID, client secret, token scope, and token URL. If realm-specific credentials are provided but incomplete, the server will not fall back to global credentials for that realm.
 
 ## Tools
 

@@ -18,7 +18,7 @@
 #
 
 [project]
-name = "polaris-mcp"
+name = "apache-polaris-mcp"
 version = "0.9.0"
 description = "Apache Polaris Model Context Protocol server"
 authors = [
@@ -32,6 +32,7 @@ dependencies = [
     "fastmcp>=2.13.0.2",
     "urllib3>=1.25.3,<3.0.0",
     "python-json-logger>=4.0.0",
+    "python-dotenv>=1.2.1",
 ]
 
 [project.optional-dependencies]
@@ -54,4 +55,15 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["polaris_mcp"]
+where = ["."]
+include = ["polaris_mcp*"]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple/"
+publish-url = "https://upload.pypi.org/legacy/"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"

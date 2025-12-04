@@ -21,17 +21,20 @@
 
 from __future__ import annotations
 
+import sys
 import logging
 import logging.config
+import argparse
 import os
 from typing import Any, Mapping, MutableMapping, Sequence, Optional
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import urllib3
 from fastmcp import FastMCP
 from fastmcp.tools.tool import ToolResult as FastMcpToolResult
 from importlib import metadata
 from mcp.types import TextContent
+from dotenv import find_dotenv, load_dotenv
 
 from polaris_mcp.authorization import (
     AuthorizationProvider,
@@ -161,6 +164,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             table_tool,
@@ -174,6 +178,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "namespace": _normalize_namespace,
@@ -195,6 +200,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             namespace_tool,
@@ -207,6 +213,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "namespace": _normalize_namespace,
@@ -228,6 +235,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             principal_tool,
@@ -238,6 +246,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -259,6 +268,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             principal_role_tool,
@@ -270,6 +280,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -290,6 +301,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             catalog_role_tool,
@@ -302,6 +314,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -323,6 +336,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             policy_tool,
@@ -336,6 +350,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "namespace": _normalize_namespace,
@@ -356,6 +371,7 @@ def create_server() -> FastMCP:
         query: Mapping[str, str | Sequence[str]] | None = None,
         headers: Mapping[str, str | Sequence[str]] | None = None,
         body: Any | None = None,
+        realm: str | None = None,
     ) -> FastMcpToolResult:
         return _call_tool(
             catalog_tool,
@@ -365,6 +381,7 @@ def create_server() -> FastMCP:
                 "query": query,
                 "headers": headers,
                 "body": body,
+                "realm": realm,
             },
             transforms={
                 "query": _copy_mapping,
@@ -479,23 +496,21 @@ def _resolve_http_timeout() -> urllib3.Timeout:
 
 
 def _resolve_authorization_provider(
-    base_url: str, http: urllib3.PoolManager, timeout: urllib3.Timeout
+    base_url: str,
+    http: urllib3.PoolManager,
+    timeout: urllib3.Timeout,
 ) -> AuthorizationProvider:
     token = _resolve_token()
     if token:
         return StaticAuthorizationProvider(token)
 
-    client_id = _first_non_blank(
-        os.getenv("POLARIS_CLIENT_ID"),
-    )
-    client_secret = _first_non_blank(
-        os.getenv("POLARIS_CLIENT_SECRET"),
+    client_id = _first_non_blank(os.getenv("POLARIS_CLIENT_ID"))
+    client_secret = _first_non_blank(os.getenv("POLARIS_CLIENT_SECRET"))
+    has_realm_credentials = any(
+        key.startswith("POLARIS_REALM_") for key in os.environ.keys()
     )
 
-    if client_id and client_secret:
-        scope = _first_non_blank(os.getenv("POLARIS_TOKEN_SCOPE"))
-        token_url = _first_non_blank(os.getenv("POLARIS_TOKEN_URL"))
-        endpoint = token_url or urljoin(base_url, "api/catalog/v1/oauth/tokens")
+    if client_id and client_secret or has_realm_credentials:
         refresh_buffer_seconds = DEFAULT_TOKEN_REFRESH_BUFFER_SECONDS
         refresh_buffer_seconds_str = os.getenv("POLARIS_TOKEN_REFRESH_BUFFER_SECONDS")
         if refresh_buffer_seconds_str:
@@ -504,10 +519,7 @@ def _resolve_authorization_provider(
             except ValueError:
                 pass
         return ClientCredentialsAuthorizationProvider(
-            token_endpoint=endpoint,
-            client_id=client_id,
-            client_secret=client_secret,
-            scope=scope,
+            base_url=base_url,
             http=http,
             refresh_buffer_seconds=refresh_buffer_seconds,
             timeout=timeout,
@@ -540,9 +552,50 @@ def _resolve_package_version() -> str:
 
 def main() -> None:
     """Script entry point."""
+    config_file = os.getenv("POLARIS_CONFIG_FILE")
+    if config_file is None:
+        config_file = find_dotenv(".polaris_mcp.env")
+    load_dotenv(dotenv_path=config_file)
+
     logging.config.dictConfig(LOGGING_CONFIG)
     server = create_server()
-    server.run()
+
+    parser = argparse.ArgumentParser(description="Run Apache Polaris MCP Server")
+    parser.add_argument(
+        "--transport",
+        choices=["stdio", "sse", "http"],
+        default="stdio",
+        help="Transport type to use (default: stdio)",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Host for SSE/HTTP transportS (default: 127.0.0.1)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port for SSE/HTTP transports (default: 8000)",
+    )
+    args = parser.parse_args()
+
+    if args.transport == "stdio":
+        logger.info("Starting Apache Polaris MCP server using STDIO transport")
+        server.run()
+    elif args.transport == "sse":
+        logger.info(
+            f"Starting Apache Polaris MCP server using SSE transport on http://{args.host}:{args.port}/sse"
+        )
+        server.run(transport="sse", host=args.host, port=args.port)
+    elif args.transport == "http":
+        logger.info(
+            f"Starting Apache Polaris MCP server using HTTP transport on http://{args.host}:{args.port}/mcp"
+        )
+        server.run(transport="http", host=args.host, port=args.port, path="/mcp")
+    else:
+        logger.error(f"Unknown transport: {args.transport}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":  # pragma: no cover

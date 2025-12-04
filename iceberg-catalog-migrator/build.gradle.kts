@@ -43,9 +43,11 @@ tasks.named<RatTask>("rat").configure {
   excludes.add("ide-name.txt")
   excludes.add("version.txt")
 
-  excludes.add("LICENSE")
+  excludes.add("**/LICENSE")
+  excludes.add("**/BUNDLE-LICENSE")
   excludes.add("DISCLAIMER")
-  excludes.add("NOTICE")
+  excludes.add("**/NOTICE")
+  excludes.add("**/BUNDLE-NOTICE")
 
   // Eclipse preference files cannot have comments
   excludes.add("**/*.prefs")
@@ -56,7 +58,7 @@ tasks.named<RatTask>("rat").configure {
 
   // Misc build artifacts
   excludes.add("**/.keep")
-  excludes.add("logs/**")
+  excludes.add("**/logs/**")
   excludes.add("**/*.lock")
 
   // Binary files
