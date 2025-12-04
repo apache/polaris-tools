@@ -22,11 +22,12 @@
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 from abc import ABC, abstractmethod
 from typing import Optional
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
 import urllib3
 
@@ -35,7 +36,7 @@ class AuthorizationProvider(ABC):
     """Return Authorization header values for outgoing requests."""
 
     @abstractmethod
-    def authorization_header(self) -> Optional[str]: ...
+    def authorization_header(self, realm: Optional[str] = None) -> Optional[str]: ...
 
 
 class StaticAuthorizationProvider(AuthorizationProvider):
@@ -45,7 +46,7 @@ class StaticAuthorizationProvider(AuthorizationProvider):
         value = (token or "").strip()
         self._header = f"Bearer {value}" if value else None
 
-    def authorization_header(self) -> Optional[str]:
+    def authorization_header(self, realm: Optional[str] = None) -> Optional[str]:
         return self._header
 
 
@@ -54,59 +55,100 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
 
     def __init__(
         self,
-        token_endpoint: str,
-        client_id: str,
-        client_secret: str,
-        scope: Optional[str],
+        base_url: str,
         http: urllib3.PoolManager,
         refresh_buffer_seconds: float,
         timeout: urllib3.Timeout,
     ) -> None:
-        self._token_endpoint = token_endpoint
-        self._client_id = client_id
-        self._client_secret = client_secret
-        self._scope = scope
+        self._base_url = base_url
         self._http = http
+        self._refresh_buffer_seconds = max(refresh_buffer_seconds, 0.0)
         self._timeout = timeout
         self._lock = threading.Lock()
-        self._cached: Optional[tuple[str, float]] = None  # (token, expires_at_epoch)
-        self._refresh_buffer_seconds = max(refresh_buffer_seconds, 0.0)
+        # {realm: (token, expires_at_epoch)}
+        self._cached: dict[str, tuple[str, float]] = {}
 
-    def authorization_header(self) -> Optional[str]:
-        token = self._current_token()
+    def authorization_header(self, realm: Optional[str] = None) -> Optional[str]:
+        token = self._get_token_from_realm(realm)
         return f"Bearer {token}" if token else None
 
-    def _current_token(self) -> Optional[str]:
-        now = time.time()
-        cached = self._cached
-        if not cached or cached[1] - self._refresh_buffer_seconds <= now:
-            with self._lock:
-                cached = self._cached
-                if (
-                    not cached
-                    or cached[1] - self._refresh_buffer_seconds <= time.time()
-                ):
-                    self._cached = cached = self._fetch_token()
-        return cached[0] if cached else None
+    def _get_token_from_realm(self, realm: Optional[str]) -> Optional[str]:
+        def needs_refresh(cached):
+            return (
+                cached is None
+                or cached[1] - self._refresh_buffer_seconds <= time.time()
+            )
 
-    def _fetch_token(self) -> tuple[str, float]:
+        cache_key = realm or ""
+        token = self._cached.get(cache_key)
+        # Token not expired
+        if not needs_refresh(token):
+            return token[0]
+        # Acquire lock and verify again if token expired
+        with self._lock:
+            token = self._cached.get(cache_key)
+            if needs_refresh(token):
+                credentials = self._get_credentials_from_realm(realm)
+                if not credentials:
+                    return None
+                token = self._fetch_token(realm, credentials)
+                self._cached[cache_key] = token
+        return token[0] if token else None
+
+    def _get_credentials_from_realm(
+        self, realm: Optional[str]
+    ) -> Optional[dict[str, str]]:
+        def get_env(key: str) -> Optional[str]:
+            val = os.getenv(key)
+            return val.strip() or None if val else None
+
+        def load_creds(realm: Optional[str] = None) -> dict[str, Optional[str]]:
+            prefix = f"POLARIS_REALM_{realm}_" if realm else "POLARIS_"
+            return {
+                "client_id": get_env(f"{prefix}CLIENT_ID"),
+                "client_secret": get_env(f"{prefix}CLIENT_SECRET"),
+                "scope": get_env(f"{prefix}TOKEN_SCOPE"),
+                "token_url": get_env(f"{prefix}TOKEN_URL"),
+            }
+
+        # Only use realm-specific credentials
+        if realm:
+            creds = load_creds(realm)
+            if creds["client_id"] and creds["client_secret"]:
+                return creds
+            return None
+        # No realm specified, use global credentials
+        creds = load_creds()
+        if creds["client_id"] and creds["client_secret"]:
+            return creds
+        return None
+
+    def _fetch_token(
+        self, realm: Optional[str], credentials: dict[str, str]
+    ) -> tuple[str, float]:
+        token_url = credentials.get("token_url") or urljoin(
+            self._base_url, "api/catalog/v1/oauth/tokens"
+        )
         payload = {
             "grant_type": "client_credentials",
-            "client_id": self._client_id,
-            "client_secret": self._client_secret,
+            "client_id": credentials["client_id"],
+            "client_secret": credentials["client_secret"],
         }
-        if self._scope:
-            payload["scope"] = self._scope
+        if credentials.get("scope"):
+            payload["scope"] = credentials["scope"]
 
         encoded = urlencode(payload)
+        header_name = os.getenv("POLARIS_REALM_CONTEXT_HEADER_NAME", "Polaris-Realm")
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        if realm:
+            headers[header_name] = realm
         response = self._http.request(
             "POST",
-            self._token_endpoint,
+            token_url,
             body=encoded,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            headers=headers,
             timeout=self._timeout,
         )
-
         if response.status != 200:
             raise RuntimeError(
                 f"OAuth token endpoint returned {response.status}: {response.data.decode('utf-8', errors='ignore')}"
@@ -132,7 +174,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
 
 
 class _NoneAuthorizationProvider(AuthorizationProvider):
-    def authorization_header(self) -> Optional[str]:
+    def authorization_header(self, realm: Optional[str] = None) -> Optional[str]:
         return None
 
 

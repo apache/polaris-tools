@@ -27,6 +27,7 @@ plugins {
   id("eclipse")
   id("polaris-apprunner-root")
   alias(libs.plugins.rat)
+  alias(libs.plugins.jetbrains.changelog)
 }
 
 version = rootProject.rootDir.resolve("version.txt").readText().trim()
@@ -128,4 +129,24 @@ nexusPublishing {
         URI.create("https://repository.apache.org/content/repositories/snapshots/")
     }
   }
+}
+
+changelog {
+  repositoryUrl.set("https://github.com/apache/polaris-tools")
+  title.set("Apache Polaris Apprunner Changelog")
+  versionPrefix.set("apache-polaris-apprunner-")
+  header.set(provider { version.get() })
+  groups.set(
+    listOf(
+      "Highlights",
+      "Upgrade notes",
+      "Breaking changes",
+      "New Features",
+      "Changes",
+      "Deprecations",
+      "Fixes",
+      "Commits",
+    )
+  )
+  version.set(provider { project.version.toString() })
 }

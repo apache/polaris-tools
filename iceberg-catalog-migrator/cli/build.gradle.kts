@@ -159,7 +159,26 @@ val processResources =
 
 val mainClassName = "org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigrationCLI"
 
-val shadowJar = tasks.named<ShadowJar>("shadowJar") { isZip64 = true }
+val shadowJar =
+  tasks.named<ShadowJar>("shadowJar") {
+    isZip64 = true
+
+    // recursively remove all LICENSE and NOTICE file under META-INF, includes
+    // directories contains 'license' in the name
+    exclude("META-INF/**/*LICENSE*")
+    exclude("META-INF/**/*NOTICE*")
+    // exclude the top level LICENSE, LICENSE-*.txt and NOTICE
+    exclude("LICENSE*")
+    exclude("NOTICE*")
+
+    // add customized LICENSE and NOTICE for the bundle jar at top level. Note that the
+    // customized LICENSE and NOTICE file are called BUNDLE-LICENSE and BUNDLE-NOTICE,
+    // and renamed to LICENSE and NOTICE after include, this is to avoid the file
+    // being excluded due to the exclude pattern matching used above.
+    from("${projectDir}/BUNDLE-LICENSE") { rename { "LICENSE" } }
+    from("${projectDir}/BUNDLE-NOTICE") { rename { "NOTICE" } }
+    from("${projectDir}/../DISCLAIMER") { rename { "DISCLAIMER" } }
+  }
 
 shadowJar { manifest { attributes["Main-Class"] = mainClassName } }
 
