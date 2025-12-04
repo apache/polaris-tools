@@ -17,30 +17,22 @@
 # under the License.
 #
 
-.gradle
-build
-bin/
+.PHONY: create-dataset-simulation
+create-dataset-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDataset \
+      -Dconfig.file=./application.conf
 
-# Ignore Gradle wrapper jar file
-gradle/wrapper/gradle-wrapper.jar
-gradle/wrapper/gradle-wrapper-*.sha256
+.PHONY: read-simulation
+read-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.ReadTreeDataset \
+      -Dconfig.file=./application.conf
 
-# Log files
-*.log
-logs/
+.PHONY: read-update-simulation
+read-update-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset \
+      -Dconfig.file=./application.conf
 
-# binary files
-*.class
-*.jar
-*.zip
-*.tar.gz
-*.tgz
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-# macOS
-*.DS_Store
-
-# Development Experience
-application.conf
+.PHONY: create-commits-simulation
+create-commits-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateCommits \
+      -Dconfig.file=./application.conf
