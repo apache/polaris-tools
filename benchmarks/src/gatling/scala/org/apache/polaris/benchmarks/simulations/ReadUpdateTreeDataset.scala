@@ -78,7 +78,7 @@ class ReadUpdateTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   val readWriteScenario: ScenarioBuilder =
     scenario("Read and write entities using the Iceberg REST API")
-      .exec(setupActions.authActions.restoreAccessTokenInSession)
+      .exec(setupActions.restoreAccessTokenInSession)
       .randomSwitch(
         wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
           uniformRandomSwitch(
