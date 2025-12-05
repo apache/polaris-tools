@@ -19,7 +19,7 @@
 package org.apache.polaris.benchmarks.actions
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.core.structure.{ChainBuilder, ScenarioBuilder}
 import org.apache.polaris.benchmarks.parameters.ConnectionParameters
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
@@ -53,9 +53,10 @@ case class SetupActions(
   private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
 
   /**
-   * Authentication actions instance that handles the actual OAuth token operations.
+   * Authentication actions instance that handles the actual OAuth token operations. This is private
+   * as all necessary functionality is exposed through SetupActions methods.
    */
-  val authActions: AuthenticationActions =
+  private val authActions: AuthenticationActions =
     AuthenticationActions(cp, accessToken, maxRetries, retryableHttpCodes)
 
   /**
@@ -118,4 +119,14 @@ case class SetupActions(
         shouldRefreshToken.set(false)
         session
       }
+
+  /**
+   * Restores the current access token from the shared reference into the Gatling session. This
+   * operation is useful when a scenario needs to reuse an authentication token from a previous
+   * scenario.
+   *
+   * @return ChainBuilder that restores the token to the session
+   */
+  val restoreAccessTokenInSession: ChainBuilder =
+    exec(session => session.set("accessToken", accessToken.get()))
 }
