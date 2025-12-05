@@ -61,6 +61,8 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   println("### Writer distributions ###")
   wp.weightedWorkloadOnTreeDataset.writers.foreach(_.printDescription(dp))
 
+  private val duration = wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes
+
   // --------------------------------------------------------------------------------
   // Helper values
   // --------------------------------------------------------------------------------
@@ -86,7 +88,7 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
           RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 1000) + threadId)
         scenario(s"Reader-$i-$threadId")
           .exec(setupActions.restoreAccessTokenInSession)
-          .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
+          .during(duration) {
             exec { session =>
               val tableIndex = dist.sample(dp.maxPossibleTables, rnp)
               val (catalog, namespace, table) =
@@ -117,7 +119,7 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
           RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 2000) + threadId)
         scenario(s"Writer-$i-$threadId")
           .exec(setupActions.restoreAccessTokenInSession)
-          .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
+          .during(duration) {
             exec { session =>
               val tableIndex = dist.sample(dp.maxPossibleTables, rnp)
               val (catalog, namespace, table) =
@@ -141,10 +143,7 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   // Setup
   // --------------------------------------------------------------------------------
   setUp(
-    setupActions
-      .refreshOauthForDuration(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes)
-      .inject(atOnceUsers(1))
-      .protocols(httpProtocol),
+    setupActions.refreshOauthForDuration(duration).inject(atOnceUsers(1)).protocols(httpProtocol),
     setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .protocols(httpProtocol)
