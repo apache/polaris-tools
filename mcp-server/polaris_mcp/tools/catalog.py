@@ -37,7 +37,9 @@ class PolarisCatalogTool(McpTool):
     """Interact with the Polaris management API for catalog lifecycle operations."""
 
     TOOL_NAME = "polaris-catalog-request"
-    TOOL_DESCRIPTION = "Perform catalogs operations (list, get, create, update, delete)."
+    TOOL_DESCRIPTION = (
+        "Perform catalogs operations (list, get, create, update, delete)."
+    )
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
