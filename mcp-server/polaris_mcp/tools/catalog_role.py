@@ -38,13 +38,13 @@ class PolarisCatalogRoleTool(McpTool):
     """Manage catalog roles and grants via the Polaris management API."""
 
     TOOL_NAME = "polaris-catalog-role-request"
-    TOOL_DESCRIPTION = "Manage catalog roles and grants via the Polaris management API."
+    TOOL_DESCRIPTION = "Perform catalog roles operations (list, get, create, update, delete, list-principal-roles, list-grants, add-grant, revoke-grant)."
 
-    LIST_ALIASES: Set[str] = {"list"}
+    LIST_ALIASES: Set[str] = {"list", "ls"}
+    GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
-    GET_ALIASES: Set[str] = {"get"}
     UPDATE_ALIASES: Set[str] = {"update"}
-    DELETE_ALIASES: Set[str] = {"delete", "remove"}
+    DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
     LIST_PRINCIPAL_ROLES_ALIASES: Set[str] = {
         "list-principal-roles",
         "list-assigned-principal-roles",
@@ -134,56 +134,99 @@ class PolarisCatalogRoleTool(McpTool):
         base_path = f"catalogs/{catalog}/catalog-roles"
 
         if normalized == "list":
-            delegate_args["method"] = "GET"
-            delegate_args["path"] = base_path
+            self._handle_list(delegate_args, base_path)
         elif normalized == "create":
-            delegate_args["method"] = "POST"
-            delegate_args["path"] = base_path
-            delegate_args["body"] = self._require_object(
-                arguments, "body", "CreateCatalogRoleRequest"
-            )
+            self._handle_create(arguments, delegate_args, base_path)
         elif normalized == "get":
-            delegate_args["method"] = "GET"
-            delegate_args["path"] = self._catalog_role_path(base_path, arguments)
+            self._handle_get(arguments, delegate_args, base_path)
         elif normalized == "update":
-            delegate_args["method"] = "PUT"
-            delegate_args["path"] = self._catalog_role_path(base_path, arguments)
-            delegate_args["body"] = self._require_object(
-                arguments, "body", "UpdateCatalogRoleRequest"
-            )
+            self._handle_update(arguments, delegate_args, base_path)
         elif normalized == "delete":
-            delegate_args["method"] = "DELETE"
-            delegate_args["path"] = self._catalog_role_path(base_path, arguments)
+            self._handle_delete(arguments, delegate_args, base_path)
         elif normalized == "list-principal-roles":
-            delegate_args["method"] = "GET"
-            delegate_args["path"] = (
-                f"{self._catalog_role_path(base_path, arguments)}/principal-roles"
-            )
+            self._handle_list_principal_roles(arguments, delegate_args, base_path)
         elif normalized == "list-grants":
-            delegate_args["method"] = "GET"
-            delegate_args["path"] = (
-                f"{self._catalog_role_path(base_path, arguments)}/grants"
-            )
+            self._handle_list_grants(arguments, delegate_args, base_path)
         elif normalized == "add-grant":
-            delegate_args["method"] = "PUT"
-            delegate_args["path"] = (
-                f"{self._catalog_role_path(base_path, arguments)}/grants"
-            )
-            delegate_args["body"] = self._require_object(
-                arguments, "body", "AddGrantRequest"
-            )
+            self._handle_add_grant(arguments, delegate_args, base_path)
         elif normalized == "revoke-grant":
-            delegate_args["method"] = "POST"
-            delegate_args["path"] = (
-                f"{self._catalog_role_path(base_path, arguments)}/grants"
-            )
-            if isinstance(arguments.get("body"), dict):
-                delegate_args["body"] = copy.deepcopy(arguments["body"])
+            self._handle_revoke_grant(arguments, delegate_args, base_path)
         else:  # pragma: no cover
             raise ValueError(f"Unsupported operation: {operation}")
 
         raw = self._rest_client.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
+
+    def _handle_list(self, delegate_args: JSONDict, base_path: str) -> None:
+        delegate_args["method"] = "GET"
+        delegate_args["path"] = base_path
+
+    def _handle_create(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "POST"
+        delegate_args["path"] = base_path
+        delegate_args["body"] = self._require_object(
+            arguments, "body", "CreateCatalogRoleRequest"
+        )
+
+    def _handle_get(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "GET"
+        delegate_args["path"] = self._catalog_role_path(base_path, arguments)
+
+    def _handle_update(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "PUT"
+        delegate_args["path"] = self._catalog_role_path(base_path, arguments)
+        delegate_args["body"] = self._require_object(
+            arguments, "body", "UpdateCatalogRoleRequest"
+        )
+
+    def _handle_delete(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "DELETE"
+        delegate_args["path"] = self._catalog_role_path(base_path, arguments)
+
+    def _handle_list_principal_roles(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "GET"
+        delegate_args["path"] = (
+            f"{self._catalog_role_path(base_path, arguments)}/principal-roles"
+        )
+
+    def _handle_list_grants(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "GET"
+        delegate_args["path"] = (
+            f"{self._catalog_role_path(base_path, arguments)}/grants"
+        )
+
+    def _handle_add_grant(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "PUT"
+        delegate_args["path"] = (
+            f"{self._catalog_role_path(base_path, arguments)}/grants"
+        )
+        delegate_args["body"] = self._require_object(
+            arguments, "body", "AddGrantRequest"
+        )
+
+    def _handle_revoke_grant(
+        self, arguments: dict, delegate_args: JSONDict, base_path: str
+    ) -> None:
+        delegate_args["method"] = "POST"
+        delegate_args["path"] = (
+            f"{self._catalog_role_path(base_path, arguments)}/grants"
+        )
+        if isinstance(arguments.get("body"), dict):
+            delegate_args["body"] = copy.deepcopy(arguments["body"])
 
     def _catalog_role_path(self, base_path: str, arguments: Dict[str, Any]) -> str:
         role = encode_path_segment(require_text(arguments, "catalogRole"))

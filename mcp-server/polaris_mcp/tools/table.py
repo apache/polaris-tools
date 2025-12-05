@@ -39,13 +39,14 @@ from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 class PolarisTableTool(McpTool):
     """Expose Polaris table REST endpoints through MCP."""
 
-    TOOL_NAME = "polaris-iceberg-table"
-    TOOL_DESCRIPTION = "Perform table-centric operations (list, get, create, commit, delete) using the Polaris REST API."
+    TOOL_NAME = "polaris-iceberg-table-request"
+    TOOL_DESCRIPTION = "Perform table-centric operations (list, get, create, update, delete)."
+
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
     COMMIT_ALIASES: Set[str] = {"commit", "update"}
-    DELETE_ALIASES: Set[str] = {"delete", "drop"}
+    DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
 
     def __init__(self, rest_client: PolarisRestTool) -> None:
         self._rest_client = rest_client

@@ -37,12 +37,10 @@ class PolarisCatalogTool(McpTool):
     """Interact with the Polaris management API for catalog lifecycle operations."""
 
     TOOL_NAME = "polaris-catalog-request"
-    TOOL_DESCRIPTION = (
-        "Interact with the Polaris management API for catalog lifecycle operations."
-    )
+    TOOL_DESCRIPTION = "Perform catalogs operations (list, get, create, update, delete)."
 
-    LIST_ALIASES: Set[str] = {"list"}
-    GET_ALIASES: Set[str] = {"get"}
+    LIST_ALIASES: Set[str] = {"list", "ls"}
+    GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
     UPDATE_ALIASES: Set[str] = {"update"}
     DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
@@ -111,40 +109,55 @@ class PolarisCatalogTool(McpTool):
             delegate_args["realm"] = realm
 
         if normalized == "list":
-            delegate_args["method"] = "GET"
-            delegate_args["path"] = "catalogs"
+            self._handle_list(delegate_args)
         elif normalized == "get":
-            catalog_name = encode_path_segment(require_text(arguments, "catalog"))
-            delegate_args["method"] = "GET"
-            delegate_args["path"] = f"catalogs/{catalog_name}"
+            self._handle_get(arguments, delegate_args)
         elif normalized == "create":
-            body = arguments.get("body")
-            if not isinstance(body, dict):
-                raise ValueError(
-                    "Create operations require a body matching CreateCatalogRequest."
-                )
-            delegate_args["method"] = "POST"
-            delegate_args["path"] = "catalogs"
-            delegate_args["body"] = copy.deepcopy(body)
+            self._handle_create(arguments, delegate_args)
         elif normalized == "update":
-            catalog_name = encode_path_segment(require_text(arguments, "catalog"))
-            body = arguments.get("body")
-            if not isinstance(body, dict):
-                raise ValueError(
-                    "Update operations require a body matching UpdateCatalogRequest."
-                )
-            delegate_args["method"] = "PUT"
-            delegate_args["path"] = f"catalogs/{catalog_name}"
-            delegate_args["body"] = copy.deepcopy(body)
+            self._handle_update(arguments, delegate_args)
         elif normalized == "delete":
-            catalog_name = encode_path_segment(require_text(arguments, "catalog"))
-            delegate_args["method"] = "DELETE"
-            delegate_args["path"] = f"catalogs/{catalog_name}"
+            self._handle_delete(arguments, delegate_args)
         else:  # pragma: no cover
             raise ValueError(f"Unsupported operation: {operation}")
 
         raw = self._rest_client.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
+
+    def _handle_list(self, delegate_args: JSONDict) -> None:
+        delegate_args["method"] = "GET"
+        delegate_args["path"] = "catalogs"
+
+    def _handle_get(self, arguments: dict, delegate_args: JSONDict) -> None:
+        catalog_name = encode_path_segment(require_text(arguments, "catalog"))
+        delegate_args["method"] = "GET"
+        delegate_args["path"] = f"catalogs/{catalog_name}"
+
+    def _handle_create(self, arguments: dict, delegate_args: JSONDict) -> None:
+        body = arguments.get("body")
+        if not isinstance(body, dict):
+            raise ValueError(
+                "Create operations require a body matching CreateCatalogRequest."
+            )
+        delegate_args["method"] = "POST"
+        delegate_args["path"] = "catalogs"
+        delegate_args["body"] = copy.deepcopy(body)
+
+    def _handle_update(self, arguments: dict, delegate_args: JSONDict) -> None:
+        catalog_name = encode_path_segment(require_text(arguments, "catalog"))
+        body = arguments.get("body")
+        if not isinstance(body, dict):
+            raise ValueError(
+                "Update operations require a body matching UpdateCatalogRequest."
+            )
+        delegate_args["method"] = "PUT"
+        delegate_args["path"] = f"catalogs/{catalog_name}"
+        delegate_args["body"] = copy.deepcopy(body)
+
+    def _handle_delete(self, arguments: dict, delegate_args: JSONDict) -> None:
+        catalog_name = encode_path_segment(require_text(arguments, "catalog"))
+        delegate_args["method"] = "DELETE"
+        delegate_args["path"] = f"catalogs/{catalog_name}"
 
     def _maybe_augment_error(
         self, result: ToolExecutionResult, operation: str
