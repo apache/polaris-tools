@@ -31,7 +31,6 @@ import org.apache.polaris.benchmarks.parameters.{
 import org.apache.polaris.benchmarks.util.CircularIterator
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 import scala.concurrent.duration._
 
 /**
@@ -53,14 +52,11 @@ class ReadUpdateTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   // Helper values
   // --------------------------------------------------------------------------------
-  private val accessToken: AtomicReference[String] = new AtomicReference()
-  private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
-
-  private val authActions = AuthenticationActions(cp, accessToken)
-  private val catActions = CatalogActions(dp, accessToken)
-  private val nsActions = NamespaceActions(dp, wp, accessToken)
-  private val tblActions = TableActions(dp, wp, accessToken)
-  private val viewActions = ViewActions(dp, wp, accessToken)
+  private val setupActions = SetupActions(cp)
+  private val catActions = CatalogActions(dp, setupActions.accessToken)
+  private val nsActions = NamespaceActions(dp, wp, setupActions.accessToken)
+  private val tblActions = TableActions(dp, wp, setupActions.accessToken)
+  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
 
   private val nsListFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
   private val nsExistsFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
@@ -78,38 +74,11 @@ class ReadUpdateTreeDataset extends Simulation {
   private val viewUpdateFeeder = viewActions.propertyUpdateFeeder()
 
   // --------------------------------------------------------------------------------
-  // Authentication related workloads:
-  // * Authenticate and store the access token for later use every minute
-  // * Wait for an OAuth token to be available
-  // * Stop the token refresh loop
-  // --------------------------------------------------------------------------------
-  val continuouslyRefreshOauthToken: ScenarioBuilder =
-    scenario("Authenticate every minute using the Iceberg REST API")
-      .asLongAs(_ => shouldRefreshToken.get()) {
-        feed(authActions.feeder())
-          .exec(authActions.authenticateAndSaveAccessToken)
-          .pause(1.minute)
-      }
-
-  val waitForAuthentication: ScenarioBuilder =
-    scenario("Wait for the authentication token to be available")
-      .asLongAs(_ => accessToken.get() == null) {
-        pause(1.second)
-      }
-
-  val stopRefreshingToken: ScenarioBuilder =
-    scenario("Stop refreshing the authentication token")
-      .exec { session =>
-        shouldRefreshToken.set(false)
-        session
-      }
-
-  // --------------------------------------------------------------------------------
   // Workload: Randomly read and write entities
   // --------------------------------------------------------------------------------
   val readWriteScenario: ScenarioBuilder =
     scenario("Read and write entities using the Iceberg REST API")
-      .exec(authActions.restoreAccessTokenInSession)
+      .exec(setupActions.authActions.restoreAccessTokenInSession)
       .randomSwitch(
         wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
           uniformRandomSwitch(
@@ -147,8 +116,8 @@ class ReadUpdateTreeDataset extends Simulation {
   private val durationInMinutes = wp.readUpdateTreeDataset.durationInMinutes
 
   setUp(
-    continuouslyRefreshOauthToken.inject(atOnceUsers(1)).protocols(httpProtocol),
-    waitForAuthentication
+    setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
+    setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .andThen(
         readWriteScenario
@@ -157,6 +126,6 @@ class ReadUpdateTreeDataset extends Simulation {
           )
           .protocols(httpProtocol)
       )
-      .andThen(stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }
