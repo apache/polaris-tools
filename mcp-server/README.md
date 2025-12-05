@@ -179,9 +179,9 @@ Realm-specific variables (e.g., `POLARIS_REALM_${realm}_CLIENT_ID`) override the
 
 The server exposes the following MCP tools:
 
-* `polaris-iceberg-table` — Table operations (`list`, `get`, `create`, `update`, `delete`).
+* `polaris-iceberg-table-request` — Table operations (`list`, `get`, `create`, `update`, `delete`).
 * `polaris-namespace-request` — Namespace lifecycle management.
-* `polaris-policy` — Policy lifecycle management and mappings.
+* `polaris-policy-request` — Policy lifecycle management and mappings.
 * `polaris-catalog-request` — Catalog lifecycle management.
 * `polaris-principal-request` — Principal lifecycle helpers.
 * `polaris-principal-role-request` — Principal role lifecycle and catalog-role assignments.
