@@ -67,11 +67,8 @@ Please note: `--directory` specifies a local directory. It is not needed when we
 For quick local testing without configuring a full client like Claude Desktop, you can use the included `client.py` script.
 
 ```bash
-# Start service in HTTP mode
-## Make sure you have set necessary environment variables (POLARIS_BASE_URL, etc.)
-uv run polaris-mcp --transport http
-# Start client in interactative mode
-uv run int_test/client.py http://localhost:8000/mcp
+# Start client in interactative mode with STDIO transport
+uv run int_test/client.py polaris_mcp/server.py
 ```
 
 You can also run client directly from the command line with non-interactive mode:
@@ -84,7 +81,7 @@ Here are sample client commands:
 
 ```bash
 # Create catalog
-uv run int_test/client.py http://localhost:8000/mcp \
+uv run int_test/client.py polaris_mcp/server.py \
   --tool polaris-catalog-request \
   --args '{
     "operation": "create",
@@ -106,11 +103,15 @@ uv run int_test/client.py http://localhost:8000/mcp \
     }
   }'
 # List catalog
-uv run client.py http://localhost:8000/mcp \
+uv run int_test/client.py polaris_mcp/server.py \
   --tool polaris-catalog-request \
   --args '{"operation": "list"}'
+# List catalog in realm "POLARIS"
+uv run int_test/client.py polaris_mcp/server.py \
+  --tool polaris-catalog-request \
+  --args '{"operation": "list", "realm": "POLARIS"}'
 # Create principal
-uv run client.py http://localhost:8000/mcp \
+uv run int_test/client.py polaris_mcp/server.py \
   --tool polaris-principal-request \
   --args '{
     "operation": "create",
@@ -122,7 +123,7 @@ uv run client.py http://localhost:8000/mcp \
     }
   }'
 # Create principal role
-uv run client.py http://localhost:8000/mcp \
+uv run int_test/client.py polaris_mcp/server.py \
   --tool polaris-principal-role-request \
   --args '{
     "operation": "create",
@@ -134,7 +135,7 @@ uv run client.py http://localhost:8000/mcp \
     }
   }'
 # Assign principal role
-uv run client.py http://localhost:8000/mcp \
+uv run int_test/client.py polaris_mcp/server.py \
   --tool polaris-principal-request \
   --args '{
     "operation": "assign-principal-role",
