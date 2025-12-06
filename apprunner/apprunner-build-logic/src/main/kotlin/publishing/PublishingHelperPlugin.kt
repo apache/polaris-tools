@@ -28,6 +28,7 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.javadoc.Javadoc
@@ -94,6 +95,17 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         configureOnRootProject(project)
       }
 
+      // The Gradle plugin-plugin adds another publication for the Gradle plugin marker artifact,
+      // which is needed to resolve Gradle plugins by their ID. It uses the name `pluginMaven` for
+      // the "main" `MavenPublication`, but that publication is created _after_ this code runs,
+      // if it does not already exist.
+      // The Maven plugin-plugin uses the name `mavenJava` for the "main" `MavenPublication`, which
+      // is created _before_ this code runs.
+      val hasGradlePlugin = plugins.hasPlugin("java-gradle-plugin")
+      val hasMavenPlugin = plugins.hasPlugin("io.freefair.maven-plugin")
+      val publicationName =
+        if (hasGradlePlugin) "pluginMaven" else if (hasMavenPlugin) "mavenJava" else "maven"
+
       if (isSigningEnabled()) {
         apply(plugin = "signing")
         plugins.withType<SigningPlugin>().configureEach {
@@ -102,7 +114,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             val signingPassword: String? by project
             useInMemoryPgpKeys(signingKey, signingPassword)
             val publishing = project.extensions.getByType(PublishingExtension::class.java)
-            afterEvaluate { sign(publishing.publications.getByName("maven")) }
+            afterEvaluate { publishing.publications.forEach { publication -> sign(publication) } }
 
             if (project.hasProperty("useGpgAgent")) {
               useGpgCmd()
@@ -121,7 +133,11 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       plugins.withType<MavenPublishPlugin>().configureEach {
         configure<PublishingExtension> {
           publications {
-            register<MavenPublication>("maven") {
+            // The maven plugin-plugin has already registered the 'mavenJava' publication.
+            if (!hasMavenPlugin) {
+              register<MavenPublication>(publicationName)
+            }
+            named<MavenPublication>(publicationName) {
               val mavenPublication = this
               afterEvaluate {
                 // This MUST happen in an 'afterEvaluate' to ensure that the Shadow*Plugin has
@@ -139,7 +155,12 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
                       }
                     }
                   }
-                  from(component)
+                  // The Gradle and Maven plugin-plugins unconditionally add the 'java' component.
+                  // It's illegal to have more than one `SoftwareComponent` in a publication,
+                  // even if it is the same.
+                  if (!hasGradlePlugin && !hasMavenPlugin) {
+                    from(component)
+                  }
                 }
 
                 suppressPomMetadataWarningsFor("testFixturesApiElements")
@@ -167,14 +188,15 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
                 artifact(testFixturesJavadocJar)
               }
 
-              tasks.named("generatePomFileForMavenPublication").configure {
-                configurePom(project, mavenPublication, this)
+              // Have to configure all pom's (needed for the Gradle plugin-plugin)
+              tasks.withType(GenerateMavenPom::class.java).configureEach {
+                configurePom(project, this)
               }
             }
           }
         }
       }
 
-      addAdditionalJarContent(this)
+      addAdditionalJarContent(this, publicationName)
     }
 }

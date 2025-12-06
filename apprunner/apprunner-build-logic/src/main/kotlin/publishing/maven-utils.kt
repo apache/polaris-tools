@@ -70,7 +70,7 @@ abstract class GeneratePomProperties : DefaultTask() {
  * `META-INF/maven/group-id/artifact-id/`. Also adds the `NOTICE` and `LICENSE` files in `META-INF`,
  * which makes it easier for license scanners.
  */
-fun addAdditionalJarContent(project: Project): Unit =
+fun addAdditionalJarContent(project: Project, mainPublicationName: String): Unit =
   project.run {
     project.plugins.withType(JavaLibraryPlugin::class.java) {
       val generatePomProperties =
@@ -83,7 +83,6 @@ fun addAdditionalJarContent(project: Project): Unit =
             rootProject.layout.files("gradle/jar-licenses/LICENSE", "gradle/jar-licenses/NOTICE")
           )
           inputs.property("GAV", "${project.group}:${project.name}:${project.version}")
-          dependsOn("generatePomFileForMavenPublication")
           if (!project.file("src/main/resources/META-INF/LICENSE").exists()) {
             from(rootProject.rootDir).include("gradle/jar-licenses/LICENSE").eachFile {
               this.path = "META-INF/$sourceName"
@@ -94,7 +93,12 @@ fun addAdditionalJarContent(project: Project): Unit =
               this.path = "META-INF/$sourceName"
             }
           }
-          from(tasks.named("generatePomFileForMavenPublication")) {
+          // The Gradle plugin-plugin add another publication for the Gradle plugin marker artifact,
+          // which is needed to resolve Gradle plugins by their ID.
+          // Here we want to add the Maven pom information for the "main" publication to the jar.
+          val generateMavenPomTask = tasks.named(generatePomTaskName(mainPublicationName))
+          dependsOn(generateMavenPomTask)
+          from(generateMavenPomTask) {
             include("pom-default.xml")
             eachFile { this.path = "META-INF/maven/${project.group}/${project.name}/pom.xml" }
           }
@@ -110,3 +114,6 @@ fun addAdditionalJarContent(project: Project): Unit =
       }
     }
   }
+
+fun generatePomTaskName(publicationName: String) =
+  "generatePomFileFor${publicationName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Publication"
