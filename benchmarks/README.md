@@ -131,6 +131,9 @@ make read-simulation
 
 # Commits creation
 make create-commits-simulation
+
+# S3 sign request
+make s3-sign-request-simulation
 ```
 
 A message will show the location of the Gatling report:
