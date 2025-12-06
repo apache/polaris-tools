@@ -71,7 +71,8 @@ case class S3SignActions(
       .set("uri", fileUri)
   }
     .exec { session =>
-      logger.info(s"Signing S3 request for #{fileUri")
+      val uri = session("uri").as[String]
+      logger.info(s"Signing S3 request for $uri")
       session
     }
     .exec(
