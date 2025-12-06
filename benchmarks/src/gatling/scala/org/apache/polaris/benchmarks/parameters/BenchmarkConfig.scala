@@ -43,6 +43,7 @@ object BenchmarkConfig {
       val ctdConfig = workload.getConfig("create-tree-dataset")
       val rutdConfig = workload.getConfig("read-update-tree-dataset")
       val wwotdConfig = workload.getConfig("weighted-workload-on-tree-dataset")
+      val s3srConfig = workload.getConfig("s3-sign-request")
 
       WorkloadParameters(
         CreateCommitsParameters(
@@ -68,6 +69,9 @@ object BenchmarkConfig {
           WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "readers"),
           WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "writers"),
           wwotdConfig.getInt("duration-in-minutes")
+        ),
+        S3SignRequestParameters(
+          s3srConfig.getInt("table-concurrency")
         )
       )
     }
