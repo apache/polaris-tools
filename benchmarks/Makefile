@@ -17,6 +17,11 @@
 # under the License.
 #
 
+.PHONY: s3-sign-request-simulation
+s3-sign-request-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.S3SignRequest \
+      -Dconfig.file=./application.conf
+
 .PHONY: create-dataset-simulation
 create-dataset-simulation:
 	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDataset \

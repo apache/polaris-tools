@@ -19,7 +19,6 @@
 package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
@@ -27,42 +26,41 @@ import org.apache.polaris.benchmarks.parameters.WorkloadParameters
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicInteger
-import scala.concurrent.duration._
 
 /**
- * This simulation is a 100% read workload that fetches a tree dataset in Polaris. It is intended to
- * be used against a Polaris instance with a pre-existing tree dataset. It has no side effect on the
- * dataset and therefore can be executed multiple times without any issue. It fetches each entity
- * exactly once.
+ * This simulation signs S3 requests for table files in a pre-existing tree dataset. It is intended
+ * to be used against a Polaris instance with a pre-existing tree dataset. It has no side effect on
+ * the dataset and therefore can be executed multiple times without any issue. It signs each table
+ * file exactly once.
  */
-class ReadTreeDataset extends Simulation {
+class S3SignRequest extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  // --------------------------------------------------------------------------------
-  // Load parameters
-  // --------------------------------------------------------------------------------
   private val cp = config.connectionParameters
   private val dp = config.datasetParameters
   val wp: WorkloadParameters = config.workloadParameters
 
-  // --------------------------------------------------------------------------------
-  // Helper values
-  // --------------------------------------------------------------------------------
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
   private val setupActions = SetupActions(cp)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken)
   private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken)
   private val tableActions = TableActions(dp, wp, setupActions.accessToken)
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
+  private val s3SignActions = S3SignActions(dp, wp, setupActions.accessToken)
 
+  private val grantedCatalogs = new AtomicInteger()
   private val verifiedCatalogs = new AtomicInteger()
   private val verifiedNamespaces = new AtomicInteger()
-  private val verifiedTables = new AtomicInteger()
-  private val verifiedViews = new AtomicInteger()
+  private val signedTables = new AtomicInteger()
 
-  // --------------------------------------------------------------------------------
-  // Workload: Verify each catalog
-  // --------------------------------------------------------------------------------
+  private val grantCatalogPrivileges = scenario("Grant privileges to catalog role")
+    .exec(setupActions.restoreAccessTokenInSession)
+    .asLongAs(session =>
+      grantedCatalogs.getAndIncrement() < dp.numCatalogs && session.contains("accessToken")
+    )(
+      feed(catalogActions.feeder())
+        .exec(setupActions.grantPrivileges)
+    )
+
   private val verifyCatalogs = scenario("Verify catalogs using the Polaris Management REST API")
     .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
@@ -72,9 +70,6 @@ class ReadTreeDataset extends Simulation {
         .exec(catalogActions.fetchCatalog)
     )
 
-  // --------------------------------------------------------------------------------
-  // Workload: Verify namespaces
-  // --------------------------------------------------------------------------------
   private val verifyNamespaces = scenario("Verify namespaces using the Iceberg REST API")
     .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
@@ -86,55 +81,35 @@ class ReadTreeDataset extends Simulation {
         .exec(namespaceActions.fetchNamespace)
     )
 
-  // --------------------------------------------------------------------------------
-  // Workload: Verify tables
-  // --------------------------------------------------------------------------------
-  private val verifyTables = scenario("Verify tables using the Iceberg REST API")
+  private val signTables = scenario("Sign S3 requests for table files")
     .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
-      verifiedTables.getAndIncrement() < dp.numTables && session.contains("accessToken")
+      signedTables.getAndIncrement() < dp.numTables && session.contains("accessToken")
     )(
       feed(tableActions.tableFetchFeeder())
         .exec(tableActions.fetchAllTables)
         .exec(tableActions.checkTableExists)
-        .exec(tableActions.fetchTable)
+        .exec(s3SignActions.signTableRequest)
     )
 
-  // --------------------------------------------------------------------------------
-  // Workload: Verify views
-  // --------------------------------------------------------------------------------
-  private val verifyViews = scenario("Verify views using the Iceberg REST API")
-    .exec(setupActions.restoreAccessTokenInSession)
-    .asLongAs(session =>
-      verifiedViews.getAndIncrement() < dp.numViews && session.contains("accessToken")
-    )(
-      feed(viewActions.viewFetchFeeder())
-        .exec(viewActions.fetchAllViews)
-        .exec(viewActions.checkViewExists)
-        .exec(viewActions.fetchView)
-    )
-
-  // --------------------------------------------------------------------------------
-  // Build up the HTTP protocol configuration and set up the simulation
-  // --------------------------------------------------------------------------------
   private val httpProtocol = http
     .baseUrl(cp.baseUrl)
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
     .disableCaching
 
-  // Get the configured throughput for tables and views
-  private val tableThroughput = wp.readTreeDataset.tableThroughput
-  private val viewThroughput = wp.readTreeDataset.viewThroughput
+  private val tableThroughput = wp.s3SignRequest.tableThroughput
 
   setUp(
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
     setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
+      .andThen(grantCatalogPrivileges.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(verifyNamespaces.inject(atOnceUsers(dp.nsDepth)).protocols(httpProtocol))
-      .andThen(verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
-      .andThen(verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
+      .andThen(
+        signTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol)
+      )
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }

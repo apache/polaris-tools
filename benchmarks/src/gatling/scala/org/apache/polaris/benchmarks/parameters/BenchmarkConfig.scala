@@ -20,6 +20,8 @@ package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.jdk.CollectionConverters._
+
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
 
@@ -34,7 +36,9 @@ object BenchmarkConfig {
     val connectionParams = ConnectionParameters(
       auth.getString("client-id"),
       auth.getString("client-secret"),
-      http.getString("base-url")
+      http.getString("base-url"),
+      auth.getString("catalog-role"),
+      auth.getStringList("privileges").asScala.toSeq
     )
 
     val workloadParams = {
@@ -43,6 +47,7 @@ object BenchmarkConfig {
       val ctdConfig = workload.getConfig("create-tree-dataset")
       val rutdConfig = workload.getConfig("read-update-tree-dataset")
       val wwotdConfig = workload.getConfig("weighted-workload-on-tree-dataset")
+      val s3srConfig = workload.getConfig("s3-sign-request")
 
       WorkloadParameters(
         CreateCommitsParameters(
@@ -68,6 +73,9 @@ object BenchmarkConfig {
           WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "readers"),
           WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "writers"),
           wwotdConfig.getInt("duration-in-minutes")
+        ),
+        S3SignRequestParameters(
+          s3srConfig.getInt("table-concurrency")
         )
       )
     }
