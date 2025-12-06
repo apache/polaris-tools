@@ -36,3 +36,29 @@ read-update-simulation:
 create-commits-simulation:
 	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateCommits \
       -Dconfig.file=./application.conf
+
+.PHONY: reports-list
+reports-list:
+	@for report in $$(ls -d build/reports/gatling/*/ 2>/dev/null | sort -r); do \
+		basename="$$(basename $$report)"; \
+		name="$$(echo $$basename | sed 's/-[0-9]\{17\}$$//')"; \
+		timestamp="$$(echo $$basename | grep -o '[0-9]\{17\}$$')"; \
+		if [ -n "$$timestamp" ]; then \
+			date="$$(echo $$timestamp | cut -c1-8)"; \
+			time="$$(echo $$timestamp | cut -c9-14)"; \
+			millis="$$(echo $$timestamp | cut -c15-17)"; \
+			formatted_date="$$(echo $$date | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3/')"; \
+			formatted_time="$$(echo $$time | sed 's/\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1:\2:\3/')"; \
+			index_path="$${report}index.html"; \
+			if [ -f "$$index_path" ]; then \
+				echo "$$name | $$formatted_date $$formatted_time.$$millis | $$index_path"; \
+			else \
+				echo "$$name | $$formatted_date $$formatted_time.$$millis | ERROR"; \
+			fi; \
+		fi; \
+	done
+
+.PHONY: reports-clean
+reports-clean:
+	@rm -rf build/reports/gatling/*/ 2>/dev/null || true
+
