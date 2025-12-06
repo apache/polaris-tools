@@ -1,0 +1,24 @@
+image:
+  repository: apache/polaris-console
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  polarisApiUrl: "http://polaris:8181"
+  polarisRealm: "POLARIS"
+  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
