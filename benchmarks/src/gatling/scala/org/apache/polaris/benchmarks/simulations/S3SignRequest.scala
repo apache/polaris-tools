@@ -47,9 +47,19 @@ class S3SignRequest extends Simulation {
   private val tableActions = TableActions(dp, wp, setupActions.accessToken)
   private val s3SignActions = S3SignActions(dp, wp, setupActions.accessToken)
 
+  private val grantedCatalogs = new AtomicInteger()
   private val verifiedCatalogs = new AtomicInteger()
   private val verifiedNamespaces = new AtomicInteger()
   private val signedTables = new AtomicInteger()
+
+  private val grantCatalogPrivileges = scenario("Grant privileges to catalog role")
+    .exec(setupActions.restoreAccessTokenInSession)
+    .asLongAs(session =>
+      grantedCatalogs.getAndIncrement() < dp.numCatalogs && session.contains("accessToken")
+    )(
+      feed(catalogActions.feeder())
+        .exec(setupActions.grantPrivileges)
+    )
 
   private val verifyCatalogs = scenario("Verify catalogs using the Polaris Management REST API")
     .exec(setupActions.restoreAccessTokenInSession)
@@ -94,6 +104,7 @@ class S3SignRequest extends Simulation {
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
     setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
+      .andThen(grantCatalogPrivileges.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(verifyNamespaces.inject(atOnceUsers(dp.nsDepth)).protocols(httpProtocol))
       .andThen(

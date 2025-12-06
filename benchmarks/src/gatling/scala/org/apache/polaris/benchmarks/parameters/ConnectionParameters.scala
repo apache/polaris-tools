@@ -24,8 +24,16 @@ package org.apache.polaris.benchmarks.parameters
  * @param clientId The client ID for authentication.
  * @param clientSecret The client secret for authentication.
  * @param baseUrl The base URL of the Polaris service.
+ * @param catalogRole The catalog role to grant privileges to.
+ * @param privileges The list of privileges to grant to the catalog role.
  */
-case class ConnectionParameters(clientId: String, clientSecret: String, baseUrl: String) {
+case class ConnectionParameters(
+    clientId: String,
+    clientSecret: String,
+    baseUrl: String,
+    catalogRole: String,
+    privileges: Seq[String]
+) {
   require(clientId != null && clientId.nonEmpty, "Client ID cannot be null or empty")
   require(clientSecret != null && clientSecret.nonEmpty, "Client secret cannot be null or empty")
   require(baseUrl != null && baseUrl.nonEmpty, "Base URL cannot be null or empty")
@@ -33,4 +41,6 @@ case class ConnectionParameters(clientId: String, clientSecret: String, baseUrl:
     baseUrl.startsWith("http://") || baseUrl.startsWith("https://"),
     "Base URL must start with http:// or https://"
   )
+  require(catalogRole != null && catalogRole.nonEmpty, "Catalog role cannot be null or empty")
+  require(privileges != null, "Privileges cannot be null")
 }

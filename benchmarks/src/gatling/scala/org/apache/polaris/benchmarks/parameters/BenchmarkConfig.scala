@@ -20,6 +20,8 @@ package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.jdk.CollectionConverters._
+
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
 
@@ -34,7 +36,9 @@ object BenchmarkConfig {
     val connectionParams = ConnectionParameters(
       auth.getString("client-id"),
       auth.getString("client-secret"),
-      http.getString("base-url")
+      http.getString("base-url"),
+      auth.getString("catalog-role"),
+      auth.getStringList("privileges").asScala.toSeq
     )
 
     val workloadParams = {

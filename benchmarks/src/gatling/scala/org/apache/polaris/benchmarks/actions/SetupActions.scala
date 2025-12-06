@@ -20,6 +20,7 @@ package org.apache.polaris.benchmarks.actions
 
 import io.gatling.core.Predef._
 import io.gatling.core.structure.{ChainBuilder, ScenarioBuilder}
+import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.parameters.ConnectionParameters
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
@@ -129,4 +130,51 @@ case class SetupActions(
    */
   val restoreAccessTokenInSession: ChainBuilder =
     exec(session => session.set("accessToken", accessToken.get()))
+
+  /**
+   * Grants configured privileges to the configured catalog role for each catalog. This action
+   * iterates through the privileges specified in the connection parameters and grants each one
+   * to the catalog role if it's not already granted.
+   *
+   * The catalog name should be available in the session as "catalogName".
+   *
+   * @return ChainBuilder that grants all configured privileges
+   */
+  val grantPrivileges: ChainBuilder = {
+    cp.privileges.foldLeft(exec(session => session)) { (chain, privilege) =>
+      chain.exec(
+        http(s"Check ${cp.catalogRole} privileges")
+          .get(s"/api/management/v1/catalogs/#{catalogName}/catalog-roles/${cp.catalogRole}/grants")
+          .header("Authorization", "Bearer #{accessToken}")
+          .header("Content-Type", "application/json")
+          .check(status.in(200, 404))
+          .check(status.saveAs(s"privilegeCheckStatus_$privilege"))
+          .check(
+            jsonPath(s"$$.grants[?(@.privilege == '$privilege')]").optional.saveAs(s"existingPrivilege_$privilege")
+          )
+      )
+        .doIf(session => {
+          val status = session(s"privilegeCheckStatus_$privilege").as[Int]
+          val hasPrivilege = session.attributes.get(s"existingPrivilege_$privilege").isDefined &&
+            session(s"existingPrivilege_$privilege").asOption[String].isDefined
+          status == 404 || !hasPrivilege
+        }) {
+          exec(
+            http(s"Grant $privilege to ${cp.catalogRole}")
+              .put(s"/api/management/v1/catalogs/#{catalogName}/catalog-roles/${cp.catalogRole}/grants")
+              .header("Authorization", "Bearer #{accessToken}")
+              .header("Content-Type", "application/json")
+              .body(
+                StringBody(
+                  s"""{
+                     |  "type": "catalog",
+                     |  "privilege": "$privilege"
+                     |}""".stripMargin
+                )
+              )
+              .check(status.in(200, 201))
+          )
+        }
+    }
+  }
 }
