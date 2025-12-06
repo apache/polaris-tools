@@ -89,12 +89,4 @@ case class AuthenticationActions(
         }
         session
       }
-
-  /**
-   * Restores the current access token from the shared reference into the Gatling session. This
-   * operation is useful when a scenario needs to reuse an authentication token from a previous
-   * scenario.
-   */
-  val restoreAccessTokenInSession: ChainBuilder =
-    exec(session => session.set("accessToken", accessToken.get()))
 }

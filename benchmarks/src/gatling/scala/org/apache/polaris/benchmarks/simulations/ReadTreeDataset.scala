@@ -26,8 +26,8 @@ import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.WorkloadParameters
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
-import scala.concurrent.duration.DurationInt
+import java.util.concurrent.atomic.AtomicInteger
+import scala.concurrent.duration._
 
 /**
  * This simulation is a 100% read workload that fetches a tree dataset in Polaris. It is intended to
@@ -49,14 +49,11 @@ class ReadTreeDataset extends Simulation {
   // Helper values
   // --------------------------------------------------------------------------------
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
-  private val accessToken: AtomicReference[String] = new AtomicReference()
-  private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
-
-  private val authenticationActions = AuthenticationActions(cp, accessToken)
-  private val catalogActions = CatalogActions(dp, accessToken)
-  private val namespaceActions = NamespaceActions(dp, wp, accessToken)
-  private val tableActions = TableActions(dp, wp, accessToken)
-  private val viewActions = ViewActions(dp, wp, accessToken)
+  private val setupActions = SetupActions(cp)
+  private val catalogActions = CatalogActions(dp, setupActions.accessToken)
+  private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken)
+  private val tableActions = TableActions(dp, wp, setupActions.accessToken)
+  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
 
   private val verifiedCatalogs = new AtomicInteger()
   private val verifiedNamespaces = new AtomicInteger()
@@ -64,37 +61,10 @@ class ReadTreeDataset extends Simulation {
   private val verifiedViews = new AtomicInteger()
 
   // --------------------------------------------------------------------------------
-  // Authentication related workloads:
-  // * Authenticate and store the access token for later use every minute
-  // * Wait for an OAuth token to be available
-  // * Stop the token refresh loop
-  // --------------------------------------------------------------------------------
-  val continuouslyRefreshOauthToken: ScenarioBuilder =
-    scenario("Authenticate every minute using the Iceberg REST API")
-      .asLongAs(_ => shouldRefreshToken.get()) {
-        feed(authenticationActions.feeder())
-          .exec(authenticationActions.authenticateAndSaveAccessToken)
-          .pause(1.minute)
-      }
-
-  val waitForAuthentication: ScenarioBuilder =
-    scenario("Wait for the authentication token to be available")
-      .asLongAs(_ => accessToken.get() == null) {
-        pause(1.second)
-      }
-
-  val stopRefreshingToken: ScenarioBuilder =
-    scenario("Stop refreshing the authentication token")
-      .exec { session =>
-        shouldRefreshToken.set(false)
-        session
-      }
-
-  // --------------------------------------------------------------------------------
   // Workload: Verify each catalog
   // --------------------------------------------------------------------------------
   private val verifyCatalogs = scenario("Verify catalogs using the Polaris Management REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       verifiedCatalogs.getAndIncrement() < dp.numCatalogs && session.contains("accessToken")
     )(
@@ -106,7 +76,7 @@ class ReadTreeDataset extends Simulation {
   // Workload: Verify namespaces
   // --------------------------------------------------------------------------------
   private val verifyNamespaces = scenario("Verify namespaces using the Iceberg REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       verifiedNamespaces.getAndIncrement() < numNamespaces && session.contains("accessToken")
     )(
@@ -120,7 +90,7 @@ class ReadTreeDataset extends Simulation {
   // Workload: Verify tables
   // --------------------------------------------------------------------------------
   private val verifyTables = scenario("Verify tables using the Iceberg REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       verifiedTables.getAndIncrement() < dp.numTables && session.contains("accessToken")
     )(
@@ -134,7 +104,7 @@ class ReadTreeDataset extends Simulation {
   // Workload: Verify views
   // --------------------------------------------------------------------------------
   private val verifyViews = scenario("Verify views using the Iceberg REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       verifiedViews.getAndIncrement() < dp.numViews && session.contains("accessToken")
     )(
@@ -158,13 +128,13 @@ class ReadTreeDataset extends Simulation {
   private val viewThroughput = wp.readTreeDataset.viewThroughput
 
   setUp(
-    continuouslyRefreshOauthToken.inject(atOnceUsers(1)).protocols(httpProtocol),
-    waitForAuthentication
+    setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
+    setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(verifyNamespaces.inject(atOnceUsers(dp.nsDepth)).protocols(httpProtocol))
       .andThen(verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
       .andThen(verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
-      .andThen(stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }
