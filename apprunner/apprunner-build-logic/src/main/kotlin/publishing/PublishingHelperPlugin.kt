@@ -89,12 +89,6 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
 
       apply(plugin = "maven-publish")
 
-      // Generate a source tarball for a release to be uploaded to
-      // https://dist.apache.org/repos/dist/dev/<name>/apache-<name>-<version-with-rc>/
-      if (project == rootProject) {
-        configureOnRootProject(project)
-      }
-
       // The Gradle plugin-plugin adds another publication for the Gradle plugin marker artifact,
       // which is needed to resolve Gradle plugins by their ID. It uses the name `pluginMaven` for
       // the "main" `MavenPublication`, but that publication is created _after_ this code runs,
