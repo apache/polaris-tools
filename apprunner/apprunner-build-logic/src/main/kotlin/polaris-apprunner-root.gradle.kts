@@ -20,7 +20,10 @@
 import org.gradle.kotlin.dsl.apply
 import publishing.PublishingHelperPlugin
 
-plugins { id("com.diffplug.spotless") }
+plugins {
+  id("com.diffplug.spotless")
+  id("io.github.gradle-nexus.publish-plugin")
+}
 
 apply<PublishingHelperPlugin>()
 
