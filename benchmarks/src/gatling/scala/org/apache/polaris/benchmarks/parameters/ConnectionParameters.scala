@@ -21,13 +21,9 @@ package org.apache.polaris.benchmarks.parameters
 /**
  * Case class to hold the connection parameters for the benchmark.
  *
- * @param clientId The client ID for authentication.
- * @param clientSecret The client secret for authentication.
  * @param baseUrl The base URL of the Polaris service.
  */
-case class ConnectionParameters(clientId: String, clientSecret: String, baseUrl: String) {
-  require(clientId != null && clientId.nonEmpty, "Client ID cannot be null or empty")
-  require(clientSecret != null && clientSecret.nonEmpty, "Client secret cannot be null or empty")
+case class ConnectionParameters(baseUrl: String) {
   require(baseUrl != null && baseUrl.nonEmpty, "Base URL cannot be null or empty")
   require(
     baseUrl.startsWith("http://") || baseUrl.startsWith("https://"),

@@ -24,6 +24,7 @@ import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.{
+  AuthParameters,
   ConnectionParameters,
   DatasetParameters,
   Distribution,
@@ -32,7 +33,6 @@ import org.apache.polaris.benchmarks.parameters.{
 }
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent.duration._
 
 /**
@@ -47,6 +47,7 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   // Load parameters
   // --------------------------------------------------------------------------------
   val cp: ConnectionParameters = config.connectionParameters
+  val ap: AuthParameters = config.authParameters
   val dp: DatasetParameters = config.datasetParameters
   val wp: WorkloadParameters = config.workloadParameters
 
@@ -62,30 +63,13 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   println("### Writer distributions ###")
   wp.weightedWorkloadOnTreeDataset.writers.foreach(_.printDescription(dp))
 
+  private val duration = wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes
+
   // --------------------------------------------------------------------------------
   // Helper values
   // --------------------------------------------------------------------------------
-  private val accessToken: AtomicReference[String] = new AtomicReference()
-
-  private val authActions = AuthenticationActions(cp, accessToken)
-  private val tblActions = TableActions(dp, wp, accessToken)
-
-  // --------------------------------------------------------------------------------
-  // Authentication related workloads
-  // --------------------------------------------------------------------------------
-  val refreshOauthForDuration: ScenarioBuilder =
-    scenario("Authenticate every 30s using the Iceberg REST API")
-      .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
-        feed(authActions.feeder())
-          .exec(authActions.authenticateAndSaveAccessToken)
-          .pause(30.seconds)
-      }
-
-  val waitForAuthentication: ScenarioBuilder =
-    scenario("Wait for the authentication token to be available")
-      .asLongAs(_ => accessToken.get() == null) {
-        pause(1.second)
-      }
+  private val setupActions = SetupActions(cp, ap)
+  private val tblActions = TableActions(dp, wp, setupActions.accessToken)
 
   // --------------------------------------------------------------------------------
   // Build up the HTTP protocol configuration and set up the simulation
@@ -105,8 +89,8 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
         val rnp =
           RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 1000) + threadId)
         scenario(s"Reader-$i-$threadId")
-          .exec(authActions.restoreAccessTokenInSession)
-          .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
+          .exec(setupActions.restoreAccessTokenInSession)
+          .during(duration) {
             exec { session =>
               val tableIndex = dist.sample(dp.maxPossibleTables, rnp)
               val (catalog, namespace, table) =
@@ -136,8 +120,8 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
         val rnp =
           RandomNumberProvider(wp.weightedWorkloadOnTreeDataset.seed, ((i + 1) * 2000) + threadId)
         scenario(s"Writer-$i-$threadId")
-          .exec(authActions.restoreAccessTokenInSession)
-          .during(wp.weightedWorkloadOnTreeDataset.durationInMinutes.minutes) {
+          .exec(setupActions.restoreAccessTokenInSession)
+          .during(duration) {
             exec { session =>
               val tableIndex = dist.sample(dp.maxPossibleTables, rnp)
               val (catalog, namespace, table) =
@@ -161,8 +145,8 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   // Setup
   // --------------------------------------------------------------------------------
   setUp(
-    refreshOauthForDuration.inject(atOnceUsers(1)).protocols(httpProtocol),
-    waitForAuthentication
+    setupActions.refreshOauthForDuration(duration).inject(atOnceUsers(1)).protocols(httpProtocol),
+    setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .protocols(httpProtocol)
       .andThen(

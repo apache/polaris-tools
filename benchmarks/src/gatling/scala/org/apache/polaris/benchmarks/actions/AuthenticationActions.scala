@@ -26,7 +26,7 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   retryOnHttpStatus,
   HttpRequestBuilderWithStatusSave
 }
-import org.apache.polaris.benchmarks.parameters.ConnectionParameters
+import org.apache.polaris.benchmarks.parameters.{AuthParameters, ConnectionParameters}
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicReference
@@ -35,30 +35,28 @@ import java.util.concurrent.atomic.AtomicReference
  * Actions for performance testing authentication operations. This class provides methods to
  * authenticate and manage access tokens for API requests.
  *
- * @param cp Connection parameters containing client credentials
+ * @param cp Connection parameters containing the base URL
+ * @param ap Authentication parameters
  * @param accessToken Reference to the authentication token shared across actions
- * @param maxRetries Maximum number of retry attempts for failed operations
- * @param retryableHttpCodes HTTP status codes that should trigger a retry
  */
 case class AuthenticationActions(
     cp: ConnectionParameters,
-    accessToken: AtomicReference[String],
-    maxRetries: Int = 10,
-    retryableHttpCodes: Set[Int] = Set(500)
+    ap: AuthParameters,
+    accessToken: AtomicReference[String]
 ) {
   private val logger = LoggerFactory.getLogger(getClass)
 
   /**
    * Creates a Gatling Feeder that provides authentication credentials. The feeder continuously
-   * supplies client ID and client secret from the connection parameters for use in authentication
-   * requests.
+   * supplies client ID and client secret from the authentication parameters for use in
+   * authentication requests.
    *
    * @return An iterator providing client credentials
    */
   def feeder(): Feeder[String] = Iterator.continually(
     Map(
-      "clientId" -> cp.clientId,
-      "clientSecret" -> cp.clientSecret
+      "clientId" -> ap.clientId,
+      "clientSecret" -> ap.clientSecret
     )
   )
 
@@ -71,7 +69,7 @@ case class AuthenticationActions(
    * There is no limit to the maximum number of users that can authenticate concurrently.
    */
   val authenticateAndSaveAccessToken: ChainBuilder =
-    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Authenticate")(
+    retryOnHttpStatus(ap.maxRetries, ap.retryableHttpCodes, "Authenticate")(
       http("Authenticate")
         .post("/api/catalog/v1/oauth/tokens")
         .header("Content-Type", "application/x-www-form-urlencoded")
@@ -89,12 +87,4 @@ case class AuthenticationActions(
         }
         session
       }
-
-  /**
-   * Restores the current access token from the shared reference into the Gatling session. This
-   * operation is useful when a scenario needs to reuse an authentication token from a previous
-   * scenario.
-   */
-  val restoreAccessTokenInSession: ChainBuilder =
-    exec(session => session.set("accessToken", accessToken.get()))
 }

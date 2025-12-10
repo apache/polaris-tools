@@ -32,9 +32,15 @@ object BenchmarkConfig {
     val workload: Config = config.getConfig("workload")
 
     val connectionParams = ConnectionParameters(
+      http.getString("base-url")
+    )
+
+    val authParams = AuthParameters(
       auth.getString("client-id"),
       auth.getString("client-secret"),
-      http.getString("base-url")
+      auth.getInt("refresh-interval-seconds"),
+      auth.getInt("max-retries"),
+      auth.getIntList("retryable-http-codes").toArray.map(_.asInstanceOf[Int]).toSet
     )
 
     val workloadParams = {
@@ -89,12 +95,13 @@ object BenchmarkConfig {
       dataset.getString("storage-config-info")
     )
 
-    BenchmarkConfig(connectionParams, workloadParams, datasetParams)
+    BenchmarkConfig(connectionParams, authParams, workloadParams, datasetParams)
   }
 }
 
 case class BenchmarkConfig(
     connectionParameters: ConnectionParameters,
+    authParameters: AuthParameters,
     workloadParameters: WorkloadParameters,
     datasetParameters: DatasetParameters
 ) {}
