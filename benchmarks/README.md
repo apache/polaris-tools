@@ -131,6 +131,9 @@ make read-simulation
 
 # Commits creation
 make create-commits-simulation
+
+# Weighted workload
+make weighted-workload-simulation
 ```
 
 A message will show the location of the Gatling report:
@@ -154,6 +157,29 @@ For repeated testing and benchmarking purposes it's convenient to have fixed cli
 ```
 
 With the above you can run the benchmarks using a configuration file with `client-id = "admin"` and `client-secret = "admin"` - meant only for convenience in a fully airgapped system.
+
+### Benchmarks results
+
+1. **List all reports**
+```bash
+make reports-list
+```
+
+Ex. output:
+
+```
+readtreedataset | 2025-12-04 12:54:33.540 | build/reports/gatling/readtreedataset-20251204125433540/index.html
+```
+
+2. **Open the report in browser**
+```bash
+open build/reports/gatling/readtreedataset-20251204125433540/index.html
+```
+
+3. **Clean all reports**
+```bash
+make reports-clean
+```
 
 # Test Dataset
 
