@@ -93,7 +93,7 @@ tasks.named<RatTask>("rat").configure {
   excludes.add("**/*.env*")
 
   excludes.add("**/kotlin-compiler*")
-  excludes.add("**/apprunner-build-logic/.kotlin/**")
+  excludes.add("**/build-logic/.kotlin/**")
 
   excludes.add(
     "gradle-plugin/src/main/resources/META-INF/gradle-plugins/org.apache.polaris.apprunner"

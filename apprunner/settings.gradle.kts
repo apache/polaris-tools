@@ -17,7 +17,7 @@
  * under the License.
  */
 
-includeBuild("apprunner-build-logic") { name = "polaris-apprunner-build-logic" }
+includeBuild("build-logic")
 
 if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
   throw GradleException(
