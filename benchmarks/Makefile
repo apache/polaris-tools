@@ -37,6 +37,11 @@ create-commits-simulation:
 	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateCommits \
       -Dconfig.file=./application.conf
 
+.PHONY: weighted-workload-simulation
+weighted-workload-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.WeightedWorkloadOnTreeDataset \
+      -Dconfig.file=./application.conf
+
 .PHONY: reports-list
 reports-list:
 	@for report in $$(ls -d build/reports/gatling/*/ 2>/dev/null | sort -r); do \
