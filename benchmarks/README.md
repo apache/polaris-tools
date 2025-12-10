@@ -131,6 +131,9 @@ make read-simulation
 
 # Commits creation
 make create-commits-simulation
+
+# Weighted workload
+make weighted-workload-simulation
 ```
 
 A message will show the location of the Gatling report:
