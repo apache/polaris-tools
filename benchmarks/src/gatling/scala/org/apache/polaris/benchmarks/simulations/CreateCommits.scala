@@ -21,14 +21,10 @@ package org.apache.polaris.benchmarks.simulations
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef.http
-import org.apache.polaris.benchmarks.actions.{
-  AuthenticationActions,
-  NamespaceActions,
-  TableActions,
-  ViewActions
-}
+import org.apache.polaris.benchmarks.actions.{SetupActions, TableActions, ViewActions}
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.{
+  AuthParameters,
   ConnectionParameters,
   DatasetParameters,
   WorkloadParameters
@@ -36,7 +32,6 @@ import org.apache.polaris.benchmarks.parameters.{
 import org.apache.polaris.benchmarks.util.CircularIterator
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 import scala.concurrent.duration._
 
 class CreateCommits extends Simulation {
@@ -46,45 +41,16 @@ class CreateCommits extends Simulation {
   // Load parameters
   // --------------------------------------------------------------------------------
   val cp: ConnectionParameters = config.connectionParameters
+  val ap: AuthParameters = config.authParameters
   val dp: DatasetParameters = config.datasetParameters
   val wp: WorkloadParameters = config.workloadParameters
 
   // --------------------------------------------------------------------------------
   // Helper values
   // --------------------------------------------------------------------------------
-  private val accessToken: AtomicReference[String] = new AtomicReference()
-  private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
-
-  private val authActions = AuthenticationActions(cp, accessToken)
-  private val tableActions = TableActions(dp, wp, accessToken)
-  private val viewActions = ViewActions(dp, wp, accessToken)
-
-  // --------------------------------------------------------------------------------
-  // Authentication related workloads:
-  // * Authenticate and store the access token for later use every minute
-  // * Wait for an OAuth token to be available
-  // * Stop the token refresh loop
-  // --------------------------------------------------------------------------------
-  val continuouslyRefreshOauthToken: ScenarioBuilder =
-    scenario("Authenticate every minute using the Iceberg REST API")
-      .asLongAs(_ => shouldRefreshToken.get())(
-        feed(authActions.feeder())
-          .exec(authActions.authenticateAndSaveAccessToken)
-          .pause(1.minute)
-      )
-
-  val waitForAuthentication: ScenarioBuilder =
-    scenario("Wait for the authentication token to be available")
-      .asLongAs(_ => accessToken.get() == null)(
-        pause(1.second)
-      )
-
-  val stopRefreshingToken: ScenarioBuilder =
-    scenario("Stop refreshing the authentication token")
-      .exec { session =>
-        shouldRefreshToken.set(false)
-        session
-      }
+  private val setupActions = SetupActions(cp, ap)
+  private val tableActions = TableActions(dp, wp, setupActions.accessToken)
+  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
 
   // --------------------------------------------------------------------------------
   // Read and write workloads:
@@ -93,7 +59,7 @@ class CreateCommits extends Simulation {
   // --------------------------------------------------------------------------------
   val tableUpdateScenario: ScenarioBuilder =
     scenario("Create table commits by updating properties")
-      .exec(authActions.restoreAccessTokenInSession)
+      .exec(setupActions.restoreAccessTokenInSession)
       .feed(tableActions.propertyUpdateFeeder())
       .exec(tableActions.updateTable)
 
@@ -104,7 +70,7 @@ class CreateCommits extends Simulation {
   // --------------------------------------------------------------------------------
   val viewUpdateScenario: ScenarioBuilder =
     scenario("Create view commits by updating properties")
-      .exec(authActions.restoreAccessTokenInSession)
+      .exec(setupActions.restoreAccessTokenInSession)
       .feed(viewActions.propertyUpdateFeeder())
       .exec(viewActions.updateView)
 
@@ -117,8 +83,8 @@ class CreateCommits extends Simulation {
   private val viewCommitsThroughput = wp.createCommits.viewCommitsThroughput
   private val durationInMinutes = wp.createCommits.durationInMinutes
   setUp(
-    continuouslyRefreshOauthToken.inject(atOnceUsers(1)).protocols(httpProtocol),
-    waitForAuthentication
+    setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
+    setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .andThen(
         tableUpdateScenario
@@ -132,6 +98,6 @@ class CreateCommits extends Simulation {
           )
           .protocols(httpProtocol)
       )
-      .andThen(stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }

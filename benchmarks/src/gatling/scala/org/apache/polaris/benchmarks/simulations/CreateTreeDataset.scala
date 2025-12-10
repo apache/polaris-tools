@@ -24,13 +24,14 @@ import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.{
+  AuthParameters,
   ConnectionParameters,
   DatasetParameters,
   WorkloadParameters
 }
 import org.slf4j.LoggerFactory
 
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
+import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.duration._
 
 /**
@@ -44,6 +45,7 @@ class CreateTreeDataset extends Simulation {
   // Load parameters
   // --------------------------------------------------------------------------------
   val cp: ConnectionParameters = config.connectionParameters
+  val ap: AuthParameters = config.authParameters
   val dp: DatasetParameters = config.datasetParameters
   val wp: WorkloadParameters = config.workloadParameters
 
@@ -51,14 +53,11 @@ class CreateTreeDataset extends Simulation {
   // Helper values
   // --------------------------------------------------------------------------------
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
-  private val accessToken: AtomicReference[String] = new AtomicReference()
-  private val shouldRefreshToken: AtomicBoolean = new AtomicBoolean(true)
-
-  private val authenticationActions = AuthenticationActions(cp, accessToken, 5, Set(500))
-  private val catalogActions = CatalogActions(dp, accessToken, 0, Set())
-  private val namespaceActions = NamespaceActions(dp, wp, accessToken, 5, Set(500))
-  private val tableActions = TableActions(dp, wp, accessToken, 0, Set())
-  private val viewActions = ViewActions(dp, wp, accessToken, 0, Set())
+  private val setupActions = SetupActions(cp, ap)
+  private val catalogActions = CatalogActions(dp, setupActions.accessToken, 0, Set())
+  private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
+  private val tableActions = TableActions(dp, wp, setupActions.accessToken, 0, Set())
+  private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 0, Set())
 
   private val createdCatalogs = new AtomicInteger()
   private val createdNamespaces = new AtomicInteger()
@@ -66,38 +65,11 @@ class CreateTreeDataset extends Simulation {
   private val createdViews = new AtomicInteger()
 
   // --------------------------------------------------------------------------------
-  // Authentication related workloads:
-  // * Authenticate and store the access token for later use every minute
-  // * Wait for an OAuth token to be available
-  // * Stop the token refresh loop
-  // --------------------------------------------------------------------------------
-  val continuouslyRefreshOauthToken: ScenarioBuilder =
-    scenario("Authenticate every minute using the Iceberg REST API")
-      .asLongAs(_ => shouldRefreshToken.get()) {
-        feed(authenticationActions.feeder())
-          .exec(authenticationActions.authenticateAndSaveAccessToken)
-          .pause(1.minute)
-      }
-
-  val waitForAuthentication: ScenarioBuilder =
-    scenario("Wait for the authentication token to be available")
-      .asLongAs(_ => accessToken.get() == null) {
-        pause(1.second)
-      }
-
-  val stopRefreshingToken: ScenarioBuilder =
-    scenario("Stop refreshing the authentication token")
-      .exec { session =>
-        shouldRefreshToken.set(false)
-        session
-      }
-
-  // --------------------------------------------------------------------------------
   // Workload: Create catalogs
   // --------------------------------------------------------------------------------
   val createCatalogs: ScenarioBuilder =
     scenario("Create catalogs using the Polaris Management REST API")
-      .exec(authenticationActions.restoreAccessTokenInSession)
+      .exec(setupActions.restoreAccessTokenInSession)
       .asLongAs(session =>
         createdCatalogs.getAndIncrement() < dp.numCatalogs && session.contains("accessToken")
       )(
@@ -109,7 +81,7 @@ class CreateTreeDataset extends Simulation {
   // Workload: Create namespaces
   // --------------------------------------------------------------------------------
   val createNamespaces: ScenarioBuilder = scenario("Create namespaces using the Iceberg REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       createdNamespaces.getAndIncrement() < numNamespaces && session.contains("accessToken")
     )(
@@ -121,7 +93,7 @@ class CreateTreeDataset extends Simulation {
   // Workload: Create tables
   // --------------------------------------------------------------------------------
   val createTables: ScenarioBuilder = scenario("Create tables using the Iceberg REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       createdTables.getAndIncrement() < dp.numTables && session.contains("accessToken")
     )(
@@ -133,7 +105,7 @@ class CreateTreeDataset extends Simulation {
   // Workload: Create views
   // --------------------------------------------------------------------------------
   val createViews: ScenarioBuilder = scenario("Create views using the Iceberg REST API")
-    .exec(authenticationActions.restoreAccessTokenInSession)
+    .exec(setupActions.restoreAccessTokenInSession)
     .asLongAs(session =>
       createdViews.getAndIncrement() < dp.numViews && session.contains("accessToken")
     )(
@@ -155,8 +127,8 @@ class CreateTreeDataset extends Simulation {
   private val viewThroughput = wp.createTreeDataset.viewThroughput
 
   setUp(
-    continuouslyRefreshOauthToken.inject(atOnceUsers(1)).protocols(httpProtocol),
-    waitForAuthentication
+    setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
+    setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
       .andThen(createCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(
@@ -169,6 +141,6 @@ class CreateTreeDataset extends Simulation {
       )
       .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
       .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
-      .andThen(stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }

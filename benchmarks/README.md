@@ -57,16 +57,25 @@ dataset.tree {
 
 ### Connection Parameters
 
-Connection settings are configured under `http` and `auth`:
+Connection settings are configured under `http`:
 
 ```hocon
 http {
   base-url = "http://localhost:8181"  # Service URL
 }
+```
 
+### Authentication Parameters
+
+Authentication settings are configured under `auth`:
+
+```hocon
 auth {
   client-id = null      # Required: OAuth2 client ID
   client-secret = null  # Required: OAuth2 client secret
+  max-retries = 10      # Maximum number of retry attempts for authentication failures
+  retryable-http-codes = [500]  # HTTP status codes that should trigger a retry
+  refresh-interval-seconds = 60  # Refresh interval for the authentication token in seconds
 }
 ```
 
