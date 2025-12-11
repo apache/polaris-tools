@@ -42,12 +42,13 @@ case class S3SignActions(
 ) {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  private val region: String = try {
-    val json = Json.parse(dp.storageConfigInfo)
-    (json \ "region").asOpt[String].getOrElse("us-east-1")
-  } catch {
-    case _: Exception => "us-east-1"
-  }
+  private val region: String =
+    try {
+      val json = Json.parse(dp.storageConfigInfo)
+      (json \ "region").asOpt[String].getOrElse("us-east-1")
+    } catch {
+      case _: Exception => "us-east-1"
+    }
 
   private val bucketName: String = dp.defaultBaseLocation.stripPrefix("s3://").split("/")(0)
   private val basePath: String = dp.defaultBaseLocation.stripPrefix(s"s3://$bucketName/")
@@ -55,14 +56,14 @@ case class S3SignActions(
 
   /**
    * Sends a request to sign an S3 request for a table file.
-   *
    */
   val signTableRequest: ChainBuilder = exec { session =>
     val catalogName = session("catalogName").as[String]
     val parentNamespacePath = session("parentNamespacePath").as[Seq[String]]
     val tableName = session("tableName").as[String]
     val namespacePath = parentNamespacePath.mkString("/")
-    val fileUri = s"https://$bucketName.$s3Domain/$basePath/$catalogName/$namespacePath/$tableName/metadata/00000-example.metadata.json"
+    val fileUri =
+      s"https://$bucketName.$s3Domain/$basePath/$catalogName/$namespacePath/$tableName/metadata/00000-example.metadata.json"
 
     session
       .set("region", region)

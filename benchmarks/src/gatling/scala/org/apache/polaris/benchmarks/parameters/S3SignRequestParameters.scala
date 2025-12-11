@@ -28,4 +28,3 @@ case class S3SignRequestParameters(
 ) {
   require(tableThroughput >= 0, "Table throughput cannot be negative")
 }
-

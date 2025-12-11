@@ -20,7 +20,7 @@ package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.{Config, ConfigFactory}
 
- import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters._
 
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
