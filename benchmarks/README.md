@@ -76,6 +76,8 @@ auth {
   max-retries = 10      # Maximum number of retry attempts for authentication failures
   retryable-http-codes = [500]  # HTTP status codes that should trigger a retry
   refresh-interval-seconds = 60  # Refresh interval for the authentication token in seconds
+  catalog-role = "catalog_admin"  # Catalog role to grant privileges to
+  privileges = ["CATALOG_MANAGE_CONTENT"]  # List of privileges to grant to the catalog role
 }
 ```
 
@@ -143,6 +145,9 @@ make create-commits-simulation
 
 # Weighted workload
 make weighted-workload-simulation
+
+# S3 sign request
+make s3-sign-request-simulation
 ```
 
 A message will show the location of the Gatling report:
