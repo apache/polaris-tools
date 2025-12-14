@@ -40,9 +40,7 @@ class PolarisTableTool(McpTool):
     """Expose Polaris table REST endpoints through MCP."""
 
     TOOL_NAME = "polaris-iceberg-table-request"
-    TOOL_DESCRIPTION = (
-        "Perform table operations (list, get, create, update, delete)."
-    )
+    TOOL_DESCRIPTION = "Perform table operations (list, get, create, update, delete)."
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
