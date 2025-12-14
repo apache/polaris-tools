@@ -38,7 +38,7 @@ class PolarisPrincipalTool(McpTool):
     """Manage principals via the Polaris management API."""
 
     TOOL_NAME = "polaris-principal-request"
-    TOOL_DESCRIPTION = "Perform principals operations (list, get, create, update, delete, rotate, reset, list-roles, assign-role, revoke-role)."
+    TOOL_DESCRIPTION = "Perform principal operations (list, get, create, update, delete, rotate, reset, list-roles, assign-role, revoke-role)."
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}

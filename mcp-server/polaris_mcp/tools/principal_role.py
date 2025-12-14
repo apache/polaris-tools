@@ -37,7 +37,7 @@ class PolarisPrincipalRoleTool(McpTool):
     """Manage principal roles through the Polaris management API."""
 
     TOOL_NAME = "polaris-principal-role-request"
-    TOOL_DESCRIPTION = "Perform principal roles operations (list, get, create, update, delete, list-assignees, list-catalog-roles, assign-catalog-role, revoke-catalog-role)."
+    TOOL_DESCRIPTION = "Perform principal role operations (list, get, create, update, delete, list-assignees, list-catalog-roles, assign-catalog-role, revoke-catalog-role)."
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}

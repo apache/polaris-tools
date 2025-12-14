@@ -38,7 +38,7 @@ class PolarisCatalogRoleTool(McpTool):
     """Manage catalog roles and grants via the Polaris management API."""
 
     TOOL_NAME = "polaris-catalog-role-request"
-    TOOL_DESCRIPTION = "Perform catalog roles operations (list, get, create, update, delete, list-principal-roles, list-grants, add-grant, revoke-grant)."
+    TOOL_DESCRIPTION = "Perform catalog role operations (list, get, create, update, delete, list-principal-roles, list-grants, add-grant, revoke-grant)."
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}

@@ -41,7 +41,7 @@ class PolarisTableTool(McpTool):
 
     TOOL_NAME = "polaris-iceberg-table-request"
     TOOL_DESCRIPTION = (
-        "Perform table-centric operations (list, get, create, update, delete)."
+        "Perform table operations (list, get, create, update, delete)."
     )
 
     LIST_ALIASES: Set[str] = {"list", "ls"}

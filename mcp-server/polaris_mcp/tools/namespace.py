@@ -40,7 +40,7 @@ class PolarisNamespaceTool(McpTool):
     """Manage namespaces through the Polaris REST API."""
 
     TOOL_NAME = "polaris-namespace-request"
-    TOOL_DESCRIPTION = "Perform namespaces operations (list, get, create, exists, get-properties, delete)."
+    TOOL_DESCRIPTION = "Perform namespace operations (list, get, create, exists, get-properties, delete)."
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}

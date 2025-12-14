@@ -38,7 +38,7 @@ class PolarisPolicyTool(McpTool):
     """Expose Polaris policy endpoints via MCP."""
 
     TOOL_NAME = "polaris-policy-request"
-    TOOL_DESCRIPTION = "Perform policies operations (list, get, create, update, delete, attach, detach, applicable)."
+    TOOL_DESCRIPTION = "Perform policy operations (list, get, create, update, delete, attach, detach, applicable)."
 
     LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
