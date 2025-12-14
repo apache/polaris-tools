@@ -179,12 +179,12 @@ Realm-specific variables (e.g., `POLARIS_REALM_${realm}_CLIENT_ID`) override the
 
 The server exposes the following MCP tools:
 
-* `polaris-iceberg-table` — Table operations (`list`, `get`, `create`, `update`, `delete`).
-* `polaris-namespace-request` — Namespace lifecycle management.
-* `polaris-policy` — Policy lifecycle management and mappings.
-* `polaris-catalog-request` — Catalog lifecycle management.
-* `polaris-principal-request` — Principal lifecycle helpers.
-* `polaris-principal-role-request` — Principal role lifecycle and catalog-role assignments.
-* `polaris-catalog-role-request` — Catalog role and grant management.
+* `polaris-iceberg-table-request` — Perform table operations (`list`, `get`, `create`, `update`, `delete`).
+* `polaris-namespace-request` — Perform namespace operations (`list`, `get`, `create`, `exists`, `get-properties`, `delete`).
+* `polaris-policy-request` — Perform policy operations (`list`, `get`, `create`, `update`, `delete`, `attach`, `detach`, `applicable`).
+* `polaris-catalog-request` — Perform catalog operations (`list`, `get`, `create`, `update`, `delete`).
+* `polaris-principal-request` — Perform principal operations (`list`, `get`, `create`, `update`, `delete`, `rotate`, `reset`, `list-roles`, `assign-role`, `revoke-role`).
+* `polaris-principal-role-request` — Perform principal role operations (`list`, `get`, `create`, `update`, `delete`, `list-assignees`, `list-catalog-roles`, `assign-catalog-role`, `revoke-catalog-role`).
+* `polaris-catalog-role-request` — Perform catalog role operations (`list`, `get`, `create`, `update`, `delete`, `list-principal-roles`, `list-grants`, `add-grant`, `revoke-grant`).
 
 Each tool returns both a human-readable transcript of the HTTP exchange and structured metadata under `result.meta`.

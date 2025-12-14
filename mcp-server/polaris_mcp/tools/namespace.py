@@ -40,12 +40,12 @@ class PolarisNamespaceTool(McpTool):
     """Manage namespaces through the Polaris REST API."""
 
     TOOL_NAME = "polaris-namespace-request"
-    TOOL_DESCRIPTION = "Manage namespaces in an Iceberg catalog (list, get, create, update properties, delete)."
+    TOOL_DESCRIPTION = "Perform namespace operations (list, get, create, exists, get-properties, delete)."
 
-    LIST_ALIASES: Set[str] = {"list"}
-    GET_ALIASES: Set[str] = {"get", "load"}
-    EXISTS_ALIASES: Set[str] = {"exists", "head"}
+    LIST_ALIASES: Set[str] = {"list", "ls"}
+    GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
+    EXISTS_ALIASES: Set[str] = {"exists", "head"}
     UPDATE_PROPS_ALIASES: Set[str] = {
         "update-properties",
         "set-properties",

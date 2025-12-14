@@ -37,10 +37,10 @@ from polaris_mcp.rest import PolarisRestTool, encode_path_segment
 class PolarisPolicyTool(McpTool):
     """Expose Polaris policy endpoints via MCP."""
 
-    TOOL_NAME = "polaris-policy"
-    TOOL_DESCRIPTION = "Manage Polaris policies (list, create, update, delete, attach, detach, applicable)."
+    TOOL_NAME = "polaris-policy-request"
+    TOOL_DESCRIPTION = "Perform policy operations (list, get, create, update, delete, attach, detach, applicable)."
 
-    LIST_ALIASES: Set[str] = {"list"}
+    LIST_ALIASES: Set[str] = {"list", "ls"}
     GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
     UPDATE_ALIASES: Set[str] = {"update"}
