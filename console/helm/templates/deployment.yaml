@@ -1,0 +1,70 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "polaris-console.fullname" . }}
+  labels:
+    {{- include "polaris-console.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "polaris-console.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "polaris-console.fullname" . }}
+    spec:
+      imagePullSecrets:
+      {{- if .Values.image.pullSecrets }}
+      {{- toYaml .Values.image.pullSecrets | nindent 6 }}
+      {{- end }}
+      containers:
+        - name: polaris-console
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_POLARIS_API_URL
+              value: {{ .Values.env.polarisApiUrl | quote }}
+            - name: VITE_POLARIS_REALM
+              value: {{ .Values.env.polarisRealm | quote }}
+            - name: VITE_OAUTH_TOKEN_URL
+              value: {{ .Values.env.oauthTokenUrl | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
