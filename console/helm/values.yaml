@@ -41,3 +41,15 @@ resources:
   requests:
     cpu: 250m
     memory: 256Mi
+
+httproute:
+  enabled: false
+  port: 80
+  # Name of the httpGateway deployment
+  gatewayName: ""
+  # Namespace where the httpGateway is deployed
+  gatewayNamespace: default
+  # Section name within the gateway to use
+  sectionName: ""
+  hosts:
+    - example.local
