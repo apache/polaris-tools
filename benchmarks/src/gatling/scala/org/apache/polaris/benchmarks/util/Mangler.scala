@@ -24,10 +24,10 @@ case class Mangler(enabled: Boolean) {
   val MD5: MessageDigest = MessageDigest.getInstance("MD5")
 
   def maybeMangle(prefix: String, ordinal: Int): String =
-    if (!enabled) {
-      s"$prefix$ordinal"
-    } else {
+    if (enabled) {
       MD5.digest((prefix + ordinal).getBytes()).map("%02x".format(_)).mkString
+    } else {
+      s"$prefix$ordinal"
     }
 
   def maybeMangleNs(ordinal: Int): String = maybeMangle("NS_", ordinal)
