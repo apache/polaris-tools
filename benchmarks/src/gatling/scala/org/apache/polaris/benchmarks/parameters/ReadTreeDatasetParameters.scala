@@ -21,13 +21,16 @@ package org.apache.polaris.benchmarks.parameters
 /**
  * Case class to hold the parameters for the ReadTreeDataset simulation.
  *
+ * @param namespaceThroughput The number of namespace operations to perform per second.
  * @param tableThroughput The number of table operations to perform per second.
  * @param viewThroughput The number of view operations to perform per second.
  */
 case class ReadTreeDatasetParameters(
+    namespaceThroughput: Int,
     tableThroughput: Int,
     viewThroughput: Int
 ) {
+  require(namespaceThroughput >= 0, "Namespace throughput cannot be negative")
   require(tableThroughput >= 0, "Table throughput cannot be negative")
   require(viewThroughput >= 0, "View throughput cannot be negative")
 }

@@ -56,8 +56,8 @@ class CreateTreeDataset extends Simulation {
   private val setupActions = SetupActions(cp, ap)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken, 0, Set())
   private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val tableActions = TableActions(dp, wp, setupActions.accessToken, 0, Set())
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 0, Set())
+  private val tableActions = TableActions(dp, wp, setupActions.accessToken, 5, Set(500))
+  private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 5, Set(500))
 
   private val createdCatalogs = new AtomicInteger()
   private val createdNamespaces = new AtomicInteger()
@@ -142,5 +142,9 @@ class CreateTreeDataset extends Simulation {
       .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
       .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
+  ).assertions(
+    details("Create Namespace").successfulRequests.count.is(numNamespaces),
+    details("Create Table").successfulRequests.count.is(dp.numTables),
+    details("Create View").successfulRequests.count.is(dp.numViews)
   )
 }

@@ -57,6 +57,7 @@ object BenchmarkConfig {
           ccConfig.getInt("duration-in-minutes")
         ),
         ReadTreeDatasetParameters(
+          rtdConfig.getInt("namespace-concurrency"),
           rtdConfig.getInt("table-concurrency"),
           rtdConfig.getInt("view-concurrency")
         ),
