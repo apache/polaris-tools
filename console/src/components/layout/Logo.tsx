@@ -33,7 +33,7 @@ export function Logo({ variant = "default", showText = true, className = "", cli
     <>
       {/* Logo Icon - Star logo */}
       <img
-        src="/polaris-logo-star.svg"
+        src="/apache-polaris-logo.svg"
         alt=" (incubating) Logo"
         className={isCompact ? "h-6 w-6" : "h-8 w-8"}
       />
