@@ -195,6 +195,26 @@ export const tablesApi = {
   },
 
   /**
+   * Get generic table details.
+   * @param prefix - The catalog name
+   * @param namespace - Namespace array (e.g., ["accounting", "tax"])
+   * @param tableName - Table name
+   */
+  getGeneric: async (
+    prefix: string,
+    namespace: string[],
+    tableName: string
+  ): Promise<unknown> => {
+    const namespaceStr = encodeNamespace(namespace)
+    const response = await apiClient
+      .getPolarisClient()
+      .get<unknown>(
+        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/generic-tables/${encodeURIComponent(tableName)}`
+      )
+    return response.data
+  },
+
+  /**
    * Create a generic table.
    * @param prefix - The catalog name
    * @param namespace - Namespace array
@@ -213,6 +233,25 @@ export const tablesApi = {
         request
       )
     return response.data
+  },
+
+  /**
+   * Delete a generic table.
+   * @param prefix - The catalog name
+   * @param namespace - Namespace array
+   * @param tableName - Table name
+   */
+  deleteGeneric: async (
+    prefix: string,
+    namespace: string[],
+    tableName: string
+  ): Promise<void> => {
+    const namespaceStr = encodeNamespace(namespace)
+    await apiClient
+      .getPolarisClient()
+      .delete(
+        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/generic-tables/${encodeURIComponent(tableName)}`
+      )
   },
 }
 
