@@ -19,9 +19,6 @@
 
 source "${LIBS_DIR}/_version.sh"
 
-# Get the current branch name
-current_branch=$(git branch --show-current)
-
 echo "## Parameters" >> $GITHUB_STEP_SUMMARY
 
 if [[ ! -d "${tool}/releasey" ]]; then
@@ -29,14 +26,25 @@ if [[ ! -d "${tool}/releasey" ]]; then
   exit 1
 fi
 
+# Extract the ref name from github.ref
+# github_ref environment format: refs/heads/branch-name or refs/tags/tag-name
+if [[ "${github_ref}" =~ ^refs/heads/release/(.+)$ ]]; then
+  # Running from a release branch
+  branch_version="${BASH_REMATCH[1]}"
+  current_branch="release/${branch_version}"
+else
+  echo "❌ This workflow must be run from a release branch (release/major.minor.x)." >> $GITHUB_STEP_SUMMARY
+  echo "" >> $GITHUB_STEP_SUMMARY
+  echo "Current ref: \`${github_ref}\`" >> $GITHUB_STEP_SUMMARY
+  echo "" >> $GITHUB_STEP_SUMMARY
+  echo "Please select a release branch (e.g., \`release/1.0.x\`) from the 'Use workflow from' dropdown in the GitHub UI." >> $GITHUB_STEP_SUMMARY
+  exit 1
+fi
 # Validate that we're on a release branch
 if [[ ! "${current_branch}" =~ ^release/(.+)$ ]]; then
   echo "❌ This workflow must be run from a release branch (release/major.minor.x). Current branch: \`${current_branch}\`." >> $GITHUB_STEP_SUMMARY
   exit 1
 fi
-
-# Extract version from release branch name
-branch_version="${BASH_REMATCH[1]}"
 
 # Validate branch version format and extract components
 if ! validate_and_extract_branch_version "${branch_version}"; then
@@ -45,17 +53,12 @@ if ! validate_and_extract_branch_version "${branch_version}"; then
 fi
 
 # Find the next patch number for this major.minor version by looking at existing tags
+# Note: find_next_patch_number returns the current patch if no final tag exists,
+# which is exactly what we need for publishing (we publish from an RC that has no final tag yet)
 find_next_patch_number "${major}" "${minor}"
-next_patch=$((patch))
-latest_patch=$((next_patch - 1))
-
-if [[ ${next_patch} -eq 0 ]]; then
-  echo "❌ No existing tags found for version \`${major}.${minor}.0\`. Expected at least one RC to be created before publishing a release." >> $GITHUB_STEP_SUMMARY
-  exit 1
-fi
 
 # Build the version string for the latest existing patch
-version_without_rc="${major}.${minor}.${latest_patch}-incubating"
+version_without_rc="${major}.${minor}.${patch}-incubating"
 
 # Find the latest RC tag for this version
 find_next_rc_number "${version_without_rc}"
@@ -73,6 +76,21 @@ if ! git rev-parse "${rc_tag}" >/dev/null 2>&1; then
   echo "❌ RC tag \`${rc_tag}\` does not exist in repository." >> $GITHUB_STEP_SUMMARY
   exit 1
 fi
+
+# Verify that current HEAD is at the RC tag commit
+rc_commit=$(git rev-parse "${rc_tag}")
+current_commit=$(git rev-parse HEAD)
+
+if [[ "${current_commit}" != "${rc_commit}" ]]; then
+  echo "❌ Current HEAD (\`${current_commit}\`) does not match RC tag \`${rc_tag}\` (\`${rc_commit}\`)." >> $GITHUB_STEP_SUMMARY
+  echo "" >> $GITHUB_STEP_SUMMARY
+  echo "This means that some commits have been made on the release branch after the last RC was created." >> $GITHUB_STEP_SUMMARY
+  echo "You should not publish a release from a branch that has received additional commits after the last RC was created." >> $GITHUB_STEP_SUMMARY
+  echo "Either remove the commits from the release branch so that it points to the last RC that was voted on, or create a new RC from the current state of the branch." >> $GITHUB_STEP_SUMMARY
+  exit 1
+fi
+
+echo "✅ Current HEAD matches RC tag \`${rc_tag}\`" >> $GITHUB_STEP_SUMMARY
 
 # Create final release tag name
 final_release_tag="apache-polaris-${tool}-${version_without_rc}"
