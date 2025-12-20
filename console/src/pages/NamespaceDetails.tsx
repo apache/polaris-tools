@@ -445,7 +445,6 @@ export function NamespaceDetails() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Type</TableHead>
-                    <TableHead>Created</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -465,13 +464,6 @@ export function NamespaceDetails() {
                       <TableCell>
                         <span className="text-muted-foreground text-sm">
                           {table.type || "Generic"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-muted-foreground text-sm">
-                          {table.createTime
-                            ? formatDistanceToNow(new Date(table.createTime), { addSuffix: true })
-                            : "Unknown"}
                         </span>
                       </TableCell>
                       <TableCell>
