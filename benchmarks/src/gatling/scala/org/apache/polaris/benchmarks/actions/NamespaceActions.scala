@@ -27,6 +27,7 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   HttpRequestBuilderWithStatusSave
 }
 import org.apache.polaris.benchmarks.parameters.{DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.util.Mangler
 import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
@@ -50,6 +51,7 @@ case class NamespaceActions(
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
   private val logger = LoggerFactory.getLogger(getClass)
+  private val mangler = Mangler(dp.mangleNames)
 
   /**
    * Creates a Gatling Feeder that generates namespace hierarchies. Each row is associated with a
@@ -64,7 +66,7 @@ case class NamespaceActions(
       val namespaceId = tableId
       val namespacePath: Seq[String] = dp.nAryTree
         .pathToRoot(namespaceId)
-        .map(ordinal => s"NS_$ordinal")
+        .map(mangler.maybeMangleNs)
       Map(
         "catalogName" -> "C_0",
         "namespaceId" -> tableId,
