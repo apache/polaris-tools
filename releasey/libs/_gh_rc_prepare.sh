@@ -21,8 +21,17 @@ source "${LIBS_DIR}/_version.sh"
 
 echo "## Parameters" >> $GITHUB_STEP_SUMMARY
 
-if ! git_tag=$(git describe --tags --exact-match HEAD 2>/dev/null); then
-  echo "❌ Current HEAD is not on a release candidate tag. Please checkout a release candidate tag first." >> $GITHUB_STEP_SUMMARY
+# Extract the ref name from github.ref
+# github_ref environment format: refs/heads/branch-name or refs/tags/tag-name
+if [[ "${git_ref}" =~ ^refs/tags/(.+)$ ]]; then
+  # Running from a tag
+  git_tag="${BASH_REMATCH[1]}"
+else
+  echo "❌ Workflow must be run from a release candidate tag, not a branch." >> $GITHUB_STEP_SUMMARY
+  echo "" >> $GITHUB_STEP_SUMMARY
+  echo "Current ref: \`${git_ref}\`" >> $GITHUB_STEP_SUMMARY
+  echo "" >> $GITHUB_STEP_SUMMARY
+  echo "Please select a release candidate tag (e.g., \`apache-polaris-1.0.0-incubating-rc0\`) from the 'Use workflow from' dropdown in the GitHub UI." >> $GITHUB_STEP_SUMMARY
   exit 1
 fi
 

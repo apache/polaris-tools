@@ -89,6 +89,8 @@ jobs:
         run: source "${LIBS_DIR}/_gh_determine_built_flavors.sh"
 
       - name: Auto-determine release parameters from branch and Git state
+        env:
+          git_ref: ${{ github.ref }}
         run: source "${LIBS_DIR}/_gh_release_prepare.sh"
 
       - name: Copy distribution from SVN dev to release space
