@@ -17,32 +17,48 @@
 # under the License.
 #
 {{- include "polaris-console.validateRouting" . }}
-{{- if .Values.httproute.enabled }}
+{{- if .Values.ingress.enabled }}
 {{- $fullName := include "polaris-console.fullname" . }}
-{{- $svcPort := .Values.httproute.port }}
+{{- $svcPort := .Values.service.port }}
 
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
     {{- include "polaris-console.labels" . | nindent 4 }}
-  {{- with .Values.httproute.annotations }}
+  {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  hostnames: {{ .Values.httproute.hosts }}
-  # This will be different depending on which Gateway implementation is in use and the configuration of the Gateway resource
-  parentRefs:
-    - name: {{ .Values.httproute.gatewayName}}
-      namespace: {{ .Values.httproute.gatewayNamespace }}
-      sectionName: {{ .Values.httproute.sectionName }}
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
   rules:
-    # We don't specify a matches block here, so the default is a prefix path match on "/" (match every HTTP request)
-    # The backend (Service) to send matching requests to
-    - backendRefs:
-        - name: {{ $fullName }}
-          port: {{ $svcPort }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+          {{- end }}
+    {{- end }}
 
 {{- end }}

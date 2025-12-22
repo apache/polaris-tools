@@ -42,6 +42,22 @@ resources:
     cpu: 250m
     memory: 256Mi
 
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: console.example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: polaris-console-tls
+  #    hosts:
+  #      - console.example.local
+
 httproute:
   enabled: false
   port: 80
