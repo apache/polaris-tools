@@ -47,12 +47,30 @@ export function TableDetailsDrawer({
 }: TableDetailsDrawerProps) {
   const tableQuery = useQuery({
     queryKey: ["table", catalogName, namespace.join("."), tableName],
-    queryFn: () => tablesApi.get(catalogName, namespace, tableName),
+    queryFn: async () => {
+      // Try to fetch as an Iceberg table first
+      try {
+        return await tablesApi.get(catalogName, namespace, tableName)
+      } catch (icebergError) {
+        // If that fails, try to fetch as a generic table
+        try {
+          return await tablesApi.getGeneric(catalogName, namespace, tableName)
+        } catch (genericError) {
+          // If both fail, throw the original Iceberg error
+          throw icebergError
+        }
+      }
+    },
     enabled: open && !!catalogName && namespace.length > 0 && !!tableName,
   })
 
   const tableData = tableQuery.data
-  const currentSchema = tableData?.metadata.schemas.find(
+
+  // Check if this is a generic table (has 'table' property) or Iceberg table (has 'metadata' property)
+  const isGenericTable = tableData && 'table' in tableData
+  const genericTableData = isGenericTable ? (tableData as any).table : null
+
+  const currentSchema = !isGenericTable && tableData?.metadata?.schemas?.find(
     (s) => s["schema-id"] === tableData.metadata["current-schema-id"]
   )
 
@@ -90,9 +108,71 @@ export function TableDetailsDrawer({
           </div>
         )}
 
-        {tableData && (
+        {tableData && isGenericTable && genericTableData && (
           <div className="mt-6 space-y-6">
-            {/* Table Info */}
+            {/* Generic Table Info */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2">Generic Table Information</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Name:</span>
+                  <span className="font-mono text-xs">
+                    {genericTableData.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Format:</span>
+                  <span>{genericTableData.format}</span>
+                </div>
+                {genericTableData["base-location"] && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Base Location:</span>
+                    <span className="font-mono text-xs break-all">
+                      {genericTableData["base-location"]}
+                    </span>
+                  </div>
+                )}
+                {genericTableData.doc && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Description:</span>
+                    <span className="text-xs break-all">
+                      {genericTableData.doc}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Properties */}
+            {genericTableData.properties &&
+              Object.keys(genericTableData.properties).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Properties</h3>
+                  <div className="border rounded-md">
+                    <div className="divide-y">
+                      {Object.entries(genericTableData.properties).map(
+                        ([key, value]) => (
+                          <div
+                            key={key}
+                            className="px-3 py-2 flex justify-between text-sm"
+                          >
+                            <span className="text-muted-foreground">{key}:</span>
+                            <span className="font-mono text-xs break-all">
+                              {String(value)}
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+          </div>
+        )}
+
+        {tableData && !isGenericTable && (
+          <div className="mt-6 space-y-6">
+            {/* Iceberg Table Info */}
             <div>
               <h3 className="text-sm font-semibold mb-2">Table Information</h3>
               <div className="space-y-1 text-sm">
