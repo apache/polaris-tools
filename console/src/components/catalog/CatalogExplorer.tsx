@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import { CatalogTreeNode, type TreeNode } from "./CatalogTreeNode"
 import { catalogsApi } from "@/api/management/catalogs"
 import { TableDetailsDrawer } from "./TableDetailsDrawer"
+import { ViewDetailsDrawer } from "./ViewDetailsDrawer"
 import { useResizableWidth } from "@/hooks/useResizableWidth"
 import { CATALOG_NODE_PREFIX } from "@/lib/constants"
 
@@ -34,10 +35,16 @@ interface CatalogExplorerProps {
   className?: string
 }
 
-interface SelectedTable {
+enum CatalogEntityType {
+    TABLE = "table",
+    VIEW = "view",
+}
+
+interface SelectedCatalogEntity {
   catalogName: string
   namespace: string[]
-  tableName: string
+  name: string
+  type: CatalogEntityType
 }
 
 export function CatalogExplorer({
@@ -49,7 +56,7 @@ export function CatalogExplorer({
   const [selectedNodeId, setSelectedNodeId] = useState<string>()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedTable, setSelectedTable] = useState<SelectedTable | null>(null)
+  const [selectedCatalogEntity, setSelectedCatalogEntity] = useState<SelectedCatalogEntity | null>(null)
 
   // Use custom hook for resizable width
   const { width, isResizing, handleMouseDown } = useResizableWidth()
@@ -83,9 +90,18 @@ export function CatalogExplorer({
   const handleTableClick = useCallback((
     catalogName: string,
     namespace: string[],
-    tableName: string
+    name: string
   ) => {
-    setSelectedTable({ catalogName, namespace, tableName })
+    setSelectedCatalogEntity({ catalogName, namespace, name, type: CatalogEntityType.TABLE })
+    setDrawerOpen(true)
+  }, [])
+
+  const handleViewClick = useCallback((
+    catalogName: string,
+    namespace: string[],
+    name: string
+  ) => {
+    setSelectedCatalogEntity({ catalogName, namespace, name, type: CatalogEntityType.VIEW })
     setDrawerOpen(true)
   }, [])
 
@@ -179,6 +195,7 @@ export function CatalogExplorer({
                   onToggleExpand={handleToggleExpand}
                   onSelectNode={handleSelectNode}
                   onTableClick={handleTableClick}
+                  onViewClick={handleViewClick}
                 />
               ))}
             </div>
@@ -214,15 +231,26 @@ export function CatalogExplorer({
       )}
 
       {/* Table Details Drawer */}
-      {selectedTable && (
+      {selectedCatalogEntity && selectedCatalogEntity.type === CatalogEntityType.TABLE && (
         <TableDetailsDrawer
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
-          catalogName={selectedTable.catalogName}
-          namespace={selectedTable.namespace}
-          tableName={selectedTable.tableName}
+          catalogName={selectedCatalogEntity.catalogName}
+          namespace={selectedCatalogEntity.namespace}
+          tableName={selectedCatalogEntity.name}
         />
       )}
+
+        {/* View Details Drawer */}
+      {selectedCatalogEntity && selectedCatalogEntity.type === CatalogEntityType.VIEW && (
+          <ViewDetailsDrawer
+            open={drawerOpen}
+            onOpenChange={setDrawerOpen}
+            catalogName={selectedCatalogEntity.catalogName}
+            namespace={selectedCatalogEntity.namespace}
+            viewName={selectedCatalogEntity.name}
+          />
+        )}
     </>
   )
 }
