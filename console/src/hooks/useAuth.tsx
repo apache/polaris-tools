@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
 
@@ -32,18 +32,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
-
-  useEffect(() => {
-    // Check if user is already authenticated
-    const token = localStorage.getItem("polaris_access_token")
-    setIsAuthenticated(!!token)
-    setLoading(false)
-  }, [])
+  const [loading] = useState<boolean>(false)
 
   const login = async (clientId: string, clientSecret: string, realm: string) => {
     try {
-      // Store realm in localStorage
+      // Store realm in localStorage (non-sensitive configuration)
       if (realm) {
         localStorage.setItem("polaris_realm", realm)
       }
@@ -59,8 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast.success("Logged out successfully")
     authApi.logout()
     setIsAuthenticated(false)
-    // Clear realm from localStorage on logout
-    localStorage.removeItem("polaris_realm")
   }
 
   return (
@@ -78,4 +69,3 @@ export function useAuth() {
   }
   return context
 }
-
