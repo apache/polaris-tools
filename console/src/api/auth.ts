@@ -43,7 +43,7 @@ export const authApi = {
     formData.append("grant_type", "client_credentials")
     formData.append("client_id", clientId)
     formData.append("client_secret", clientSecret)
-    formData.append("scope", "PRINCIPAL_ROLE:ALL")
+    formData.append("scope", "PRINCIPAL_ROLE: ALL")
 
     const headers: Record<string, string> = {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -120,12 +120,10 @@ export const authApi = {
   },
 
   logout: (): void => {
-    localStorage.removeItem("polaris_access_token")
-    localStorage.removeItem("polaris_realm")
+    apiClient.clearAccessToken()
     // Use a small delay to allow toast to show before redirect
     setTimeout(() => {
       navigate("/login", true)
     }, 100)
   },
 }
-
