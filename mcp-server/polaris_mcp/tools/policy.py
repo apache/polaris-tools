@@ -147,31 +147,26 @@ class PolarisPolicyTool(McpTool):
         if isinstance(realm, str) and realm.strip():
             delegate_args["realm"] = realm
 
-        if normalized == "list":
-            self._require_namespace(namespace, "list")
-            self._handle_list(delegate_args, catalog, namespace)
-        elif normalized == "get":
-            self._require_namespace(namespace, "get")
-            self._handle_get(arguments, delegate_args, catalog, namespace)
-        elif normalized == "create":
-            self._require_namespace(namespace, "create")
-            self._handle_create(arguments, delegate_args, catalog, namespace)
-        elif normalized == "update":
-            self._require_namespace(namespace, "update")
-            self._handle_update(arguments, delegate_args, catalog, namespace)
-        elif normalized == "delete":
-            self._require_namespace(namespace, "delete")
-            self._handle_delete(arguments, delegate_args, catalog, namespace)
-        elif normalized == "attach":
-            self._require_namespace(namespace, "attach")
-            self._handle_attach(arguments, delegate_args, catalog, namespace)
-        elif normalized == "detach":
-            self._require_namespace(namespace, "detach")
-            self._handle_detach(arguments, delegate_args, catalog, namespace)
-        elif normalized == "applicable":
+        if normalized == "applicable":
             self._handle_applicable(delegate_args, catalog)
-        else:  # pragma: no cover
-            raise ValueError(f"Unsupported operation: {operation}")
+        else:
+            str_namespace = self._require_namespace(namespace, normalized)
+            if normalized == "list":
+                self._handle_list(delegate_args, catalog, str_namespace)
+            elif normalized == "get":
+                self._handle_get(arguments, delegate_args, catalog, str_namespace)
+            elif normalized == "create":
+                self._handle_create(arguments, delegate_args, catalog, str_namespace)
+            elif normalized == "update":
+                self._handle_update(arguments, delegate_args, catalog, str_namespace)
+            elif normalized == "delete":
+                self._handle_delete(arguments, delegate_args, catalog, str_namespace)
+            elif normalized == "attach":
+                self._handle_attach(arguments, delegate_args, catalog, str_namespace)
+            elif normalized == "detach":
+                self._handle_detach(arguments, delegate_args, catalog, str_namespace)
+            else:  # pragma: no cover
+                raise ValueError(f"Unsupported operation: {operation}")
 
         raw = self._rest_client.call(delegate_args)
         return self._maybe_augment_error(raw, normalized)
@@ -360,11 +355,12 @@ class PolarisPolicyTool(McpTool):
             return "applicable"
         raise ValueError(f"Unsupported operation: {operation}")
 
-    def _require_namespace(self, namespace: Optional[str], operation: str) -> None:
+    def _require_namespace(self, namespace: Optional[str], operation: str) -> str:
         if not namespace:
             raise ValueError(
                 f"Namespace is required for {operation} operations. Provide `namespace` as a string or array."
             )
+        return namespace
 
     def _resolve_namespace(self, namespace: Any) -> str:
         if namespace is None:

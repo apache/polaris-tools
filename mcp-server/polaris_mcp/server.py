@@ -413,7 +413,7 @@ def _call_tool(
 
 
 def _to_tool_result(result: ToolExecutionResult) -> FastMcpToolResult:
-    structured = {"isError": result.is_error}
+    structured: dict[str, Any] = {"isError": result.is_error}
     if result.metadata is not None:
         structured["meta"] = result.metadata
 
@@ -448,7 +448,7 @@ def _coerce_body(body: Any) -> Any:
     return body
 
 
-def _normalize_namespace(namespace: str | Sequence[str]) -> str | list[str]:
+def _normalize_namespace(namespace: str | Sequence) -> str | list[str]:
     if isinstance(namespace, str):
         return namespace
     return [str(part) for part in namespace]

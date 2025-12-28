@@ -23,6 +23,7 @@ import os
 import textwrap
 from unittest import mock
 from polaris_mcp import server
+from pathlib import Path
 
 
 def test_main_loads_default_config_file() -> None:
@@ -64,7 +65,7 @@ def test_main_loads_custom_config_file() -> None:
         mock_server_instance.run.assert_called_once()
 
 
-def test_config_loading_precedence(tmp_path) -> None:
+def test_config_loading_precedence(tmp_path: Path) -> None:
     config_file = tmp_path / "test_config.env"
     config_file.write_text(
         textwrap.dedent("""

@@ -105,6 +105,7 @@ def test_call_builds_request_and_metadata_with_json_body() -> None:
     assert not result.is_error
     assert f"POST {expected_url}" in result.text
     assert '"result": "ok"' in result.text
+    assert result.metadata is not None
     assert result.metadata["method"] == "POST"
     assert result.metadata["url"] == expected_url
     assert result.metadata["status"] == 201
@@ -155,6 +156,7 @@ def test_call_uses_authorization_provider_and_handles_plain_text() -> None:
 
     assert result.is_error
     assert "Status: 404" in result.text
+    assert result.metadata is not None
     assert result.metadata["url"] == expected_url
     assert result.metadata["request"]["bodyText"] == "payload"
     assert result.metadata["response"]["bodyText"] == "failure"

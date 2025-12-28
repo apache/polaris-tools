@@ -25,6 +25,7 @@ import argparse
 import json
 import sys
 from typing import Any, Optional
+import mcp.types as types
 
 
 class McpClientError(Exception):
@@ -115,7 +116,7 @@ async def _display(result: Any) -> None:
 
 
 async def _run_session(session: Any, args: argparse.Namespace) -> None:
-    def list_tools(tools):
+    def list_tools(tools: types.ListToolsResult) -> None:
         print("Available Tools:")
         for tool in tools:
             print(f"- {tool.name}: {tool.description}")
@@ -184,7 +185,7 @@ async def _run_session(session: Any, args: argparse.Namespace) -> None:
             print(f"Error running tool '{selected_tool.name}': {e}")
 
 
-async def run():
+async def run() -> None:
     parser = argparse.ArgumentParser(description="Polaris MCP Client")
     parser.add_argument(
         "server", help="MCP server. Can be a local .py file, or an HTTP/SSE URL."
