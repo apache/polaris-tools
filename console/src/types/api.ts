@@ -226,6 +226,25 @@ export interface CreateGenericTableRequest {
   properties?: Record<string, string>
 }
 
+export interface GenericTable {
+  name: string
+  format: string
+  "base-location"?: string
+  doc?: string
+  properties?: Record<string, string>
+}
+
+export interface LoadGenericTableResponse {
+  table: GenericTable
+}
+
+export interface GenericTableIdentifier {
+  namespace: string[]
+  name: string
+  type?: string
+  createTime?: string
+}
+
 export interface ListTablesResponse {
   identifiers: Array<{
     namespace: string[]
