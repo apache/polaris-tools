@@ -20,11 +20,11 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { formatDistanceToNow } from "date-fns"
 import { ArrowLeft, Folder, Table as TableIcon, RefreshCw, Trash2, Plus } from "lucide-react"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { tablesApi } from "@/api/catalog/tables"
 import { catalogsApi } from "@/api/management/catalogs"
+import type { GenericTableIdentifier } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -449,7 +449,7 @@ export function NamespaceDetails() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {polarisGenericTablesQuery.data?.map((table: any, idx: number) => (
+                  {polarisGenericTablesQuery.data?.map((table: GenericTableIdentifier, idx: number) => (
                     <TableRow
                       key={idx}
                       className="cursor-pointer hover:bg-muted/50"
