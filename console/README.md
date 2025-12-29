@@ -30,13 +30,13 @@ A modern web interface for Apache Polaris, built with React, TypeScript, TanStac
 
 ```bash
 # Install dependencies
-npm install
+make install
 
 # Start development server
-npm run dev
+make dev
 
 # Build for production
-npm run build
+make build
 ```
 
 ### Environment Variables
@@ -91,7 +91,7 @@ The project uses:
 To start developing:
 
 ```bash
-npm run dev
+make dev
 ```
 
 The app will be available at `http://localhost:5173`
@@ -99,7 +99,7 @@ The app will be available at `http://localhost:5173`
 ## Building
 
 ```bash
-npm run build
+make build
 ```
 
 Output will be in the `dist/` directory.
