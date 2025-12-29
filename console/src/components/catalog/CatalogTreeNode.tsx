@@ -121,6 +121,22 @@ export function CatalogTreeNode({
       currentNamespacePath.length > 0,
   })
 
+  // Fetch generic tables when namespace is expanded
+  const genericTablesQuery = useQuery({
+    queryKey: [
+      "generic-tables",
+      node.catalogName || "",
+      currentNamespacePath.join(".") || "",
+    ],
+    queryFn: () =>
+      tablesApi.listGeneric(node.catalogName || "", currentNamespacePath),
+    enabled:
+      node.type === "namespace" &&
+      isExpanded &&
+      !!node.catalogName &&
+      currentNamespacePath.length > 0,
+  })
+
   const handleClick = () => {
     // Only toggle expand/collapse, don't navigate when clicking in tree
     if (node.type === "catalog") {
@@ -231,6 +247,20 @@ export function CatalogTreeNode({
           parent: node,
         })
       })
+
+      // Add generic tables under namespace
+      const genericTables = genericTablesQuery.data || []
+      genericTables.forEach((table) => {
+        const namespaceId = `${node.id}.table.${table.name}`
+        children.push({
+          type: "table",
+          id: namespaceId,
+          name: table.name,
+          namespace: currentNamespacePath, // Full namespace path where table resides
+          catalogName: node.catalogName,
+          parent: node,
+        })
+      })
     }
 
     return children
@@ -239,13 +269,14 @@ export function CatalogTreeNode({
     namespacesQuery.data,
     childNamespacesQuery.data,
     tablesQuery.data,
+    genericTablesQuery.data,
     currentNamespacePath,
   ])
 
   const isLoading =
     (node.type === "catalog" && namespacesQuery.isLoading) ||
     (node.type === "namespace" &&
-      (childNamespacesQuery.isLoading || tablesQuery.isLoading))
+      (childNamespacesQuery.isLoading || tablesQuery.isLoading || genericTablesQuery.isLoading))
 
   const Icon = useMemo(() => {
     if (node.type === "catalog") return Database
