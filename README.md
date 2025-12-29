@@ -27,3 +27,4 @@ This repository is maintained by the [Apache Polaris community](https://polaris.
 2. [Iceberg Catalog Migrator](/iceberg-catalog-migrator/README.md): A command-line tool to migrate Iceberg tables from one Iceberg catalog to another.
 3. [Polaris Synchronizer](/polaris-synchronizer/README.md): A tool to migrate entities from one Polaris instance to another.
 4. [Polaris MCP Server](/mcp-server/README.md): A Polaris MCP server implementation.
+5. [Polaris Console UI](/console/README.md): A Polaris Console UI sidecar. 

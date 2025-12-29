@@ -24,6 +24,8 @@ import type {
   CreateTableRequest,
   CreateGenericTableRequest,
   LoadTableResult,
+  LoadGenericTableResponse,
+  GenericTableIdentifier,
 } from "@/types/api"
 
 /**
@@ -180,7 +182,7 @@ export const tablesApi = {
   listGeneric: async (
     prefix: string,
     namespace: string[]
-  ): Promise<Array<{ namespace: string[]; name: string; type?: string; createTime?: string }>> => {
+  ): Promise<GenericTableIdentifier[]> => {
     const namespaceStr = encodeNamespace(namespace)
     const response = await apiClient
       .getPolarisClient()
@@ -204,11 +206,11 @@ export const tablesApi = {
     prefix: string,
     namespace: string[],
     tableName: string
-  ): Promise<unknown> => {
+  ): Promise<LoadGenericTableResponse> => {
     const namespaceStr = encodeNamespace(namespace)
     const response = await apiClient
       .getPolarisClient()
-      .get<unknown>(
+      .get<LoadGenericTableResponse>(
         `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/generic-tables/${encodeURIComponent(tableName)}`
       )
     return response.data

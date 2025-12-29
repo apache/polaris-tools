@@ -16,7 +16,7 @@
 # under the License.
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22.12.0-alpine AS builder
 
 # Default environment variables (can be overridden at runtime)
 ENV VITE_POLARIS_API_URL=http://polaris:8181
