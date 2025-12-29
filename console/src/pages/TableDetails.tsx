@@ -33,6 +33,7 @@ import { RenameTableModal } from "@/components/forms/RenameTableModal"
 import { EditTablePropertiesModal } from "@/components/forms/EditTablePropertiesModal"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "sonner"
+import type { LoadGenericTableResponse, GenericTable, LoadTableResult, TableSchema } from "@/types/api"
 
 export function TableDetails() {
   const { catalogName, namespace: namespaceParam, tableName } = useParams<{
@@ -58,7 +59,7 @@ export function TableDetails() {
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
-  const tableQuery = useQuery({
+  const tableQuery = useQuery<LoadTableResult | LoadGenericTableResponse>({
     queryKey: ["table", catalogName, namespaceArray.join("."), tableName],
     queryFn: async () => {
       // Try to fetch as an Iceberg table first
@@ -68,7 +69,7 @@ export function TableDetails() {
         // If that fails, try to fetch as a generic table
         try {
           return await tablesApi.getGeneric(catalogName!, namespaceArray, tableName!)
-        } catch (genericError) {
+        } catch {
           // If both fail, throw the original Iceberg error
           throw icebergError
         }
@@ -82,18 +83,15 @@ export function TableDetails() {
   const [editPropsOpen, setEditPropsOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  if (!catalogName || !namespaceParam || !tableName) {
-    return <div>Catalog, namespace, and table name are required</div>
-  }
-
   const nsPath = namespaceArray.join(".")
   const refreshDisabled = tableQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
 
   const tableData = tableQuery.data
 
-  // Check if this is a generic table (has 'table' property) or Iceberg table (has 'metadata' property)
-  const isGenericTable = tableData && 'table' in tableData
-  const genericTableData = isGenericTable ? (tableData as any).table : null
+  // Type guards
+  const isGenericTable = tableData ? 'table' in tableData : false
+  const genericTableData: GenericTable | null = isGenericTable && tableData ? (tableData as LoadGenericTableResponse).table : null
+  const icebergTableData: LoadTableResult | null = !isGenericTable && tableData ? (tableData as LoadTableResult) : null
 
   // Delete mutations
   const deleteIcebergMutation = useMutation({
@@ -126,6 +124,10 @@ export function TableDetails() {
     },
   })
 
+  if (!catalogName || !namespaceParam || !tableName) {
+    return <div>Catalog, namespace, and table name are required</div>
+  }
+
   const handleDelete = () => {
     if (isGenericTable) {
       deleteGenericMutation.mutate()
@@ -134,9 +136,141 @@ export function TableDetails() {
     }
   }
 
-  const currentSchema = !isGenericTable && tableData?.metadata?.schemas?.find(
-    (s) => s["schema-id"] === tableData.metadata["current-schema-id"]
+  const currentSchema: TableSchema | undefined = icebergTableData?.metadata?.schemas?.find(
+    (s) => s["schema-id"] === icebergTableData.metadata["current-schema-id"]
   )
+
+  // Render helpers for different states
+  const renderLoading = () => <div>Loading table details...</div>
+
+  const renderError = () => (
+    <div className="text-red-600">Error loading table: {tableQuery.error?.message}</div>
+  )
+
+  const renderNotFound = () => <div>Table not found</div>
+
+  const renderGenericTable = () => {
+    if (!genericTableData) return null
+
+    return (
+      <>
+        {/* Generic Table Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Generic Table Information</CardTitle>
+            <CardDescription>Metadata for this {genericTableData.format} table</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Name</label>
+                  <p className="mt-1 text-sm font-mono">{genericTableData.name}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Format</label>
+                  <p className="mt-1 text-sm">{genericTableData.format}</p>
+                </div>
+                {genericTableData["base-location"] && (
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-medium text-muted-foreground">Base Location</label>
+                    <p className="mt-1 text-sm font-mono break-all">{genericTableData["base-location"]}</p>
+                  </div>
+                )}
+                {genericTableData.doc && (
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-medium text-muted-foreground">Description</label>
+                    <p className="mt-1 text-sm">{genericTableData.doc}</p>
+                  </div>
+                )}
+              </div>
+              {genericTableData.properties && Object.keys(genericTableData.properties).length > 0 && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Properties</label>
+                  <div className="mt-2 border rounded-md overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium">Key</th>
+                          <th className="px-3 py-2 text-left font-medium">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {Object.entries(genericTableData.properties).map(([key, value]) => (
+                          <tr key={key} className="hover:bg-muted/50">
+                            <td className="px-3 py-2 font-mono text-xs">{key}</td>
+                            <td className="px-3 py-2 text-xs break-all">{value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </>
+    )
+  }
+
+  const renderIcebergTable = () => {
+    if (!icebergTableData) return null
+
+    return (
+      <>
+        {/* Iceberg Table Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Table Information</CardTitle>
+            <CardDescription>Core metadata for this table</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MetadataViewer metadata={icebergTableData.metadata} metadataLocation={icebergTableData["metadata-location"]} />
+          </CardContent>
+        </Card>
+
+        {/* Schema */}
+        {currentSchema && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Schema</CardTitle>
+              <CardDescription>Current schema (id {currentSchema["schema-id"]})</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SchemaViewer schema={currentSchema} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Properties and Partition Specs are shown inside MetadataViewer */}
+
+        {/* DDL */}
+        <Card>
+          <CardHeader>
+            <CardTitle>DDL</CardTitle>
+            <CardDescription>Generate a CREATE TABLE statement</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TableDDLDisplay
+              catalogName={catalogName!}
+              namespace={namespaceArray}
+              tableName={tableName!}
+              metadata={icebergTableData.metadata}
+            />
+          </CardContent>
+        </Card>
+      </>
+    )
+  }
+
+  const renderTableContent = () => {
+    if (tableQuery.isLoading) return renderLoading()
+    if (tableQuery.error) return renderError()
+    if (!tableData) return renderNotFound()
+    if (isGenericTable) return renderGenericTable()
+    return renderIcebergTable()
+  }
 
   return (
     <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
@@ -207,119 +341,10 @@ export function TableDetails() {
         </div>
       </div>
 
-      {tableQuery.isLoading ? (
-        <div>Loading table details...</div>
-      ) : tableQuery.error ? (
-        <div className="text-red-600">Error loading table: {tableQuery.error.message}</div>
-      ) : !tableData ? (
-        <div>Table not found</div>
-      ) : isGenericTable ? (
-        <>
-          {/* Generic Table Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Generic Table Information</CardTitle>
-              <CardDescription>Metadata for this {genericTableData.format} table</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Name</label>
-                    <p className="mt-1 text-sm font-mono">{genericTableData.name}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Format</label>
-                    <p className="mt-1 text-sm">{genericTableData.format}</p>
-                  </div>
-                  {genericTableData["base-location"] && (
-                    <div className="md:col-span-2">
-                      <label className="text-sm font-medium text-muted-foreground">Base Location</label>
-                      <p className="mt-1 text-sm font-mono break-all">{genericTableData["base-location"]}</p>
-                    </div>
-                  )}
-                  {genericTableData.doc && (
-                    <div className="md:col-span-2">
-                      <label className="text-sm font-medium text-muted-foreground">Description</label>
-                      <p className="mt-1 text-sm">{genericTableData.doc}</p>
-                    </div>
-                  )}
-                </div>
-                {genericTableData.properties && Object.keys(genericTableData.properties).length > 0 && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Properties</label>
-                    <div className="mt-2 border rounded-md overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead className="bg-muted/50">
-                          <tr>
-                            <th className="px-3 py-2 text-left font-medium">Key</th>
-                            <th className="px-3 py-2 text-left font-medium">Value</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {Object.entries(genericTableData.properties).map(([key, value]) => (
-                            <tr key={key} className="hover:bg-muted/50">
-                              <td className="px-3 py-2 font-mono text-xs">{key}</td>
-                              <td className="px-3 py-2 text-xs break-all">{value}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      ) : (
-        <>
-          {/* Iceberg Table Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Table Information</CardTitle>
-              <CardDescription>Core metadata for this table</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MetadataViewer metadata={tableData.metadata} metadataLocation={tableData["metadata-location"]} />
-            </CardContent>
-          </Card>
-
-          {/* Schema */}
-          {currentSchema && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Schema</CardTitle>
-                <CardDescription>Current schema (id {currentSchema["schema-id"]})</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SchemaViewer schema={currentSchema} />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Properties and Partition Specs are shown inside MetadataViewer */}
-
-          {/* DDL */}
-          <Card>
-            <CardHeader>
-              <CardTitle>DDL</CardTitle>
-              <CardDescription>Generate a CREATE TABLE statement</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TableDDLDisplay
-                catalogName={catalogName}
-                namespace={namespaceArray}
-                tableName={tableName}
-                metadata={tableData.metadata}
-              />
-            </CardContent>
-          </Card>
-        </>
-      )}
+      {renderTableContent()}
 
       {/* Modals - shown for Iceberg tables only */}
-      {tableData && !isGenericTable && (
+      {icebergTableData && (
         <>
           <RenameTableModal
             open={renameOpen}
@@ -340,7 +365,7 @@ export function TableDetails() {
             catalogName={catalogName}
             namespace={namespaceArray}
             tableName={tableName}
-            properties={tableData.metadata.properties}
+            properties={icebergTableData.metadata.properties}
           />
         </>
       )}
