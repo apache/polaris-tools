@@ -23,6 +23,7 @@ import { toast } from "sonner"
 import { ArrowLeft, Folder, Table as TableIcon, RefreshCw, Trash2, Plus } from "lucide-react"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { tablesApi } from "@/api/catalog/tables"
+import { viewsApi } from "@/api/catalog/views"
 import { catalogsApi } from "@/api/management/catalogs"
 import type { GenericTableIdentifier } from "@/types/api"
 import { Button } from "@/components/ui/button"
@@ -46,6 +47,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import { CreateViewModal } from "@/components/forms/CreateViewModal"
 
 export function NamespaceDetails() {
   const { catalogName, namespace: namespaceParam } = useParams<{
@@ -56,6 +58,7 @@ export function NamespaceDetails() {
   const queryClient = useQueryClient()
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [createGenericTableOpen, setCreateGenericTableOpen] = useState(false)
+  const [createViewOpen, setCreateViewOpen] = useState(false)
   const [genericTableForm, setGenericTableForm] = useState({
     name: "",
     format: "",
@@ -93,6 +96,12 @@ export function NamespaceDetails() {
   const polarisGenericTablesQuery = useQuery({
     queryKey: ["generic-tables", catalogName, namespaceArray],
     queryFn: () => tablesApi.listGeneric(catalogName!, namespaceArray),
+    enabled: !!catalogName && namespaceArray.length > 0,
+  })
+
+  const viewsQuery = useQuery({
+    queryKey: ["views", catalogName, namespaceArray],
+    queryFn: () => viewsApi.list(catalogName!, namespaceArray),
     enabled: !!catalogName && namespaceArray.length > 0,
   })
 
@@ -149,6 +158,7 @@ export function NamespaceDetails() {
   const namespace = namespaceQuery.data
   const tables = tablesQuery.data ?? []
   const childrenNamespaces = childrenNamespacesQuery.data ?? []
+  const views = viewsQuery.data ?? []
 
   const handleTableClick = (tableName: string) => {
     if (!catalogName || !namespaceParam) return
@@ -162,6 +172,13 @@ export function NamespaceDetails() {
     const tableNamespace = table.namespace.join(".")
     navigate(
       `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(tableNamespace)}/tables/${encodeURIComponent(table.name)}`
+    )
+  }
+
+  const handleViewClick = (viewName: string) => {
+    if (!catalogName || !namespaceParam) return
+    navigate(
+      `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespaceParam)}/views/${encodeURIComponent(viewName)}`
     )
   }
 
@@ -203,8 +220,9 @@ export function NamespaceDetails() {
               catalogQuery.refetch()
               childrenNamespacesQuery.refetch()
               polarisGenericTablesQuery.refetch()
+              viewsQuery.refetch()
             }}
-            disabled={namespaceQuery.isFetching || tablesQuery.isFetching || childrenNamespacesQuery.isFetching || polarisGenericTablesQuery.isFetching}
+            disabled={namespaceQuery.isFetching || tablesQuery.isFetching || childrenNamespacesQuery.isFetching || polarisGenericTablesQuery.isFetching || viewsQuery.isFetching}
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
@@ -408,6 +426,86 @@ export function NamespaceDetails() {
         </>
       )}
 
+        {/* Iceberg Views Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Iceberg Views</CardTitle>
+                <CardDescription>
+                  Iceberg views in this namespace
+                </CardDescription>
+              </div>
+              <Button
+                onClick={() => setCreateViewOpen(true)}
+                disabled={!catalogName || !namespaceParam}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Iceberg View
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {viewsQuery.isLoading ? (
+              <div>Loading Iceberg views...</div>
+            ) : viewsQuery.error ? (
+              <div className="text-red-600">
+                Error loading Iceberg views: {viewsQuery.error.message}
+              </div>
+            ) : views.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                No Iceberg views found in this namespace.
+              </div>
+            ) : (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Namespace</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {views.map((view, idx) => {
+                      const viewNamespace = view.namespace.join(".")
+                      return (
+                        <TableRow
+                          key={idx}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => handleViewClick(view.name)}
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <TableIcon className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{view.name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-muted-foreground text-sm">{viewNamespace}</span>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleViewClick(view.name)
+                              }}
+                            >
+                              View Details
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
       {/* Polaris Generic Tables Section */}
       <Card>
         <CardHeader>
@@ -599,6 +697,17 @@ export function NamespaceDetails() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Create Iceberg View Modal */}
+      <CreateViewModal
+        open={createViewOpen}
+        onOpenChange={setCreateViewOpen}
+        catalogName={catalogName!}
+        namespace={namespaceArray}
+        onCreated={() => {
+          viewsQuery.refetch()
+        }}
+      />
     </div>
   )
 }

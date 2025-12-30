@@ -33,6 +33,7 @@ import { CatalogDetails } from "@/pages/CatalogDetails"
 import { NamespaceDetails } from "@/pages/NamespaceDetails"
 import { AccessControl } from "@/pages/AccessControl"
 import { TableDetails } from "@/pages/TableDetails"
+import { ViewDetails } from "@/pages/ViewDetails"
 
 function ThemedToaster() {
   const { effectiveTheme } = useTheme()
@@ -70,6 +71,7 @@ function App() {
                   <Route path="/catalogs/:catalogName" element={<CatalogDetails />} />
                   <Route path="/catalogs/:catalogName/namespaces/:namespace" element={<NamespaceDetails />} />
                   <Route path="/catalogs/:catalogName/namespaces/:namespace/tables/:tableName" element={<TableDetails />} />
+                  <Route path="/catalogs/:catalogName/namespaces/:namespace/views/:viewName" element={<ViewDetails />} />
                   <Route path="/access-control" element={<AccessControl />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />
