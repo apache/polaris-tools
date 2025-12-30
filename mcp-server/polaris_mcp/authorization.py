@@ -73,7 +73,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
         return f"Bearer {token}" if token else None
 
     def _get_token_from_realm(self, realm: Optional[str]) -> Optional[str]:
-        def needs_refresh(cached):
+        def needs_refresh(cached: Optional[tuple[str, float]]) -> bool:
             return (
                 cached is None
                 or cached[1] - self._refresh_buffer_seconds <= time.time()
@@ -82,7 +82,7 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
         cache_key = realm or ""
         token = self._cached.get(cache_key)
         # Token not expired
-        if not needs_refresh(token):
+        if token and not needs_refresh(token):
             return token[0]
         # Acquire lock and verify again if token expired
         with self._lock:
@@ -102,26 +102,26 @@ class ClientCredentialsAuthorizationProvider(AuthorizationProvider):
             val = os.getenv(key)
             return val.strip() or None if val else None
 
-        def load_creds(realm: Optional[str] = None) -> dict[str, Optional[str]]:
-            prefix = f"POLARIS_REALM_{realm}_" if realm else "POLARIS_"
-            return {
-                "client_id": get_env(f"{prefix}CLIENT_ID"),
-                "client_secret": get_env(f"{prefix}CLIENT_SECRET"),
-                "scope": get_env(f"{prefix}TOKEN_SCOPE"),
-                "token_url": get_env(f"{prefix}TOKEN_URL"),
+        def load_creds(creds_realm: Optional[str] = None) -> Optional[dict[str, str]]:
+            prefix = f"POLARIS_REALM_{creds_realm}_" if creds_realm else "POLARIS_"
+            client_id = get_env(f"{prefix}CLIENT_ID")
+            client_secret = get_env(f"{prefix}CLIENT_SECRET")
+            if not client_id or not client_secret:
+                return None
+            creds: dict[str, str] = {
+                "client_id": client_id,
+                "client_secret": client_secret,
             }
-
-        # Only use realm-specific credentials
-        if realm:
-            creds = load_creds(realm)
-            if creds["client_id"] and creds["client_secret"]:
-                return creds
-            return None
-        # No realm specified, use global credentials
-        creds = load_creds()
-        if creds["client_id"] and creds["client_secret"]:
+            scope = get_env(f"{prefix}TOKEN_SCOPE")
+            if scope:
+                creds["scope"] = scope
+            token_url = get_env(f"{prefix}TOKEN_URL")
+            if token_url:
+                creds["token_url"] = token_url
             return creds
-        return None
+
+        # Use global credentials if realm not specified
+        return load_creds(realm) if realm else load_creds()
 
     def _fetch_token(
         self, realm: Optional[str], credentials: dict[str, str]

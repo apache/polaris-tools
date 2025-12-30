@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import pytest
 from unittest import mock
+from typing import Any
 
 from polaris_mcp.base import ToolExecutionResult
 from polaris_mcp.tools.table import PolarisTableTool
@@ -87,7 +88,7 @@ def test_get_operation_requires_table_argument() -> None:
 
 def test_create_operation_deep_copies_request_body() -> None:
     tool, delegate = _build_tool()
-    body = {"table": "t1", "properties": {"schema-id": 1}}
+    body: dict[str, Any] = {"table": "t1", "properties": {"schema-id": 1}}
     tool.call(
         {
             "operation": "create",
