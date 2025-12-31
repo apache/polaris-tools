@@ -98,3 +98,7 @@ site/site
 
 # Ignore Gradle build output directory
 build
+
+# Do not store console/package-lock.json
+# for open-source projects
+console/package-lock.json
