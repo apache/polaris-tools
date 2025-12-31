@@ -33,6 +33,8 @@ class ApiClient {
   private managementClient: AxiosInstance
   private catalogClient: AxiosInstance
   private polarisClient: AxiosInstance
+  // Store access token in memory only (not in localStorage for security)
+  private accessToken: string | null = null
 
   constructor() {
     this.managementClient = axios.create({
@@ -63,7 +65,7 @@ class ApiClient {
     // Request interceptor to add auth token
     const requestInterceptor = (config: InternalAxiosRequestConfig) => {
       const token = this.getAccessToken()
-      // Read realm from localStorage, fallback to environment variable for backward compatibility
+      // Read realm from localStorage (non-sensitive configuration)
       const realm = localStorage.getItem("polaris_realm") || import.meta.env.VITE_POLARIS_REALM
 
       if (token) {
@@ -107,16 +109,16 @@ class ApiClient {
   }
 
   getAccessToken(): string | null {
-    return localStorage.getItem("polaris_access_token")
+    return this.accessToken
   }
 
   clearAccessToken(): void {
-    localStorage.removeItem("polaris_access_token")
+    this.accessToken = null
     localStorage.removeItem("polaris_realm")
   }
 
   setAccessToken(token: string): void {
-    localStorage.setItem("polaris_access_token", token)
+    this.accessToken = token
   }
 
   getManagementClient(): AxiosInstance {
@@ -133,4 +135,3 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient()
-

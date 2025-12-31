@@ -120,12 +120,10 @@ export const authApi = {
   },
 
   logout: (): void => {
-    localStorage.removeItem("polaris_access_token")
-    localStorage.removeItem("polaris_realm")
+    apiClient.clearAccessToken()
     // Use a small delay to allow toast to show before redirect
     setTimeout(() => {
       navigate("/login", true)
     }, 100)
   },
 }
-
