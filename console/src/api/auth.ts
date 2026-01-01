@@ -2,7 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
+ * regarding copyright ownership.   The ASF licenses this file
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
@@ -25,7 +25,7 @@ import type { OAuthTokenResponse } from "@/types/api"
 
 // Always use relative URL to go through the proxy (dev server or production server)
 // This avoids CORS issues by proxying requests through the server
-// The server.ts proxy handles /api routes in production, and Vite handles them in development
+// The server. ts proxy handles /api routes in production, and Vite handles them in development
 const TOKEN_URL = "/api/catalog/v1/oauth/tokens"
 
 // Log OAuth URL in development only
@@ -43,7 +43,7 @@ export const authApi = {
     formData.append("grant_type", "client_credentials")
     formData.append("client_id", clientId)
     formData.append("client_secret", clientSecret)
-    formData.append("scope", "PRINCIPAL_ROLE:ALL")
+    formData.append("scope", "PRINCIPAL_ROLE: ALL")
 
     const headers: Record<string, string> = {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -98,9 +98,9 @@ export const authApi = {
 
   refreshToken: async (accessToken: string): Promise<OAuthTokenResponse> => {
     const formData = new URLSearchParams()
-    formData.append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
+    formData.append("grant_type", "urn:ietf:params: oauth:grant-type:token-exchange")
     formData.append("subject_token", accessToken)
-    formData.append("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
+    formData.append("subject_token_type", "urn: ietf:params:oauth: token-type:access_token")
 
     const response = await axios.post<OAuthTokenResponse>(
       TOKEN_URL,
@@ -120,12 +120,10 @@ export const authApi = {
   },
 
   logout: (): void => {
-    localStorage.removeItem("polaris_access_token")
-    localStorage.removeItem("polaris_realm")
+    apiClient.clearAccessToken()
     // Use a small delay to allow toast to show before redirect
     setTimeout(() => {
       navigate("/login", true)
     }, 100)
   },
 }
-
