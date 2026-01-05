@@ -28,6 +28,7 @@ import {
 import { tablesApi } from "@/api/catalog/tables"
 import { Loader2 } from "lucide-react"
 import { TableSchemaDisplay } from "./TableSchemaDisplay"
+import type { LoadGenericTableResponse } from "@/types/api"
 import { TableDDLDisplay } from "./TableDDLDisplay"
 
 interface TableDetailsDrawerProps {
@@ -55,7 +56,7 @@ export function TableDetailsDrawer({
         // If that fails, try to fetch as a generic table
         try {
           return await tablesApi.getGeneric(catalogName, namespace, tableName)
-        } catch (genericError) {
+        } catch {
           // If both fail, throw the original Iceberg error
           throw icebergError
         }
@@ -68,7 +69,7 @@ export function TableDetailsDrawer({
 
   // Check if this is a generic table (has 'table' property) or Iceberg table (has 'metadata' property)
   const isGenericTable = tableData && 'table' in tableData
-  const genericTableData = isGenericTable ? (tableData as any).table : null
+  const genericTableData = isGenericTable ? (tableData as LoadGenericTableResponse).table : null
 
   const currentSchema = !isGenericTable && tableData?.metadata?.schemas?.find(
     (s) => s["schema-id"] === tableData.metadata["current-schema-id"]
