@@ -19,7 +19,6 @@
 {{- include "polaris-console.validateRouting" . }}
 {{- if .Values.httproute.enabled }}
 {{- $fullName := include "polaris-console.fullname" . }}
-{{- $svcPort := .Values.httproute.port }}
 
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -43,6 +42,6 @@ spec:
     # The backend (Service) to send matching requests to
     - backendRefs:
         - name: {{ $fullName }}
-          port: {{ $svcPort }}
+          port: {{ .Values.httproute.port }}
 
 {{- end }}

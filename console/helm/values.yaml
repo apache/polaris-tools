@@ -60,6 +60,9 @@ ingress:
 
 httproute:
   enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
   port: 80
   # Name of the httpGateway deployment
   gatewayName: ""

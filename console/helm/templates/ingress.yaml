@@ -19,7 +19,6 @@
 {{- include "polaris-console.validateRouting" . }}
 {{- if .Values.ingress.enabled }}
 {{- $fullName := include "polaris-console.fullname" . }}
-{{- $svcPort := .Values.service.port }}
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -57,7 +56,7 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  number: {{ $svcPort }}
+                  number: {{ .Values.service.port }}
           {{- end }}
     {{- end }}
 
