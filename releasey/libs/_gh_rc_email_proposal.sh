@@ -20,7 +20,7 @@
 # The ^0 suffix "resolves" a Git tag SHA to a commit SHA, if necessary.
 git_commit="$(git rev-parse ${git_tag}^0)"
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 
 ## \`VOTE\` email proposal
 
@@ -47,32 +47,32 @@ The release tarball, signature, and checksums are here:
 EOT
 
 if [[ ${skip_maven} != 1 ]]; then
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 Convenience binary artifacts are staged on Nexus. The Maven repositories URLs are:
 * https://repository.apache.org/content/repositories/${staging_repo_id}/
 EOT
 fi
 
 if [[ ${skip_python} != 1 ]]; then
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 ## TODO ADD PYTHON
 EOT
 fi
 
 if [[ ${skip_docker} != 1 ]]; then
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 ## TODO ADD DOCKER
 EOT
 fi
 
 if [[ ${skip_helm} != 1 ]]; then
-  cat <<EOT >> $GITHUB_STEP_SUMMARY
+  cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 Helm charts are available on:
 * https://dist.apache.org/repos/dist/dev/incubator/polaris-tools/${tool}/$version_without_rc}/helm-charts
 EOT
 fi
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 You can find the KEYS file here:
 * https://downloads.apache.org/incubator/polaris-tools/KEYS
 

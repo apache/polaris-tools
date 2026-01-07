@@ -19,7 +19,7 @@
 
 source "${LIBS_DIR}/_version.sh"
 
-echo "## Parameters" >> $GITHUB_STEP_SUMMARY
+echo "## Parameters" >> "$GITHUB_STEP_SUMMARY"
 
 # Extract the ref name from github.ref
 # github_ref environment format: refs/heads/branch-name or refs/tags/tag-name
@@ -27,41 +27,45 @@ if [[ "${git_ref}" =~ ^refs/tags/(.+)$ ]]; then
   # Running from a tag
   git_tag="${BASH_REMATCH[1]}"
 else
-  echo "❌ Workflow must be run from a release candidate tag, not a branch." >> $GITHUB_STEP_SUMMARY
-  echo "" >> $GITHUB_STEP_SUMMARY
-  echo "Current ref: \`${git_ref}\`" >> $GITHUB_STEP_SUMMARY
-  echo "" >> $GITHUB_STEP_SUMMARY
-  echo "Please select a release candidate tag (e.g., \`apache-polaris-1.0.0-incubating-rc0\`) from the 'Use workflow from' dropdown in the GitHub UI." >> $GITHUB_STEP_SUMMARY
+  (
+    echo "❌ Workflow must be run from a release candidate tag, not a branch."
+    echo ""
+    echo "Current ref: \`${git_ref}\`"
+    echo ""
+    echo "Please select a release candidate tag (e.g., \`apache-polaris-1.0.0-incubating-rc0\`) from the 'Use workflow from' dropdown in the GitHub UI."
+  ) >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
 
 # Validate git tag format and extract version components
 if ! validate_and_extract_git_tag_version "${git_tag}"; then
-  echo "❌ Invalid git tag format: \`${git_tag}\`. Expected format: apache-polaris-x.y.z-incubating-rcN." >> $GITHUB_STEP_SUMMARY
+  echo "❌ Invalid git tag format: \`${git_tag}\`. Expected format: apache-polaris-x.y.z-incubating-rcN." >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
 
 if [[ ! -d "${tool}/releasey" ]]; then
-  echo "❌ The directory ${tool}/releasey does not exist." >> $GITHUB_STEP_SUMMARY
+  echo "❌ The directory ${tool}/releasey does not exist." >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
 
 source "${LIBS_DIR}/_gh_determine_built_artifacts.sh"
 
 # Export variables for next steps and job outputs
-( echo "tool=${tool}"
-  echo "git_tag=${git_tag}"
-  echo "version_without_rc=${version_without_rc}"
-  echo "rc_number=${rc_number}"
-) >> $GITHUB_ENV
+cat << EOT >> "$GITHUB_ENV"
+tool=${tool}
+git_tag=${git_tag}
+version_without_rc=${version_without_rc}
+rc_number=${rc_number}
+EOT
 
-( echo "tool=${tool}"
-  echo "git_tag=${git_tag}"
-  echo "version_without_rc=${version_without_rc}"
-  echo "rc_number=${rc_number}"
-) >> $GITHUB_OUTPUT
+cat << EOT >> "$GITHUB_OUTPUT"
+tool=${tool}
+git_tag=${git_tag}
+version_without_rc=${version_without_rc}
+rc_number=${rc_number}
+EOT
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 | Parameter | Value |
 | --- | --- |
 | Tool | \`${tool}\` |

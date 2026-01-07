@@ -33,14 +33,14 @@ if [[ -d "${tool}/build/distributions" ]]; then
   exec_process svn add "${tool}/${version_without_rc}"
   exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Stage Apache Polaris ${tool} ${version_without_rc} RC${rc_number}"
 
-  cat <<EOT >> $GITHUB_STEP_SUMMARY
+  cat <<EOT >> "$GITHUB_STEP_SUMMARY"
   ## Staging to dist dev
   Artifacts staged to Apache dist dev repository
 EOT
 
 else
 
-  cat <<EOT >> $GITHUB_STEP_SUMMARY
+  cat <<EOT >> "$GITHUB_STEP_SUMMARY"
   ## No artifacts staged to dist dev
 EOT
 

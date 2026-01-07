@@ -48,7 +48,7 @@ exec_process cd "${dist_dev_dir}"
 exec_process svn add "${tool}/${version_without_rc}/${tool_base_name}.tar.gz*"
 exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Stage source tarball of Apache Polaris ${tool} ${version_without_rc} RC${rc_number}"
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
   ## Staging source tarball to dist dev
   Source tarball staged to Apache dist dev repository
 EOT

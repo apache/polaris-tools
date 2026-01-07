@@ -96,7 +96,7 @@ jobs:
           echo "Version: \`${version}\`" >> $GITHUB_STEP_SUMMARY
 
           # Create branch name in major.minor.x format
-          branch_name="${tool}-${major}.${minor}.x"
+          branch_name="${tool}/${major}.${minor}.x"
 
           # Export parameters for next step
           echo "tool=${tool}" >> $GITHUB_ENV

@@ -30,7 +30,7 @@ exec_process svn mv --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-
   "${dev_artifacts_url}" "${release_artifacts_url}" \
   -m "Release Apache Polaris ${tool} ${version_without_rc}"
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 ## Distribution
 Artifacts and Helm chart moved from dist dev to dist release
 EOT

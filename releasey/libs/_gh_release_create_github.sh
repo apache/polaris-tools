@@ -77,7 +77,7 @@ if [[ -d "${artifacts_dir}" ]]; then
   done
 fi
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 ## GitHub Release
 GitHub release created: \`${final_release_tag}\`
 EOT

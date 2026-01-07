@@ -26,10 +26,10 @@ out_params_file="$(mktemp --tmpdir maven-stage-XXXXXXXXXX)"
 
 source "$out_params_file"
 
-echo "staging_repo_id=${staging_repo_id}" >> $GITHUB_OUTPUT
-echo "staging_repo_url=${staging_repo_url}" >> $GITHUB_OUTPUT
+echo "staging_repo_id=${staging_repo_id}" >> "$GITHUB_OUTPUT"
+echo "staging_repo_url=${staging_repo_url}" >> "$GITHUB_OUTPUT"
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 ## Nexus Staging Repository
 Artifacts published and staging repository closed successfully
 

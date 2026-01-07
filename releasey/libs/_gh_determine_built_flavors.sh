@@ -24,29 +24,31 @@ skip_python=0
 
 if [[ ! -x "${tool}/releasey/maven-build.sh" ]]; then
   skip_maven=1
-  echo "## No Maven Artifacts built by ${tool}" >> $GITHUB_STEP_SUMMARY
+  echo "## No Maven Artifacts built by ${tool}" >> "$GITHUB_STEP_SUMMARY"
 fi
 if [[ ! -x "${tool}/releasey/docker-build.sh" ]]; then
   skip_docker=1
-  echo "## No Docker Images built by ${tool}" >> $GITHUB_STEP_SUMMARY
+  echo "## No Docker Images built by ${tool}" >> "$GITHUB_STEP_SUMMARY"
 fi
 if [[ ! -x "${tool}/releasey/helm-build.sh" ]]; then
   skip_helm=1
-  echo "## No Helm Charts built by ${tool}" >> $GITHUB_STEP_SUMMARY
+  echo "## No Helm Charts built by ${tool}" >> "$GITHUB_STEP_SUMMARY"
 fi
 if [[ ! -x "${tool}/releasey/python-build.sh" ]]; then
   skip_python=1
-  echo "## No Python packages built by ${tool}" >> $GITHUB_STEP_SUMMARY
+  echo "## No Python packages built by ${tool}" >> "$GITHUB_STEP_SUMMARY"
 fi
 
-( echo "skip_maven=$skip_maven"
-  echo "skip_docker=$skip_docker"
-  echo "skip_helm=$skip_helm"
-  echo "skip_python=$skip_python"
-) >> $GITHUB_ENV
+cat << EOT >> "$GITHUB_ENV"
+skip_maven=$skip_maven
+skip_docker=$skip_docker
+skip_helm=$skip_helm
+skip_python=$skip_python
+EOT
 
-( echo "skip_maven=$skip_maven"
-  echo "skip_docker=$skip_docker"
-  echo "skip_helm=$skip_helm"
-  echo "skip_python=$skip_python"
-) >> $GITHUB_OUTPUT
+cat << EOT >> "$GITHUB_OUTPUT"
+skip_maven=$skip_maven
+skip_docker=$skip_docker
+skip_helm=$skip_helm
+skip_python=$skip_python
+EOT

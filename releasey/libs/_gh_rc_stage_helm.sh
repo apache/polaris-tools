@@ -44,8 +44,8 @@ exec_process svn add "${version_without_rc}/helm-charts"
 
 exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Stage Apache Polaris ${tool} Helm chart(s) ${version_without_rc} RC${rc_number}"
 
-echo "## Helm Chart Summary" >> $GITHUB_STEP_SUMMARY
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+echo "## Helm Chart Summary" >> "$GITHUB_STEP_SUMMARY"
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 🎉 Helm chart built and staged successfully:
 
 | Component | Status |

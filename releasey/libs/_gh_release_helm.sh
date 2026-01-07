@@ -40,7 +40,7 @@ done
 
 exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Update Helm index for ${tool} ${version_without_rc} release"
 
-cat <<EOT >> $GITHUB_STEP_SUMMARY
+cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 ## Helm Index
 Helm index updated in dist release
 EOT

@@ -22,40 +22,32 @@ git_commit="$(git rev-parse ${git_tag}^0)"
 
 cat <<EOT >> "$GITHUB_STEP_SUMMARY"
 
-## \`[ANNOUNCE]\` email proposal
+## \`[RESULT][VOTE]\` email proposal
 
-Subject:
-
+### Subject
 \`\`\`
-[ANNOUNCE] Apache Polaris ${tool} ${version_without_rc} has been released!
+[RESULT][VOTE] Release Apache Polaris ${tool}${version_without_rc} (rc${rc_number})
 \`\`\`
 
-Message body proposal, read carefully and adapt if necessary:
-
+### Body
 \`\`\`
-The Apache Polaris team is pleased to announce Apache Polaris ${tool} ${version_without_rc}.
+Hello everyone,
 
-This release includes:
-## TODO ADD CHANGELOG
+Thanks to all who participated in the vote for Release Apache Polaris ${tool} ${version_without_rc} (rc${rc_number}).
 
-This release can be downloaded:
-* https://polaris.apache.org/downloads/
+The vote failed due to [REASON - TO BE FILLED BY RELEASE MANAGER].
 
-The artifacts are available on Maven Central:
-* https://repo1.maven.org/maven2/org/apache/polaris/
+A new release candidate will be proposed soon once the issues are addressed.
 
-The Docker images are available on Docker Hub:
-* https://hub.docker.com/r/apache/polaris-${tool}/tags
-
-Apache Polaris is an open-source, fully-featured catalog for Apache
-Iceberg™. It implements Iceberg's REST API, enabling seamless
-multi-engine interoperability across a wide range of platforms,
-including Apache Doris™, Apache Flink®, Apache Spark™, Dremio® OSS,
-StarRocks, and Trino.
-
-Enjoy !
-
-The Apache Polaris team.
-
+Thanks,
 \`\`\`
+
+## Summary
+🔄 Release candidate cancellation completed:
+
+| Component | Status |
+| --- | --- |
+| Nexus staging repository | ✅ Dropped |
+| Distribution artifacts (dist dev) | ✅ Deleted |
+| Helm chart (dist dev) | ✅ Deleted |
 EOT

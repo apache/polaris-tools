@@ -20,28 +20,29 @@
 source "${LIBS_DIR}/_version.sh"
 
 if ! git_tag=$(git describe --tags --exact-match HEAD 2>/dev/null); then
-  echo "❌ Current HEAD is not on a release candidate tag. Please checkout a release candidate tag first." >> $GITHUB_STEP_SUMMARY
+  echo "❌ Current HEAD is not on a release candidate tag. Please checkout a release candidate tag first." >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
 
 # Validate git tag format and extract version components
 if ! validate_and_extract_git_tag_version "${git_tag}"; then
-  echo "❌ Invalid git tag format: \`${git_tag}\`. Expected format: apache-polaris-x.y.z-incubating-rcN." >> $GITHUB_STEP_SUMMARY
+  echo "❌ Invalid git tag format: \`${git_tag}\`. Expected format: apache-polaris-x.y.z-incubating-rcN." >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
 
 if [[ ! -d "${tool}/releasey" ]]; then
-  echo "❌ The directory ${tool}/releasey does not exist." >> $GITHUB_STEP_SUMMARY
+  echo "❌ The directory ${tool}/releasey does not exist." >> "$GITHUB_STEP_SUMMARY"
   exit 1
 fi
 
 dist_dev_dir="${RELEASEY_DIR}/polaris-tools-dist-dev"
 
 # Export variables for next steps and job outputs
-( echo "tool=${tool}"
-  echo "git_tag=${git_tag}"
-  echo "version_without_rc=${version_without_rc}"
-  echo "rc_number=${rc_number}"
-  echo "dist_dev_dir=${dist_dev_dir}"
-  echo "version_dir=${dist_dev_dir}/${version_without_rc}"
-) >> $GITHUB_ENV
+cat << EOT >> "$GITHUB_ENV"
+tool=${tool}
+git_tag=${git_tag}
+version_without_rc=${version_without_rc}
+rc_number=${rc_number}
+dist_dev_dir=${dist_dev_dir}
+version_dir=${dist_dev_dir}/${version_without_rc}
+EOT

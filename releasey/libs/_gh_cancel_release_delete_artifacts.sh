@@ -17,16 +17,23 @@
 # under the License.
 #
 
+source "${LIBS_DIR}/_constants.sh"
 source "${LIBS_DIR}/_exec.sh"
 
-# Get the commit SHA that the RC tag points to
-rc_commit=$(git rev-parse "${rc_tag}")
-echo "rc_commit=${rc_commit}" >> "$GITHUB_ENV"
+# Define URLs for artifacts and Helm chart in dist dev
+dev_artifacts_url="${APACHE_DIST_URL}${APACHE_DIST_PATH}/${tool}/${version_without_rc}"
 
-exec_process git tag -a "${final_release_tag}" "${rc_commit}" -m "Apache Polaris ${version_without_rc} Release"
-exec_process git push apache "${final_release_tag}"
+# Check if artifacts directory exists and delete it
+if svn ls --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive "${dev_artifacts_url}" >/dev/null 2>&1; then
+  exec_process svn rm --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+    "${dev_artifacts_url}" \
+    -m "Cancel Apache Polaris ${version_without_rc} RC${rc_number}"
+  echo "✅ Deleted artifacts from ${dev_artifacts_url}" >> "$GITHUB_STEP_SUMMARY"
+else
+  echo "⚠️ Artifacts directory not found at ${dev_artifacts_url}" >> "$GITHUB_STEP_SUMMARY"
+fi
 
 cat <<EOT >> "$GITHUB_STEP_SUMMARY"
-## Git Release Tag
-Final release tag \`${final_release_tag}\` created and pushed
+## Distribution Cleanup
+Artifacts and Helm chart removed from dist dev repository
 EOT
