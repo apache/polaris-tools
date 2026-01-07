@@ -60,6 +60,7 @@ tasks.named<RatTask>("rat").configure {
   excludes.add("**/.keep")
   excludes.add("**/logs/**")
   excludes.add("**/*.lock")
+  excludes.add("**/.kotlin")
 
   // Binary files
   excludes.add("**/*.jar")
