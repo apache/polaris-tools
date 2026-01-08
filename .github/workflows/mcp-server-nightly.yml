@@ -40,6 +40,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
         with:
+          # The wheel built with Python 3.13 will work for all Python 3.10, 3.11, 3.12, and 3.13 users
           python-version: "3.13"
 
       - name: Install uv
