@@ -54,19 +54,19 @@ jobs:
         working-directory: mcp-server
         run: |
           # Create a nightly version with date suffix (e.g., 0.9.0.dev20231215)
-          NIGHTLY_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          CURRENT_VERSION=$(uv version --short)
           DATE_SUFFIX=$(date +%Y%m%d%H%M%S)
-          NIGHTLY_VERSION="${NIGHTLY_VERSION}.dev${DATE_SUFFIX}"
+          NIGHTLY_VERSION="${CURRENT_VERSION}.dev${DATE_SUFFIX}"
 
           # Update the version in pyproject.toml
-          sed -i "s/^version = .*/version = \"${NIGHTLY_VERSION}\"/" pyproject.toml
+          uv version "${NIGHTLY_VERSION}"
 
           echo "Publishing nightly version: ${NIGHTLY_VERSION}"
 
       - name: Sync dependencies
         working-directory: mcp-server
         run: |
-          uv sync --extra dev
+          uv sync
 
       - name: Build package
         working-directory: mcp-server
