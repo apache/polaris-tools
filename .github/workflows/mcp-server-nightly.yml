@@ -1,0 +1,79 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: MCP Server Nightly Publish
+
+on:
+  schedule:
+    # Run every day at 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger. To manually trigger this workflow:
+    # 1. Go to Actions tab in GitHub
+    # 2. Select "MCP Server Nightly Publish"
+    # 3. Click "Run workflow" button
+    # 4. Select branch and click "Run workflow"
+
+jobs:
+  publish-nightly:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Polaris Tools project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcb5dd907a8 # v5
+
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
+        with:
+          # The wheel built with Python 3.13 will work for all Python 3.10, 3.11, 3.12, and 3.13 users
+          python-version: "3.13"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+
+      - name: Update version for nightly build
+        working-directory: mcp-server
+        run: |
+          # Create a nightly version with date suffix (e.g., 0.9.0.dev20231215)
+          CURRENT_VERSION=$(uv version --short)
+          DATE_SUFFIX=$(date +%Y%m%d%H%M%S)
+          NIGHTLY_VERSION="${CURRENT_VERSION}.dev${DATE_SUFFIX}"
+
+          # Update the version in pyproject.toml
+          uv version "${NIGHTLY_VERSION}"
+
+          echo "Publishing nightly version: ${NIGHTLY_VERSION}"
+
+      - name: Sync dependencies
+        working-directory: mcp-server
+        run: |
+          uv sync
+
+      - name: Build package
+        working-directory: mcp-server
+        run: |
+          uv build
+
+      - name: Publish to Test PyPI
+        working-directory: mcp-server
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          uv publish --index testpypi
