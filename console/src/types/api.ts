@@ -262,7 +262,7 @@ export interface ListViewsResponse {
   nextPageToken?: string
 }
 
-export interface SchemaField {
+export interface ViewSchemaField {
   id: number
   name: string
   type: string
@@ -272,7 +272,7 @@ export interface SchemaField {
 
 export interface IcebergSchema {
   type: "struct"
-  fields: SchemaField[]
+  fields: ViewSchemaField[]
   "schema-id"?: number
   "identifier-field-ids"?: number[]
 }

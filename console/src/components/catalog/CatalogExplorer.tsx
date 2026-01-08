@@ -35,10 +35,12 @@ interface CatalogExplorerProps {
   className?: string
 }
 
-enum CatalogEntityType {
-    TABLE = "table",
-    VIEW = "view",
-}
+const CatalogEntityType = {
+    TABLE: "table",
+    VIEW: "view",
+} as const
+
+type CatalogEntityType = typeof CatalogEntityType[keyof typeof CatalogEntityType]
 
 interface SelectedCatalogEntity {
   catalogName: string

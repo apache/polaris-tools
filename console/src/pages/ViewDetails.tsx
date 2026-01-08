@@ -63,15 +63,6 @@ export function ViewDetails() {
   // Modals
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  if (!catalogName || !namespaceParam || !viewName) {
-    return <div>Catalog, namespace, and view name are required</div>
-  }
-
-  const nsPath = namespaceArray.join(".")
-  const refreshDisabled = viewQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
-
-  const viewData = viewQuery.data
-
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: () => viewsApi.delete(catalogName!, namespaceArray, viewName!),
@@ -87,6 +78,15 @@ export function ViewDetails() {
       })
     },
   })
+
+  if (!catalogName || !namespaceParam || !viewName) {
+    return <div>Catalog, namespace, and view name are required</div>
+  }
+
+  const nsPath = namespaceArray.join(".")
+  const refreshDisabled = viewQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
+
+  const viewData = viewQuery.data
 
   const handleDelete = () => {
     deleteMutation.mutate()
