@@ -1244,13 +1244,6 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 
 --------------------------------------------------------------------------------
 
-This artifact bundles Amazon AWS SDK.
-
-Project URL: https://aws.amazon.com/sdkforjava
-License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
-
---------------------------------------------------------------------------------
-
 This artifact bundles Stax API.
 
 Project URL: http://stax.codehaus.org/

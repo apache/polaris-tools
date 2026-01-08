@@ -47,17 +47,7 @@ dependencies {
   implementation("org.apache.iceberg:iceberg-hive-metastore")
   implementation("org.apache.iceberg:iceberg-nessie")
   implementation("org.apache.iceberg:iceberg-dell")
-  implementation(libs.hadoop.aws) { exclude("com.amazonaws", "aws-java-sdk-bundle") }
-  // AWS dependencies based on https://iceberg.apache.org/docs/latest/aws/#enabling-aws-integration
-  runtimeOnly(libs.aws.sdk.apache.client)
-  runtimeOnly(libs.aws.sdk.auth)
-  runtimeOnly(libs.aws.sdk.glue)
-  runtimeOnly(libs.aws.sdk.s3)
-  runtimeOnly(libs.aws.sdk.dynamo)
-  runtimeOnly(libs.aws.sdk.kms)
-  runtimeOnly(libs.aws.sdk.lakeformation)
-  runtimeOnly(libs.aws.sdk.sts)
-  runtimeOnly(libs.aws.sdk.url.connection.client)
+  implementation(libs.hadoop.aws) { exclude(group = "software.amazon.awssdk") }
 
   // needed for Hive catalog
   runtimeOnly("org.apache.hive:hive-metastore:${libs.versions.hive.get()}") {
