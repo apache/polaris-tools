@@ -31,9 +31,10 @@ import {
 import { cn } from "@/lib/utils"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { tablesApi } from "@/api/catalog/tables"
+import { viewsApi } from "@/api/catalog/views"
 import type { Catalog } from "@/types/api"
 
-export type TreeNodeType = "catalog" | "namespace" | "table"
+export type TreeNodeType = "catalog" | "namespace" | "table" | "view"
 
 export interface TreeNode {
   type: TreeNodeType
@@ -52,6 +53,7 @@ interface CatalogTreeNodeProps {
   onToggleExpand: (nodeId: string) => void
   onSelectNode?: (node: TreeNode) => void
   onTableClick?: (catalogName: string, namespace: string[], tableName: string) => void
+  onViewClick?: (catalogName: string, namespace: string[], viewName: string) => void
 }
 
 export function CatalogTreeNode({
@@ -62,6 +64,7 @@ export function CatalogTreeNode({
   onToggleExpand,
   onSelectNode,
   onTableClick,
+  onViewClick,
 }: CatalogTreeNodeProps) {
   const isExpanded = expandedNodes.has(node.id)
   const isSelected = selectedNodeId === node.id
@@ -121,6 +124,22 @@ export function CatalogTreeNode({
       currentNamespacePath.length > 0,
   })
 
+  // Fetch views when namespace is expanded
+  const viewsQuery = useQuery({
+    queryKey: [
+      "views",
+      node.catalogName || "",
+      currentNamespacePath.join(".") || "",
+    ],
+    queryFn: () =>
+      viewsApi.list(node.catalogName || "", currentNamespacePath),
+    enabled:
+      node.type === "namespace" &&
+      isExpanded &&
+      !!node.catalogName &&
+      currentNamespacePath.length > 0,
+  })
+
   // Fetch generic tables when namespace is expanded
   const genericTablesQuery = useQuery({
     queryKey: [
@@ -150,6 +169,12 @@ export function CatalogTreeNode({
       // Open table details drawer when clicking a table
       if (node.catalogName && node.namespace && node.namespace.length > 0) {
         onTableClick?.(node.catalogName, node.namespace, node.name)
+      }
+      onSelectNode?.(node)
+    } else if (node.type === "view") {
+      // Open view details when clicking a view
+      if (node.catalogName && node.namespace && node.namespace.length > 0) {
+        onViewClick?.(node.catalogName, node.namespace, node.name)
       }
       onSelectNode?.(node)
     }
@@ -261,6 +286,21 @@ export function CatalogTreeNode({
           parent: node,
         })
       })
+
+      // Add views under namespace
+      // Views API returns identifiers like [{namespace: ["accounting"], name: "sales_view"}]
+      const views = viewsQuery.data || []
+      views.forEach((view) => {
+        const namespaceId = `${node.id}.view.${view.name}`
+        children.push({
+          type: "view",
+          id: namespaceId,
+          name: view.name,
+          namespace: currentNamespacePath, // Full namespace path where view resides
+          catalogName: node.catalogName,
+          parent: node,
+        })
+      })
     }
 
     return children
@@ -269,6 +309,7 @@ export function CatalogTreeNode({
     namespacesQuery.data,
     childNamespacesQuery.data,
     tablesQuery.data,
+    viewsQuery.data,
     genericTablesQuery.data,
     currentNamespacePath,
   ])
@@ -276,7 +317,7 @@ export function CatalogTreeNode({
   const isLoading =
     (node.type === "catalog" && namespacesQuery.isLoading) ||
     (node.type === "namespace" &&
-      (childNamespacesQuery.isLoading || tablesQuery.isLoading || genericTablesQuery.isLoading))
+      (childNamespacesQuery.isLoading || tablesQuery.isLoading || viewsQuery.isLoading || genericTablesQuery.isLoading))
 
   const Icon = useMemo(() => {
     if (node.type === "catalog") return Database
@@ -327,11 +368,12 @@ export function CatalogTreeNode({
                   onToggleExpand={onToggleExpand}
                   onSelectNode={onSelectNode}
                   onTableClick={onTableClick}
+                  onViewClick={onViewClick}
                 />
               ))}
-          {!isLoading && childNodes.length === 0 && node.type !== "table" && (
+          {!isLoading && childNodes.length === 0 && node.type !== "table" && node.type !== "view" && (
             <div className="px-2 py-1 text-xs text-muted-foreground italic">
-              No {node.type === "catalog" ? "namespaces" : "tables"} found
+              No {node.type === "catalog" ? "namespaces" : "items"} found
             </div>
           )}
         </div>
