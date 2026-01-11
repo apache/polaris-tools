@@ -17,12 +17,12 @@
 # under the License.
 
 # Generate nginx configuration with the backend URL
-envsubst '${VITE_POLARIS_API_URL}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+envsubst '${VITE_POLARIS_API_URL}' < /opt/app-root/etc/nginx.d/default.conf.template > /opt/app-root/etc/nginx.d/default.conf
 
 echo "Generated nginx config with backend: ${VITE_POLARIS_API_URL}"
 
 # Generate runtime configuration from environment variables
-cat > /usr/share/nginx/html/config.js << EOF
+cat > /opt/app-root/src/config.js << EOF
 // Runtime configuration generated from environment variables
 window.APP_CONFIG = {
   VITE_POLARIS_API_URL: '${VITE_POLARIS_API_URL}',
@@ -33,7 +33,7 @@ window.APP_CONFIG = {
 EOF
 
 echo "Generated config.js with runtime configuration:"
-cat /usr/share/nginx/html/config.js
+cat /opt/app-root/src/config.js
 
 # Start nginx
 exec nginx -g 'daemon off;'

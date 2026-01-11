@@ -16,7 +16,7 @@
 # under the License.
 
 # Build stage
-FROM registry.access.redhat.com/ubi9/nodejs-20-minimal:latest AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
 
 # Default environment variables (can be overridden at runtime)
 ENV VITE_POLARIS_API_URL=http://polaris:8181
@@ -39,33 +39,21 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM registry.access.redhat.com/ubi9/nginx-126:latest
-
-# Switch to root to configure the image
-USER 0
+FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
 
 # Copy DISCLAIMER, LICENSE, NOTICE files
 COPY DISCLAIMER /DISCLAIMER
 COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
-# Override Global Nginx Config
-COPY docker/nginx-global.conf /etc/nginx/nginx.conf
-
 # Copy custom nginx configuration as template
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf.template
+COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
 
 # Copy runtime config generation script
-COPY docker/generate-config.sh /generate-config.sh
-
-RUN chmod +x /generate-config.sh && \
-    chmod -R g+w /usr/share/nginx/html /etc/nginx/conf.d
+COPY --chmod=755 docker/generate-config.sh /generate-config.sh
 
 # Copy built application from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Switch to runtime user
-USER 1001
+COPY --from=builder /app/dist /opt/app-root/src
 
 # Expose port 80
 EXPOSE 80
