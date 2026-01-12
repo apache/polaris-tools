@@ -31,7 +31,7 @@ Download the required bundle jar from [Maven Central](https://repo1.maven.org/ma
 ## AWS S3
 
 ### Required Dependencies
-You must include the Iceberg AWS bundle jar in the classpath:
+Users must include the Iceberg AWS bundle jar (can be downloaded from [here](https://mvnrepository.com/artifact/org.apache.iceberg/iceberg-aws-bundle)) in the classpath:
 ```shell
 java -cp iceberg-catalog-migrator-cli-0.1.0-SNAPSHOT.jar:iceberg-aws-bundle-x.x.x.jar \
   org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigrationCLI register \
@@ -41,7 +41,7 @@ java -cp iceberg-catalog-migrator-cli-0.1.0-SNAPSHOT.jar:iceberg-aws-bundle-x.x.
 For more information on AWS integration, refer to the [Iceberg AWS documentation](https://iceberg.apache.org/docs/nightly/aws/#enabling-aws-integration).
 
 ### Environment Variables
-For AWS, you can use the following environment variables:
+For AWS, use the following environment variables:
 ```shell
 export AWS_ACCESS_KEY_ID=xxxxxxx
 export AWS_SECRET_ACCESS_KEY=xxxxxxx
@@ -51,7 +51,7 @@ export AWS_S3_ENDPOINT=xxxxxxx
 ## Azure Data Lake Storage (ADLS)
 
 ### Required Dependencies
-You must include the Iceberg Azure bundle jar in the classpath:
+Users must include the Iceberg Azure bundle jar (can be downloaded from [here](https://mvnrepository.com/artifact/org.apache.iceberg/iceberg-azure-bundle)) in the classpath:
 ```shell
 java -cp iceberg-catalog-migrator-cli-0.1.0.jar:iceberg-azure-bundle-x.x.x.jar \
   org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigrationCLI register \
@@ -59,7 +59,7 @@ java -cp iceberg-catalog-migrator-cli-0.1.0.jar:iceberg-azure-bundle-x.x.x.jar \
 ```
 
 ### Environment Variables
-For ADLS, you can use the following environment variables:
+For ADLS, use the following environment variables:
 ```shell
 export AZURE_SAS_TOKEN=xxxxxxx
 ```
@@ -67,7 +67,7 @@ export AZURE_SAS_TOKEN=xxxxxxx
 ## Google Cloud Storage (GCS)
 
 ### Required Dependencies
-You must include the Iceberg GCP bundle jar in the classpath:
+Users must include the Iceberg GCP bundle jar (can be downloaded from [here](https://mvnrepository.com/artifact/org.apache.iceberg/iceberg-gcp-bundle)) in the classpath:
 ```shell
 java -cp iceberg-catalog-migrator-cli-0.1.0.jar:iceberg-gcp-bundle-x.x.x.jar \
   org.apache.polaris.iceberg.catalog.migrator.cli.CatalogMigrationCLI register \
@@ -76,4 +76,4 @@ java -cp iceberg-catalog-migrator-cli-0.1.0.jar:iceberg-gcp-bundle-x.x.x.jar \
 
 ## Notes
 - Replace `x.x.x` with the Iceberg version matching the release version of the migrator tool.
-- Multiple bundle jars can be included if you need to access multiple cloud providers
+- Multiple bundle jars can be included if users need to access multiple cloud providers.
