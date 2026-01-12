@@ -16,7 +16,7 @@
 # under the License.
 
 # Build stage
-FROM node:22.12.0-alpine AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
 
 # Default environment variables (can be overridden at runtime)
 ENV VITE_POLARIS_API_URL=http://polaris:8181
@@ -39,7 +39,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
 
 # Copy DISCLAIMER, LICENSE, NOTICE files
 COPY DISCLAIMER /DISCLAIMER
@@ -47,14 +47,13 @@ COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
 # Copy custom nginx configuration as template
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf.template
+COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
 
 # Copy runtime config generation script
-COPY docker/generate-config.sh /generate-config.sh
-RUN chmod +x /generate-config.sh
+COPY --chmod=755 docker/generate-config.sh /generate-config.sh
 
 # Copy built application from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /opt/app-root/src
 
 # Expose port 80
 EXPOSE 80
