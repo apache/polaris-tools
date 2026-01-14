@@ -32,6 +32,7 @@ export function Login() {
   const [clientSecret, setClientSecret] = useState("")
   // Initialize realm with value from .env file if present
   const [realm, setRealm] = useState(import.meta.env.VITE_POLARIS_REALM || "")
+  const [scope, setScope] = useState(import.meta.env.VITE_POLARIS_PRINCIPAL_SCOPE || "")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -43,7 +44,7 @@ export function Login() {
     setLoading(true)
 
     try {
-      await login(clientId, clientSecret, realm)
+      await login(clientId, clientSecret, scope, realm)
       navigate("/")
     } catch (err) {
       setError(
@@ -98,6 +99,17 @@ export function Login() {
                   onChange={(e) => setRealm(e.target.value)}
                   required
                   placeholder="Enter your realm"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="scope">Scope</Label>
+                <Input
+                  id="scope"
+                  type="text"
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                  required
+                  placeholder="Enter the scope"
                 />
               </div>
               {error && (

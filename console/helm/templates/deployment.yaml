@@ -48,6 +48,8 @@ spec:
               value: {{ .Values.env.polarisApiUrl | quote }}
             - name: VITE_POLARIS_REALM
               value: {{ .Values.env.polarisRealm | quote }}
+            - name: VITE_POLARIS_PRINCIPAL_SCOPE
+              value: { { .Values.env.polarisPrincipalScope | quote } }
             - name: VITE_OAUTH_TOKEN_URL
               value: {{ .Values.env.oauthTokenUrl | quote }}
           readinessProbe:
