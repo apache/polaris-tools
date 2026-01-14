@@ -21,6 +21,7 @@ FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
 # Default environment variables (can be overridden at runtime)
 ENV VITE_POLARIS_API_URL=http://polaris:8181
 ENV VITE_POLARIS_REALM=POLARIS
+ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
 ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
 

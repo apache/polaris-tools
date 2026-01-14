@@ -37,13 +37,14 @@ export const authApi = {
   getToken: async (
     clientId: string,
     clientSecret: string,
+    scope: string,
     realm?: string
   ): Promise<OAuthTokenResponse> => {
     const formData = new URLSearchParams()
     formData.append("grant_type", "client_credentials")
     formData.append("client_id", clientId)
     formData.append("client_secret", clientSecret)
-    formData.append("scope", "PRINCIPAL_ROLE:ALL")
+    formData.append("scope", scope)
 
     const headers: Record<string, string> = {
       "Content-Type": "application/x-www-form-urlencoded",

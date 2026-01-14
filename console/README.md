@@ -46,6 +46,7 @@ Create a `.env` file based on `.env.example`:
 ```env
 VITE_POLARIS_API_URL=http://localhost:8181
 VITE_POLARIS_REALM=POLARIS 
+VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # optional, defaults to "Polaris-Realm"
 VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/v1/oauth/tokens  # optional
 ```
@@ -127,6 +128,7 @@ Then, you run Polaris Console using:
 docker run -p 8080:80 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
+  -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
   apache/polaris-console:latest
 ```
 
