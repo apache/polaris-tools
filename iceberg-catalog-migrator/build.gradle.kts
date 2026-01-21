@@ -17,13 +17,14 @@
  * under the License.
  */
 
+import io.github.gradlenexus.publishplugin.NexusPublishExtension
+import java.net.URI
 import org.nosphere.apache.rat.RatTask
 
 plugins {
-  `maven-publish`
-  signing
   `build-conventions`
   alias(libs.plugins.rat)
+  alias(libs.plugins.nexus.publish.plugin)
 }
 
 spotless {
@@ -76,4 +77,22 @@ tasks.named<RatTask>("rat").configure {
 
   // Rat can't scan binary images
   excludes.add("**/*.png")
+}
+
+configure<NexusPublishExtension> {
+  transitionCheckOptions {
+    // Increase timeout from default 1 minute
+    maxRetries.set(360)
+    delayBetween.set(java.time.Duration.ofSeconds(10))
+  }
+  repositories {
+    create("apache") {
+      nexusUrl.set(URI.create("https://repository.apache.org/service/local/"))
+      snapshotRepositoryUrl.set(
+        URI.create("https://repository.apache.org/content/repositories/snapshots/")
+      )
+      username.set(System.getenv("ASF_USERNAME") ?: findProperty("asfNexusUsername") as String?)
+      password.set(System.getenv("ASF_PASSWORD") ?: findProperty("asfNexusPassword") as String?)
+    }
+  }
 }
