@@ -125,20 +125,17 @@ export function Workspaces() {
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <Link to="/login">
-            <Button variant="ghost" size="sm" className="mb-2">
+            <Button variant="ghost" size="lg" className="mb-2">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Login
+              Go back
             </Button>
           </Link>
           <h1 className="text-3xl font-bold">Workspaces</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your Polaris workspace configurations
-          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleReloadFromServer}>
             <Server className="mr-2 h-4 w-4" />
-            Reload From Server
+            Reset to defaults
           </Button>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />

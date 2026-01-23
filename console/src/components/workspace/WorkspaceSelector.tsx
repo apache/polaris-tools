@@ -40,7 +40,7 @@ export function WorkspaceSelector({
 }: WorkspaceSelectorProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="workspace">Workspace</Label>
+      <Label htmlFor="workspace">Select a workspace</Label>
       <Select
         value={selectedWorkspace?.name}
         onValueChange={(name) => {
@@ -56,23 +56,11 @@ export function WorkspaceSelector({
         <SelectContent>
           {workspaces.map((workspace) => (
             <SelectItem key={workspace.name} value={workspace.name}>
-              <div className="flex flex-col">
-                <span>{workspace.name}</span>
-                {workspace.description && (
-                  <span className="text-xs text-muted-foreground">
-                    {workspace.description}
-                  </span>
-                )}
-              </div>
+                {workspace.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-      {selectedWorkspace?.description && (
-        <p className="text-xs text-muted-foreground">
-          {selectedWorkspace.description}
-        </p>
-      )}
     </div>
   )
 }
