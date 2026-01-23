@@ -40,7 +40,7 @@ export function WorkspaceSelector({
 }: WorkspaceSelectorProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="workspace">Select a workspace</Label>
+      <Label htmlFor="workspace">Workspace</Label>
       <Select
         value={selectedWorkspace?.name}
         onValueChange={(name) => {

@@ -33,14 +33,17 @@ interface AuthProviderSelectorProps {
   onSelectProvider: (provider: AuthConfig) => void
 }
 
-function getAuthProviderLabel(type: AuthProviderType): string {
-  if (type === AuthProviderType.INTERNAL) {
-    return "Internal Authentication"
+function getAuthProviderLabel(provider: AuthConfig): string {
+  const typeLabel = provider.type === AuthProviderType.INTERNAL
+    ? "Internal"
+    : "OIDC"
+
+  try {
+    const urlPart = provider.url ? ` (${new URL(provider.url).origin})` : ""
+    return `${typeLabel}${urlPart}`
+  } catch {
+    return typeLabel
   }
-  if (type === AuthProviderType.OIDC) {
-    return "OIDC (OpenID Connect)"
-  }
-  return type
 }
 
 export function AuthProviderSelector({
@@ -52,26 +55,19 @@ export function AuthProviderSelector({
     return null
   }
 
-  if (authProviders.length === 1) {
-    return (
-      <div className="space-y-2">
-        <Label>Authentication Method</Label>
-        <div className="text-sm text-muted-foreground">
-          {getAuthProviderLabel(authProviders[0].type)}
-        </div>
-      </div>
-    )
-  }
+  const selectedIndex = selectedProvider
+    ? authProviders.findIndex(p => p === selectedProvider)
+    : 0
 
   return (
     <div className="space-y-2">
       <Label htmlFor="authProvider">Authentication Method</Label>
       <Select
-        value={selectedProvider?.type}
-        onValueChange={(type) => {
-          const provider = authProviders.find(p => p.type === type)
-          if (provider) {
-            onSelectProvider(provider)
+        value={selectedIndex.toString()}
+        onValueChange={(value) => {
+          const index = parseInt(value, 10)
+          if (authProviders[index]) {
+            onSelectProvider(authProviders[index])
           }
         }}
       >
@@ -80,8 +76,8 @@ export function AuthProviderSelector({
         </SelectTrigger>
         <SelectContent>
           {authProviders.map((provider, index) => (
-            <SelectItem key={`${provider.type}-${index}`} value={provider.type}>
-              {getAuthProviderLabel(provider.type)}
+            <SelectItem key={index} value={index.toString()}>
+              {getAuthProviderLabel(provider)}
             </SelectItem>
           ))}
         </SelectContent>
