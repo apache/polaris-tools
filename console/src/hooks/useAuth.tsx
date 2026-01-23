@@ -52,11 +52,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (workspace) {
         setCurrentWorkspace(workspace)
-      } else if (realm) {
-        localStorage.setItem("polaris_realm", realm)
+        await authApi.getToken(
+          clientId,
+          clientSecret,
+          scope,
+          workspace.realm,
+          workspace["realm-header"]
+        )
+      } else {
+        await authApi.getToken(clientId, clientSecret, scope, realm, "Polaris-Realm")
       }
-
-      await authApi.getToken(clientId, clientSecret, scope, realm)
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)

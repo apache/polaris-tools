@@ -19,8 +19,8 @@
 
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios"
 import { navigate } from "@/lib/navigation"
-import { REALM_HEADER_NAME } from "@/lib/constants"
 import { config } from "@/lib/config"
+import { getCurrentWorkspace } from "@/lib/workspaces"
 
 const API_BASE_URL = config.POLARIS_API_URL
 const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
@@ -62,14 +62,15 @@ class ApiClient {
   private setupInterceptors() {
     const requestInterceptor = (config: InternalAxiosRequestConfig) => {
       const token = this.getAccessToken()
-      const realm = localStorage.getItem("polaris_realm")
+      const workspace = getCurrentWorkspace()
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
 
-      if (realm) {
-        config.headers[REALM_HEADER_NAME] = realm
+      if (workspace) {
+        const realmHeaderName = workspace["realm-header"] || "Polaris-Realm"
+        config.headers[realmHeaderName] = workspace.realm
       }
 
       return config
@@ -104,7 +105,6 @@ class ApiClient {
 
   clearAccessToken(): void {
     this.accessToken = null
-    localStorage.removeItem("polaris_realm")
   }
 
   setAccessToken(token: string): void {

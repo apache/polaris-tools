@@ -20,6 +20,7 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Plus, RefreshCw, Pencil, Trash2, Server, ArrowLeft } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -41,12 +42,14 @@ import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import type { Workspace, WorkspacesConfig } from "@/types/workspaces"
 
 export function Workspaces() {
+  const { isAuthenticated } = useAuth()
   const [config, setConfig] = useState<WorkspacesConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [workspaceToDelete, setWorkspaceToDelete] = useState<Workspace | null>(null)
+  const [resetDialogOpen, setResetDialogOpen] = useState(false)
 
   useEffect(() => {
     loadConfig()
@@ -64,14 +67,19 @@ export function Workspaces() {
     }
   }
 
-  const handleReloadFromServer = async () => {
+  const handleResetClick = () => {
+    setResetDialogOpen(true)
+  }
+
+  const confirmReset = async () => {
+    setResetDialogOpen(false)
     setLoading(true)
     try {
       const cfg = await reloadFromServer()
       setConfig(cfg)
-      toast.success("Workspaces reloaded from server")
+      toast.success("Workspaces reset to defaults")
     } catch {
-      toast.error("Failed to reload from server")
+      toast.error("Failed to reset to defaults")
     } finally {
       setLoading(false)
     }
@@ -123,15 +131,18 @@ export function Workspaces() {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="space-y-4">
+        <h1 className="text-3xl font-bold">Workspaces</h1>
         <div className="flex items-center gap-2">
-          <Link to="/login">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Go back
-            </Button>
-          </Link>
+          {!isAuthenticated && (
+            <Link to="/login">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Go back
+              </Button>
+            </Link>
+          )}
           <div className="flex-1" />
-          <Button variant="outline" size="sm" onClick={handleReloadFromServer}>
+          <Button variant="outline" size="sm" onClick={handleResetClick}>
             <Server className="mr-2 h-4 w-4" />
             Reset to defaults
           </Button>
@@ -140,7 +151,6 @@ export function Workspaces() {
             Add Workspace
           </Button>
         </div>
-        <h1 className="text-3xl font-bold">Workspaces</h1>
       </div>
 
       <div className="border rounded-lg">
@@ -230,6 +240,14 @@ export function Workspaces() {
         onConfirm={confirmDelete}
         title="Delete Workspace"
         description={`Are you sure you want to delete "${workspaceToDelete?.name}"? This action cannot be undone.`}
+      />
+
+      <DeleteConfirmDialog
+        open={resetDialogOpen}
+        onOpenChange={setResetDialogOpen}
+        onConfirm={confirmReset}
+        title="Reset to Defaults"
+        description="This will reload workspaces from the server and discard all local changes. Are you sure you want to continue?"
       />
     </div>
   )

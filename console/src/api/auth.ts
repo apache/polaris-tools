@@ -20,7 +20,6 @@
 import axios from "axios"
 import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
-import { REALM_HEADER_NAME } from "@/lib/constants"
 import { config } from "@/lib/config"
 import type { OAuthTokenResponse } from "@/types/api"
 
@@ -35,7 +34,8 @@ export const authApi = {
     clientId: string,
     clientSecret: string,
     scope: string,
-    realm?: string
+    realm?: string,
+    realmHeaderName?: string
   ): Promise<OAuthTokenResponse> => {
     const formData = new URLSearchParams()
     formData.append("grant_type", "client_credentials")
@@ -47,9 +47,8 @@ export const authApi = {
       "Content-Type": "application/x-www-form-urlencoded",
     }
 
-    // Add realm header if provided
-    if (realm) {
-      headers[REALM_HEADER_NAME] = realm
+    if (realm && realmHeaderName) {
+      headers[realmHeaderName] = realm
     }
 
     const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
