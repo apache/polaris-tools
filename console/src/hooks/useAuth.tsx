@@ -17,10 +17,11 @@
  * under the License.
  */
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
-import { setCurrentWorkspace, clearCurrentWorkspace } from "@/lib/workspaces"
+import { apiClient } from "@/api/client"
+import { setCurrentWorkspace, clearCurrentWorkspace, getCurrentWorkspace } from "@/lib/workspaces"
 import type { Workspace } from "@/types/workspaces"
 
 interface AuthContextType {
@@ -40,7 +41,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
-  const [loading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const token = apiClient.getAccessToken()
+    const workspace = getCurrentWorkspace()
+    if (token && workspace) {
+      setIsAuthenticated(true)
+    }
+    setLoading(false)
+  }, [])
 
   const login = async (
     clientId: string,

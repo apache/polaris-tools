@@ -31,10 +31,11 @@ class ApiClient {
   private managementClient: AxiosInstance
   private catalogClient: AxiosInstance
   private polarisClient: AxiosInstance
-  // Store access token in memory only (not in localStorage for security)
   private accessToken: string | null = null
+  private readonly TOKEN_KEY = "polaris_access_token"
 
   constructor() {
+    this.accessToken = sessionStorage.getItem(this.TOKEN_KEY)
     this.managementClient = axios.create({
       baseURL: MANAGEMENT_BASE_URL,
       headers: {
@@ -105,10 +106,12 @@ class ApiClient {
 
   clearAccessToken(): void {
     this.accessToken = null
+    sessionStorage.removeItem(this.TOKEN_KEY)
   }
 
   setAccessToken(token: string): void {
     this.accessToken = token
+    sessionStorage.setItem(this.TOKEN_KEY, token)
   }
 
   getManagementClient(): AxiosInstance {
