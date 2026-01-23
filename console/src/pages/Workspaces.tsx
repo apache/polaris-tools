@@ -18,8 +18,8 @@
  */
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Plus, RefreshCw, Pencil, Trash2, Server, ArrowLeft } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
+import { Plus, RefreshCw, Pencil, Trash2, Server, ArrowLeft, LogIn, LogOut } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -36,13 +36,16 @@ import {
   loadWorkspacesConfig,
   deleteWorkspace,
   reloadFromServer,
+  getCurrentWorkspace,
 } from "@/lib/workspaces"
 import { WorkspaceFormModal } from "@/components/workspace/WorkspaceFormModal"
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
+import { apiClient } from "@/api/client"
 import type { Workspace, WorkspacesConfig } from "@/types/workspaces"
 
 export function Workspaces() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, logout } = useAuth()
+  const navigate = useNavigate()
   const [config, setConfig] = useState<WorkspacesConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
@@ -50,9 +53,11 @@ export function Workspaces() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [workspaceToDelete, setWorkspaceToDelete] = useState<Workspace | null>(null)
   const [resetDialogOpen, setResetDialogOpen] = useState(false)
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null)
 
   useEffect(() => {
     loadConfig()
+    setCurrentWorkspace(getCurrentWorkspace())
   }, [])
 
   const loadConfig = async () => {
@@ -120,6 +125,18 @@ export function Workspaces() {
     setSelectedWorkspace(null)
   }
 
+  const handleLogin = (workspace: Workspace) => {
+    navigate(`/login?workspace=${encodeURIComponent(workspace.name)}`)
+  }
+
+  const handleLogout = (workspace: Workspace) => {
+    apiClient.clearAccessToken(workspace.name)
+    toast.success(`Logged out from "${workspace.name}"`)
+    if (currentWorkspace?.name === workspace.name) {
+      logout()
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -162,63 +179,105 @@ export function Workspaces() {
               <TableHead>Realm</TableHead>
               <TableHead>API Server</TableHead>
               <TableHead>Auth Providers</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {config?.workspaces.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={7} className="text-center text-muted-foreground">
                   No workspaces configured. Click "Add Workspace" to create one.
                 </TableCell>
               </TableRow>
             ) : (
-              config?.workspaces.map((workspace) => (
-                <TableRow key={workspace.name}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {workspace.name}
-                      {workspace.is_default && (
-                        <Badge variant="secondary" className="text-xs">Default</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {workspace.description || "-"}
-                  </TableCell>
-                  <TableCell>{workspace.realm}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {workspace.server?.api || "-"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      {workspace.auth.map((auth, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {auth.type}
+              config?.workspaces.map((workspace) => {
+                const isActive = currentWorkspace?.name === workspace.name
+                const hasToken = apiClient.hasToken(workspace.name)
+
+                return (
+                  <TableRow
+                    key={workspace.name}
+                    className={isActive ? "bg-primary/5" : ""}
+                  >
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {workspace.name}
+                        {workspace.is_default && (
+                          <Badge variant="secondary" className="text-xs">Default</Badge>
+                        )}
+                        {isActive && (
+                          <Badge variant="default" className="text-xs">Active</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {workspace.description || "-"}
+                    </TableCell>
+                    <TableCell>{workspace.realm}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {workspace.server?.api || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        {workspace.auth.map((auth, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {auth.type}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {hasToken ? (
+                        <Badge variant="outline" className="text-xs text-green-600 border-green-600">
+                          Authenticated
                         </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(workspace)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(workspace)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-muted-foreground">
+                          Not authenticated
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        {hasToken ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleLogout(workspace)}
+                            title="Logout"
+                          >
+                            <LogOut className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleLogin(workspace)}
+                            title="Login"
+                          >
+                            <LogIn className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(workspace)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(workspace)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>

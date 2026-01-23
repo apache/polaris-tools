@@ -37,14 +37,15 @@ export function Header() {
   const { logout } = useAuth()
   const { principal, principalRoles, loading } = useCurrentUser()
   const { theme, setTheme } = useTheme()
-  const [realmInfo, setRealmInfo] = useState<{ header: string; value: string } | null>(null)
+  const [workspaceInfo, setWorkspaceInfo] = useState<{ name: string; realm: string; header: string } | null>(null)
 
   useEffect(() => {
     const workspace = getCurrentWorkspace()
     if (workspace) {
-      setRealmInfo({
+      setWorkspaceInfo({
+        name: workspace.name,
         header: workspace["realm-header"] || "Polaris-Realm",
-        value: workspace.realm
+        realm: workspace.realm
       })
     }
   }, [])
@@ -107,12 +108,19 @@ export function Header() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Realm Info and User Profile - Right Side */}
+      {/* Workspace and Realm Info - Right Side */}
       <div className="flex items-center gap-4">
-        {realmInfo && (
-          <div className="text-sm font-medium text-foreground">
-            <span className="text-muted-foreground">{realmInfo.header}:</span>{" "}
-            <span className="font-semibold">{realmInfo.value}</span>
+        {workspaceInfo && (
+          <div className="flex items-center gap-3">
+            <div className="text-sm">
+              <span className="text-muted-foreground">Workspace:</span>{" "}
+              <span className="font-semibold text-foreground">{workspaceInfo.name}</span>
+            </div>
+            <div className="h-4 w-px bg-border" />
+            <div className="text-sm">
+              <span className="text-muted-foreground">{workspaceInfo.header}:</span>{" "}
+              <span className="font-semibold text-foreground">{workspaceInfo.realm}</span>
+            </div>
           </div>
         )}
 
