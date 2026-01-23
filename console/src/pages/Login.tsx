@@ -30,14 +30,9 @@ import {WorkspaceSelector} from "@/components/workspace/WorkspaceSelector"
 import {AuthProviderSelector} from "@/components/workspace/AuthProviderSelector"
 import {loadWorkspacesConfig, getDefaultWorkspace} from "@/lib/workspaces"
 import type {Workspace, AuthConfig, WorkspacesConfig} from "@/types/workspaces"
-import {Settings, ExternalLink} from "lucide-react"
+import {Settings, ExternalLink, AlertTriangle} from "lucide-react"
 import {AuthProviderType} from "@/types/workspaces"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from "@/components/ui/tooltip.tsx";
+import {toast} from "sonner"
 
 export function Login() {
   const [workspacesConfig, setWorkspacesConfig] = useState<WorkspacesConfig | null>(null)
@@ -84,7 +79,10 @@ export function Login() {
     if (!selectedAuthProvider || selectedAuthProvider.type !== AuthProviderType.OIDC) {
       return
     }
-    window.location.href = selectedAuthProvider.url
+    toast.warning("OIDC authentication is not yet implemented", {
+      description: "This feature will be available in the next release. Please use Internal authentication for now.",
+      duration: 5000,
+    })
   }
 
   const handleInternalLogin = async (e: React.FormEvent) => {
@@ -138,24 +136,11 @@ export function Login() {
                       onSelectWorkspace={handleWorkspaceChange}
                     />
                   </div>
-                  <div>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Link to="/workspaces">
-                            <Button variant="outline" size="icon" type="button">
-                              <Settings className="h-4 w-4"/>
-                            </Button>
-                          </Link>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="max-w-xs">
-                            Configure workspaces
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
+                  <Link to="/workspaces">
+                    <Button variant="outline" size="icon" type="button">
+                      <Settings className="h-4 w-4"/>
+                    </Button>
+                  </Link>
                 </div>
 
                 {selectedWorkspace && (
@@ -220,6 +205,29 @@ export function Login() {
                       </form>
                     ) : (
                       <div className="space-y-4">
+                        <div className="rounded-md bg-yellow-500/10 border border-yellow-500/20 p-3 text-sm text-yellow-600 dark:text-yellow-500">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0"/>
+                            <div>
+                              <div className="font-medium">OIDC Not Yet Implemented</div>
+                              <div className="text-xs mt-1">
+                                This feature will be available in the next release. Please use Internal authentication for now.
+                              </div>
+                              <div className="text-xs mt-2">
+                                Follow{" "}
+                                <a
+                                  href="https://github.com/apache/polaris-tools/issues/125"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline hover:text-yellow-700 dark:hover:text-yellow-400"
+                                >
+                                  apache/polaris-tools/issue #125
+                                </a>
+                                {" "}for updates.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         {error && (
                           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                             {error}
@@ -227,8 +235,10 @@ export function Login() {
                         )}
                         <Button
                           type="button"
+                          variant="outline"
                           className="w-full"
                           onClick={handleOIDCLogin}
+                          disabled
                         >
                           <ExternalLink className="mr-2 h-4 w-4"/>
                           Sign in with OIDC
