@@ -34,6 +34,7 @@ import { NamespaceDetails } from "@/pages/NamespaceDetails"
 import { AccessControl } from "@/pages/AccessControl"
 import { TableDetails } from "@/pages/TableDetails"
 import { ViewDetails } from "@/pages/ViewDetails"
+import { Workspaces } from "@/pages/Workspaces"
 
 function ThemedToaster() {
   const { effectiveTheme } = useTheme()
@@ -58,6 +59,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/workspaces" element={<Workspaces />} />
                 <Route
                   element={
                     <ProtectedRoute>

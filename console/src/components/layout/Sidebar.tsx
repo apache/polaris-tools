@@ -18,12 +18,13 @@
  */
 
 import { Link, useLocation } from "react-router-dom"
-import { Home, Link as LinkIcon, Database, Shield } from "lucide-react"
+import { Home, Link as LinkIcon, Database, Shield, Layers } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NAV_ITEMS } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
 
 const iconMap = {
+  Layers,
   Home,
   Link: LinkIcon,
   Database,

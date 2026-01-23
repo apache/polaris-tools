@@ -20,10 +20,18 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
+import { setCurrentWorkspace, clearCurrentWorkspace } from "@/lib/workspaces"
+import type { Workspace } from "@/types/workspaces"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  login: (clientId: string, clientSecret: string, scope: string, realm: string) => Promise<void>
+  login: (
+    clientId: string,
+    clientSecret: string,
+    scope: string,
+    realm: string,
+    workspace?: Workspace
+  ) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -34,12 +42,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [loading] = useState<boolean>(false)
 
-  const login = async (clientId: string, clientSecret: string, scope: string, realm: string) => {
+  const login = async (
+    clientId: string,
+    clientSecret: string,
+    scope: string,
+    realm: string,
+    workspace?: Workspace
+  ) => {
     try {
-      // Store realm in localStorage (non-sensitive configuration)
-      if (realm) {
+      if (workspace) {
+        setCurrentWorkspace(workspace)
+      } else if (realm) {
         localStorage.setItem("polaris_realm", realm)
       }
+
       await authApi.getToken(clientId, clientSecret, scope, realm)
       setIsAuthenticated(true)
     } catch (error) {
@@ -51,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     toast.success("Logged out successfully")
     authApi.logout()
+    clearCurrentWorkspace()
     setIsAuthenticated(false)
   }
 
