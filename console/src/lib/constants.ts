@@ -48,8 +48,6 @@ export const NAV_ITEMS = [
   { path: "/access-control", label: "Access Control", icon: "Shield" },
 ] as const
 
-export const REALM_HEADER_NAME = "Polaris-Realm"
-
 // Catalog Explorer resize configuration
 export const CATALOG_EXPLORER_STORAGE_KEY = "catalog-explorer-width"
 export const CATALOG_EXPLORER_MIN_WIDTH = 200

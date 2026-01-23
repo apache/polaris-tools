@@ -136,7 +136,7 @@ export function Login() {
                       onSelectWorkspace={handleWorkspaceChange}
                     />
                   </div>
-                  <Link to="/workspaces">
+                  <Link to="/workspaces/config">
                     <Button variant="outline" size="icon" type="button">
                       <Settings className="h-4 w-4"/>
                     </Button>

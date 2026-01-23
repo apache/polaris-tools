@@ -102,12 +102,10 @@ export function getCurrentWorkspace(): Workspace | null {
 
 export function setCurrentWorkspace(workspace: Workspace): void {
   localStorage.setItem('polaris_workspace', JSON.stringify(workspace))
-  localStorage.setItem('polaris_realm', workspace.realm)
 }
 
 export function clearCurrentWorkspace(): void {
   localStorage.removeItem('polaris_workspace')
-  localStorage.removeItem('polaris_realm')
 }
 
 export function addWorkspace(config: WorkspacesConfig, workspace: Workspace): WorkspacesConfig {

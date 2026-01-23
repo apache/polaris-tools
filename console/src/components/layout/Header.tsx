@@ -22,6 +22,7 @@ import { LogOut, ChevronDown, Sun, Moon, Monitor } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { useTheme } from "@/hooks/useTheme"
+import { getCurrentWorkspace } from "@/lib/workspaces"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,21 +37,30 @@ export function Header() {
   const { logout } = useAuth()
   const { principal, principalRoles, loading } = useCurrentUser()
   const { theme, setTheme } = useTheme()
-  const [realm, setRealm] = useState<string | null>(null)
+  const [realmInfo, setRealmInfo] = useState<{ header: string; value: string } | null>(null)
 
-  // Get realm from localStorage
   useEffect(() => {
-    const storedRealm = localStorage.getItem("polaris_realm")
-    setRealm(storedRealm)
+    const workspace = getCurrentWorkspace()
+    if (workspace) {
+      setRealmInfo({
+        header: workspace["realm-header"] || "Polaris-Realm",
+        value: workspace.realm
+      })
+    }
   }, [])
 
   // Get display name and role
   const displayName =
-    principal?.name || principal?.properties?.displayName || principal?.properties?.name || "User"
+    principal?.name ||
+    principal?.properties?.displayName ||
+    principal?.properties?.name ||
+    "User"
   const primaryRole =
     principalRoles.length > 0
       ? principalRoles[0].name
-      : principal?.properties?.role || principal?.properties?.principalRole || "USER"
+      : principal?.properties?.role ||
+        principal?.properties?.principalRole ||
+        "USER"
 
   // Get initials for avatar
   const getInitials = (name: string): string => {
@@ -80,10 +90,7 @@ export function Header() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-40">
-          <DropdownMenuRadioGroup
-            value={theme}
-            onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}
-          >
+          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}>
             <DropdownMenuRadioItem value="light">
               <Sun className="mr-2 h-4 w-4" />
               <span>Light</span>
@@ -100,8 +107,16 @@ export function Header() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* User Profile with Dropdown - Right Side */}
-      <DropdownMenu>
+      {/* Realm Info and User Profile - Right Side */}
+      <div className="flex items-center gap-4">
+        {realmInfo && (
+          <div className="text-sm font-medium text-foreground">
+            <span className="text-muted-foreground">{realmInfo.header}:</span>{" "}
+            <span className="font-semibold">{realmInfo.value}</span>
+          </div>
+        )}
+
+        <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
@@ -114,23 +129,19 @@ export function Header() {
               <div className="text-xs text-muted-foreground truncate">
                 {loading ? "..." : primaryRole}
               </div>
-              {realm && (
-                <div className="text-xs text-muted-foreground/70 truncate">Realm: {realm}</div>
-              )}
             </div>
             <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem
-            onClick={logout}
-            className="text-destructive focus:text-destructive cursor-pointer"
-          >
+          <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+      </div>
     </header>
   )
 }
+
