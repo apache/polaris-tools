@@ -17,20 +17,42 @@
  * under the License.
  */
 
-import { getCurrentWorkspace } from "./workspaces"
+export const AuthProviderType = {
+  INTERNAL: "internal",
+  OIDC: "oidc",
+} as const
 
-export const config = {
-  get POLARIS_API_URL() {
-    const workspace = getCurrentWorkspace()
-    return workspace?.server?.api || ''
-  },
-  get POLARIS_REALM() {
-    const workspace = getCurrentWorkspace()
-    return workspace?.realm || ''
-  },
-  get REALM_HEADER_NAME() {
-    const workspace = getCurrentWorkspace()
-    return workspace?.["realm-header"] || 'Polaris-Realm'
-  },
+export type AuthProviderType = typeof AuthProviderType[keyof typeof AuthProviderType]
+
+export interface InternalAuthConfig {
+  type: "internal"
+  url: string
+  scope: string
 }
 
+export interface OIDCAuthConfig {
+  type: "oidc"
+  url: string
+  client_id: string
+  scope: string
+}
+
+export type AuthConfig = InternalAuthConfig | OIDCAuthConfig
+
+export interface ServerConfig {
+  api: string
+}
+
+export interface Workspace {
+  name: string
+  description: string
+  is_default: boolean
+  "realm-header": string
+  realm: string
+  server?: ServerConfig
+  auth: AuthConfig[]
+}
+
+export interface WorkspacesConfig {
+  workspaces: Workspace[]
+}

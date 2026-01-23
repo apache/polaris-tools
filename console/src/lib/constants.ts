@@ -42,15 +42,13 @@ export const CATALOG_TYPES = [
 
 export const NAV_ITEMS = [
   { path: "/", label: "Home", icon: "Home" },
+  { path: "/workspaces", label: "Workspaces", icon: "Layers" },
   { path: "/connections", label: "Connections", icon: "Link" },
   { path: "/catalogs", label: "Catalogs", icon: "Database" },
   { path: "/access-control", label: "Access Control", icon: "Shield" },
 ] as const
 
-// Realm header name configuration
-// Defaults to "Polaris-Realm" if not specified in environment variables
-// Can be configured via VITE_POLARIS_REALM_HEADER_NAME environment variable
-export const REALM_HEADER_NAME = import.meta.env.VITE_POLARIS_REALM_HEADER_NAME || "Polaris-Realm"
+export const REALM_HEADER_NAME = "Polaris-Realm"
 
 // Catalog Explorer resize configuration
 export const CATALOG_EXPLORER_STORAGE_KEY = "catalog-explorer-width"
@@ -58,3 +56,4 @@ export const CATALOG_EXPLORER_MIN_WIDTH = 200
 export const CATALOG_EXPLORER_MAX_WIDTH = 600
 export const CATALOG_EXPLORER_DEFAULT_WIDTH = 320 // 80 * 4 (w-80 = 20rem = 320px)
 export const CATALOG_NODE_PREFIX = "catalog."
+

@@ -1,0 +1,275 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { toast } from "sonner"
+import { addWorkspace, updateWorkspace } from "@/lib/workspaces"
+import { AuthProviderType, type Workspace, type WorkspacesConfig, type AuthConfig } from "@/types/workspaces"
+
+interface WorkspaceFormModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  workspace: Workspace | null
+  config: WorkspacesConfig
+  onSuccess: (config: WorkspacesConfig) => void
+}
+
+export function WorkspaceFormModal({
+  open,
+  onOpenChange,
+  workspace,
+  config,
+  onSuccess,
+}: WorkspaceFormModalProps) {
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
+  const [isDefault, setIsDefault] = useState(false)
+  const [realm, setRealm] = useState("")
+  const [realmHeader, setRealmHeader] = useState("Polaris-Realm")
+  const [apiUrl, setApiUrl] = useState("")
+  const [authType, setAuthType] = useState<AuthProviderType>(AuthProviderType.INTERNAL)
+  const [authUrl, setAuthUrl] = useState("")
+  const [authScope, setAuthScope] = useState("")
+  const [authClientId, setAuthClientId] = useState("")
+
+  useEffect(() => {
+    if (workspace) {
+      setName(workspace.name)
+      setDescription(workspace.description)
+      setIsDefault(workspace.is_default)
+      setRealm(workspace.realm)
+      setRealmHeader(workspace["realm-header"])
+      setApiUrl(workspace.server?.api || "")
+
+      if (workspace.auth.length > 0) {
+        const auth = workspace.auth[0]
+        setAuthType(auth.type)
+        setAuthUrl(auth.url)
+        setAuthScope(auth.scope)
+        if (auth.type === AuthProviderType.OIDC) {
+          setAuthClientId(auth.client_id)
+        }
+      }
+    } else {
+      setName("")
+      setDescription("")
+      setIsDefault(false)
+      setRealm("")
+      setRealmHeader("Polaris-Realm")
+      setApiUrl("")
+      setAuthType(AuthProviderType.INTERNAL)
+      setAuthUrl("")
+      setAuthScope("PRINCIPAL_ROLE:ALL")
+      setAuthClientId("")
+    }
+  }, [workspace, open])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const authConfig: AuthConfig = authType === AuthProviderType.INTERNAL
+      ? {
+          type: AuthProviderType.INTERNAL,
+          url: authUrl,
+          scope: authScope,
+        }
+      : {
+          type: AuthProviderType.OIDC,
+          url: authUrl,
+          client_id: authClientId,
+          scope: authScope,
+        }
+
+    const newWorkspace: Workspace = {
+      name,
+      description,
+      is_default: isDefault,
+      "realm-header": realmHeader,
+      realm,
+      server: apiUrl ? { api: apiUrl } : undefined,
+      auth: [authConfig],
+    }
+
+    try {
+      let newConfig: WorkspacesConfig
+      if (workspace) {
+        newConfig = updateWorkspace(config, workspace.name, newWorkspace)
+        toast.success(`Workspace "${name}" updated`)
+      } else {
+        newConfig = addWorkspace(config, newWorkspace)
+        toast.success(`Workspace "${name}" created`)
+      }
+      onSuccess(newConfig)
+    } catch {
+      toast.error("Failed to save workspace")
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{workspace ? "Edit Workspace" : "Add Workspace"}</DialogTitle>
+          <DialogDescription>
+            {workspace ? "Update workspace configuration" : "Create a new workspace configuration"}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-[1fr_auto] gap-4 items-end">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="My Workspace"
+              />
+            </div>
+            <div className="flex items-center space-x-2 pb-2">
+              <Switch
+                id="isDefault"
+                checked={isDefault}
+                onCheckedChange={setIsDefault}
+              />
+              <Label htmlFor="isDefault" className="whitespace-nowrap">Set as default</Label>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Input
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Workspace description"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="realmHeader">Realm Header</Label>
+              <Input
+                id="realmHeader"
+                value={realmHeader}
+                onChange={(e) => setRealmHeader(e.target.value)}
+                placeholder="Polaris-Realm"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="realm">Realm Name *</Label>
+              <Input
+                id="realm"
+                value={realm}
+                onChange={(e) => setRealm(e.target.value)}
+                required
+                placeholder="POLARIS"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="apiUrl">API URL</Label>
+            <Input
+              id="apiUrl"
+              value={apiUrl}
+              onChange={(e) => setApiUrl(e.target.value)}
+              placeholder="http://localhost:8181"
+            />
+          </div>
+
+          <div className="border-t pt-4">
+            <h3 className="font-medium mb-4">Authentication Configuration</h3>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="authType">Auth Type</Label>
+                <select
+                  id="authType"
+                  value={authType}
+                  onChange={(e) => setAuthType(e.target.value as AuthProviderType)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value={AuthProviderType.INTERNAL}>Internal</option>
+                  <option value={AuthProviderType.OIDC}>OIDC</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="authUrl">Auth URL *</Label>
+                <Input
+                  id="authUrl"
+                  value={authUrl}
+                  onChange={(e) => setAuthUrl(e.target.value)}
+                  required
+                  placeholder="http://localhost:8181/api/v1/oauth/tokens"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="authScope">Scope *</Label>
+                <Input
+                  id="authScope"
+                  value={authScope}
+                  onChange={(e) => setAuthScope(e.target.value)}
+                  required
+                  placeholder="PRINCIPAL_ROLE:ALL"
+                />
+              </div>
+
+              {authType === AuthProviderType.OIDC && (
+                <div className="space-y-2">
+                  <Label htmlFor="authClientId">Client ID *</Label>
+                  <Input
+                    id="authClientId"
+                    value={authClientId}
+                    onChange={(e) => setAuthClientId(e.target.value)}
+                    required
+                    placeholder="client-id"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {workspace ? "Update" : "Create"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,25 +26,62 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Logo } from "@/components/layout/Logo"
 import { Footer } from "@/components/layout/Footer"
+import { WorkspaceSelector } from "@/components/workspace/WorkspaceSelector"
+import { AuthProviderSelector } from "@/components/workspace/AuthProviderSelector"
+import { loadWorkspacesConfig, getDefaultWorkspace } from "@/lib/workspaces"
+import type { Workspace, AuthConfig, WorkspacesConfig } from "@/types/workspaces"
+import { Settings } from "lucide-react"
 
 export function Login() {
+  const [workspacesConfig, setWorkspacesConfig] = useState<WorkspacesConfig | null>(null)
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
+  const [selectedAuthProvider, setSelectedAuthProvider] = useState<AuthConfig | null>(null)
   const [clientId, setClientId] = useState("")
   const [clientSecret, setClientSecret] = useState("")
-  // Initialize realm with value from .env file if present
-  const [realm, setRealm] = useState(import.meta.env.VITE_POLARIS_REALM || "")
-  const [scope, setScope] = useState(import.meta.env.VITE_POLARIS_PRINCIPAL_SCOPE || "")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    loadWorkspacesConfig().then(config => {
+      setWorkspacesConfig(config)
+      const defaultWs = getDefaultWorkspace(config)
+      setSelectedWorkspace(defaultWs)
+      if (defaultWs.auth.length > 0) {
+        setSelectedAuthProvider(defaultWs.auth[0])
+      }
+    })
+  }, [])
+
+  const handleWorkspaceChange = (workspace: Workspace) => {
+    setSelectedWorkspace(workspace)
+    if (workspace.auth.length > 0) {
+      setSelectedAuthProvider(workspace.auth[0])
+    } else {
+      setSelectedAuthProvider(null)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
 
+    if (!selectedWorkspace || !selectedAuthProvider) {
+      setError("Please select a workspace and authentication method")
+      setLoading(false)
+      return
+    }
+
     try {
-      await login(clientId, clientSecret, scope, realm)
+      await login(
+        clientId,
+        clientSecret,
+        selectedAuthProvider.scope,
+        selectedWorkspace.realm,
+        selectedWorkspace
+      )
       navigate("/")
     } catch (err) {
       setError(
@@ -90,28 +127,6 @@ export function Login() {
                   placeholder="Enter your client secret"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="realm">Realm</Label>
-                <Input
-                  id="realm"
-                  type="text"
-                  value={realm}
-                  onChange={(e) => setRealm(e.target.value)}
-                  required
-                  placeholder="Enter your realm"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="scope">Scope</Label>
-                <Input
-                  id="scope"
-                  type="text"
-                  value={scope}
-                  onChange={(e) => setScope(e.target.value)}
-                  required
-                  placeholder="Enter the scope"
-                />
-              </div>
               {error && (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                   {error}
@@ -120,6 +135,44 @@ export function Login() {
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Signing in..." : "Sign in"}
               </Button>
+
+              {workspacesConfig && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Workspace
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
+                    <div className="space-y-2">
+                      <WorkspaceSelector
+                        workspaces={workspacesConfig.workspaces}
+                        selectedWorkspace={selectedWorkspace}
+                        onSelectWorkspace={handleWorkspaceChange}
+                      />
+                    </div>
+                    <Link to="/workspaces">
+                      <Button variant="outline" size="icon" type="button">
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {selectedWorkspace && (
+                    <AuthProviderSelector
+                      authProviders={selectedWorkspace.auth}
+                      selectedProvider={selectedAuthProvider}
+                      onSelectProvider={setSelectedAuthProvider}
+                    />
+                  )}
+                </>
+              )}
             </form>
           </CardContent>
         </Card>
