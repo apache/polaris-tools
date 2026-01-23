@@ -29,10 +29,22 @@ service:
   type: ClusterIP
   port: 80
 
-env:
-  polarisApiUrl: "http://polaris:8181"
-  polarisRealm: "POLARIS"
-  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+# Polaris backend URL for nginx proxy
+polarisProxyUrl: "http://polaris:8181"
+
+workspaces:
+  workspaces:
+    - name: "Default Polaris"
+      description: "Default Polaris Workspace"
+      is_default: true
+      realm-header: "Polaris-Realm"
+      realm: "POLARIS"
+      server:
+        api: "http://polaris:8181"
+      auth:
+        - type: "internal"
+          url: "http://polaris:8181/api/v1/oauth/tokens"
+          scope: "PRINCIPAL_ROLE:ALL"
 
 resources:
   limits:
