@@ -30,7 +30,8 @@ import {WorkspaceSelector} from "@/components/workspace/WorkspaceSelector"
 import {AuthProviderSelector} from "@/components/workspace/AuthProviderSelector"
 import {loadWorkspacesConfig, getDefaultWorkspace} from "@/lib/workspaces"
 import type {Workspace, AuthConfig, WorkspacesConfig} from "@/types/workspaces"
-import {Settings} from "lucide-react"
+import {Settings, ExternalLink} from "lucide-react"
+import {AuthProviderType} from "@/types/workspaces"
 import {
   Tooltip,
   TooltipContent,
@@ -42,8 +43,8 @@ export function Login() {
   const [workspacesConfig, setWorkspacesConfig] = useState<WorkspacesConfig | null>(null)
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
   const [selectedAuthProvider, setSelectedAuthProvider] = useState<AuthConfig | null>(null)
-  const [clientId, setClientId] = useState("")
-  const [clientSecret, setClientSecret] = useState("")
+  const [principalId, setPrincipalId] = useState("")
+  const [principalPassword, setPrincipalPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const {login} = useAuth()
@@ -67,9 +68,26 @@ export function Login() {
     } else {
       setSelectedAuthProvider(null)
     }
+    setPrincipalId("")
+    setPrincipalPassword("")
+    setError("")
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleAuthProviderChange = (provider: AuthConfig) => {
+    setSelectedAuthProvider(provider)
+    setPrincipalId("")
+    setPrincipalPassword("")
+    setError("")
+  }
+
+  const handleOIDCLogin = () => {
+    if (!selectedAuthProvider || selectedAuthProvider.type !== AuthProviderType.OIDC) {
+      return
+    }
+    window.location.href = selectedAuthProvider.url
+  }
+
+  const handleInternalLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -82,8 +100,8 @@ export function Login() {
 
     try {
       await login(
-        clientId,
-        clientSecret,
+        principalId,
+        principalPassword,
         selectedAuthProvider.scope,
         selectedWorkspace.realm,
         selectedWorkspace
@@ -110,89 +128,117 @@ export function Login() {
             </div>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="clientId">Client ID</Label>
-                <Input
-                  id="clientId"
-                  type="text"
-                  value={clientId}
-                  onChange={(e) => setClientId(e.target.value)}
-                  required
-                  placeholder="Enter your client ID"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="clientSecret">Client Secret</Label>
-                <Input
-                  id="clientSecret"
-                  type="password"
-                  value={clientSecret}
-                  onChange={(e) => setClientSecret(e.target.value)}
-                  required
-                  placeholder="Enter your client secret"
-                />
-              </div>
-              {error && (
-                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                  {error}
-                </div>
-              )}
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign in"}
-              </Button>
-
-              {workspacesConfig && (
-                <>
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t"/>
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">
-                        Workspace
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
-                    <div className="space-y-2">
-                      <WorkspaceSelector
-                        workspaces={workspacesConfig.workspaces}
-                        selectedWorkspace={selectedWorkspace}
-                        onSelectWorkspace={handleWorkspaceChange}
-                      />
-                    </div>
-                    <div>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Link to="/workspaces">
-                              <Button variant="outline" size="icon" type="button">
-                                <Settings className="h-4 w-4"/>
-                              </Button>
-                            </Link>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="max-w-xs">
-                              Configure workspaces
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
-
-                  {selectedWorkspace && (
-                    <AuthProviderSelector
-                      authProviders={selectedWorkspace.auth}
-                      selectedProvider={selectedAuthProvider}
-                      onSelectProvider={setSelectedAuthProvider}
+            {workspacesConfig && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
+                  <div className="space-y-2">
+                    <WorkspaceSelector
+                      workspaces={workspacesConfig.workspaces}
+                      selectedWorkspace={selectedWorkspace}
+                      onSelectWorkspace={handleWorkspaceChange}
                     />
-                  )}
-                </>
-              )}
-            </form>
+                  </div>
+                  <div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link to="/workspaces">
+                            <Button variant="outline" size="icon" type="button">
+                              <Settings className="h-4 w-4"/>
+                            </Button>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">
+                            Configure workspaces
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+
+                {selectedWorkspace && (
+                  <div className="text-sm text-muted-foreground">
+                    {selectedWorkspace["realm-header"]}: {selectedWorkspace.realm}
+                  </div>
+                )}
+
+                {selectedWorkspace && selectedWorkspace.auth.length > 0 && (
+                  <AuthProviderSelector
+                    authProviders={selectedWorkspace.auth}
+                    selectedProvider={selectedAuthProvider}
+                    onSelectProvider={handleAuthProviderChange}
+                  />
+                )}
+
+                {selectedAuthProvider && (
+                  <>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t"/>
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">
+                          Authentication
+                        </span>
+                      </div>
+                    </div>
+
+                    {selectedAuthProvider.type === AuthProviderType.INTERNAL ? (
+                      <form onSubmit={handleInternalLogin} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="principalId">Principal</Label>
+                          <Input
+                            id="principalId"
+                            type="text"
+                            value={principalId}
+                            onChange={(e) => setPrincipalId(e.target.value)}
+                            required
+                            placeholder="Principal Name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="principalPassword">Principal Password</Label>
+                          <Input
+                            id="principalPassword"
+                            type="password"
+                            value={principalPassword}
+                            onChange={(e) => setPrincipalPassword(e.target.value)}
+                            required
+                            placeholder="Password"
+                          />
+                        </div>
+                        {error && (
+                          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                            {error}
+                          </div>
+                        )}
+                        <Button type="submit" className="w-full" disabled={loading}>
+                          {loading ? "Signing in..." : "Sign in"}
+                        </Button>
+                      </form>
+                    ) : (
+                      <div className="space-y-4">
+                        {error && (
+                          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                            {error}
+                          </div>
+                        )}
+                        <Button
+                          type="button"
+                          className="w-full"
+                          onClick={handleOIDCLogin}
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4"/>
+                          Sign in with OIDC
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
