@@ -39,7 +39,7 @@ fun Project.configurePublishing() {
   apply(plugin = "maven-publish")
   apply<SigningPlugin>()
 
-  val isRelease = project.hasProperty("release")
+  val isSigningEnabled = project.hasProperty("release") || project.hasProperty("signArtifacts")
 
   afterEvaluate {
     configure<PublishingExtension> {
@@ -68,7 +68,7 @@ fun Project.configurePublishing() {
 
             licenses {
               license {
-                name.set("The Apache License, Version 2.0")
+                name.set("Apache-2.0") // SPDX identifier
                 url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
               }
             }
@@ -97,10 +97,20 @@ fun Project.configurePublishing() {
       }
     }
 
-    configure<SigningExtension> {
-      if (isRelease) {
+    // Configure signing following Apache Polaris pattern
+    if (isSigningEnabled) {
+      configure<SigningExtension> {
+        val signingKey = project.findProperty("signingKey") as String?
+        val signingPassword = project.findProperty("signingPassword") as String?
+        useInMemoryPgpKeys(signingKey, signingPassword)
+
         val publishing = the<PublishingExtension>()
         sign(publishing.publications["maven"])
+
+        // Support gpg-agent if useGpgAgent property is set
+        if (project.hasProperty("useGpgAgent")) {
+          useGpgCmd()
+        }
       }
     }
   }
