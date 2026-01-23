@@ -17,20 +17,26 @@
  * under the License.
  */
 
-import { useState, useEffect } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { useAuth } from "@/hooks/useAuth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Logo } from "@/components/layout/Logo"
-import { Footer } from "@/components/layout/Footer"
-import { WorkspaceSelector } from "@/components/workspace/WorkspaceSelector"
-import { AuthProviderSelector } from "@/components/workspace/AuthProviderSelector"
-import { loadWorkspacesConfig, getDefaultWorkspace } from "@/lib/workspaces"
-import type { Workspace, AuthConfig, WorkspacesConfig } from "@/types/workspaces"
-import { Settings } from "lucide-react"
+import {useState, useEffect} from "react"
+import {useNavigate, Link} from "react-router-dom"
+import {useAuth} from "@/hooks/useAuth"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Card, CardContent, CardHeader} from "@/components/ui/card"
+import {Logo} from "@/components/layout/Logo"
+import {Footer} from "@/components/layout/Footer"
+import {WorkspaceSelector} from "@/components/workspace/WorkspaceSelector"
+import {AuthProviderSelector} from "@/components/workspace/AuthProviderSelector"
+import {loadWorkspacesConfig, getDefaultWorkspace} from "@/lib/workspaces"
+import type {Workspace, AuthConfig, WorkspacesConfig} from "@/types/workspaces"
+import {Settings} from "lucide-react"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip.tsx";
 
 export function Login() {
   const [workspacesConfig, setWorkspacesConfig] = useState<WorkspacesConfig | null>(null)
@@ -40,7 +46,7 @@ export function Login() {
   const [clientSecret, setClientSecret] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const {login} = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -100,7 +106,7 @@ export function Login() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center">
-              <Logo clickable={false} />
+              <Logo clickable={false}/>
             </div>
           </CardHeader>
           <CardContent>
@@ -140,7 +146,7 @@ export function Login() {
                 <>
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
+                      <span className="w-full border-t"/>
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-background px-2 text-muted-foreground">
@@ -157,11 +163,24 @@ export function Login() {
                         onSelectWorkspace={handleWorkspaceChange}
                       />
                     </div>
-                    <Link to="/workspaces">
-                      <Button variant="outline" size="icon" type="button">
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    <div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link to="/workspaces">
+                              <Button variant="outline" size="icon" type="button">
+                                <Settings className="h-4 w-4"/>
+                              </Button>
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">
+                              Configure workspaces
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                   </div>
 
                   {selectedWorkspace && (
@@ -177,7 +196,7 @@ export function Login() {
           </CardContent>
         </Card>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   )
 }
