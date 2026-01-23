@@ -122,26 +122,25 @@ export function Workspaces() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-start">
-        <div className="flex-1">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
           <Link to="/login">
-            <Button variant="ghost" size="lg" className="mb-2">
+            <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Go back
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold">Workspaces</h1>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleReloadFromServer}>
+          <div className="flex-1" />
+          <Button variant="outline" size="sm" onClick={handleReloadFromServer}>
             <Server className="mr-2 h-4 w-4" />
             Reset to defaults
           </Button>
-          <Button onClick={handleCreate}>
+          <Button size="sm" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             Add Workspace
           </Button>
         </div>
+        <h1 className="text-3xl font-bold">Workspaces</h1>
       </div>
 
       <div className="border rounded-lg">
