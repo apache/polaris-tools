@@ -18,7 +18,7 @@
  */
 
 import {useState, useEffect} from "react"
-import {useNavigate, Link} from "react-router-dom"
+import {useNavigate, Link, useSearchParams} from "react-router-dom"
 import {useAuth} from "@/hooks/useAuth"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
@@ -28,13 +28,14 @@ import {Logo} from "@/components/layout/Logo"
 import {Footer} from "@/components/layout/Footer"
 import {WorkspaceSelector} from "@/components/workspace/WorkspaceSelector"
 import {AuthProviderSelector} from "@/components/workspace/AuthProviderSelector"
-import {loadWorkspacesConfig, getDefaultWorkspace} from "@/lib/workspaces"
+import {loadWorkspacesConfig, getDefaultWorkspace, getWorkspaceByName} from "@/lib/workspaces"
 import type {Workspace, AuthConfig, WorkspacesConfig} from "@/types/workspaces"
 import {Settings, ExternalLink, AlertTriangle} from "lucide-react"
 import {AuthProviderType} from "@/types/workspaces"
 import {toast} from "sonner"
 
 export function Login() {
+  const [searchParams] = useSearchParams()
   const [workspacesConfig, setWorkspacesConfig] = useState<WorkspacesConfig | null>(null)
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
   const [selectedAuthProvider, setSelectedAuthProvider] = useState<AuthConfig | null>(null)
@@ -48,13 +49,23 @@ export function Login() {
   useEffect(() => {
     loadWorkspacesConfig().then(config => {
       setWorkspacesConfig(config)
-      const defaultWs = getDefaultWorkspace(config)
-      setSelectedWorkspace(defaultWs)
-      if (defaultWs.auth.length > 0) {
-        setSelectedAuthProvider(defaultWs.auth[0])
+
+      const workspaceParam = searchParams.get('workspace')
+      let targetWorkspace: Workspace
+
+      if (workspaceParam) {
+        const ws = getWorkspaceByName(config, workspaceParam)
+        targetWorkspace = ws || getDefaultWorkspace(config)
+      } else {
+        targetWorkspace = getDefaultWorkspace(config)
+      }
+
+      setSelectedWorkspace(targetWorkspace)
+      if (targetWorkspace.auth.length > 0) {
+        setSelectedAuthProvider(targetWorkspace.auth[0])
       }
     })
-  }, [])
+  }, [searchParams])
 
   const handleWorkspaceChange = (workspace: Workspace) => {
     setSelectedWorkspace(workspace)

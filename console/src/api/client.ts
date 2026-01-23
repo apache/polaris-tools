@@ -31,11 +31,9 @@ class ApiClient {
   private managementClient: AxiosInstance
   private catalogClient: AxiosInstance
   private polarisClient: AxiosInstance
-  private accessToken: string | null = null
-  private readonly TOKEN_KEY = "polaris_access_token"
+  private readonly TOKENS_KEY = "polaris_workspace_tokens"
 
   constructor() {
-    this.accessToken = sessionStorage.getItem(this.TOKEN_KEY)
     this.managementClient = axios.create({
       baseURL: MANAGEMENT_BASE_URL,
       headers: {
@@ -100,18 +98,51 @@ class ApiClient {
     this.polarisClient.interceptors.response.use((response) => response, responseErrorInterceptor)
   }
 
-  getAccessToken(): string | null {
-    return this.accessToken
+  private getTokensMap(): Record<string, string> {
+    const stored = sessionStorage.getItem(this.TOKENS_KEY)
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch {
+        return {}
+      }
+    }
+    return {}
   }
 
-  clearAccessToken(): void {
-    this.accessToken = null
-    sessionStorage.removeItem(this.TOKEN_KEY)
+  private saveTokensMap(tokens: Record<string, string>): void {
+    sessionStorage.setItem(this.TOKENS_KEY, JSON.stringify(tokens))
   }
 
-  setAccessToken(token: string): void {
-    this.accessToken = token
-    sessionStorage.setItem(this.TOKEN_KEY, token)
+  getAccessToken(workspaceName?: string): string | null {
+    const workspace = workspaceName || getCurrentWorkspace()?.name
+    if (!workspace) return null
+
+    const tokens = this.getTokensMap()
+    return tokens[workspace] || null
+  }
+
+  clearAccessToken(workspaceName?: string): void {
+    const workspace = workspaceName || getCurrentWorkspace()?.name
+    if (!workspace) return
+
+    const tokens = this.getTokensMap()
+    delete tokens[workspace]
+    this.saveTokensMap(tokens)
+  }
+
+  setAccessToken(token: string, workspaceName?: string): void {
+    const workspace = workspaceName || getCurrentWorkspace()?.name
+    if (!workspace) return
+
+    const tokens = this.getTokensMap()
+    tokens[workspace] = token
+    this.saveTokensMap(tokens)
+  }
+
+  hasToken(workspaceName: string): boolean {
+    const tokens = this.getTokensMap()
+    return !!tokens[workspaceName]
   }
 
   getManagementClient(): AxiosInstance {
