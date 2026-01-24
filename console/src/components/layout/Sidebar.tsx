@@ -18,12 +18,14 @@
  */
 
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { Home, Link as LinkIcon, Database, Shield, Layers, Settings, Sun, Moon, Monitor } from "lucide-react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Home, Link as LinkIcon, Database, Shield, Layers, Settings, Sun, Moon, Monitor, ChevronDown, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NAV_ITEMS } from "@/lib/constants"
 import { useTheme } from "@/hooks/useTheme"
-import { getCurrentWorkspace } from "@/lib/workspaces"
+import { getCurrentWorkspace, loadWorkspacesConfig, setCurrentWorkspace } from "@/lib/workspaces"
+import { apiClient } from "@/api/client"
+import type { Workspace, WorkspacesConfig } from "@/types/workspaces"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +34,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 
@@ -45,31 +48,83 @@ const iconMap = {
 
 export function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
-  const [workspaceName, setWorkspaceName] = useState<string | null>(null)
+  const [currentWorkspace, setCurrentWorkspaceState] = useState<Workspace | null>(null)
+  const [workspacesConfig, setWorkspacesConfig] = useState<WorkspacesConfig | null>(null)
 
   useEffect(() => {
     const workspace = getCurrentWorkspace()
-    setWorkspaceName(workspace?.name || null)
+    setCurrentWorkspaceState(workspace)
+
+    loadWorkspacesConfig().then(config => {
+      setWorkspacesConfig(config)
+    })
   }, [])
+
+  const handleWorkspaceChange = (workspace: Workspace) => {
+    const hasToken = apiClient.hasToken(workspace.name)
+
+    if (!hasToken) {
+      navigate(`/login?workspace=${encodeURIComponent(workspace.name)}`)
+    } else {
+      setCurrentWorkspace(workspace)
+      setCurrentWorkspaceState(workspace)
+      window.location.reload()
+    }
+  }
+
+  const handleManageWorkspaces = () => {
+    navigate("/workspaces/config")
+  }
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card">
-      {/* Logo and Workspace */}
-      <header className="flex h-16 items-center justify-between border-b bg-background px-6">
-        <div className="flex items-center gap-3">
-          <img
-            src="/apache-polaris-logo.svg"
-            alt="Apache Polaris Logo"
-            className="h-10 w-10 flex-shrink-0"
-          />
-          <div className="flex flex-col min-w-0">
-            <span className="text-xs font-medium text-muted-foreground">Workspace</span>
-            <span className="text-sm font-semibold text-foreground truncate">
-              {workspaceName || "No workspace"}
-            </span>
-          </div>
-        </div>
+      {/* Logo and Workspace Dropdown */}
+      <header className="h-16 border-b bg-background">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex h-16 w-full items-center justify-between px-6 hover:bg-accent transition-colors">
+              <div className="flex gap-3 min-w-0">
+                <img
+                  src="/apache-polaris-logo.svg"
+                  alt="Apache Polaris Logo"
+                  className="h-10 w-10 flex-shrink-0"
+                />
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-medium text-muted-foreground">Active workspace</span>
+                  <span className="text-sm font-semibold text-foreground truncate">
+                    {currentWorkspace?.name || "No workspace"}
+                  </span>
+                </div>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {workspacesConfig?.workspaces.map((workspace) => (
+              <DropdownMenuItem
+                key={workspace.name}
+                onClick={() => handleWorkspaceChange(workspace)}
+                className="cursor-pointer"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span>{workspace.name}</span>
+                  {currentWorkspace?.name === workspace.name && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
+                </div>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleManageWorkspaces} className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Manage workspaces</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </header>
 
       {/* Navigation */}

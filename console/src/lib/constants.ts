@@ -42,7 +42,6 @@ export const CATALOG_TYPES = [
 
 export const NAV_ITEMS = [
   { path: "/", label: "Home", icon: "Home" },
-  { path: "/workspaces", label: "Workspaces", icon: "Layers" },
   { path: "/connections", label: "Connections", icon: "Link" },
   { path: "/catalogs", label: "Catalogs", icon: "Database" },
   { path: "/access-control", label: "Access Control", icon: "Shield" },
