@@ -53,4 +53,3 @@ export const CATALOG_EXPLORER_MIN_WIDTH = 200
 export const CATALOG_EXPLORER_MAX_WIDTH = 600
 export const CATALOG_EXPLORER_DEFAULT_WIDTH = 320 // 80 * 4 (w-80 = 20rem = 320px)
 export const CATALOG_NODE_PREFIX = "catalog."
-

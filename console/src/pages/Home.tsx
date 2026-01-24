@@ -22,7 +22,7 @@ import { catalogsApi } from "@/api/management/catalogs"
 import { principalsApi } from "@/api/management/principals"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sparkles } from "lucide-react"
-import {Logo} from "@/components/layout/Logo.tsx";
+import { Logo } from "@/components/layout/Logo.tsx"
 
 export function Home() {
   const { data: catalogs } = useQuery({

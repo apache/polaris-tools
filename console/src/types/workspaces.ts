@@ -22,7 +22,7 @@ export const AuthProviderType = {
   OIDC: "oidc",
 } as const
 
-export type AuthProviderType = typeof AuthProviderType[keyof typeof AuthProviderType]
+export type AuthProviderType = (typeof AuthProviderType)[keyof typeof AuthProviderType]
 
 export interface InternalAuthConfig {
   type: "internal"

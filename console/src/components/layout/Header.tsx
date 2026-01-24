@@ -17,11 +17,11 @@
  * under the License.
  */
 
-import {useState, useEffect} from "react"
-import {LogOut} from "lucide-react"
-import {useAuth} from "@/hooks/useAuth"
-import {useCurrentUser} from "@/hooks/useCurrentUser"
-import {getCurrentWorkspace} from "@/lib/workspaces"
+import { useState, useEffect } from "react"
+import { LogOut } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { getCurrentWorkspace } from "@/lib/workspaces"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,11 +30,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function Header() {
-  const {logout} = useAuth()
-  const {principal, principalRoles, loading} = useCurrentUser()
+  const { logout } = useAuth()
+  const { principal, principalRoles, loading } = useCurrentUser()
   const [workspaceInfo, setWorkspaceInfo] = useState<{
-    name: string;
-    realm: string;
+    name: string
+    realm: string
     header: string
   } | null>(null)
 
@@ -44,23 +44,18 @@ export function Header() {
       setWorkspaceInfo({
         name: workspace.name,
         header: workspace["realm-header"] || "Polaris-Realm",
-        realm: workspace.realm
+        realm: workspace.realm,
       })
     }
   }, [])
 
   // Get display name and role
   const displayName =
-    principal?.name ||
-    principal?.properties?.displayName ||
-    principal?.properties?.name ||
-    "User"
+    principal?.name || principal?.properties?.displayName || principal?.properties?.name || "User"
   const primaryRole =
     principalRoles.length > 0
       ? principalRoles[0].name
-      : principal?.properties?.role ||
-      principal?.properties?.principalRole ||
-      "USER"
+      : principal?.properties?.role || principal?.properties?.principalRole || "USER"
 
   // Get initials for avatar
   const getInitials = (name: string): string => {
@@ -88,10 +83,8 @@ export function Header() {
       <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-56">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+            <button className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-56">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
                 {loading ? "..." : initials}
               </div>
               <div className="min-w-0 text-left">
@@ -105,9 +98,11 @@ export function Header() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem onClick={logout}
-                              className="text-destructive focus:text-destructive cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4"/>
+            <DropdownMenuItem
+              onClick={logout}
+              className="text-destructive focus:text-destructive cursor-pointer"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -116,4 +111,3 @@ export function Header() {
     </header>
   )
 }
-

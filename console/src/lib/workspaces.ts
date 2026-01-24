@@ -26,32 +26,32 @@ const DEFAULT_WORKSPACE: Workspace = {
   "realm-header": "Polaris-Realm",
   realm: "POLARIS",
   server: {
-    api: "http://localhost:8181"
+    api: "http://localhost:8181",
   },
   auth: [
     {
       type: AuthProviderType.INTERNAL,
       url: "http://localhost:8181/api/v1/oauth/tokens",
-      scope: "PRINCIPAL_ROLE:ALL"
-    }
-  ]
+      scope: "PRINCIPAL_ROLE:ALL",
+    },
+  ],
 }
 
 const WORKSPACES_STORAGE_KEY = "polaris_workspaces_config"
 
 export async function loadWorkspacesFromServer(): Promise<WorkspacesConfig> {
   try {
-    const response = await fetch('/workspaces.json')
+    const response = await fetch("/workspaces.json")
     if (response.ok) {
-      const config = await response.json() as WorkspacesConfig
+      const config = (await response.json()) as WorkspacesConfig
       return config
     }
   } catch (error) {
-    console.warn('Failed to load workspaces.json from server:', error)
+    console.warn("Failed to load workspaces.json from server:", error)
   }
 
   return {
-    workspaces: [DEFAULT_WORKSPACE]
+    workspaces: [DEFAULT_WORKSPACE],
   }
 }
 
@@ -62,7 +62,7 @@ export async function loadWorkspacesConfig(): Promise<WorkspacesConfig> {
     try {
       return JSON.parse(stored) as WorkspacesConfig
     } catch (error) {
-      console.warn('Failed to parse stored workspaces config:', error)
+      console.warn("Failed to parse stored workspaces config:", error)
     }
   }
 
@@ -80,16 +80,16 @@ export function clearWorkspacesConfig(): void {
 }
 
 export function getDefaultWorkspace(config: WorkspacesConfig): Workspace {
-  const defaultWs = config.workspaces.find(ws => ws.is_default)
+  const defaultWs = config.workspaces.find((ws) => ws.is_default)
   return defaultWs || config.workspaces[0] || DEFAULT_WORKSPACE
 }
 
 export function getWorkspaceByName(config: WorkspacesConfig, name: string): Workspace | undefined {
-  return config.workspaces.find(ws => ws.name === name)
+  return config.workspaces.find((ws) => ws.name === name)
 }
 
 export function getCurrentWorkspace(): Workspace | null {
-  const workspaceJson = localStorage.getItem('polaris_workspace')
+  const workspaceJson = localStorage.getItem("polaris_workspace")
   if (workspaceJson) {
     try {
       return JSON.parse(workspaceJson) as Workspace
@@ -101,24 +101,30 @@ export function getCurrentWorkspace(): Workspace | null {
 }
 
 export function setCurrentWorkspace(workspace: Workspace): void {
-  localStorage.setItem('polaris_workspace', JSON.stringify(workspace))
+  localStorage.setItem("polaris_workspace", JSON.stringify(workspace))
+  window.dispatchEvent(new CustomEvent("workspace-changed"))
 }
 
 export function clearCurrentWorkspace(): void {
-  localStorage.removeItem('polaris_workspace')
+  localStorage.removeItem("polaris_workspace")
+  window.dispatchEvent(new CustomEvent("workspace-changed"))
 }
 
 export function addWorkspace(config: WorkspacesConfig, workspace: Workspace): WorkspacesConfig {
   const newConfig = {
-    workspaces: [...config.workspaces, workspace]
+    workspaces: [...config.workspaces, workspace],
   }
   saveWorkspacesConfig(newConfig)
   return newConfig
 }
 
-export function updateWorkspace(config: WorkspacesConfig, oldName: string, workspace: Workspace): WorkspacesConfig {
+export function updateWorkspace(
+  config: WorkspacesConfig,
+  oldName: string,
+  workspace: Workspace
+): WorkspacesConfig {
   const newConfig = {
-    workspaces: config.workspaces.map(ws => ws.name === oldName ? workspace : ws)
+    workspaces: config.workspaces.map((ws) => (ws.name === oldName ? workspace : ws)),
   }
   saveWorkspacesConfig(newConfig)
   return newConfig
@@ -126,7 +132,7 @@ export function updateWorkspace(config: WorkspacesConfig, oldName: string, works
 
 export function deleteWorkspace(config: WorkspacesConfig, name: string): WorkspacesConfig {
   const newConfig = {
-    workspaces: config.workspaces.filter(ws => ws.name !== name)
+    workspaces: config.workspaces.filter((ws) => ws.name !== name),
   }
   saveWorkspacesConfig(newConfig)
   return newConfig
@@ -138,4 +144,3 @@ export async function reloadFromServer(): Promise<WorkspacesConfig> {
   saveWorkspacesConfig(serverConfig)
   return serverConfig
 }
-
