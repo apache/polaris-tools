@@ -29,7 +29,7 @@ import {
   Sun,
   Moon,
   Monitor,
-  ChevronDown,
+  Menu,
   Check,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -112,7 +112,7 @@ export function Sidebar() {
                   </span>
                 </div>
               </div>
-              <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <Menu className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
