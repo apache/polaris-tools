@@ -24,7 +24,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { catalogsApi } from "@/api/management/catalogs"
-import type { CreateCatalogRequest, Catalog, ConnectionConfigInfo, StorageConfigInfo } from "@/types/api"
+import type {
+  CreateCatalogRequest,
+  Catalog,
+  ConnectionConfigInfo,
+  StorageConfigInfo,
+} from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,56 +49,71 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  type: z.enum(["INTERNAL", "EXTERNAL"]),
-  defaultBaseLocation: z.string().min(1, "Default base location is required"),
-  storageType: z.enum(["S3", "AZURE", "GCS", "FILE"]),
-  allowedLocations: z.string().optional(), // comma separated
+const schema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    type: z.enum(["INTERNAL", "EXTERNAL"]),
+    defaultBaseLocation: z.string().min(1, "Default base location is required"),
+    storageType: z.enum(["S3", "AZURE", "GCS", "FILE"]),
+    allowedLocations: z.string().optional(), // comma separated
 
-  // S3
-  s3_region: z.string().optional(),
-  s3_roleArn: z.string().optional(),
-  s3_externalId: z.string().optional(),
-  s3_endpoint: z.string().optional(),
-  s3_endpointInternal: z.string().optional(),
-  s3_stsEndpoint: z.string().optional(),
-  s3_stsUnavailable: z.boolean().optional(),
-  s3_pathStyleAccess: z.boolean().optional(),
+    // S3
+    s3_region: z.string().optional(),
+    s3_roleArn: z.string().optional(),
+    s3_externalId: z.string().optional(),
+    s3_endpoint: z.string().optional(),
+    s3_endpointInternal: z.string().optional(),
+    s3_stsEndpoint: z.string().optional(),
+    s3_stsUnavailable: z.boolean().optional(),
+    s3_pathStyleAccess: z.boolean().optional(),
 
-  // Azure
-  azure_tenantId: z.string().optional(),
-  azure_multiTenantAppName: z.string().optional(),
-  azure_consentUrl: z.string().optional(),
+    // Azure
+    azure_tenantId: z.string().optional(),
+    azure_multiTenantAppName: z.string().optional(),
+    azure_consentUrl: z.string().optional(),
 
-  // GCS
-  gcs_serviceAccount: z.string().optional(),
+    // GCS
+    gcs_serviceAccount: z.string().optional(),
 
-  // External connection (only when type === EXTERNAL)
-  connectionType: z.enum(["ICEBERG_REST", "HADOOP", "HIVE"]).optional(),
-  conn_uri: z.string().optional(),
-  auth_type: z.enum(["OAUTH", "BEARER", "SIGV4", "IMPLICIT"]).optional(),
-  // OAUTH
-  oauth_tokenUri: z.string().optional(),
-  oauth_clientId: z.string().optional(),
-  oauth_clientSecret: z.string().optional(),
-  oauth_scopes: z.string().optional(), // comma separated
-  // BEARER
-  bearer_token: z.string().optional(),
-  // SIGV4
-  sigv4_roleArn: z.string().optional(),
-  sigv4_roleSessionName: z.string().optional(),
-  sigv4_externalId: z.string().optional(),
-  sigv4_signingRegion: z.string().optional(),
-  sigv4_signingName: z.string().optional(),
-})
+    // External connection (only when type === EXTERNAL)
+    connectionType: z.enum(["ICEBERG_REST", "HADOOP", "HIVE"]).optional(),
+    conn_uri: z.string().optional(),
+    auth_type: z.enum(["OAUTH", "BEARER", "SIGV4", "IMPLICIT"]).optional(),
+    // OAUTH
+    oauth_tokenUri: z.string().optional(),
+    oauth_clientId: z.string().optional(),
+    oauth_clientSecret: z.string().optional(),
+    oauth_scopes: z.string().optional(), // comma separated
+    // BEARER
+    bearer_token: z.string().optional(),
+    // SIGV4
+    sigv4_roleArn: z.string().optional(),
+    sigv4_roleSessionName: z.string().optional(),
+    sigv4_externalId: z.string().optional(),
+    sigv4_signingRegion: z.string().optional(),
+    sigv4_signingName: z.string().optional(),
+  })
   .superRefine((val, ctx) => {
     if (val.type === "EXTERNAL") {
-      if (!val.connectionType) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Connection type is required", path: ["connectionType"] })
-      if (!val.auth_type) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Auth type is required", path: ["auth_type"] })
+      if (!val.connectionType)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Connection type is required",
+          path: ["connectionType"],
+        })
+      if (!val.auth_type)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Auth type is required",
+          path: ["auth_type"],
+        })
     }
     if (val.storageType === "AZURE" && !val.azure_tenantId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Tenant ID is required for Azure", path: ["azure_tenantId"] })
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Tenant ID is required for Azure",
+        path: ["azure_tenantId"],
+      })
     }
   })
 
@@ -126,30 +146,39 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
   const createMutation = useMutation({
     mutationFn: (values: FormValues) => {
       const allowedLocations = values.allowedLocations
-        ? values.allowedLocations.split(",").map((s) => s.trim()).filter(Boolean)
+        ? values.allowedLocations
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : undefined
 
       const storageConfigInfo: StorageConfigInfo = {
         storageType: values.storageType,
       }
-      if (allowedLocations && allowedLocations.length) storageConfigInfo.allowedLocations = allowedLocations
+      if (allowedLocations && allowedLocations.length)
+        storageConfigInfo.allowedLocations = allowedLocations
       if (values.storageType === "S3") {
         if (values.s3_region) storageConfigInfo.region = values.s3_region
         if (values.s3_roleArn) storageConfigInfo.roleArn = values.s3_roleArn
         if (values.s3_externalId) storageConfigInfo.externalId = values.s3_externalId
         if (values.s3_endpoint) storageConfigInfo.endpoint = values.s3_endpoint
-        if (values.s3_endpointInternal) storageConfigInfo.endpointInternal = values.s3_endpointInternal
+        if (values.s3_endpointInternal)
+          storageConfigInfo.endpointInternal = values.s3_endpointInternal
         if (values.s3_stsEndpoint) storageConfigInfo.stsEndpoint = values.s3_stsEndpoint
-        if (typeof values.s3_stsUnavailable === "boolean") storageConfigInfo.stsUnavailable = values.s3_stsUnavailable
-        if (typeof values.s3_pathStyleAccess === "boolean") storageConfigInfo.pathStyleAccess = values.s3_pathStyleAccess
+        if (typeof values.s3_stsUnavailable === "boolean")
+          storageConfigInfo.stsUnavailable = values.s3_stsUnavailable
+        if (typeof values.s3_pathStyleAccess === "boolean")
+          storageConfigInfo.pathStyleAccess = values.s3_pathStyleAccess
       }
       if (values.storageType === "AZURE") {
         if (values.azure_tenantId) storageConfigInfo.tenantId = values.azure_tenantId
-        if (values.azure_multiTenantAppName) storageConfigInfo.multiTenantAppName = values.azure_multiTenantAppName
+        if (values.azure_multiTenantAppName)
+          storageConfigInfo.multiTenantAppName = values.azure_multiTenantAppName
         if (values.azure_consentUrl) storageConfigInfo.consentUrl = values.azure_consentUrl
       }
       if (values.storageType === "GCS") {
-        if (values.gcs_serviceAccount) storageConfigInfo.gcsServiceAccount = values.gcs_serviceAccount
+        if (values.gcs_serviceAccount)
+          storageConfigInfo.gcsServiceAccount = values.gcs_serviceAccount
       }
 
       const catalog: Catalog = {
@@ -172,7 +201,10 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                 clientId: values.oauth_clientId,
                 clientSecret: values.oauth_clientSecret,
                 scopes: values.oauth_scopes
-                  ? values.oauth_scopes.split(",").map((s) => s.trim()).filter(Boolean)
+                  ? values.oauth_scopes
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean)
                   : undefined,
               }
             case "BEARER":
@@ -200,7 +232,8 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
           connectionType: values.connectionType!,
         }
         if (values.conn_uri) connectionConfigInfo.uri = values.conn_uri
-        if (authenticationParameters) connectionConfigInfo.authenticationParameters = authenticationParameters
+        if (authenticationParameters)
+          connectionConfigInfo.authenticationParameters = authenticationParameters
 
         catalog.connectionConfigInfo = connectionConfigInfo
       }
@@ -238,7 +271,8 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
         <DialogHeader>
           <DialogTitle>Create catalog</DialogTitle>
           <DialogDescription>
-            Provide basic details to create a new catalog. You can configure advanced storage options later.
+            Provide basic details to create a new catalog. You can configure advanced storage
+            options later.
           </DialogDescription>
         </DialogHeader>
 
@@ -249,15 +283,15 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" placeholder="e.g. prod" {...register("name")} />
-            {errors.name && (
-              <p className="text-sm text-red-600">{errors.name.message}</p>
-            )}
+            {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label>Type</Label>
             <Select
-              onValueChange={(v) => setValue("type", v as FormValues["type"], { shouldValidate: true })}
+              onValueChange={(v) =>
+                setValue("type", v as FormValues["type"], { shouldValidate: true })
+              }
               defaultValue="INTERNAL"
             >
               <SelectTrigger>
@@ -268,45 +302,56 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                 <SelectItem value="EXTERNAL">EXTERNAL</SelectItem>
               </SelectContent>
             </Select>
-            {errors.type && (
-              <p className="text-sm text-red-600">{errors.type.message}</p>
-            )}
+            {errors.type && <p className="text-sm text-red-600">{errors.type.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="defaultBaseLocation">Default base location</Label>
-            <Input id="defaultBaseLocation" placeholder="e.g. s3://bucket/prefix or file:///path" {...register("defaultBaseLocation")} />
+            <Input
+              id="defaultBaseLocation"
+              placeholder="e.g. s3://bucket/prefix or file:///path"
+              {...register("defaultBaseLocation")}
+            />
             {errors.defaultBaseLocation && (
               <p className="text-sm text-red-600">{errors.defaultBaseLocation.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-              <Label>Storage provider</Label>
-              <Controller
-                name="storageType"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="S3">S3</SelectItem>
-                      <SelectItem value="AZURE">Azure</SelectItem>
-                      <SelectItem value="GCS">GCS</SelectItem>
-                      <SelectItem value="FILE">File</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <p className="text-xs text-muted-foreground">Select the cloud/storage provider used by this catalog.</p>
+            <Label>Storage provider</Label>
+            <Controller
+              name="storageType"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="S3">S3</SelectItem>
+                    <SelectItem value="AZURE">Azure</SelectItem>
+                    <SelectItem value="GCS">GCS</SelectItem>
+                    <SelectItem value="FILE">File</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <p className="text-xs text-muted-foreground">
+              Select the cloud/storage provider used by this catalog.
+            </p>
           </div>
           <div className="space-y-2">
-              <Label htmlFor="allowedLocations">Allowed locations (comma-separated)</Label>
-              <Input id="allowedLocations" placeholder="s3://bucket1/, s3://bucket2/" {...register("allowedLocations")} />
-              <p className="text-xs text-muted-foreground">Optional list of storage locations allowed for this catalog. Example: s3://bucket/prefix/</p>
-            </div>
+            <Label htmlFor="allowedLocations">Allowed locations (comma-separated)</Label>
+            <Input
+              id="allowedLocations"
+              placeholder="s3://bucket1/, s3://bucket2/"
+              {...register("allowedLocations")}
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional list of storage locations allowed for this catalog. Example:
+              s3://bucket/prefix/
+            </p>
+          </div>
 
           {/* Provider-specific fields */}
           {storageType === "S3" && (
@@ -314,27 +359,43 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
               <Label className="text-sm font-medium">S3 options</Label>
               <div className="space-y-2">
                 <Input placeholder="Region" {...register("s3_region")} />
-                <p className="mt-1 text-xs text-muted-foreground">AWS region where data is stored, e.g., us-west-2.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  AWS region where data is stored, e.g., us-west-2.
+                </p>
                 <Input placeholder="Role ARN" {...register("s3_roleArn")} />
-                <p className="mt-1 text-xs text-muted-foreground">AWS IAM role ARN used to access S3 buckets.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  AWS IAM role ARN used to access S3 buckets.
+                </p>
                 <Input placeholder="External ID" {...register("s3_externalId")} />
-                <p className="mt-1 text-xs text-muted-foreground">Optional external ID for AWS trust relationship.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Optional external ID for AWS trust relationship.
+                </p>
                 <Input placeholder="Endpoint" {...register("s3_endpoint")} />
-                <p className="mt-1 text-xs text-muted-foreground">Public S3-compatible endpoint for clients, e.g., https://s3.example.com:1234.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Public S3-compatible endpoint for clients, e.g., https://s3.example.com:1234.
+                </p>
                 <Input placeholder="Internal Endpoint" {...register("s3_endpointInternal")} />
-                <p className="mt-1 text-xs text-muted-foreground">Internal S3 endpoint used by Polaris servers. Defaults to Endpoint if not set.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Internal S3 endpoint used by Polaris servers. Defaults to Endpoint if not set.
+                </p>
                 <Input placeholder="STS Endpoint" {...register("s3_stsEndpoint")} />
-                <p className="mt-1 text-xs text-muted-foreground">STS endpoint used by Polaris servers when vending credentials.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  STS endpoint used by Polaris servers when vending credentials.
+                </p>
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" {...register("s3_stsUnavailable")} /> STS unavailable
                 </label>
-                <p className="mt-1 text-xs text-muted-foreground">If true, Polaris avoids using STS and will not vend storage credentials.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  If true, Polaris avoids using STS and will not vend storage credentials.
+                </p>
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" {...register("s3_pathStyleAccess")} /> Path-style access
                 </label>
-                <p className="mt-1 text-xs text-muted-foreground">Whether S3 requests should use path-style addressing for buckets.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Whether S3 requests should use path-style addressing for buckets.
+                </p>
               </div>
             </div>
           )}
@@ -348,12 +409,21 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                   {errors.azure_tenantId && (
                     <p className="text-sm text-red-600">{errors.azure_tenantId.message}</p>
                   )}
-                  <p className="mt-1 text-xs text-muted-foreground">Azure Tenant ID that the storage accounts belong to.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Azure Tenant ID that the storage accounts belong to.
+                  </p>
                 </div>
-                <Input placeholder="Multi-tenant app name" {...register("azure_multiTenantAppName")} />
-                <p className="mt-1 text-xs text-muted-foreground">Name of the Azure client application for multi-tenant usage.</p>
+                <Input
+                  placeholder="Multi-tenant app name"
+                  {...register("azure_multiTenantAppName")}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Name of the Azure client application for multi-tenant usage.
+                </p>
                 <Input placeholder="Consent URL" {...register("azure_consentUrl")} />
-                <p className="mt-1 text-xs text-muted-foreground">URL to the Azure permissions request page.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  URL to the Azure permissions request page.
+                </p>
               </div>
             </div>
           )}
@@ -362,7 +432,9 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
             <div className="space-y-2">
               <Label className="text-sm font-medium">GCS options</Label>
               <Input placeholder="Service account" {...register("gcs_serviceAccount")} />
-              <p className="mt-1 text-xs text-muted-foreground">Google Cloud Storage service account used to access data.</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Google Cloud Storage service account used to access data.
+              </p>
             </div>
           )}
 
@@ -387,9 +459,13 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                     </Select>
                   )}
                 />
-                <p className="mt-1 text-xs text-muted-foreground">The remote catalog service type.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  The remote catalog service type.
+                </p>
                 <Input placeholder="URI (optional)" {...register("conn_uri")} />
-                <p className="mt-1 text-xs text-muted-foreground">URI to the remote catalog service (if applicable).</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  URI to the remote catalog service (if applicable).
+                </p>
               </div>
               <Controller
                 name="auth_type"
@@ -408,45 +484,74 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                   </Select>
                 )}
               />
-              <p className="mt-1 text-xs text-muted-foreground">Authentication method to use when connecting to the remote service.</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Authentication method to use when connecting to the remote service.
+              </p>
               {/* Auth-specific fields */}
               {authType === "OAUTH" && (
                 <div className="space-y-2">
                   <Input placeholder="OAuth token URI" {...register("oauth_tokenUri")} />
-                  <p className="mt-1 text-xs text-muted-foreground">Token server URI for exchanging client credentials.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Token server URI for exchanging client credentials.
+                  </p>
                   <Input placeholder="OAuth client ID" {...register("oauth_clientId")} />
                   <p className="mt-1 text-xs text-muted-foreground">OAuth client ID.</p>
                   <Input placeholder="OAuth client secret" {...register("oauth_clientSecret")} />
                   <p className="mt-1 text-xs text-muted-foreground">OAuth client secret.</p>
-                  <Input placeholder="OAuth scopes (comma-separated)" {...register("oauth_scopes")} />
-                  <p className="mt-1 text-xs text-muted-foreground">Optional list of scopes used when requesting access tokens.</p>
+                  <Input
+                    placeholder="OAuth scopes (comma-separated)"
+                    {...register("oauth_scopes")}
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Optional list of scopes used when requesting access tokens.
+                  </p>
                 </div>
               )}
               {authType === "BEARER" && (
                 <div className="space-y-2">
                   <Input placeholder="Bearer token" {...register("bearer_token")} />
-                  <p className="mt-1 text-xs text-muted-foreground">Bearer token to include in request Authorization headers.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Bearer token to include in request Authorization headers.
+                  </p>
                 </div>
               )}
               {authType === "SIGV4" && (
                 <div className="space-y-2">
                   <Input placeholder="SigV4 role ARN" {...register("sigv4_roleArn")} />
-                  <p className="mt-1 text-xs text-muted-foreground">IAM role ARN assumed when signing requests.</p>
-                  <Input placeholder="SigV4 role session name" {...register("sigv4_roleSessionName")} />
-                  <p className="mt-1 text-xs text-muted-foreground">Role session name used by SigV4 for signing.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    IAM role ARN assumed when signing requests.
+                  </p>
+                  <Input
+                    placeholder="SigV4 role session name"
+                    {...register("sigv4_roleSessionName")}
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Role session name used by SigV4 for signing.
+                  </p>
                   <Input placeholder="SigV4 external ID" {...register("sigv4_externalId")} />
-                  <p className="mt-1 text-xs text-muted-foreground">Optional external ID for AWS trust relationship.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Optional external ID for AWS trust relationship.
+                  </p>
                   <Input placeholder="SigV4 signing region" {...register("sigv4_signingRegion")} />
-                  <p className="mt-1 text-xs text-muted-foreground">AWS region used for SigV4 signing.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    AWS region used for SigV4 signing.
+                  </p>
                   <Input placeholder="SigV4 signing name" {...register("sigv4_signingName")} />
-                  <p className="mt-1 text-xs text-muted-foreground">Service name used for SigV4 signing (defaults to execute-api if not provided).</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Service name used for SigV4 signing (defaults to execute-api if not provided).
+                  </p>
                 </div>
               )}
             </div>
           )}
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={createMutation.isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={createMutation.isPending}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
@@ -460,5 +565,3 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
 }
 
 export default CreateCatalogModal
-
-

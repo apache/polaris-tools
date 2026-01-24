@@ -61,11 +61,7 @@ export const tablesApi = {
    * @param namespace - Namespace array (e.g., ["accounting", "tax"])
    * @param tableName - Table name
    */
-  get: async (
-    prefix: string,
-    namespace: string[],
-    tableName: string
-  ): Promise<LoadTableResult> => {
+  get: async (prefix: string, namespace: string[], tableName: string): Promise<LoadTableResult> => {
     const namespaceStr = encodeNamespace(namespace)
     const response = await apiClient
       .getCatalogClient()
@@ -102,11 +98,7 @@ export const tablesApi = {
    * @param namespace - Namespace array
    * @param tableName - Table name
    */
-  delete: async (
-    prefix: string,
-    namespace: string[],
-    tableName: string
-  ): Promise<void> => {
+  delete: async (prefix: string, namespace: string[], tableName: string): Promise<void> => {
     const namespaceStr = encodeNamespace(namespace)
     await apiClient
       .getCatalogClient()
@@ -135,12 +127,7 @@ export const tablesApi = {
         name: destinationName,
       },
     }
-    await apiClient
-      .getCatalogClient()
-      .post(
-        `/${encodeURIComponent(prefix)}/tables/rename`,
-        payload
-      )
+    await apiClient.getCatalogClient().post(`/${encodeURIComponent(prefix)}/tables/rename`, payload)
   },
 
   /**
@@ -159,10 +146,10 @@ export const tablesApi = {
       requirements: [],
       updates: [
         ...(Object.keys(updates || {}).length > 0
-          ? [{ action: "set-properties", updates }] as Array<unknown>
+          ? ([{ action: "set-properties", updates }] as Array<unknown>)
           : []),
         ...(removals && removals.length > 0
-          ? [{ action: "remove-properties", removals }] as Array<unknown>
+          ? ([{ action: "remove-properties", removals }] as Array<unknown>)
           : []),
       ],
     }
@@ -179,10 +166,7 @@ export const tablesApi = {
    * @param prefix - The catalog name (prefix)
    * @param namespace - Namespace array (e.g., ["accounting", "tax"])
    */
-  listGeneric: async (
-    prefix: string,
-    namespace: string[]
-  ): Promise<GenericTableIdentifier[]> => {
+  listGeneric: async (prefix: string, namespace: string[]): Promise<GenericTableIdentifier[]> => {
     const namespaceStr = encodeNamespace(namespace)
     const response = await apiClient
       .getPolarisClient()
@@ -243,11 +227,7 @@ export const tablesApi = {
    * @param namespace - Namespace array
    * @param tableName - Table name
    */
-  deleteGeneric: async (
-    prefix: string,
-    namespace: string[],
-    tableName: string
-  ): Promise<void> => {
+  deleteGeneric: async (prefix: string, namespace: string[], tableName: string): Promise<void> => {
     const namespaceStr = encodeNamespace(namespace)
     await apiClient
       .getPolarisClient()
@@ -256,4 +236,3 @@ export const tablesApi = {
       )
   },
 }
-

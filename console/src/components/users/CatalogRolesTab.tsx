@@ -74,9 +74,7 @@ export function CatalogRolesTab() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [selectedCatalog, setSelectedCatalog] = useState<string>("all")
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "name", desc: false },
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
   const [roleToDelete, setRoleToDelete] = useState<CatalogRole | null>(null)
   const [roleToEdit, setRoleToEdit] = useState<CatalogRole | null>(null)
   const [roleToView, setRoleToView] = useState<CatalogRole | null>(null)
@@ -243,9 +241,7 @@ export function CatalogRolesTab() {
               <DropdownMenuItem onClick={() => setRoleToView(row.original)}>
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setRoleToEdit(row.original)}>
-                Edit
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setRoleToEdit(row.original)}>Edit</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setRoleToGrant(row.original)}>
                 Grant to Principal Role
               </DropdownMenuItem>
@@ -310,7 +306,12 @@ export function CatalogRolesTab() {
               Refresh
             </Button>
             <Button
-              onClick={() => setRoleToEdit({ name: "", catalogName: selectedCatalog !== "all" ? selectedCatalog : "" } as CatalogRole)}
+              onClick={() =>
+                setRoleToEdit({
+                  name: "",
+                  catalogName: selectedCatalog !== "all" ? selectedCatalog : "",
+                } as CatalogRole)
+              }
             >
               <Plus className="mr-2 h-4 w-4" />
               Role
@@ -342,19 +343,18 @@ export function CatalogRolesTab() {
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
                       className={`${
-                        header.column.getCanSort()
-                          ? "cursor-pointer select-none"
-                          : ""
+                        header.column.getCanSort() ? "cursor-pointer select-none" : ""
                       } h-9 px-3 py-2 text-xs font-medium`}
                     >
                       {header.isPlaceholder ? null : (
                         <div className="flex items-center gap-1">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getIsSorted() === "asc" && (
+                            <span className="text-xs">▲</span>
                           )}
-                          {header.column.getIsSorted() === "asc" && <span className="text-xs">▲</span>}
-                          {header.column.getIsSorted() === "desc" && <span className="text-xs">▼</span>}
+                          {header.column.getIsSorted() === "desc" && (
+                            <span className="text-xs">▼</span>
+                          )}
                         </div>
                       )}
                     </TableHead>
@@ -392,16 +392,13 @@ export function CatalogRolesTab() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={!!roleToDelete}
-        onOpenChange={(open) => !open && setRoleToDelete(null)}
-      >
+      <Dialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Catalog Role</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the
-              catalog role <span className="font-medium">{roleToDelete?.name}</span> from catalog{" "}
+              This action cannot be undone. This will permanently delete the catalog role{" "}
+              <span className="font-medium">{roleToDelete?.name}</span> from catalog{" "}
               <span className="font-medium">{roleToDelete?.catalogName}</span>.
             </DialogDescription>
           </DialogHeader>
@@ -470,10 +467,7 @@ export function CatalogRolesTab() {
       )}
 
       {/* Revoke Role Confirmation Dialog */}
-      <Dialog
-        open={!!roleToRevoke}
-        onOpenChange={(open) => !open && setRoleToRevoke(null)}
-      >
+      <Dialog open={!!roleToRevoke} onOpenChange={(open) => !open && setRoleToRevoke(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Revoke Catalog Role</DialogTitle>
@@ -549,7 +543,7 @@ function PrincipalRoleCountCell({
   }
 
   const principalRoles = principalRolesQuery.data || []
-  
+
   if (principalRoles.length === 0) {
     return <span className="text-muted-foreground text-sm">No roles</span>
   }
@@ -645,11 +639,7 @@ function CatalogRoleDetailsDialog({
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onRevoke(principalRole)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => onRevoke(principalRole)}>
                             Revoke
                           </Button>
                         </TableCell>
@@ -674,4 +664,3 @@ function CatalogRoleDetailsDialog({
     </Dialog>
   )
 }
-

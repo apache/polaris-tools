@@ -56,21 +56,17 @@ export function ViewDetailsDrawer({
     (v) => v["version-id"] === viewData?.metadata?.["current-version-id"]
   )
 
-  const currentSchema = viewData?.metadata?.schemas?.find(
-    (s) => s["schema-id"] === currentVersion?.["schema-id"]
-  ) || viewData?.metadata?.schemas?.[0]
+  const currentSchema =
+    viewData?.metadata?.schemas?.find((s) => s["schema-id"] === currentVersion?.["schema-id"]) ||
+    viewData?.metadata?.schemas?.[0]
 
-  const currentSql = currentVersion?.representations?.find(
-    (r) => r.type === "sql"
-  )
+  const currentSql = currentVersion?.representations?.find((r) => r.type === "sql")
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle className="text-xl font-bold">
-            {viewName}
-          </SheetTitle>
+          <SheetTitle className="text-xl font-bold">{viewName}</SheetTitle>
           <SheetDescription>
             {namespace.length > 0 ? (
               <span className="text-sm text-muted-foreground">
@@ -92,9 +88,7 @@ export function ViewDetailsDrawer({
 
         {viewQuery.isError && (
           <div className="py-12">
-            <div className="text-sm text-destructive">
-              Failed to load view details
-            </div>
+            <div className="text-sm text-destructive">Failed to load view details</div>
           </div>
         )}
 
@@ -106,9 +100,7 @@ export function ViewDetailsDrawer({
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">UUID:</span>
-                  <span className="font-mono text-xs">
-                    {viewData.metadata["view-uuid"]}
-                  </span>
+                  <span className="font-mono text-xs">{viewData.metadata["view-uuid"]}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Format Version:</span>
@@ -134,9 +126,7 @@ export function ViewDetailsDrawer({
                 )}
                 {viewData["metadata-location"] && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Metadata Location:
-                    </span>
+                    <span className="text-muted-foreground">Metadata Location:</span>
                     <span className="font-mono text-xs break-all">
                       {viewData["metadata-location"]}
                     </span>
@@ -156,9 +146,7 @@ export function ViewDetailsDrawer({
             )}
 
             {/* Schema */}
-            {currentSchema && (
-              <TableSchemaDisplay schema={currentSchema} />
-            )}
+            {currentSchema && <TableSchemaDisplay schema={currentSchema} />}
 
             {/* Properties */}
             {viewData.metadata.properties &&
@@ -167,19 +155,12 @@ export function ViewDetailsDrawer({
                   <h3 className="text-sm font-semibold mb-2">Properties</h3>
                   <div className="border rounded-md">
                     <div className="divide-y">
-                      {Object.entries(viewData.metadata.properties).map(
-                        ([key, value]) => (
-                          <div
-                            key={key}
-                            className="px-3 py-2 flex justify-between text-sm"
-                          >
-                            <span className="text-muted-foreground">{key}:</span>
-                            <span className="font-mono text-xs break-all">
-                              {String(value)}
-                            </span>
-                          </div>
-                        )
-                      )}
+                      {Object.entries(viewData.metadata.properties).map(([key, value]) => (
+                        <div key={key} className="px-3 py-2 flex justify-between text-sm">
+                          <span className="text-muted-foreground">{key}:</span>
+                          <span className="font-mono text-xs break-all">{String(value)}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -192,7 +173,8 @@ export function ViewDetailsDrawer({
                 <div className="space-y-2">
                   {viewData.metadata.versions.map((version) => {
                     const sqlRep = version.representations?.find((r) => r.type === "sql")
-                    const isCurrent = version["version-id"] === viewData.metadata["current-version-id"]
+                    const isCurrent =
+                      version["version-id"] === viewData.metadata["current-version-id"]
                     return (
                       <div
                         key={version["version-id"]}
@@ -226,4 +208,3 @@ export function ViewDetailsDrawer({
     </Sheet>
   )
 }
-

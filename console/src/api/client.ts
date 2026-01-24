@@ -98,14 +98,8 @@ class ApiClient {
       (response) => response,
       responseErrorInterceptor
     )
-    this.catalogClient.interceptors.response.use(
-      (response) => response,
-      responseErrorInterceptor
-    )
-    this.polarisClient.interceptors.response.use(
-      (response) => response,
-      responseErrorInterceptor
-    )
+    this.catalogClient.interceptors.response.use((response) => response, responseErrorInterceptor)
+    this.polarisClient.interceptors.response.use((response) => response, responseErrorInterceptor)
   }
 
   getAccessToken(): string | null {

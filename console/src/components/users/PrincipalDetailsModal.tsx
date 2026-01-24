@@ -53,16 +53,15 @@ export function PrincipalDetailsModal({
     enabled: open && !!principal?.name,
   })
 
-  const displayPrincipal: ExtendedPrincipal | null = (principalDetails || principal) as ExtendedPrincipal
+  const displayPrincipal: ExtendedPrincipal | null = (principalDetails ||
+    principal) as ExtendedPrincipal
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Principal Details</DialogTitle>
-          <DialogDescription>
-            View detailed information about this principal.
-          </DialogDescription>
+          <DialogDescription>View detailed information about this principal.</DialogDescription>
         </DialogHeader>
         {isLoading ? (
           <div className="py-4 text-center text-muted-foreground">Loading...</div>
@@ -73,46 +72,36 @@ export function PrincipalDetailsModal({
               <p className="mt-1 font-medium">{displayPrincipal.name}</p>
             </div>
 
-            {displayPrincipal.properties &&
-              Object.keys(displayPrincipal.properties).length > 0 && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Properties
-                  </label>
-                  <div className="mt-2 rounded-md border p-3 bg-muted/50">
-                    <div className="space-y-1">
-                      {Object.entries(displayPrincipal.properties).map(
-                        ([key, value]) => (
-                          <div key={key} className="flex gap-2 text-sm">
-                            <span className="font-medium">{key}:</span>
-                            <span className="text-muted-foreground">{value}</span>
-                          </div>
-                        )
-                      )}
-                    </div>
+            {displayPrincipal.properties && Object.keys(displayPrincipal.properties).length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Properties</label>
+                <div className="mt-2 rounded-md border p-3 bg-muted/50">
+                  <div className="space-y-1">
+                    {Object.entries(displayPrincipal.properties).map(([key, value]) => (
+                      <div key={key} className="flex gap-2 text-sm">
+                        <span className="font-medium">{key}:</span>
+                        <span className="text-muted-foreground">{value}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
             {displayPrincipal.createTimestamp && (
               <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Created
-                </label>
+                <label className="text-sm font-medium text-muted-foreground">Created</label>
                 <p className="mt-1 text-sm">
-                  {formatDistanceToNow(
-                    new Date(displayPrincipal.createTimestamp),
-                    { addSuffix: true }
-                  )}
+                  {formatDistanceToNow(new Date(displayPrincipal.createTimestamp), {
+                    addSuffix: true,
+                  })}
                 </p>
               </div>
             )}
 
             {displayPrincipal.clientId && (
               <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Client ID
-                </label>
+                <label className="text-sm font-medium text-muted-foreground">Client ID</label>
                 <p className="mt-1 font-mono text-sm bg-muted/50 p-2 rounded">
                   {displayPrincipal.clientId}
                 </p>
@@ -124,4 +113,3 @@ export function PrincipalDetailsModal({
     </Dialog>
   )
 }
-

@@ -137,20 +137,19 @@ export function CreateCatalogRoleModal({
         })
       } else {
         const updateCatalogName = catalogRole!.catalogName || data.catalogName
-        return catalogRolesApi.update(
-          updateCatalogName,
-          catalogRole!.name,
-          {
-            properties: Object.keys(properties).length > 0 ? properties : undefined,
-            currentEntityVersion: catalogRole?.entityVersion || catalogRole?.currentEntityVersion
+        return catalogRolesApi.update(updateCatalogName, catalogRole!.name, {
+          properties: Object.keys(properties).length > 0 ? properties : undefined,
+          currentEntityVersion:
+            catalogRole?.entityVersion || catalogRole?.currentEntityVersion
               ? parseInt(String(catalogRole.entityVersion || catalogRole.currentEntityVersion))
               : undefined,
-          }
-        )
+        })
       }
     },
     onSuccess: () => {
-      toast.success(isNew ? "Catalog role created successfully" : "Catalog role updated successfully")
+      toast.success(
+        isNew ? "Catalog role created successfully" : "Catalog role updated successfully"
+      )
       queryClient.invalidateQueries({ queryKey: ["catalog-roles"] })
       queryClient.invalidateQueries({ queryKey: ["catalogs"] })
       onSuccess?.()
@@ -171,9 +170,7 @@ export function CreateCatalogRoleModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>
-            {isNew ? "Create Catalog Role" : "Edit Catalog Role"}
-          </DialogTitle>
+          <DialogTitle>{isNew ? "Create Catalog Role" : "Edit Catalog Role"}</DialogTitle>
           <DialogDescription>
             {isNew
               ? "Create a new catalog role in the selected catalog."
@@ -210,9 +207,7 @@ export function CreateCatalogRoleModal({
               </SelectContent>
             </Select>
             {form.formState.errors.catalogName && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.catalogName.message}
-              </p>
+              <p className="text-sm text-red-600">{form.formState.errors.catalogName.message}</p>
             )}
             <p className="text-xs text-muted-foreground">
               {isNew
@@ -223,16 +218,9 @@ export function CreateCatalogRoleModal({
 
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              {...form.register("name")}
-              placeholder="role-name"
-              disabled={!isNew}
-            />
+            <Input id="name" {...form.register("name")} placeholder="role-name" disabled={!isNew} />
             {form.formState.errors.name && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.name.message}
-              </p>
+              <p className="text-sm text-red-600">{form.formState.errors.name.message}</p>
             )}
             <p className="text-xs text-muted-foreground">
               {isNew
@@ -274,4 +262,3 @@ export function CreateCatalogRoleModal({
     </Dialog>
   )
 }
-

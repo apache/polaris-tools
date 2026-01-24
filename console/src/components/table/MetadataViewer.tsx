@@ -85,15 +85,7 @@ export function MetadataViewer({ metadata, metadataLocation }: MetadataViewerPro
   )
 }
 
-function InfoRow({
-  label,
-  value,
-  mono,
-}: {
-  label: string
-  value: string
-  mono?: boolean
-}) {
+function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
       <label className="text-sm font-medium text-muted-foreground">{label}</label>
@@ -103,5 +95,3 @@ function InfoRow({
 }
 
 export default MetadataViewer
-
-

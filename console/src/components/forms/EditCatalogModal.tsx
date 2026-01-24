@@ -45,32 +45,33 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-const schema = z.object({
-  defaultBaseLocation: z.string().min(1, "Default base location is required"),
-  storageType: z.enum(["S3", "AZURE", "GCS", "FILE"]),
-  allowedLocations: z.string().optional(), // comma separated
+const schema = z
+  .object({
+    defaultBaseLocation: z.string().min(1, "Default base location is required"),
+    storageType: z.enum(["S3", "AZURE", "GCS", "FILE"]),
+    allowedLocations: z.string().optional(), // comma separated
 
-  // S3
-  s3_region: z.string().optional(),
-  s3_roleArn: z.string().optional(),
-  s3_externalId: z.string().optional(),
-  s3_endpoint: z.string().optional(),
-  s3_endpointInternal: z.string().optional(),
-  s3_stsEndpoint: z.string().optional(),
-  s3_stsUnavailable: z.boolean().optional(),
-  s3_pathStyleAccess: z.boolean().optional(),
+    // S3
+    s3_region: z.string().optional(),
+    s3_roleArn: z.string().optional(),
+    s3_externalId: z.string().optional(),
+    s3_endpoint: z.string().optional(),
+    s3_endpointInternal: z.string().optional(),
+    s3_stsEndpoint: z.string().optional(),
+    s3_stsUnavailable: z.boolean().optional(),
+    s3_pathStyleAccess: z.boolean().optional(),
 
-  // Azure
-  azure_tenantId: z.string().optional(),
-  azure_multiTenantAppName: z.string().optional(),
-  azure_consentUrl: z.string().optional(),
+    // Azure
+    azure_tenantId: z.string().optional(),
+    azure_multiTenantAppName: z.string().optional(),
+    azure_consentUrl: z.string().optional(),
 
-  // GCS
-  gcs_serviceAccount: z.string().optional(),
+    // GCS
+    gcs_serviceAccount: z.string().optional(),
 
-  // Properties (key-value pairs as JSON string or separate fields)
-  propertiesJson: z.string().optional(),
-})
+    // Properties (key-value pairs as JSON string or separate fields)
+    propertiesJson: z.string().optional(),
+  })
   .superRefine((val, ctx) => {
     if (val.storageType === "AZURE" && !val.azure_tenantId) {
       ctx.addIssue({
@@ -114,7 +115,10 @@ export function EditCatalogModal({
       if (!catalog) throw new Error("Catalog is required")
 
       const allowedLocations = values.allowedLocations
-        ? values.allowedLocations.split(",").map((s) => s.trim()).filter(Boolean)
+        ? values.allowedLocations
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : undefined
 
       // Build storage config from form values
@@ -131,8 +135,7 @@ export function EditCatalogModal({
         if (values.s3_endpoint) storageConfigInfo.endpoint = values.s3_endpoint
         if (values.s3_endpointInternal)
           storageConfigInfo.endpointInternal = values.s3_endpointInternal
-        if (values.s3_stsEndpoint)
-          storageConfigInfo.stsEndpoint = values.s3_stsEndpoint
+        if (values.s3_stsEndpoint) storageConfigInfo.stsEndpoint = values.s3_stsEndpoint
         if (typeof values.s3_stsUnavailable === "boolean")
           storageConfigInfo.stsUnavailable = values.s3_stsUnavailable
         if (typeof values.s3_pathStyleAccess === "boolean")
@@ -142,8 +145,7 @@ export function EditCatalogModal({
         if (values.azure_tenantId) storageConfigInfo.tenantId = values.azure_tenantId
         if (values.azure_multiTenantAppName)
           storageConfigInfo.multiTenantAppName = values.azure_multiTenantAppName
-        if (values.azure_consentUrl)
-          storageConfigInfo.consentUrl = values.azure_consentUrl
+        if (values.azure_consentUrl) storageConfigInfo.consentUrl = values.azure_consentUrl
       }
       if (values.storageType === "GCS") {
         if (values.gcs_serviceAccount)
@@ -179,8 +181,7 @@ export function EditCatalogModal({
       const payload = {
         properties,
         storageConfigInfo,
-        currentEntityVersion:
-          catalog.currentEntityVersion ?? catalog.entityVersion ?? undefined,
+        currentEntityVersion: catalog.currentEntityVersion ?? catalog.entityVersion ?? undefined,
       }
 
       return catalogsApi.update(catalog.name, payload)
@@ -201,8 +202,7 @@ export function EditCatalogModal({
   useEffect(() => {
     if (open && catalog) {
       const storageConfig = catalog.storageConfigInfo
-      const defaultBaseLocation =
-        catalog.properties?.["default-base-location"] || ""
+      const defaultBaseLocation = catalog.properties?.["default-base-location"] || ""
 
       reset({
         defaultBaseLocation,
@@ -246,17 +246,13 @@ export function EditCatalogModal({
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" value={catalog.name} disabled />
-            <p className="text-xs text-muted-foreground">
-              Catalog name cannot be changed
-            </p>
+            <p className="text-xs text-muted-foreground">Catalog name cannot be changed</p>
           </div>
 
           <div className="space-y-2">
             <Label>Type</Label>
             <Input value={catalog.type} disabled />
-            <p className="text-xs text-muted-foreground">
-              Catalog type cannot be changed
-            </p>
+            <p className="text-xs text-muted-foreground">Catalog type cannot be changed</p>
           </div>
 
           <div className="space-y-2">
@@ -267,9 +263,7 @@ export function EditCatalogModal({
               {...register("defaultBaseLocation")}
             />
             {errors.defaultBaseLocation && (
-              <p className="text-sm text-red-600">
-                {errors.defaultBaseLocation.message}
-              </p>
+              <p className="text-sm text-red-600">{errors.defaultBaseLocation.message}</p>
             )}
           </div>
 
@@ -298,17 +292,15 @@ export function EditCatalogModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="allowedLocations">
-              Allowed locations (comma-separated)
-            </Label>
+            <Label htmlFor="allowedLocations">Allowed locations (comma-separated)</Label>
             <Input
               id="allowedLocations"
               placeholder="s3://bucket1/, s3://bucket2/"
               {...register("allowedLocations")}
             />
             <p className="text-xs text-muted-foreground">
-              Optional list of storage locations allowed for this catalog.
-              Example: s3://bucket/prefix/
+              Optional list of storage locations allowed for this catalog. Example:
+              s3://bucket/prefix/
             </p>
           </div>
 
@@ -325,56 +317,35 @@ export function EditCatalogModal({
                 <p className="mt-1 text-xs text-muted-foreground">
                   AWS IAM role ARN used to access S3 buckets.
                 </p>
-                <Input
-                  placeholder="External ID"
-                  {...register("s3_externalId")}
-                />
+                <Input placeholder="External ID" {...register("s3_externalId")} />
                 <p className="mt-1 text-xs text-muted-foreground">
                   Optional external ID for AWS trust relationship.
                 </p>
                 <Input placeholder="Endpoint" {...register("s3_endpoint")} />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Public S3-compatible endpoint for clients, e.g.,
-                  https://s3.example.com:1234.
+                  Public S3-compatible endpoint for clients, e.g., https://s3.example.com:1234.
                 </p>
-                <Input
-                  placeholder="Internal Endpoint"
-                  {...register("s3_endpointInternal")}
-                />
+                <Input placeholder="Internal Endpoint" {...register("s3_endpointInternal")} />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Internal S3 endpoint used by Polaris servers. Defaults to
-                  Endpoint if not set.
+                  Internal S3 endpoint used by Polaris servers. Defaults to Endpoint if not set.
                 </p>
-                <Input
-                  placeholder="STS Endpoint"
-                  {...register("s3_stsEndpoint")}
-                />
+                <Input placeholder="STS Endpoint" {...register("s3_stsEndpoint")} />
                 <p className="mt-1 text-xs text-muted-foreground">
                   STS endpoint used by Polaris servers when vending credentials.
                 </p>
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    {...register("s3_stsUnavailable")}
-                  />{" "}
-                  STS unavailable
+                  <input type="checkbox" {...register("s3_stsUnavailable")} /> STS unavailable
                 </label>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  If true, Polaris avoids using STS and will not vend storage
-                  credentials.
+                  If true, Polaris avoids using STS and will not vend storage credentials.
                 </p>
                 <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    {...register("s3_pathStyleAccess")}
-                  />{" "}
-                  Path-style access
+                  <input type="checkbox" {...register("s3_pathStyleAccess")} /> Path-style access
                 </label>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Whether S3 requests should use path-style addressing for
-                  buckets.
+                  Whether S3 requests should use path-style addressing for buckets.
                 </p>
               </div>
             </div>
@@ -385,14 +356,9 @@ export function EditCatalogModal({
               <Label className="text-sm font-medium">Azure options</Label>
               <div className="space-y-2">
                 <div>
-                  <Input
-                    placeholder="Tenant ID"
-                    {...register("azure_tenantId")}
-                  />
+                  <Input placeholder="Tenant ID" {...register("azure_tenantId")} />
                   {errors.azure_tenantId && (
-                    <p className="text-sm text-red-600">
-                      {errors.azure_tenantId.message}
-                    </p>
+                    <p className="text-sm text-red-600">{errors.azure_tenantId.message}</p>
                   )}
                   <p className="mt-1 text-xs text-muted-foreground">
                     Azure Tenant ID that the storage accounts belong to.
@@ -405,10 +371,7 @@ export function EditCatalogModal({
                 <p className="mt-1 text-xs text-muted-foreground">
                   Name of the Azure client application for multi-tenant usage.
                 </p>
-                <Input
-                  placeholder="Consent URL"
-                  {...register("azure_consentUrl")}
-                />
+                <Input placeholder="Consent URL" {...register("azure_consentUrl")} />
                 <p className="mt-1 text-xs text-muted-foreground">
                   URL to the Azure permissions request page.
                 </p>
@@ -419,10 +382,7 @@ export function EditCatalogModal({
           {storageType === "GCS" && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">GCS options</Label>
-              <Input
-                placeholder="Service account"
-                {...register("gcs_serviceAccount")}
-              />
+              <Input placeholder="Service account" {...register("gcs_serviceAccount")} />
               <p className="mt-1 text-xs text-muted-foreground">
                 Google Cloud Storage service account used to access data.
               </p>
@@ -438,8 +398,7 @@ export function EditCatalogModal({
               {...register("propertiesJson")}
             />
             <p className="text-xs text-muted-foreground">
-              Catalog properties as JSON. You can also use key=value format,
-              one per line.
+              Catalog properties as JSON. You can also use key=value format, one per line.
             </p>
           </div>
 
@@ -461,4 +420,3 @@ export function EditCatalogModal({
     </Dialog>
   )
 }
-

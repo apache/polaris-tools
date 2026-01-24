@@ -46,16 +46,11 @@ export function Header() {
 
   // Get display name and role
   const displayName =
-    principal?.name ||
-    principal?.properties?.displayName ||
-    principal?.properties?.name ||
-    "User"
+    principal?.name || principal?.properties?.displayName || principal?.properties?.name || "User"
   const primaryRole =
     principalRoles.length > 0
       ? principalRoles[0].name
-      : principal?.properties?.role ||
-        principal?.properties?.principalRole ||
-        "USER"
+      : principal?.properties?.role || principal?.properties?.principalRole || "USER"
 
   // Get initials for avatar
   const getInitials = (name: string): string => {
@@ -85,7 +80,10 @@ export function Header() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-40">
-          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}>
+          <DropdownMenuRadioGroup
+            value={theme}
+            onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}
+          >
             <DropdownMenuRadioItem value="light">
               <Sun className="mr-2 h-4 w-4" />
               <span>Light</span>
@@ -117,16 +115,17 @@ export function Header() {
                 {loading ? "..." : primaryRole}
               </div>
               {realm && (
-                <div className="text-xs text-muted-foreground/70 truncate">
-                  Realm: {realm}
-                </div>
+                <div className="text-xs text-muted-foreground/70 truncate">Realm: {realm}</div>
               )}
             </div>
             <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
+          <DropdownMenuItem
+            onClick={logout}
+            className="text-destructive focus:text-destructive cursor-pointer"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Logout</span>
           </DropdownMenuItem>
@@ -135,4 +134,3 @@ export function Header() {
     </header>
   )
 }
-

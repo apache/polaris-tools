@@ -18,7 +18,12 @@
  */
 
 import { apiClient } from "../client"
-import type { PrincipalRole, PrincipalRolesResponse, Principal, PrincipalsResponse } from "@/types/api"
+import type {
+  PrincipalRole,
+  PrincipalRolesResponse,
+  Principal,
+  PrincipalsResponse,
+} from "@/types/api"
 
 export const principalRolesApi = {
   list: async (): Promise<PrincipalRole[]> => {
@@ -41,12 +46,13 @@ export const principalRolesApi = {
     return response.data
   },
 
-  create: async (principalRole: { name: string; properties?: Record<string, string> }): Promise<PrincipalRole> => {
-    const response = await apiClient
-      .getManagementClient()
-      .post<PrincipalRole>("/principal-roles", {
-        principalRole,
-      })
+  create: async (principalRole: {
+    name: string
+    properties?: Record<string, string>
+  }): Promise<PrincipalRole> => {
+    const response = await apiClient.getManagementClient().post<PrincipalRole>("/principal-roles", {
+      principalRole,
+    })
     return response.data
   },
 
@@ -56,13 +62,10 @@ export const principalRolesApi = {
   ): Promise<PrincipalRole> => {
     const response = await apiClient
       .getManagementClient()
-      .put<PrincipalRole>(
-        `/principal-roles/${encodeURIComponent(principalRoleName)}`,
-        {
-          currentEntityVersion: principalRole.currentEntityVersion,
-          properties: principalRole.properties,
-        }
-      )
+      .put<PrincipalRole>(`/principal-roles/${encodeURIComponent(principalRoleName)}`, {
+        currentEntityVersion: principalRole.currentEntityVersion,
+        properties: principalRole.properties,
+      })
     return response.data
   },
 
@@ -81,4 +84,3 @@ export const principalRolesApi = {
     return response.data.principals
   },
 }
-

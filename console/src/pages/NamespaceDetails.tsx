@@ -198,7 +198,11 @@ export function NamespaceDetails() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/catalogs/${encodeURIComponent(catalogName)}`)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(`/catalogs/${encodeURIComponent(catalogName)}`)}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="space-y-1">
@@ -207,7 +211,8 @@ export function NamespaceDetails() {
               <h1 className="text-2xl font-bold">{namespacePath}</h1>
             </div>
             <p className="text-muted-foreground">
-              Namespace in catalog: <span className="font-medium">{catalog?.name || catalogName}</span>
+              Namespace in catalog:{" "}
+              <span className="font-medium">{catalog?.name || catalogName}</span>
             </p>
           </div>
         </div>
@@ -222,7 +227,13 @@ export function NamespaceDetails() {
               polarisGenericTablesQuery.refetch()
               viewsQuery.refetch()
             }}
-            disabled={namespaceQuery.isFetching || tablesQuery.isFetching || childrenNamespacesQuery.isFetching || polarisGenericTablesQuery.isFetching || viewsQuery.isFetching}
+            disabled={
+              namespaceQuery.isFetching ||
+              tablesQuery.isFetching ||
+              childrenNamespacesQuery.isFetching ||
+              polarisGenericTablesQuery.isFetching ||
+              viewsQuery.isFetching
+            }
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
@@ -241,9 +252,7 @@ export function NamespaceDetails() {
       {namespaceQuery.isLoading ? (
         <div>Loading namespace details...</div>
       ) : namespaceQuery.error ? (
-        <div className="text-red-600">
-          Error loading namespace: {namespaceQuery.error.message}
-        </div>
+        <div className="text-red-600">Error loading namespace: {namespaceQuery.error.message}</div>
       ) : !namespace ? (
         <div>Namespace not found</div>
       ) : (
@@ -311,7 +320,7 @@ export function NamespaceDetails() {
                     </TableHeader>
                     <TableBody>
                       {childrenNamespaces?.map((child, idx) => {
-                        const childNamespacePath = child.namespace?.join(".") ?? "";
+                        const childNamespacePath = child.namespace?.join(".") ?? ""
                         return (
                           <TableRow
                             key={idx}
@@ -333,7 +342,7 @@ export function NamespaceDetails() {
                               </span>
                             </TableCell>
                           </TableRow>
-                        );
+                        )
                       })}
                     </TableBody>
                   </Table>
@@ -342,8 +351,9 @@ export function NamespaceDetails() {
             </CardContent>
           </Card>
 
-          {/* Tables Section */
-           // TODO: add Policies view here (JB) 
+          {
+            /* Tables Section */
+            // TODO: add Policies view here (JB)
           }
           <Card>
             <CardHeader>
@@ -400,7 +410,9 @@ export function NamespaceDetails() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <span className="text-muted-foreground text-sm">{tableNamespace}</span>
+                              <span className="text-muted-foreground text-sm">
+                                {tableNamespace}
+                              </span>
                             </TableCell>
                             <TableCell>
                               <Button
@@ -426,85 +438,83 @@ export function NamespaceDetails() {
         </>
       )}
 
-        {/* Iceberg Views Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Iceberg Views</CardTitle>
-                <CardDescription>
-                  Iceberg views in this namespace
-                </CardDescription>
-              </div>
-              <Button
-                onClick={() => setCreateViewOpen(true)}
-                disabled={!catalogName || !namespaceParam}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Iceberg View
-              </Button>
+      {/* Iceberg Views Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Iceberg Views</CardTitle>
+              <CardDescription>Iceberg views in this namespace</CardDescription>
             </div>
-          </CardHeader>
-          <CardContent>
-            {viewsQuery.isLoading ? (
-              <div>Loading Iceberg views...</div>
-            ) : viewsQuery.error ? (
-              <div className="text-red-600">
-                Error loading Iceberg views: {viewsQuery.error.message}
-              </div>
-            ) : views.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8">
-                No Iceberg views found in this namespace.
-              </div>
-            ) : (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Namespace</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {views.map((view, idx) => {
-                      const viewNamespace = view.namespace.join(".")
-                      return (
-                        <TableRow
-                          key={idx}
-                          className="cursor-pointer hover:bg-muted/50"
-                          onClick={() => handleViewClick(view.name)}
-                        >
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <TableIcon className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">{view.name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-muted-foreground text-sm">{viewNamespace}</span>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleViewClick(view.name)
-                              }}
-                            >
-                              View Details
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <Button
+              onClick={() => setCreateViewOpen(true)}
+              disabled={!catalogName || !namespaceParam}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Iceberg View
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {viewsQuery.isLoading ? (
+            <div>Loading Iceberg views...</div>
+          ) : viewsQuery.error ? (
+            <div className="text-red-600">
+              Error loading Iceberg views: {viewsQuery.error.message}
+            </div>
+          ) : views.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              No Iceberg views found in this namespace.
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Namespace</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {views.map((view, idx) => {
+                    const viewNamespace = view.namespace.join(".")
+                    return (
+                      <TableRow
+                        key={idx}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleViewClick(view.name)}
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <TableIcon className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{view.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground text-sm">{viewNamespace}</span>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleViewClick(view.name)
+                            }}
+                          >
+                            View Details
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Polaris Generic Tables Section */}
       <Card>
@@ -512,14 +522,9 @@ export function NamespaceDetails() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Generic Tables</CardTitle>
-              <CardDescription>
-                Generic tables in this namespace
-              </CardDescription>
+              <CardDescription>Generic tables in this namespace</CardDescription>
             </div>
-            <Button
-              onClick={() => setCreateGenericTableOpen(true)}
-              disabled={!namespace}
-            >
+            <Button onClick={() => setCreateGenericTableOpen(true)} disabled={!namespace}>
               <Plus className="mr-2 h-4 w-4" />
               Generic Table
             </Button>
@@ -529,9 +534,7 @@ export function NamespaceDetails() {
           {polarisGenericTablesQuery?.isLoading ? (
             <div>Loading Polaris generic tables...</div>
           ) : polarisGenericTablesQuery?.error ? (
-            <div className="text-red-600">
-              Error: {polarisGenericTablesQuery.error.message}
-            </div>
+            <div className="text-red-600">Error: {polarisGenericTablesQuery.error.message}</div>
           ) : !polarisGenericTablesQuery?.data || polarisGenericTablesQuery.data.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               No generic tables found in this namespace.
@@ -547,37 +550,39 @@ export function NamespaceDetails() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {polarisGenericTablesQuery.data?.map((table: GenericTableIdentifier, idx: number) => (
-                    <TableRow
-                      key={idx}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handlePolarisGenericTableClick(table)}
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <TableIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{table.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-muted-foreground text-sm">
-                          {table.type || "Generic"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={e => {
-                            e.stopPropagation()
-                            handlePolarisGenericTableClick(table)
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {polarisGenericTablesQuery.data?.map(
+                    (table: GenericTableIdentifier, idx: number) => (
+                      <TableRow
+                        key={idx}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handlePolarisGenericTableClick(table)}
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <TableIcon className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{table.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground text-sm">
+                            {table.type || "Generic"}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handlePolarisGenericTableClick(table)
+                            }}
+                          >
+                            View Details
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -601,9 +606,7 @@ export function NamespaceDetails() {
                 id="table-name"
                 placeholder="my_table"
                 value={genericTableForm.name}
-                onChange={(e) =>
-                  setGenericTableForm({ ...genericTableForm, name: e.target.value })
-                }
+                onChange={(e) => setGenericTableForm({ ...genericTableForm, name: e.target.value })}
               />
             </div>
             <div className="space-y-2">
@@ -634,9 +637,7 @@ export function NamespaceDetails() {
                 id="table-doc"
                 placeholder="Table description"
                 value={genericTableForm.doc}
-                onChange={(e) =>
-                  setGenericTableForm({ ...genericTableForm, doc: e.target.value })
-                }
+                onChange={(e) => setGenericTableForm({ ...genericTableForm, doc: e.target.value })}
               />
             </div>
           </div>
@@ -674,7 +675,8 @@ export function NamespaceDetails() {
               Are you sure you want to delete the namespace "{namespacePath}"?
               {tables.length > 0 && (
                 <span className="block mt-2 text-amber-600">
-                  Warning: This namespace contains {tables.length} table(s). The namespace must be empty to be deleted.
+                  Warning: This namespace contains {tables.length} table(s). The namespace must be
+                  empty to be deleted.
                 </span>
               )}
             </DialogDescription>
@@ -711,4 +713,3 @@ export function NamespaceDetails() {
     </div>
   )
 }
-

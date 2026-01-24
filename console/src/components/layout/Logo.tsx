@@ -26,7 +26,12 @@ interface LogoProps {
   clickable?: boolean
 }
 
-export function Logo({ variant = "default", showText = true, className = "", clickable = true }: LogoProps) {
+export function Logo({
+  variant = "default",
+  showText = true,
+  className = "",
+  clickable = true,
+}: LogoProps) {
   const isCompact = variant === "compact"
 
   const logoContent = (
@@ -42,7 +47,6 @@ export function Logo({ variant = "default", showText = true, className = "", cli
           <span className={`font-bold text-foreground ${isCompact ? "text-sm" : "text-base"}`}>
             Apache Polaris (incubating)
           </span>
-        
         </div>
       )}
     </>
@@ -61,9 +65,11 @@ export function Logo({ variant = "default", showText = true, className = "", cli
   }
 
   return (
-    <div className={`flex items-center gap-2 ${className}`} aria-label="Apache Polaris (incubating)">
+    <div
+      className={`flex items-center gap-2 ${className}`}
+      aria-label="Apache Polaris (incubating)"
+    >
       {logoContent}
     </div>
   )
 }
-

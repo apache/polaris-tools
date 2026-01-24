@@ -31,12 +31,28 @@ import { SchemaViewer } from "@/components/table/SchemaViewer"
 import { MetadataViewer } from "@/components/table/MetadataViewer"
 import { RenameTableModal } from "@/components/forms/RenameTableModal"
 import { EditTablePropertiesModal } from "@/components/forms/EditTablePropertiesModal"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
-import type { LoadGenericTableResponse, GenericTable, LoadTableResult, TableSchema } from "@/types/api"
+import type {
+  LoadGenericTableResponse,
+  GenericTable,
+  LoadTableResult,
+  TableSchema,
+} from "@/types/api"
 
 export function TableDetails() {
-  const { catalogName, namespace: namespaceParam, tableName } = useParams<{
+  const {
+    catalogName,
+    namespace: namespaceParam,
+    tableName,
+  } = useParams<{
     catalogName: string
     namespace: string
     tableName: string
@@ -84,14 +100,17 @@ export function TableDetails() {
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const nsPath = namespaceArray.join(".")
-  const refreshDisabled = tableQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
+  const refreshDisabled =
+    tableQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
 
   const tableData = tableQuery.data
 
   // Type guards
-  const isGenericTable = tableData ? 'table' in tableData : false
-  const genericTableData: GenericTable | null = isGenericTable && tableData ? (tableData as LoadGenericTableResponse).table : null
-  const icebergTableData: LoadTableResult | null = !isGenericTable && tableData ? (tableData as LoadTableResult) : null
+  const isGenericTable = tableData ? "table" in tableData : false
+  const genericTableData: GenericTable | null =
+    isGenericTable && tableData ? (tableData as LoadGenericTableResponse).table : null
+  const icebergTableData: LoadTableResult | null =
+    !isGenericTable && tableData ? (tableData as LoadTableResult) : null
 
   // Delete mutations
   const deleteIcebergMutation = useMutation({
@@ -100,7 +119,9 @@ export function TableDetails() {
       toast.success("Table deleted successfully")
       queryClient.invalidateQueries({ queryKey: ["tables", catalogName, namespaceArray] })
       queryClient.invalidateQueries({ queryKey: ["namespace", catalogName, namespaceArray] })
-      navigate(`/catalogs/${encodeURIComponent(catalogName!)}/namespaces/${encodeURIComponent(namespaceParam!)}`)
+      navigate(
+        `/catalogs/${encodeURIComponent(catalogName!)}/namespaces/${encodeURIComponent(namespaceParam!)}`
+      )
     },
     onError: (error: Error) => {
       toast.error("Failed to delete table", {
@@ -115,7 +136,9 @@ export function TableDetails() {
       toast.success("Generic table deleted successfully")
       queryClient.invalidateQueries({ queryKey: ["generic-tables", catalogName, namespaceArray] })
       queryClient.invalidateQueries({ queryKey: ["namespace", catalogName, namespaceArray] })
-      navigate(`/catalogs/${encodeURIComponent(catalogName!)}/namespaces/${encodeURIComponent(namespaceParam!)}`)
+      navigate(
+        `/catalogs/${encodeURIComponent(catalogName!)}/namespaces/${encodeURIComponent(namespaceParam!)}`
+      )
     },
     onError: (error: Error) => {
       toast.error("Failed to delete generic table", {
@@ -173,8 +196,12 @@ export function TableDetails() {
                 </div>
                 {genericTableData["base-location"] && (
                   <div className="md:col-span-2">
-                    <label className="text-sm font-medium text-muted-foreground">Base Location</label>
-                    <p className="mt-1 text-sm font-mono break-all">{genericTableData["base-location"]}</p>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Base Location
+                    </label>
+                    <p className="mt-1 text-sm font-mono break-all">
+                      {genericTableData["base-location"]}
+                    </p>
                   </div>
                 )}
                 {genericTableData.doc && (
@@ -184,29 +211,30 @@ export function TableDetails() {
                   </div>
                 )}
               </div>
-              {genericTableData.properties && Object.keys(genericTableData.properties).length > 0 && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Properties</label>
-                  <div className="mt-2 border rounded-md overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted/50">
-                        <tr>
-                          <th className="px-3 py-2 text-left font-medium">Key</th>
-                          <th className="px-3 py-2 text-left font-medium">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {Object.entries(genericTableData.properties).map(([key, value]) => (
-                          <tr key={key} className="hover:bg-muted/50">
-                            <td className="px-3 py-2 font-mono text-xs">{key}</td>
-                            <td className="px-3 py-2 text-xs break-all">{value}</td>
+              {genericTableData.properties &&
+                Object.keys(genericTableData.properties).length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Properties</label>
+                    <div className="mt-2 border rounded-md overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="px-3 py-2 text-left font-medium">Key</th>
+                            <th className="px-3 py-2 text-left font-medium">Value</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y">
+                          {Object.entries(genericTableData.properties).map(([key, value]) => (
+                            <tr key={key} className="hover:bg-muted/50">
+                              <td className="px-3 py-2 font-mono text-xs">{key}</td>
+                              <td className="px-3 py-2 text-xs break-all">{value}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </CardContent>
         </Card>
@@ -226,7 +254,10 @@ export function TableDetails() {
             <CardDescription>Core metadata for this table</CardDescription>
           </CardHeader>
           <CardContent>
-            <MetadataViewer metadata={icebergTableData.metadata} metadataLocation={icebergTableData["metadata-location"]} />
+            <MetadataViewer
+              metadata={icebergTableData.metadata}
+              metadataLocation={icebergTableData["metadata-location"]}
+            />
           </CardContent>
         </Card>
 
@@ -330,7 +361,11 @@ export function TableDetails() {
               <Button variant="outline" onClick={() => setRenameOpen(true)} disabled={!tableData}>
                 <Pencil className="mr-2 h-4 w-4" /> Rename
               </Button>
-              <Button variant="outline" onClick={() => setEditPropsOpen(true)} disabled={!tableData}>
+              <Button
+                variant="outline"
+                onClick={() => setEditPropsOpen(true)}
+                disabled={!tableData}
+              >
                 Edit Properties
               </Button>
             </>
@@ -393,7 +428,9 @@ export function TableDetails() {
                 onClick={handleDelete}
                 disabled={deleteIcebergMutation.isPending || deleteGenericMutation.isPending}
               >
-                {(deleteIcebergMutation.isPending || deleteGenericMutation.isPending) ? "Deleting..." : "Delete"}
+                {deleteIcebergMutation.isPending || deleteGenericMutation.isPending
+                  ? "Deleting..."
+                  : "Delete"}
               </Button>
             </DialogFooter>
           </DialogContent>

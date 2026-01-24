@@ -68,20 +68,20 @@ export function TableDetailsDrawer({
   const tableData = tableQuery.data
 
   // Check if this is a generic table (has 'table' property) or Iceberg table (has 'metadata' property)
-  const isGenericTable = tableData && 'table' in tableData
+  const isGenericTable = tableData && "table" in tableData
   const genericTableData = isGenericTable ? (tableData as LoadGenericTableResponse).table : null
 
-  const currentSchema = !isGenericTable && tableData?.metadata?.schemas?.find(
-    (s) => s["schema-id"] === tableData.metadata["current-schema-id"]
-  )
+  const currentSchema =
+    !isGenericTable &&
+    tableData?.metadata?.schemas?.find(
+      (s) => s["schema-id"] === tableData.metadata["current-schema-id"]
+    )
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle className="text-xl font-bold">
-            {tableName}
-          </SheetTitle>
+          <SheetTitle className="text-xl font-bold">{tableName}</SheetTitle>
           <SheetDescription>
             {namespace.length > 0 ? (
               <span className="text-sm text-muted-foreground">
@@ -103,9 +103,7 @@ export function TableDetailsDrawer({
 
         {tableQuery.isError && (
           <div className="py-12">
-            <div className="text-sm text-destructive">
-              Failed to load table details
-            </div>
+            <div className="text-sm text-destructive">Failed to load table details</div>
           </div>
         )}
 
@@ -117,9 +115,7 @@ export function TableDetailsDrawer({
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Name:</span>
-                  <span className="font-mono text-xs">
-                    {genericTableData.name}
-                  </span>
+                  <span className="font-mono text-xs">{genericTableData.name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Format:</span>
@@ -136,38 +132,28 @@ export function TableDetailsDrawer({
                 {genericTableData.doc && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Description:</span>
-                    <span className="text-xs break-all">
-                      {genericTableData.doc}
-                    </span>
+                    <span className="text-xs break-all">{genericTableData.doc}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Properties */}
-            {genericTableData.properties &&
-              Object.keys(genericTableData.properties).length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold mb-2">Properties</h3>
-                  <div className="border rounded-md">
-                    <div className="divide-y">
-                      {Object.entries(genericTableData.properties).map(
-                        ([key, value]) => (
-                          <div
-                            key={key}
-                            className="px-3 py-2 flex justify-between text-sm"
-                          >
-                            <span className="text-muted-foreground">{key}:</span>
-                            <span className="font-mono text-xs break-all">
-                              {String(value)}
-                            </span>
-                          </div>
-                        )
-                      )}
-                    </div>
+            {genericTableData.properties && Object.keys(genericTableData.properties).length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold mb-2">Properties</h3>
+                <div className="border rounded-md">
+                  <div className="divide-y">
+                    {Object.entries(genericTableData.properties).map(([key, value]) => (
+                      <div key={key} className="px-3 py-2 flex justify-between text-sm">
+                        <span className="text-muted-foreground">{key}:</span>
+                        <span className="font-mono text-xs break-all">{String(value)}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         )}
 
@@ -179,9 +165,7 @@ export function TableDetailsDrawer({
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">UUID:</span>
-                  <span className="font-mono text-xs">
-                    {tableData.metadata["table-uuid"]}
-                  </span>
+                  <span className="font-mono text-xs">{tableData.metadata["table-uuid"]}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Format Version:</span>
@@ -197,9 +181,7 @@ export function TableDetailsDrawer({
                 )}
                 {tableData["metadata-location"] && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Metadata Location:
-                    </span>
+                    <span className="text-muted-foreground">Metadata Location:</span>
                     <span className="font-mono text-xs break-all">
                       {tableData["metadata-location"]}
                     </span>
@@ -209,9 +191,7 @@ export function TableDetailsDrawer({
             </div>
 
             {/* Schema */}
-            {currentSchema && (
-              <TableSchemaDisplay schema={currentSchema} />
-            )}
+            {currentSchema && <TableSchemaDisplay schema={currentSchema} />}
 
             {/* Properties */}
             {tableData.metadata.properties &&
@@ -220,19 +200,12 @@ export function TableDetailsDrawer({
                   <h3 className="text-sm font-semibold mb-2">Properties</h3>
                   <div className="border rounded-md">
                     <div className="divide-y">
-                      {Object.entries(tableData.metadata.properties).map(
-                        ([key, value]) => (
-                          <div
-                            key={key}
-                            className="px-3 py-2 flex justify-between text-sm"
-                          >
-                            <span className="text-muted-foreground">{key}:</span>
-                            <span className="font-mono text-xs break-all">
-                              {String(value)}
-                            </span>
-                          </div>
-                        )
-                      )}
+                      {Object.entries(tableData.metadata.properties).map(([key, value]) => (
+                        <div key={key} className="px-3 py-2 flex justify-between text-sm">
+                          <span className="text-muted-foreground">{key}:</span>
+                          <span className="font-mono text-xs break-all">{String(value)}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -242,22 +215,14 @@ export function TableDetailsDrawer({
             {tableData.metadata["partition-specs"] &&
               tableData.metadata["partition-specs"].length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">
-                    Partition Specifications
-                  </h3>
+                  <h3 className="text-sm font-semibold mb-2">Partition Specifications</h3>
                   <div className="space-y-2">
                     {tableData.metadata["partition-specs"].map((spec) => (
-                      <div
-                        key={spec["spec-id"]}
-                        className="border rounded-md p-3 text-sm"
-                      >
+                      <div key={spec["spec-id"]} className="border rounded-md p-3 text-sm">
                         <div className="font-medium mb-2">
                           Spec ID: {spec["spec-id"]}
-                          {spec["spec-id"] ===
-                            tableData.metadata["default-spec-id"] && (
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              (default)
-                            </span>
+                          {spec["spec-id"] === tableData.metadata["default-spec-id"] && (
+                            <span className="ml-2 text-xs text-muted-foreground">(default)</span>
                           )}
                         </div>
                         {spec.fields.length > 0 ? (
@@ -265,9 +230,7 @@ export function TableDetailsDrawer({
                             {spec.fields.map((field, fieldIdx) => (
                               <div key={fieldIdx} className="text-xs">
                                 <span className="font-mono">{field.name}</span>{" "}
-                                <span className="text-muted-foreground">
-                                  {field.transform}
-                                </span>
+                                <span className="text-muted-foreground">{field.transform}</span>
                               </div>
                             ))}
                           </div>
@@ -295,4 +258,3 @@ export function TableDetailsDrawer({
     </Sheet>
   )
 }
-

@@ -64,4 +64,3 @@ export function getPrincipalNameFromToken(token: string): string | null {
     null
   )
 }
-

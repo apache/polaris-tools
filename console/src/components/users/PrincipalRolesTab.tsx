@@ -66,9 +66,7 @@ const columnHelper = createColumnHelper<PrincipalRole & { principalsCount?: numb
 export function PrincipalRolesTab() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "name", desc: false },
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
   const [roleToDelete, setRoleToDelete] = useState<PrincipalRole | null>(null)
   const [roleToEdit, setRoleToEdit] = useState<PrincipalRole | null>(null)
   const [roleToView, setRoleToView] = useState<PrincipalRole | null>(null)
@@ -116,13 +114,8 @@ export function PrincipalRolesTab() {
   })
 
   const revokeMutation = useMutation({
-    mutationFn: ({
-      principalName,
-      roleName,
-    }: {
-      principalName: string
-      roleName: string
-    }) => principalsApi.revokePrincipalRole(principalName, roleName),
+    mutationFn: ({ principalName, roleName }: { principalName: string; roleName: string }) =>
+      principalsApi.revokePrincipalRole(principalName, roleName),
     onSuccess: () => {
       toast.success("Principal role revoked successfully")
       queryClient.invalidateQueries({ queryKey: ["principal-roles"] })
@@ -178,11 +171,7 @@ export function PrincipalRolesTab() {
         header: () => <span>Principals</span>,
         cell: ({ row }) => {
           // We'll fetch this dynamically when needed
-          return (
-            <PrincipalCountCell
-              roleName={row.original.name}
-            />
-          )
+          return <PrincipalCountCell roleName={row.original.name} />
         },
       }),
       columnHelper.display({
@@ -199,9 +188,7 @@ export function PrincipalRolesTab() {
               <DropdownMenuItem onClick={() => setRoleToView(row.original)}>
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setRoleToEdit(row.original)}>
-                Edit
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setRoleToEdit(row.original)}>Edit</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setRoleToGrant(row.original)}>
                 Grant to Principal
               </DropdownMenuItem>
@@ -283,19 +270,18 @@ export function PrincipalRolesTab() {
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
                       className={`${
-                        header.column.getCanSort()
-                          ? "cursor-pointer select-none"
-                          : ""
+                        header.column.getCanSort() ? "cursor-pointer select-none" : ""
                       } h-9 px-3 py-2 text-xs font-medium`}
                     >
                       {header.isPlaceholder ? null : (
                         <div className="flex items-center gap-1">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getIsSorted() === "asc" && (
+                            <span className="text-xs">▲</span>
                           )}
-                          {header.column.getIsSorted() === "asc" && <span className="text-xs">▲</span>}
-                          {header.column.getIsSorted() === "desc" && <span className="text-xs">▼</span>}
+                          {header.column.getIsSorted() === "desc" && (
+                            <span className="text-xs">▼</span>
+                          )}
                         </div>
                       )}
                     </TableHead>
@@ -333,16 +319,13 @@ export function PrincipalRolesTab() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={!!roleToDelete}
-        onOpenChange={(open) => !open && setRoleToDelete(null)}
-      >
+      <Dialog open={!!roleToDelete} onOpenChange={(open) => !open && setRoleToDelete(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Principal Role</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the
-              principal role <span className="font-medium">{roleToDelete?.name}</span>.
+              This action cannot be undone. This will permanently delete the principal role{" "}
+              <span className="font-medium">{roleToDelete?.name}</span>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -355,9 +338,7 @@ export function PrincipalRolesTab() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() =>
-                roleToDelete && deleteMutation.mutate(roleToDelete.name)
-              }
+              onClick={() => roleToDelete && deleteMutation.mutate(roleToDelete.name)}
               disabled={deleteMutation.isPending}
             >
               Delete
@@ -405,17 +386,14 @@ export function PrincipalRolesTab() {
       )}
 
       {/* Revoke Role Confirmation Dialog */}
-      <Dialog
-        open={!!roleToRevoke}
-        onOpenChange={(open) => !open && setRoleToRevoke(null)}
-      >
+      <Dialog open={!!roleToRevoke} onOpenChange={(open) => !open && setRoleToRevoke(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Revoke Role</DialogTitle>
             <DialogDescription>
               This will revoke the role{" "}
-              <span className="font-medium">{roleToRevoke?.role.name}</span> from
-              principal <span className="font-medium">{roleToRevoke?.principal.name}</span>.
+              <span className="font-medium">{roleToRevoke?.role.name}</span> from principal{" "}
+              <span className="font-medium">{roleToRevoke?.principal.name}</span>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -476,7 +454,7 @@ function PrincipalCountCell({ roleName }: { roleName: string }) {
   }
 
   const principals = principalsQuery.data || []
-  
+
   if (principals.length === 0) {
     return <span className="text-muted-foreground text-sm">No principals</span>
   }
@@ -484,11 +462,7 @@ function PrincipalCountCell({ roleName }: { roleName: string }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {principals.map((principal) => (
-        <Badge
-          key={principal.name}
-          variant="secondary"
-          className="text-xs flex items-center gap-1"
-        >
+        <Badge key={principal.name} variant="secondary" className="text-xs flex items-center gap-1">
           <User className="h-3 w-3" />
           {principal.name}
         </Badge>
@@ -567,11 +541,7 @@ function PrincipalRoleDetailsDialog({
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onRevoke(principal)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => onRevoke(principal)}>
                             Revoke
                           </Button>
                         </TableCell>
@@ -581,9 +551,7 @@ function PrincipalRoleDetailsDialog({
                 </Table>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                No principals assigned to this role.
-              </p>
+              <p className="text-sm text-muted-foreground">No principals assigned to this role.</p>
             )}
           </div>
         </div>
@@ -596,4 +564,3 @@ function PrincipalRoleDetailsDialog({
     </Dialog>
   )
 }
-

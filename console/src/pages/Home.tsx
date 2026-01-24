@@ -53,10 +53,10 @@ export function Home() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            Apache Polaris (incubating) is an open source catalog for Apache Iceberg. Built on
-            the open standard Apache Iceberg REST catalog protocol, Apache Polaris
-            allows multiple engines to read and write Iceberg tables while
-            consistently managing security for all queries from all engines.
+            Apache Polaris (incubating) is an open source catalog for Apache Iceberg. Built on the
+            open standard Apache Iceberg REST catalog protocol, Apache Polaris allows multiple
+            engines to read and write Iceberg tables while consistently managing security for all
+            queries from all engines.
           </p>
           <div className="flex items-center justify-end">
             <Sparkles className="h-24 w-24 text-primary/20" />
@@ -71,9 +71,7 @@ export function Home() {
             <CardDescription>Total Catalogs</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {catalogs?.length ?? 0}
-            </div>
+            <div className="text-2xl font-bold">{catalogs?.length ?? 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -81,9 +79,7 @@ export function Home() {
             <CardDescription>Active Connections</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {principals?.length ?? 0}
-            </div>
+            <div className="text-2xl font-bold">{principals?.length ?? 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -91,15 +87,10 @@ export function Home() {
             <CardDescription>Principals</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {principals?.length ?? 0}
-            </div>
+            <div className="text-2xl font-bold">{principals?.length ?? 0}</div>
           </CardContent>
         </Card>
       </div>
-
-      
     </div>
   )
 }
-

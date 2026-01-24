@@ -149,9 +149,7 @@ export function EditPrincipalModal({
         <DialogHeader>
           <DialogTitle>{isNew ? "Create Principal" : "Edit Principal"}</DialogTitle>
           <DialogDescription>
-            {isNew
-              ? "Create a new principal in the system."
-              : "Update the principal properties."}
+            {isNew ? "Create a new principal in the system." : "Update the principal properties."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -164,14 +162,10 @@ export function EditPrincipalModal({
               disabled={!isNew}
             />
             {form.formState.errors.name && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.name.message}
-              </p>
+              <p className="text-sm text-red-600">{form.formState.errors.name.message}</p>
             )}
             <p className="text-xs text-muted-foreground">
-              {isNew
-                ? "The unique name for this principal."
-                : "Principal name cannot be changed."}
+              {isNew ? "The unique name for this principal." : "Principal name cannot be changed."}
             </p>
           </div>
 
@@ -208,4 +202,3 @@ export function EditPrincipalModal({
     </Dialog>
   )
 }
-

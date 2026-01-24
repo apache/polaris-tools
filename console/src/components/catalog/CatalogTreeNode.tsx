@@ -94,13 +94,8 @@ export function CatalogTreeNode({
   }, [node.type, node.namespace, node.name])
 
   const childNamespacesQuery = useQuery({
-    queryKey: [
-      "namespaces",
-      node.catalogName || "",
-      currentNamespacePath.join(".") || "",
-    ],
-    queryFn: () =>
-      namespacesApi.list(node.catalogName || "", currentNamespacePath),
+    queryKey: ["namespaces", node.catalogName || "", currentNamespacePath.join(".") || ""],
+    queryFn: () => namespacesApi.list(node.catalogName || "", currentNamespacePath),
     enabled:
       node.type === "namespace" &&
       isExpanded &&
@@ -110,13 +105,8 @@ export function CatalogTreeNode({
 
   // Fetch tables when namespace is expanded
   const tablesQuery = useQuery({
-    queryKey: [
-      "tables",
-      node.catalogName || "",
-      currentNamespacePath.join(".") || "",
-    ],
-    queryFn: () =>
-      tablesApi.list(node.catalogName || "", currentNamespacePath),
+    queryKey: ["tables", node.catalogName || "", currentNamespacePath.join(".") || ""],
+    queryFn: () => tablesApi.list(node.catalogName || "", currentNamespacePath),
     enabled:
       node.type === "namespace" &&
       isExpanded &&
@@ -126,13 +116,8 @@ export function CatalogTreeNode({
 
   // Fetch views when namespace is expanded
   const viewsQuery = useQuery({
-    queryKey: [
-      "views",
-      node.catalogName || "",
-      currentNamespacePath.join(".") || "",
-    ],
-    queryFn: () =>
-      viewsApi.list(node.catalogName || "", currentNamespacePath),
+    queryKey: ["views", node.catalogName || "", currentNamespacePath.join(".") || ""],
+    queryFn: () => viewsApi.list(node.catalogName || "", currentNamespacePath),
     enabled:
       node.type === "namespace" &&
       isExpanded &&
@@ -142,13 +127,8 @@ export function CatalogTreeNode({
 
   // Fetch generic tables when namespace is expanded
   const genericTablesQuery = useQuery({
-    queryKey: [
-      "generic-tables",
-      node.catalogName || "",
-      currentNamespacePath.join(".") || "",
-    ],
-    queryFn: () =>
-      tablesApi.listGeneric(node.catalogName || "", currentNamespacePath),
+    queryKey: ["generic-tables", node.catalogName || "", currentNamespacePath.join(".") || ""],
+    queryFn: () => tablesApi.listGeneric(node.catalogName || "", currentNamespacePath),
     enabled:
       node.type === "namespace" &&
       isExpanded &&
@@ -198,13 +178,13 @@ export function CatalogTreeNode({
         if (!ns.namespace || !Array.isArray(ns.namespace) || ns.namespace.length === 0) {
           return // Skip invalid namespaces
         }
-        
+
         // When listing from catalog (no parent), API should return only top-level namespaces
         // like ["accounting"]. However, if it returns nested ones like ["accounting", "tax"],
         // we only want to show the top-level ones (those with length 1).
         // For simplicity, we'll show all, but filter to only show single-level namespaces
         // as top-level children (multi-level ones will appear under their parent namespace)
-        
+
         // Only show single-level namespaces as direct children of catalog
         // Multi-level namespaces like ["accounting", "tax"] will appear when "accounting" is expanded
         if (ns.namespace.length === 1) {
@@ -228,7 +208,7 @@ export function CatalogTreeNode({
         if (!ns.namespace || !Array.isArray(ns.namespace) || ns.namespace.length === 0) {
           return // Skip invalid namespaces
         }
-        
+
         // ns.namespace is the full path, e.g., ["accounting", "tax"]
         // currentNamespacePath is ["accounting"]
         // So we want to extract "tax" as the child name
@@ -236,18 +216,16 @@ export function CatalogTreeNode({
         if (ns.namespace.length <= currentNamespacePath.length) {
           return // Skip - this shouldn't happen, child should be deeper
         }
-        
+
         // Verify this namespace is actually a child (starts with currentNamespacePath)
-        const isChild = currentNamespacePath.every(
-          (part, index) => part === ns.namespace[index]
-        )
+        const isChild = currentNamespacePath.every((part, index) => part === ns.namespace[index])
         if (!isChild) {
           return // Skip - not a direct child
         }
-        
+
         const childName = ns.namespace[currentNamespacePath.length]
         const namespaceId = `${node.id}.${childName}`
-        
+
         children.push({
           type: "namespace",
           id: namespaceId,
@@ -317,7 +295,10 @@ export function CatalogTreeNode({
   const isLoading =
     (node.type === "catalog" && namespacesQuery.isLoading) ||
     (node.type === "namespace" &&
-      (childNamespacesQuery.isLoading || tablesQuery.isLoading || viewsQuery.isLoading || genericTablesQuery.isLoading))
+      (childNamespacesQuery.isLoading ||
+        tablesQuery.isLoading ||
+        viewsQuery.isLoading ||
+        genericTablesQuery.isLoading))
 
   const Icon = useMemo(() => {
     if (node.type === "catalog") return Database
@@ -335,7 +316,7 @@ export function CatalogTreeNode({
         )}
         onClick={handleClick}
       >
-        {(node.type === "catalog" || node.type === "namespace") ? (
+        {node.type === "catalog" || node.type === "namespace" ? (
           <button
             onClick={handleToggle}
             className="flex items-center justify-center w-4 h-4 p-0 hover:bg-accent rounded"
@@ -358,27 +339,29 @@ export function CatalogTreeNode({
 
       {isExpanded && (
         <div className="ml-4 border-l border-border pl-2">
-              {childNodes.map((child) => (
-                <CatalogTreeNode
-                  key={child.id}
-                  node={child}
-                  catalogs={catalogs}
-                  expandedNodes={expandedNodes}
-                  selectedNodeId={selectedNodeId}
-                  onToggleExpand={onToggleExpand}
-                  onSelectNode={onSelectNode}
-                  onTableClick={onTableClick}
-                  onViewClick={onViewClick}
-                />
-              ))}
-          {!isLoading && childNodes.length === 0 && node.type !== "table" && node.type !== "view" && (
-            <div className="px-2 py-1 text-xs text-muted-foreground italic">
-              No {node.type === "catalog" ? "namespaces" : "items"} found
-            </div>
-          )}
+          {childNodes.map((child) => (
+            <CatalogTreeNode
+              key={child.id}
+              node={child}
+              catalogs={catalogs}
+              expandedNodes={expandedNodes}
+              selectedNodeId={selectedNodeId}
+              onToggleExpand={onToggleExpand}
+              onSelectNode={onSelectNode}
+              onTableClick={onTableClick}
+              onViewClick={onViewClick}
+            />
+          ))}
+          {!isLoading &&
+            childNodes.length === 0 &&
+            node.type !== "table" &&
+            node.type !== "view" && (
+              <div className="px-2 py-1 text-xs text-muted-foreground italic">
+                No {node.type === "catalog" ? "namespaces" : "items"} found
+              </div>
+            )}
         </div>
       )}
     </div>
   )
 }
-

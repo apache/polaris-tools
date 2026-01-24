@@ -53,11 +53,7 @@ export const viewsApi = {
    * @param namespace - Namespace array (e.g., ["accounting", "tax"])
    * @param viewName - View name
    */
-  get: async (
-    prefix: string,
-    namespace: string[],
-    viewName: string
-  ): Promise<LoadViewResult> => {
+  get: async (prefix: string, namespace: string[], viewName: string): Promise<LoadViewResult> => {
     const namespaceStr = encodeNamespace(namespace)
     const response = await apiClient
       .getCatalogClient()
@@ -73,11 +69,7 @@ export const viewsApi = {
    * @param namespace - Namespace array
    * @param viewName - View name
    */
-  delete: async (
-    prefix: string,
-    namespace: string[],
-    viewName: string
-  ): Promise<void> => {
+  delete: async (prefix: string, namespace: string[], viewName: string): Promise<void> => {
     const namespaceStr = encodeNamespace(namespace)
     await apiClient
       .getCatalogClient()
@@ -107,4 +99,3 @@ export const viewsApi = {
     return response.data
   },
 }
-

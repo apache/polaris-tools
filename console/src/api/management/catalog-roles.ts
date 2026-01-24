@@ -18,7 +18,12 @@
  */
 
 import { apiClient } from "../client"
-import type { CatalogRole, CatalogRolesResponse, PrincipalRole, PrincipalRolesResponse } from "@/types/api"
+import type {
+  CatalogRole,
+  CatalogRolesResponse,
+  PrincipalRole,
+  PrincipalRolesResponse,
+} from "@/types/api"
 
 // Type guard to check if response has roles array
 function hasRolesField(
@@ -140,4 +145,3 @@ export const catalogRolesApi = {
       )
   },
 }
-

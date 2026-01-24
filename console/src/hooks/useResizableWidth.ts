@@ -52,13 +52,16 @@ export function useResizableWidth() {
     localStorage.setItem(CATALOG_EXPLORER_STORAGE_KEY, width.toString())
   }, [width])
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    startXRef.current = e.clientX
-    startWidthRef.current = width
-    setIsResizing(true)
-  }, [width])
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      startXRef.current = e.clientX
+      startWidthRef.current = width
+      setIsResizing(true)
+    },
+    [width]
+  )
 
   useEffect(() => {
     if (!isResizing) return
@@ -66,7 +69,7 @@ export function useResizableWidth() {
     const handleMouseMove = (e: MouseEvent) => {
       const diff = e.clientX - startXRef.current
       const newWidth = startWidthRef.current + diff
-      
+
       // Clamp width within bounds
       const clampedWidth = Math.max(
         CATALOG_EXPLORER_MIN_WIDTH,
@@ -98,4 +101,3 @@ export function useResizableWidth() {
     handleMouseDown,
   }
 }
-

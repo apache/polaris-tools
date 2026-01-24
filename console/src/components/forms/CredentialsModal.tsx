@@ -37,11 +37,7 @@ interface CredentialsModalProps {
   credentials: { clientId: string; clientSecret: string } | null
 }
 
-export function CredentialsModal({
-  open,
-  onOpenChange,
-  credentials,
-}: CredentialsModalProps) {
+export function CredentialsModal({ open, onOpenChange, credentials }: CredentialsModalProps) {
   const [copiedId, setCopiedId] = useState(false)
   const [copiedSecret, setCopiedSecret] = useState(false)
   const [copiedJson, setCopiedJson] = useState(false)
@@ -100,11 +96,7 @@ export function CredentialsModal({
                 size="icon"
                 onClick={() => copyToClipboard(credentials.clientId, "id")}
               >
-                {copiedId ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
+                {copiedId ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
           </div>
@@ -124,11 +116,7 @@ export function CredentialsModal({
                 size="icon"
                 onClick={() => copyToClipboard(credentials.clientSecret, "secret")}
               >
-                {copiedSecret ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
+                {copiedSecret ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
           </div>
@@ -158,4 +146,3 @@ export function CredentialsModal({
     </Dialog>
   )
 }
-

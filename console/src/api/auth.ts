@@ -55,13 +55,9 @@ export const authApi = {
       headers[REALM_HEADER_NAME] = realm
     }
 
-    const response = await axios.post<OAuthTokenResponse>(
-      TOKEN_URL,
-      formData,
-      {
-        headers,
-      }
-    )
+    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+      headers,
+    })
 
     if (response.data.access_token) {
       apiClient.setAccessToken(response.data.access_token)
@@ -79,16 +75,12 @@ export const authApi = {
     formData.append("subject_token", subjectToken)
     formData.append("subject_token_type", subjectTokenType)
 
-    const response = await axios.post<OAuthTokenResponse>(
-      TOKEN_URL,
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Bearer ${apiClient.getAccessToken()}`,
-        },
-      }
-    )
+    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${apiClient.getAccessToken()}`,
+      },
+    })
 
     if (response.data.access_token) {
       apiClient.setAccessToken(response.data.access_token)
@@ -103,15 +95,11 @@ export const authApi = {
     formData.append("subject_token", accessToken)
     formData.append("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
 
-    const response = await axios.post<OAuthTokenResponse>(
-      TOKEN_URL,
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    )
+    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
 
     if (response.data.access_token) {
       apiClient.setAccessToken(response.data.access_token)
