@@ -59,7 +59,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<Login />} />
-                <Route path="/workspaces/config" element={<Workspaces />} />
+                <Route path="/workspaces" element={<Workspaces />} />
                 <Route
                   element={
                     <ProtectedRoute>
@@ -68,7 +68,6 @@ function App() {
                   }
                 >
                   <Route path="/" element={<Home />} />
-                  <Route path="/workspaces" element={<Workspaces />} />
                   <Route path="/connections" element={<Connections />} />
                   <Route path="/catalogs" element={<Catalogs />} />
                   <Route path="/catalogs/:catalogName" element={<CatalogDetails />} />

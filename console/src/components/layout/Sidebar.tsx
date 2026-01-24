@@ -19,7 +19,19 @@
 
 import { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { Home, Link as LinkIcon, Database, Shield, Layers, Settings, Sun, Moon, Monitor, ChevronDown, Check } from "lucide-react"
+import {
+  Home,
+  Link as LinkIcon,
+  Database,
+  Shield,
+  Layers,
+  Settings,
+  Sun,
+  Moon,
+  Monitor,
+  ChevronDown,
+  Check,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NAV_ITEMS } from "@/lib/constants"
 import { useTheme } from "@/hooks/useTheme"
@@ -57,7 +69,7 @@ export function Sidebar() {
     const workspace = getCurrentWorkspace()
     setCurrentWorkspaceState(workspace)
 
-    loadWorkspacesConfig().then(config => {
+    loadWorkspacesConfig().then((config) => {
       setWorkspacesConfig(config)
     })
   }, [])
@@ -75,7 +87,7 @@ export function Sidebar() {
   }
 
   const handleManageWorkspaces = () => {
-    navigate("/workspaces/config")
+    navigate("/workspaces")
   }
 
   return (
@@ -92,7 +104,9 @@ export function Sidebar() {
                   className="h-10 w-10 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-medium text-muted-foreground">Active workspace</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Active workspace
+                  </span>
                   <span className="text-sm font-semibold text-foreground truncate">
                     {currentWorkspace?.name || "No workspace"}
                   </span>
@@ -163,7 +177,10 @@ export function Sidebar() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Theme</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}>
+            <DropdownMenuRadioGroup
+              value={theme}
+              onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}
+            >
               <DropdownMenuRadioItem value="light">
                 <Sun className="mr-2 h-4 w-4" />
                 <span>Light</span>

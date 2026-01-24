@@ -32,7 +32,12 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { addWorkspace, updateWorkspace } from "@/lib/workspaces"
-import { AuthProviderType, type Workspace, type WorkspacesConfig, type AuthConfig } from "@/types/workspaces"
+import {
+  AuthProviderType,
+  type Workspace,
+  type WorkspacesConfig,
+  type AuthConfig,
+} from "@/types/workspaces"
 import { Plus, Trash2 } from "lucide-react"
 
 interface WorkspaceFormModalProps {
@@ -61,7 +66,7 @@ export function WorkspaceFormModal({
       type: AuthProviderType.INTERNAL,
       url: "",
       scope: "PRINCIPAL_ROLE:ALL",
-    }
+    },
   ])
 
   useEffect(() => {
@@ -72,13 +77,17 @@ export function WorkspaceFormModal({
       setRealm(workspace.realm)
       setRealmHeader(workspace["realm-header"])
       setApiUrl(workspace.server?.api || "")
-      setAuthConfigs(workspace.auth.length > 0 ? workspace.auth : [
-        {
-          type: AuthProviderType.INTERNAL,
-          url: "",
-          scope: "PRINCIPAL_ROLE:ALL",
-        }
-      ])
+      setAuthConfigs(
+        workspace.auth.length > 0
+          ? workspace.auth
+          : [
+              {
+                type: AuthProviderType.INTERNAL,
+                url: "",
+                scope: "PRINCIPAL_ROLE:ALL",
+              },
+            ]
+      )
     } else {
       setName("")
       setDescription("")
@@ -91,7 +100,7 @@ export function WorkspaceFormModal({
           type: AuthProviderType.INTERNAL,
           url: "",
           scope: "PRINCIPAL_ROLE:ALL",
-        }
+        },
       ])
     }
   }, [workspace, open])
@@ -103,7 +112,7 @@ export function WorkspaceFormModal({
         type: AuthProviderType.INTERNAL,
         url: "",
         scope: "PRINCIPAL_ROLE:ALL",
-      }
+      },
     ])
   }
 
@@ -193,12 +202,10 @@ export function WorkspaceFormModal({
               />
             </div>
             <div className="flex items-center space-x-2 pb-2">
-              <Switch
-                id="isDefault"
-                checked={isDefault}
-                onCheckedChange={setIsDefault}
-              />
-              <Label htmlFor="isDefault" className="whitespace-nowrap">Set as default</Label>
+              <Switch id="isDefault" checked={isDefault} onCheckedChange={setIsDefault} />
+              <Label htmlFor="isDefault" className="whitespace-nowrap">
+                Set as default
+              </Label>
             </div>
           </div>
 
@@ -247,13 +254,8 @@ export function WorkspaceFormModal({
           <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium">Authentication Methods</h3>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addAuthConfig}
-              >
-                <Plus className="h-4 w-4 mr-1"/>
+              <Button type="button" variant="outline" size="sm" onClick={addAuthConfig}>
+                <Plus className="h-4 w-4 mr-1" />
                 Add Auth Method
               </Button>
             </div>
@@ -270,7 +272,7 @@ export function WorkspaceFormModal({
                         size="sm"
                         onClick={() => removeAuthConfig(index)}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive"/>
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     )}
                   </div>
@@ -331,9 +333,7 @@ export function WorkspaceFormModal({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">
-              {workspace ? "Update" : "Create"}
-            </Button>
+            <Button type="submit">{workspace ? "Update" : "Create"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

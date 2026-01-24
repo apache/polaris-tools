@@ -44,7 +44,7 @@ export function WorkspaceSelector({
       <Select
         value={selectedWorkspace?.name}
         onValueChange={(name) => {
-          const workspace = workspaces.find(ws => ws.name === name)
+          const workspace = workspaces.find((ws) => ws.name === name)
           if (workspace) {
             onSelectWorkspace(workspace)
           }
@@ -56,7 +56,7 @@ export function WorkspaceSelector({
         <SelectContent>
           {workspaces.map((workspace) => (
             <SelectItem key={workspace.name} value={workspace.name}>
-                {workspace.name}
+              {workspace.name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -64,4 +64,3 @@ export function WorkspaceSelector({
     </div>
   )
 }
-

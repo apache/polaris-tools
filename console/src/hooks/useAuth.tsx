@@ -43,13 +43,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
 
-  useEffect(() => {
-    const token = apiClient.getAccessToken()
+  const checkAuth = () => {
     const workspace = getCurrentWorkspace()
-    if (token && workspace) {
-      setIsAuthenticated(true)
-    }
+    const token = apiClient.getAccessToken()
+    setIsAuthenticated(!!(token && workspace))
+  }
+
+  useEffect(() => {
+    checkAuth()
     setLoading(false)
+
+    const handleWorkspaceChange = () => {
+      checkAuth()
+    }
+
+    window.addEventListener("workspace-changed", handleWorkspaceChange)
+    return () => window.removeEventListener("workspace-changed", handleWorkspaceChange)
   }, [])
 
   const login = async (
@@ -80,10 +89,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    toast.success("Logged out successfully")
-    authApi.logout()
+    const currentWorkspace = getCurrentWorkspace()
+    if (currentWorkspace) {
+      apiClient.clearAccessToken(currentWorkspace.name)
+      toast.success(`Logged out from "${currentWorkspace.name}"`)
+    }
     clearCurrentWorkspace()
     setIsAuthenticated(false)
+    setTimeout(() => {
+      window.location.href = "/login"
+    }, 100)
   }
 
   return (

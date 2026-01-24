@@ -34,9 +34,7 @@ interface AuthProviderSelectorProps {
 }
 
 function getAuthProviderLabel(provider: AuthConfig): string {
-  const typeLabel = provider.type === AuthProviderType.INTERNAL
-    ? "Internal"
-    : "OIDC"
+  const typeLabel = provider.type === AuthProviderType.INTERNAL ? "Internal" : "OIDC"
 
   try {
     const urlPart = provider.url ? ` (${new URL(provider.url).origin})` : ""
@@ -56,7 +54,7 @@ export function AuthProviderSelector({
   }
 
   const selectedIndex = selectedProvider
-    ? authProviders.findIndex(p => p === selectedProvider)
+    ? authProviders.findIndex((p) => p === selectedProvider)
     : 0
 
   return (
@@ -85,4 +83,3 @@ export function AuthProviderSelector({
     </div>
   )
 }
-
