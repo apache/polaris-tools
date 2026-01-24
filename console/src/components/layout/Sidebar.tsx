@@ -93,18 +93,18 @@ export function Sidebar() {
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card">
       {/* Logo and Workspace Dropdown */}
-      <header className="h-16 border-b bg-background">
+      <header className="h-14 border-b bg-background">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex h-16 w-full items-center justify-between px-6 hover:bg-accent transition-colors">
+            <button className="flex h-14 w-full items-center justify-between px-6 hover:bg-accent transition-colors">
               <div className="flex gap-3 min-w-0">
                 <img
                   src="/apache-polaris-logo.svg"
                   alt="Apache Polaris Logo"
-                  className="h-10 w-10 flex-shrink-0"
+                  className="h-8 w-8 flex-shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <span className="text-xs font-medium text-muted-foreground">
                     Active workspace
                   </span>
                   <span className="text-sm font-semibold text-foreground truncate">

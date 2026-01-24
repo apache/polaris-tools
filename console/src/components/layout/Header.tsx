@@ -69,7 +69,7 @@ export function Header() {
   const initials = getInitials(displayName)
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-6">
+    <header className="flex h-14 items-center justify-between border-b bg-background px-6">
       <div>
         {workspaceInfo && (
           <div className="text-sm">
