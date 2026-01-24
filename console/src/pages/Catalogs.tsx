@@ -17,12 +17,13 @@
  * under the License.
  */
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Database, MoreVertical, Plus, RefreshCw, Search } from "lucide-react"
 import { catalogsApi } from "@/api/management/catalogs"
+import { setPageTitle } from "@/lib/pageTitle"
 import type { Catalog } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -65,6 +66,10 @@ import { cn } from "@/lib/utils"
 const columnHelper = createColumnHelper<Catalog>()
 
 export function Catalogs() {
+  useEffect(() => {
+    setPageTitle("Catalogs")
+  }, [])
+
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
