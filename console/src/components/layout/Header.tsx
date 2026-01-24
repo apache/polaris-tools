@@ -17,27 +17,27 @@
  * under the License.
  */
 
-import { useState, useEffect } from "react"
-import { LogOut, ChevronDown, Sun, Moon, Monitor } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
-import { useTheme } from "@/hooks/useTheme"
-import { getCurrentWorkspace } from "@/lib/workspaces"
+import {useState, useEffect} from "react"
+import {LogOut} from "lucide-react"
+import {useAuth} from "@/hooks/useAuth"
+import {useCurrentUser} from "@/hooks/useCurrentUser"
+import {getCurrentWorkspace} from "@/lib/workspaces"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+import {Logo} from "@/components/layout/Logo.tsx";
 
 export function Header() {
-  const { logout } = useAuth()
-  const { principal, principalRoles, loading } = useCurrentUser()
-  const { theme, setTheme } = useTheme()
-  const [workspaceInfo, setWorkspaceInfo] = useState<{ name: string; realm: string; header: string } | null>(null)
+  const {logout} = useAuth()
+  const {principal, principalRoles, loading} = useCurrentUser()
+  const [workspaceInfo, setWorkspaceInfo] = useState<{
+    name: string;
+    realm: string;
+    header: string
+  } | null>(null)
 
   useEffect(() => {
     const workspace = getCurrentWorkspace()
@@ -60,8 +60,8 @@ export function Header() {
     principalRoles.length > 0
       ? principalRoles[0].name
       : principal?.properties?.role ||
-        principal?.properties?.principalRole ||
-        "USER"
+      principal?.properties?.principalRole ||
+      "USER"
 
   // Get initials for avatar
   const getInitials = (name: string): string => {
@@ -76,37 +76,9 @@ export function Header() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
-      {/* Theme Toggle - Left Side */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            {theme === "light" ? (
-              <Sun className="h-5 w-5" />
-            ) : theme === "dark" ? (
-              <Moon className="h-5 w-5" />
-            ) : (
-              <Monitor className="h-5 w-5" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-40">
-          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}>
-            <DropdownMenuRadioItem value="light">
-              <Sun className="mr-2 h-4 w-4" />
-              <span>Light</span>
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="dark">
-              <Moon className="mr-2 h-4 w-4" />
-              <span>Dark</span>
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="auto">
-              <Monitor className="mr-2 h-4 w-4" />
-              <span>Auto</span>
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div>
+        <Logo clickable={false}/>
+      </div>
 
       {/* Workspace and Realm Info - Right Side */}
       <div className="flex items-center gap-4">
@@ -116,7 +88,7 @@ export function Header() {
               <span className="text-muted-foreground">Workspace:</span>{" "}
               <span className="font-semibold text-foreground">{workspaceInfo.name}</span>
             </div>
-            <div className="h-4 w-px bg-border" />
+            <div className="h-4 w-px bg-border"/>
             <div className="text-sm">
               <span className="text-muted-foreground">{workspaceInfo.header}:</span>{" "}
               <span className="font-semibold text-foreground">{workspaceInfo.realm}</span>
@@ -125,28 +97,30 @@ export function Header() {
         )}
 
         <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
-              {loading ? "..." : initials}
-            </div>
-            <div className="min-w-0 text-left">
-              <div className="text-sm font-medium text-foreground truncate">
-                {loading ? "Loading..." : displayName}
+          <DropdownMenuTrigger asChild>
+            <button
+              className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-56">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+                {loading ? "..." : initials}
               </div>
-              <div className="text-xs text-muted-foreground truncate">
-                {loading ? "..." : primaryRole}
+              <div className="min-w-0 text-left">
+                <div className="text-sm font-medium text-foreground truncate">
+                  {loading ? "Loading..." : displayName}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {loading ? "..." : primaryRole}
+                </div>
               </div>
-            </div>
-            <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Logout</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={logout}
+                              className="text-destructive focus:text-destructive cursor-pointer">
+              <LogOut className="mr-2 h-4 w-4"/>
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </header>

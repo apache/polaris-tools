@@ -18,10 +18,21 @@
  */
 
 import { Link, useLocation } from "react-router-dom"
-import { Home, Link as LinkIcon, Database, Shield, Layers } from "lucide-react"
+import { Home, Link as LinkIcon, Database, Shield, Layers, Settings, Sun, Moon, Monitor } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NAV_ITEMS } from "@/lib/constants"
 import { Logo } from "@/components/layout/Logo"
+import { useTheme } from "@/hooks/useTheme"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 
 const iconMap = {
   Layers,
@@ -33,6 +44,7 @@ const iconMap = {
 
 export function Sidebar() {
   const location = useLocation()
+  const { theme, setTheme } = useTheme()
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card">
@@ -63,6 +75,36 @@ export function Sidebar() {
             </Link>
           )
         })}
+      </nav>
+
+      {/* Settings Dropdown */}
+      <nav className="p-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start gap-3">
+              <Settings className="h-5 w-5" />
+              <span>Settings</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Theme</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "auto")}>
+              <DropdownMenuRadioItem value="light">
+                <Sun className="mr-2 h-4 w-4" />
+                <span>Light</span>
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="dark">
+                <Moon className="mr-2 h-4 w-4" />
+                <span>Dark</span>
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="auto">
+                <Monitor className="mr-2 h-4 w-4" />
+                <span>Auto</span>
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </nav>
     </div>
   )
