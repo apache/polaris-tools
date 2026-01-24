@@ -46,8 +46,9 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CreateViewModal } from "@/components/forms/CreateViewModal"
+import { setPageTitle } from "@/lib/pageTitle"
 
 export function NamespaceDetails() {
   const { catalogName, namespace: namespaceParam } = useParams<{
@@ -68,6 +69,10 @@ export function NamespaceDetails() {
 
   // Parse namespace from URL (e.g., "accounting.tax" -> ["accounting", "tax"])
   const namespaceArray = namespaceParam?.split(".") || []
+
+  useEffect(() => {
+    setPageTitle(namespaceParam || "Namespace")
+  }, [namespaceParam])
 
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],

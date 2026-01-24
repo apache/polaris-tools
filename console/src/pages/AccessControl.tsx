@@ -25,20 +25,20 @@ import { PrincipalsTab } from "@/components/users/PrincipalsTab"
 import { PrincipalRolesTab } from "@/components/users/PrincipalRolesTab"
 import { CatalogRolesTab } from "@/components/users/CatalogRolesTab"
 import { PrivilegesTab } from "@/components/users/PrivilegesTab"
+import { setPageTitle } from "@/lib/pageTitle"
 
 export function AccessControl() {
   const [searchParams, setSearchParams] = useSearchParams()
   const activeTab = searchParams.get("tab") || "principals"
 
   useEffect(() => {
-    // Update document title based on active tab
     const tabTitles: Record<string, string> = {
       principals: "Principals",
       "principal-roles": "Principal Roles",
       "catalog-roles": "Catalog Roles",
       privileges: "Privileges",
     }
-    document.title = `${tabTitles[activeTab] || "Users"} - Polaris`
+    setPageTitle(tabTitles[activeTab] || "Users")
   }, [activeTab])
 
   const handleTabChange = (value: string) => {

@@ -17,13 +17,14 @@
  * under the License.
  */
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, RefreshCw, Eye, Trash2 } from "lucide-react"
 import { viewsApi } from "@/api/catalog/views"
 import { catalogsApi } from "@/api/management/catalogs"
 import { namespacesApi } from "@/api/catalog/namespaces"
+import { setPageTitle } from "@/lib/pageTitle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { SchemaViewer } from "@/components/table/SchemaViewer"
@@ -52,6 +53,10 @@ export function ViewDetails() {
   const queryClient = useQueryClient()
 
   const namespaceArray = namespaceParam?.split(".") || []
+
+  useEffect(() => {
+    setPageTitle(viewName || "View")
+  }, [viewName])
 
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],

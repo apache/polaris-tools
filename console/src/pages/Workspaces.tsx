@@ -61,6 +61,10 @@ export function Workspaces() {
   )
 
   useEffect(() => {
+    document.title = "Polaris | Workspaces"
+  }, [])
+
+  useEffect(() => {
     loadConfig()
     setCurrentWorkspace(getCurrentWorkspace())
   }, [])

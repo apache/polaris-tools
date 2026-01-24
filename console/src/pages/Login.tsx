@@ -47,6 +47,10 @@ export function Login() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    document.title = "Polaris | Login"
+  }, [])
+
+  useEffect(() => {
     loadWorkspacesConfig().then((config) => {
       setWorkspacesConfig(config)
 
