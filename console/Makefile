@@ -13,12 +13,16 @@ install:
 	npm install
 
 .PHONY: lint
-lint:
+lint: format-check
 	npm run lint
 
-.PHONY: format
-format:
+.PHONY: format-fix
+format-fix:
 	npm run format
+
+.PHONE: lint-fix
+lint-fix: format-fix
+	npm run lint -- --fix
 
 .PHONY: format-check
 format-check:
