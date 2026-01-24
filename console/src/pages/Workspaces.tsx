@@ -42,7 +42,6 @@ import {
 import { WorkspaceFormModal } from "@/components/workspace/WorkspaceFormModal"
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import { apiClient } from "@/api/client"
-import { catalogsApi } from "@/api/management/catalogs"
 import type { Workspace, WorkspacesConfig } from "@/types/workspaces"
 import { Logo } from "@/components/layout/Logo.tsx"
 
@@ -70,6 +69,7 @@ export function Workspaces() {
     if (config) {
       validateTokens()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
   const validateTokens = async () => {
@@ -95,7 +95,7 @@ export function Workspaces() {
           })
 
           setTokenStatus((prev) => ({ ...prev, [workspace.name]: "valid" }))
-        } catch (error) {
+        } catch {
           setTokenStatus((prev) => ({ ...prev, [workspace.name]: "invalid" }))
           apiClient.clearAccessToken(workspace.name)
         }
