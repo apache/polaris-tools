@@ -17,12 +17,13 @@
  * under the License.
  */
 
+import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { Home, Link as LinkIcon, Database, Shield, Layers, Settings, Sun, Moon, Monitor } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NAV_ITEMS } from "@/lib/constants"
-import { Logo } from "@/components/layout/Logo"
 import { useTheme } from "@/hooks/useTheme"
+import { getCurrentWorkspace } from "@/lib/workspaces"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,13 +46,31 @@ const iconMap = {
 export function Sidebar() {
   const location = useLocation()
   const { theme, setTheme } = useTheme()
+  const [workspaceName, setWorkspaceName] = useState<string | null>(null)
+
+  useEffect(() => {
+    const workspace = getCurrentWorkspace()
+    setWorkspaceName(workspace?.name || null)
+  }, [])
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card">
-      {/* Logo */}
-      <div className="flex h-16 items-center border-b px-6">
-        <Logo clickable={false} />
-      </div>
+      {/* Logo and Workspace */}
+      <header className="flex h-16 items-center justify-between border-b bg-background px-6">
+        <div className="flex items-center gap-3">
+          <img
+            src="/apache-polaris-logo.svg"
+            alt="Apache Polaris Logo"
+            className="h-10 w-10 flex-shrink-0"
+          />
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs font-medium text-muted-foreground">Workspace</span>
+            <span className="text-sm font-semibold text-foreground truncate">
+              {workspaceName || "No workspace"}
+            </span>
+          </div>
+        </div>
+      </header>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-4">

@@ -28,7 +28,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {Logo} from "@/components/layout/Logo.tsx";
 
 export function Header() {
   const {logout} = useAuth()
@@ -77,25 +76,16 @@ export function Header() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
       <div>
-        <Logo clickable={false}/>
+        {workspaceInfo && (
+          <div className="text-sm">
+            <span className="text-muted-foreground">{workspaceInfo.header}:</span>{" "}
+            <span className="font-semibold text-foreground">{workspaceInfo.realm}</span>
+          </div>
+        )}
       </div>
 
       {/* Workspace and Realm Info - Right Side */}
       <div className="flex items-center gap-4">
-        {workspaceInfo && (
-          <div className="flex items-center gap-3">
-            <div className="text-sm">
-              <span className="text-muted-foreground">Workspace:</span>{" "}
-              <span className="font-semibold text-foreground">{workspaceInfo.name}</span>
-            </div>
-            <div className="h-4 w-px bg-border"/>
-            <div className="text-sm">
-              <span className="text-muted-foreground">{workspaceInfo.header}:</span>{" "}
-              <span className="font-semibold text-foreground">{workspaceInfo.realm}</span>
-            </div>
-          </div>
-        )}
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button

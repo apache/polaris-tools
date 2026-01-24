@@ -22,6 +22,7 @@ import { catalogsApi } from "@/api/management/catalogs"
 import { principalsApi } from "@/api/management/principals"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sparkles } from "lucide-react"
+import {Logo} from "@/components/layout/Logo.tsx";
 
 export function Home() {
   const { data: catalogs } = useQuery({
@@ -39,7 +40,7 @@ export function Home() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">
-          Get started with Apache Polaris (incubating)
+          <Logo clickable={false} />
         </h1>
       </div>
 
