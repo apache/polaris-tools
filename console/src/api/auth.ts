@@ -21,42 +21,74 @@ import axios from "axios"
 import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
 import { REALM_HEADER_NAME } from "@/lib/constants"
-import type { OAuthTokenResponse } from "@/types/api"
+import type { OAuthTokenResponse, AuthType } from "@/types/api"
 
 // Always use relative URL to go through the proxy (dev server or production server)
 // This avoids CORS issues by proxying requests through the server
 // The server.ts proxy handles /api routes in production, and Vite handles them in development
-const TOKEN_URL = "/api/catalog/v1/oauth/tokens"
+const INTERNAL_TOKEN_URL = "/api/catalog/v1/oauth/tokens"
 
 // Log OAuth URL in development only
 if (import.meta.env.DEV) {
-  console.log("🔐 Using OAuth token URL:", TOKEN_URL)
+  console.log("🔐 Using Internal OAuth token URL:", INTERNAL_TOKEN_URL)
 }
 
 export const authApi = {
   getToken: async (
     clientId: string,
     clientSecret: string,
-    scope: string,
-    realm?: string
+    authType: AuthType,
+    realm?: string,
+    polarisRealm?: string
   ): Promise<OAuthTokenResponse> => {
     const formData = new URLSearchParams()
-    formData.append("grant_type", "client_credentials")
     formData.append("client_id", clientId)
     formData.append("client_secret", clientSecret)
-    formData.append("scope", scope)
+    
+    // Internal auth uses scope, external (Keycloak) uses grant_type
+    if (authType === "internal") {
+      formData.append("scope", "PRINCIPAL_ROLE:ALL")
+      formData.append("grant_type", "client_credentials")
+    } else {
+      formData.append("grant_type", "client_credentials")
+    }
 
     const headers: Record<string, string> = {
       "Content-Type": "application/x-www-form-urlencoded",
     }
 
-    // Add realm header if provided
-    if (realm) {
-      headers[REALM_HEADER_NAME] = realm
+    let tokenUrl: string
+
+    if (authType === "keycloak") {
+      // For Keycloak, use relative path that goes through proxy (dev server or production server)
+      // This avoids CORS issues by proxying requests through the server
+      // The vite.config.ts proxy handles /keycloak routes in development
+      // In production, a similar proxy should be configured on the server
+      if (!realm) {
+        throw new Error("Keycloak realm is required for Keycloak authentication")
+      }
+      // Use relative path that goes through proxy
+      tokenUrl = `/keycloak/realms/${realm}/protocol/openid-connect/token`
+      // Add Polaris realm header if provided (for Polaris API calls)
+      if (polarisRealm) {
+        headers[REALM_HEADER_NAME] = polarisRealm
+      }
+    } else {
+      // For internal, use the relative URL that goes through proxy
+      tokenUrl = INTERNAL_TOKEN_URL
+      // Add realm header if provided (for internal auth)
+      if (realm) {
+        headers[REALM_HEADER_NAME] = realm
+      }
+    }
+
+    // Log token URL in development only
+    if (import.meta.env.DEV) {
+      console.log("🔐 Using token URL:", tokenUrl, "Auth type:", authType)
     }
 
     const response = await axios.post<OAuthTokenResponse>(
-      TOKEN_URL,
+      tokenUrl,
       formData,
       {
         headers,
@@ -74,13 +106,14 @@ export const authApi = {
     subjectToken: string,
     subjectTokenType: string
   ): Promise<OAuthTokenResponse> => {
+    // Token exchange always uses internal endpoint
     const formData = new URLSearchParams()
     formData.append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
     formData.append("subject_token", subjectToken)
     formData.append("subject_token_type", subjectTokenType)
 
     const response = await axios.post<OAuthTokenResponse>(
-      TOKEN_URL,
+      INTERNAL_TOKEN_URL,
       formData,
       {
         headers: {
@@ -98,13 +131,14 @@ export const authApi = {
   },
 
   refreshToken: async (accessToken: string): Promise<OAuthTokenResponse> => {
+    // Token refresh always uses internal endpoint
     const formData = new URLSearchParams()
     formData.append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
     formData.append("subject_token", accessToken)
     formData.append("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
 
     const response = await axios.post<OAuthTokenResponse>(
-      TOKEN_URL,
+      INTERNAL_TOKEN_URL,
       formData,
       {
         headers: {
@@ -122,6 +156,9 @@ export const authApi = {
 
   logout: (): void => {
     apiClient.clearAccessToken()
+    localStorage.removeItem("polaris_realm")
+    localStorage.removeItem("polaris_auth_type")
+    localStorage.removeItem("polaris_keycloak_realm")
     // Use a small delay to allow toast to show before redirect
     setTimeout(() => {
       navigate("/login", true)

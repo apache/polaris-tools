@@ -26,13 +26,21 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Logo } from "@/components/layout/Logo"
 import { Footer } from "@/components/layout/Footer"
+import type { AuthType } from "@/types/api"
 
 export function Login() {
   const [clientId, setClientId] = useState("")
   const [clientSecret, setClientSecret] = useState("")
-  // Initialize realm with value from .env file if present
-  const [realm, setRealm] = useState(import.meta.env.VITE_POLARIS_REALM || "")
-  const [scope, setScope] = useState(import.meta.env.VITE_POLARIS_PRINCIPAL_SCOPE || "")
+  const [authType, setAuthType] = useState<AuthType>(
+    (localStorage.getItem("polaris_auth_type") as AuthType) || "internal"
+  )
+  // Initialize realm with value from .env file or localStorage if present
+  const [realm, setRealm] = useState(
+    localStorage.getItem("polaris_realm") || import.meta.env.VITE_POLARIS_REALM || ""
+  )
+  const [keycloakRealm, setKeycloakRealm] = useState(
+    localStorage.getItem("polaris_keycloak_realm") || ""
+  )
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -44,7 +52,7 @@ export function Login() {
     setLoading(true)
 
     try {
-      await login(clientId, clientSecret, scope, realm)
+      await login(clientId, clientSecret, authType, realm, keycloakRealm)
       navigate("/")
     } catch (err) {
       setError(
@@ -69,6 +77,18 @@ export function Login() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="authType">Authentication Type</Label>
+                <select
+                  id="authType"
+                  value={authType}
+                  onChange={(e) => setAuthType(e.target.value as AuthType)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="internal">Internal (Polaris)</option>
+                  <option value="keycloak">External (Keycloak)</option>
+                </select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="clientId">Client ID</Label>
                 <Input
                   id="clientId"
@@ -90,15 +110,28 @@ export function Login() {
                   placeholder="Enter your client secret"
                 />
               </div>
+              {authType === "keycloak" && (
+                <div className="space-y-2">
+                  <Label htmlFor="keycloakRealm">Keycloak Realm</Label>
+                  <Input
+                    id="keycloakRealm"
+                    type="text"
+                    value={keycloakRealm}
+                    onChange={(e) => setKeycloakRealm(e.target.value)}
+                    required
+                    placeholder="Enter Keycloak realm (e.g., myrealm)"
+                  />
+                </div>
+              )}
               <div className="space-y-2">
-                <Label htmlFor="realm">Realm</Label>
+                <Label htmlFor="realm">Polaris Realm</Label>
                 <Input
                   id="realm"
                   type="text"
                   value={realm}
                   onChange={(e) => setRealm(e.target.value)}
                   required
-                  placeholder="Enter your realm"
+                  placeholder="Enter your Polaris realm"
                 />
               </div>
               <div className="space-y-2">

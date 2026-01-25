@@ -20,10 +20,17 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
+import type { AuthType } from "@/types/api"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  login: (clientId: string, clientSecret: string, scope: string, realm: string) => Promise<void>
+  login: (
+    clientId: string,
+    clientSecret: string,
+    authType: AuthType,
+    realm: string,
+    keycloakRealm?: string
+  ) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -34,13 +41,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [loading] = useState<boolean>(false)
 
-  const login = async (clientId: string, clientSecret: string, scope: string, realm: string) => {
+  const login = async (
+    clientId: string,
+    clientSecret: string,
+    authType: AuthType,
+    realm: string,
+    keycloakRealm?: string
+  ) => {
     try {
-      // Store realm in localStorage (non-sensitive configuration)
+      // Store auth configuration in localStorage (non-sensitive configuration)
+      localStorage.setItem("polaris_auth_type", authType)
       if (realm) {
         localStorage.setItem("polaris_realm", realm)
       }
-      await authApi.getToken(clientId, clientSecret, scope, realm)
+      if (keycloakRealm) {
+        localStorage.setItem("polaris_keycloak_realm", keycloakRealm)
+      }
+      
+      await authApi.getToken(clientId, clientSecret, authType, keycloakRealm, realm)
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
