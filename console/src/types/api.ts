@@ -17,6 +17,9 @@
  * under the License.
  */
 
+// Auth Types
+export type AuthType = "internal" | "keycloak"
+
 // Management Service API Types
 
 export interface StorageConfigInfo {
