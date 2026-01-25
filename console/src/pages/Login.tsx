@@ -134,6 +134,17 @@ export function Login() {
                   placeholder="Enter your Polaris realm"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="scope">Scope</Label>
+                <Input
+                  id="scope"
+                  type="text"
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                  required
+                  placeholder="Enter the scope"
+                />
+              </div>
               {error && (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                   {error}

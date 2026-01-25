@@ -64,6 +64,7 @@ ui/src/generated/
 dist
 dist-ssr
 *.local
+.env
 
 # Eclipse IDE
 .classpath
