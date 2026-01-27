@@ -17,7 +17,6 @@
  * under the License.
  */
 
-import io.github.gradlenexus.publishplugin.NexusPublishExtension
 import java.net.URI
 import org.nosphere.apache.rat.RatTask
 
@@ -79,20 +78,34 @@ tasks.named<RatTask>("rat").configure {
   excludes.add("**/*.png")
 }
 
-configure<NexusPublishExtension> {
+// Pass environment variables:
+//    ORG_GRADLE_PROJECT_apacheUsername
+//    ORG_GRADLE_PROJECT_apachePassword
+// OR in ~/.gradle/gradle.properties set
+//    apacheUsername
+//    apachePassword
+// Call targets:
+//    publishToApache
+//    closeApacheStagingRepository
+//    releaseApacheStagingRepository
+//       or closeAndReleaseApacheStagingRepository
+//
+// Username is your ASF ID
+// Password: your ASF LDAP password - or better: a token generated via
+// https://repository.apache.org/
+nexusPublishing {
   transitionCheckOptions {
-    // Increase timeout from default 1 minute
-    maxRetries.set(360)
-    delayBetween.set(java.time.Duration.ofSeconds(10))
+    // default==60 (10 minutes), wait up to 120 minutes
+    maxRetries = 720
+    // default 10s
+    delayBetween = java.time.Duration.ofSeconds(10)
   }
+
   repositories {
-    create("apache") {
-      nexusUrl.set(URI.create("https://repository.apache.org/service/local/"))
-      snapshotRepositoryUrl.set(
+    register("apache") {
+      nexusUrl = URI.create("https://repository.apache.org/service/local/")
+      snapshotRepositoryUrl =
         URI.create("https://repository.apache.org/content/repositories/snapshots/")
-      )
-      username.set(System.getenv("ASF_USERNAME") ?: findProperty("asfNexusUsername") as String?)
-      password.set(System.getenv("ASF_PASSWORD") ?: findProperty("asfNexusPassword") as String?)
     }
   }
 }
