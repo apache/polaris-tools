@@ -67,7 +67,9 @@ export function CatalogDetails() {
 
   const handleNamespaceClick = (namespace: Namespace) => {
     const namespacePath = namespace.namespace.join(".")
-    navigate(`/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespacePath)}`)
+    navigate(
+      `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespacePath)}`
+    )
   }
 
   const defaultBaseLocation = catalog?.properties?.["default-base-location"] || "Not set"
@@ -77,11 +79,7 @@ export function CatalogDetails() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/catalogs")}
-          >
+          <Button variant="ghost" size="icon" onClick={() => navigate("/catalogs")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="space-y-1">
@@ -89,9 +87,7 @@ export function CatalogDetails() {
               <Database className="h-6 w-6" />
               <h1 className="text-2xl font-bold">{catalog?.name || catalogName}</h1>
             </div>
-            <p className="text-muted-foreground">
-              Catalog details and configuration
-            </p>
+            <p className="text-muted-foreground">Catalog details and configuration</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -106,11 +102,7 @@ export function CatalogDetails() {
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setIsEditOpen(true)}
-            disabled={!catalog}
-          >
+          <Button variant="outline" onClick={() => setIsEditOpen(true)} disabled={!catalog}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
@@ -120,9 +112,7 @@ export function CatalogDetails() {
       {catalogQuery.isLoading ? (
         <div>Loading catalog details...</div>
       ) : catalogQuery.error ? (
-        <div className="text-red-600">
-          Error loading catalog: {catalogQuery.error.message}
-        </div>
+        <div className="text-red-600">Error loading catalog: {catalogQuery.error.message}</div>
       ) : !catalog ? (
         <div>Catalog not found</div>
       ) : (
@@ -148,7 +138,9 @@ export function CatalogDetails() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Default Base Location</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Default Base Location
+                  </label>
                   <p className="mt-1 font-mono text-sm">{defaultBaseLocation}</p>
                 </div>
                 {catalog.createTimestamp && (
@@ -181,38 +173,57 @@ export function CatalogDetails() {
               {/* Storage Configuration */}
               {catalog.storageConfigInfo && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Storage Configuration</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Storage Configuration
+                  </label>
                   <div className="mt-2 rounded-md border p-3 space-y-2">
                     <div className="flex gap-2">
                       <span className="font-mono text-sm text-muted-foreground">Storage Type:</span>
-                      <span className="font-mono text-sm">{catalog.storageConfigInfo.storageType}</span>
+                      <span className="font-mono text-sm">
+                        {catalog.storageConfigInfo.storageType}
+                      </span>
                     </div>
-                    {catalog.storageConfigInfo.allowedLocations && catalog.storageConfigInfo.allowedLocations.length > 0 && (
-                      <div>
-                        <span className="font-mono text-sm text-muted-foreground">Allowed Locations:</span>
-                        <ul className="mt-1 ml-4 list-disc space-y-1">
-                          {catalog.storageConfigInfo.allowedLocations.map((loc, idx) => (
-                            <li key={idx} className="font-mono text-sm">{loc}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    {catalog.storageConfigInfo.allowedLocations &&
+                      catalog.storageConfigInfo.allowedLocations.length > 0 && (
+                        <div>
+                          <span className="font-mono text-sm text-muted-foreground">
+                            Allowed Locations:
+                          </span>
+                          <ul className="mt-1 ml-4 list-disc space-y-1">
+                            {catalog.storageConfigInfo.allowedLocations.map((loc, idx) => (
+                              <li key={idx} className="font-mono text-sm">
+                                {loc}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     {catalog.storageConfigInfo.storageType === "S3" && (
                       <div className="space-y-1 pt-2 border-t">
                         <div className="flex gap-2">
                           <span className="font-mono text-sm text-muted-foreground">Region:</span>
-                          <span className="font-mono text-sm">{catalog.storageConfigInfo.region || "Not set"}</span>
+                          <span className="font-mono text-sm">
+                            {catalog.storageConfigInfo.region || "Not set"}
+                          </span>
                         </div>
                         {catalog.storageConfigInfo.roleArn && (
                           <div className="flex gap-2">
-                            <span className="font-mono text-sm text-muted-foreground">Role ARN:</span>
-                            <span className="font-mono text-sm">{catalog.storageConfigInfo.roleArn}</span>
+                            <span className="font-mono text-sm text-muted-foreground">
+                              Role ARN:
+                            </span>
+                            <span className="font-mono text-sm">
+                              {catalog.storageConfigInfo.roleArn}
+                            </span>
                           </div>
                         )}
                         {catalog.storageConfigInfo.endpoint && (
                           <div className="flex gap-2">
-                            <span className="font-mono text-sm text-muted-foreground">Endpoint:</span>
-                            <span className="font-mono text-sm">{catalog.storageConfigInfo.endpoint}</span>
+                            <span className="font-mono text-sm text-muted-foreground">
+                              Endpoint:
+                            </span>
+                            <span className="font-mono text-sm">
+                              {catalog.storageConfigInfo.endpoint}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -221,14 +232,22 @@ export function CatalogDetails() {
                       <div className="space-y-1 pt-2 border-t">
                         {catalog.storageConfigInfo.tenantId && (
                           <div className="flex gap-2">
-                            <span className="font-mono text-sm text-muted-foreground">Tenant ID:</span>
-                            <span className="font-mono text-sm">{catalog.storageConfigInfo.tenantId}</span>
+                            <span className="font-mono text-sm text-muted-foreground">
+                              Tenant ID:
+                            </span>
+                            <span className="font-mono text-sm">
+                              {catalog.storageConfigInfo.tenantId}
+                            </span>
                           </div>
                         )}
                         {catalog.storageConfigInfo.multiTenantAppName && (
                           <div className="flex gap-2">
-                            <span className="font-mono text-sm text-muted-foreground">Multi-tenant App Name:</span>
-                            <span className="font-mono text-sm">{catalog.storageConfigInfo.multiTenantAppName}</span>
+                            <span className="font-mono text-sm text-muted-foreground">
+                              Multi-tenant App Name:
+                            </span>
+                            <span className="font-mono text-sm">
+                              {catalog.storageConfigInfo.multiTenantAppName}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -237,8 +256,12 @@ export function CatalogDetails() {
                       <div className="space-y-1 pt-2 border-t">
                         {catalog.storageConfigInfo.gcsServiceAccount && (
                           <div className="flex gap-2">
-                            <span className="font-mono text-sm text-muted-foreground">Service Account:</span>
-                            <span className="font-mono text-sm">{catalog.storageConfigInfo.gcsServiceAccount}</span>
+                            <span className="font-mono text-sm text-muted-foreground">
+                              Service Account:
+                            </span>
+                            <span className="font-mono text-sm">
+                              {catalog.storageConfigInfo.gcsServiceAccount}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -250,16 +273,24 @@ export function CatalogDetails() {
               {/* Connection Configuration (for EXTERNAL catalogs) */}
               {catalog.type === "EXTERNAL" && catalog.connectionConfigInfo && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Connection Configuration</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Connection Configuration
+                  </label>
                   <div className="mt-2 rounded-md border p-3">
                     <div className="flex gap-2">
-                      <span className="font-mono text-sm text-muted-foreground">Connection Type:</span>
-                      <span className="font-mono text-sm">{catalog.connectionConfigInfo.connectionType}</span>
+                      <span className="font-mono text-sm text-muted-foreground">
+                        Connection Type:
+                      </span>
+                      <span className="font-mono text-sm">
+                        {catalog.connectionConfigInfo.connectionType}
+                      </span>
                     </div>
                     {catalog.connectionConfigInfo.uri && (
                       <div className="flex gap-2 mt-2">
                         <span className="font-mono text-sm text-muted-foreground">URI:</span>
-                        <span className="font-mono text-sm">{catalog.connectionConfigInfo.uri}</span>
+                        <span className="font-mono text-sm">
+                          {catalog.connectionConfigInfo.uri}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -365,10 +396,11 @@ export function CatalogDetails() {
           queryClient.invalidateQueries({ queryKey: ["namespaces", catalogName] })
           // Navigate to the newly created namespace
           const namespacePath = namespace.join(".")
-          navigate(`/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespacePath)}`)
+          navigate(
+            `/catalogs/${encodeURIComponent(catalogName)}/namespaces/${encodeURIComponent(namespacePath)}`
+          )
         }}
       />
     </div>
   )
 }
-

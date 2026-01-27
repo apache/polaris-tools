@@ -63,12 +63,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (theme === "auto") {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
       const handleChange = () => updateEffectiveTheme()
-      
+
       // Modern browsers
       if (mediaQuery.addEventListener) {
         mediaQuery.addEventListener("change", handleChange)
         return () => mediaQuery.removeEventListener("change", handleChange)
-      } 
+      }
       // Fallback for older browsers
       else if (mediaQuery.addListener) {
         mediaQuery.addListener(handleChange)
@@ -107,4 +107,3 @@ export function useTheme() {
   }
   return context
 }
-

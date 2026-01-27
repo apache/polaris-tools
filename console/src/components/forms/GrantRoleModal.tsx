@@ -97,11 +97,12 @@ export function GrantRoleModal({
   }
 
   // Get principals that don't already have this role
-  const availablePrincipals = principalsQuery.data?.filter((principal) => {
-    // Filter out principals that already have this role
-    const principalsWithRole = principalsWithRoleQuery.data || []
-    return !principalsWithRole.some((p) => p.name === principal.name)
-  }) || []
+  const availablePrincipals =
+    principalsQuery.data?.filter((principal) => {
+      // Filter out principals that already have this role
+      const principalsWithRole = principalsWithRoleQuery.data || []
+      return !principalsWithRole.some((p) => p.name === principal.name)
+    }) || []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -154,10 +155,7 @@ export function GrantRoleModal({
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleGrant}
-            disabled={!selectedPrincipal || grantMutation.isPending}
-          >
+          <Button onClick={handleGrant} disabled={!selectedPrincipal || grantMutation.isPending}>
             Grant Role
           </Button>
         </DialogFooter>
@@ -165,4 +163,3 @@ export function GrantRoleModal({
     </Dialog>
   )
 }
-

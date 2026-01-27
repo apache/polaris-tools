@@ -94,4 +94,3 @@ export function useCurrentUser(): CurrentUserInfo {
     error: principalError || rolesError || null,
   }
 }
-

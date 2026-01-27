@@ -81,7 +81,7 @@ function PrincipalRolesCell({ principalName }: { principalName: string }) {
   }
 
   const roles = rolesQuery.data || []
-  
+
   if (roles.length === 0) {
     return <span className="text-muted-foreground text-sm">No roles</span>
   }
@@ -89,11 +89,7 @@ function PrincipalRolesCell({ principalName }: { principalName: string }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {roles.map((role) => (
-        <Badge
-          key={role.name}
-          variant="secondary"
-          className="text-xs flex items-center gap-1"
-        >
+        <Badge key={role.name} variant="secondary" className="text-xs flex items-center gap-1">
           <Shield className="h-3 w-3" />
           {role.name}
         </Badge>
@@ -105,9 +101,7 @@ function PrincipalRolesCell({ principalName }: { principalName: string }) {
 export function PrincipalsTab() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "name", desc: false },
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
   const [principalToDelete, setPrincipalToDelete] = useState<Principal | null>(null)
   const [principalToEdit, setPrincipalToEdit] = useState<Principal | null>(null)
   const [principalToView, setPrincipalToView] = useState<Principal | null>(null)
@@ -148,8 +142,7 @@ export function PrincipalsTab() {
   })
 
   const rotateMutation = useMutation({
-    mutationFn: (principalName: string) =>
-      principalsApi.rotateCredentials(principalName),
+    mutationFn: (principalName: string) => principalsApi.rotateCredentials(principalName),
     onSuccess: (data: PrincipalWithCredentials) => {
       toast.success("Credentials rotated successfully")
       // API returns PrincipalWithCredentials with clientId and clientSecret
@@ -242,13 +235,11 @@ export function PrincipalsTab() {
             (typeof principal.properties?.createTimestamp === "string"
               ? parseInt(principal.properties.createTimestamp, 10)
               : typeof principal.properties?.createTimestamp === "number"
-              ? principal.properties.createTimestamp
-              : undefined)
+                ? principal.properties.createTimestamp
+                : undefined)
           return (
             <span className="text-muted-foreground text-sm">
-              {timestamp
-                ? formatDistanceToNow(new Date(timestamp), { addSuffix: true })
-                : "-"}
+              {timestamp ? formatDistanceToNow(new Date(timestamp), { addSuffix: true }) : "-"}
             </span>
           )
         },
@@ -276,9 +267,7 @@ export function PrincipalsTab() {
               <DropdownMenuItem onClick={() => setPrincipalToEdit(row.original)}>
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => rotateMutation.mutate(row.original.name)}
-              >
+              <DropdownMenuItem onClick={() => rotateMutation.mutate(row.original.name)}>
                 Rotate Credentials
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPrincipalToReset(row.original)}>
@@ -362,19 +351,18 @@ export function PrincipalsTab() {
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
                       className={`${
-                        header.column.getCanSort()
-                          ? "cursor-pointer select-none"
-                          : ""
+                        header.column.getCanSort() ? "cursor-pointer select-none" : ""
                       } h-9 px-3 py-2 text-xs font-medium`}
                     >
                       {header.isPlaceholder ? null : (
                         <div className="flex items-center gap-1">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getIsSorted() === "asc" && (
+                            <span className="text-xs">▲</span>
                           )}
-                          {header.column.getIsSorted() === "asc" && <span className="text-xs">▲</span>}
-                          {header.column.getIsSorted() === "desc" && <span className="text-xs">▼</span>}
+                          {header.column.getIsSorted() === "desc" && (
+                            <span className="text-xs">▼</span>
+                          )}
                         </div>
                       )}
                     </TableHead>
@@ -420,8 +408,8 @@ export function PrincipalsTab() {
           <DialogHeader>
             <DialogTitle>Delete Principal</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the
-              principal <span className="font-medium">{principalToDelete?.name}</span>.
+              This action cannot be undone. This will permanently delete the principal{" "}
+              <span className="font-medium">{principalToDelete?.name}</span>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -434,9 +422,7 @@ export function PrincipalsTab() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() =>
-                principalToDelete && deleteMutation.mutate(principalToDelete.name)
-              }
+              onClick={() => principalToDelete && deleteMutation.mutate(principalToDelete.name)}
               disabled={deleteMutation.isPending}
             >
               Delete
@@ -446,17 +432,14 @@ export function PrincipalsTab() {
       </Dialog>
 
       {/* Reset Credentials Confirmation Dialog */}
-      <Dialog
-        open={!!principalToReset}
-        onOpenChange={(open) => !open && setPrincipalToReset(null)}
-      >
+      <Dialog open={!!principalToReset} onOpenChange={(open) => !open && setPrincipalToReset(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reset Credentials</DialogTitle>
             <DialogDescription>
               This will reset the credentials for{" "}
-              <span className="font-medium">{principalToReset?.name}</span>. The new
-              credentials will be displayed after reset.
+              <span className="font-medium">{principalToReset?.name}</span>. The new credentials
+              will be displayed after reset.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -468,9 +451,7 @@ export function PrincipalsTab() {
               Cancel
             </Button>
             <Button
-              onClick={() =>
-                principalToReset && resetMutation.mutate(principalToReset.name)
-              }
+              onClick={() => principalToReset && resetMutation.mutate(principalToReset.name)}
               disabled={resetMutation.isPending}
             >
               Reset
@@ -524,4 +505,3 @@ export function PrincipalsTab() {
     </div>
   )
 }
-

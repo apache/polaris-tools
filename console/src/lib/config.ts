@@ -31,31 +31,27 @@ declare global {
   }
 }
 
-function getConfig<T extends string | undefined>(
-  key: keyof AppConfig,
-  defaultValue?: T
-): T {
+function getConfig<T extends string | undefined>(key: keyof AppConfig, defaultValue?: T): T {
   // First try runtime config
   const runtimeValue = window.APP_CONFIG?.[key]
-  if (runtimeValue !== undefined && runtimeValue !== '') {
+  if (runtimeValue !== undefined && runtimeValue !== "") {
     return runtimeValue as T
   }
-  
+
   // Then try build-time config
   const buildTimeValue = import.meta.env[key]
-  if (buildTimeValue !== undefined && buildTimeValue !== '') {
+  if (buildTimeValue !== undefined && buildTimeValue !== "") {
     return buildTimeValue as T
   }
-  
+
   // Finally use default
   return defaultValue as T
 }
 
 export const config = {
-  POLARIS_API_URL: getConfig('VITE_POLARIS_API_URL', ''),
-  POLARIS_REALM: getConfig('VITE_POLARIS_REALM', ''),
-  POLARIS_PRINCIPAL_SCOPE: getConfig('VITE_POLARIS_PRINCIPAL_SCOPE', ''),
-  OAUTH_TOKEN_URL: getConfig('VITE_OAUTH_TOKEN_URL', ''),
-  REALM_HEADER_NAME: getConfig('VITE_POLARIS_REALM_HEADER_NAME', 'Polaris-Realm'),
+  POLARIS_API_URL: getConfig("VITE_POLARIS_API_URL", ""),
+  POLARIS_REALM: getConfig("VITE_POLARIS_REALM", ""),
+  POLARIS_PRINCIPAL_SCOPE: getConfig("VITE_POLARIS_PRINCIPAL_SCOPE", ""),
+  OAUTH_TOKEN_URL: getConfig("VITE_OAUTH_TOKEN_URL", ""),
+  REALM_HEADER_NAME: getConfig("VITE_POLARIS_REALM_HEADER_NAME", "Polaris-Realm"),
 }
-

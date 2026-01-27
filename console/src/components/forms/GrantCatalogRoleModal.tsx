@@ -189,7 +189,9 @@ export function GrantCatalogRoleModal({
           <Button
             type="button"
             onClick={handleGrant}
-            disabled={!selectedPrincipalRole || grantMutation.isPending || !catalogRole?.catalogName}
+            disabled={
+              !selectedPrincipalRole || grantMutation.isPending || !catalogRole?.catalogName
+            }
           >
             {grantMutation.isPending ? "Granting..." : "Grant Role"}
           </Button>
@@ -203,4 +205,3 @@ export function GrantCatalogRoleModal({
     </Dialog>
   )
 }
-

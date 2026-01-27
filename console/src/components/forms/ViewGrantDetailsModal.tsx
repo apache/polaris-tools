@@ -77,7 +77,7 @@ function formatNamespace(namespace: string[]): string {
 interface ViewGrantDetailsModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  grant: GrantResource & { catalogName: string; catalogRoleName: string } | null
+  grant: (GrantResource & { catalogName: string; catalogRoleName: string }) | null
   onRevoke?: () => void
 }
 
@@ -156,9 +156,7 @@ export function ViewGrantDetailsModal({
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Namespace</h3>
               <div className="rounded-md border bg-muted/50 p-3">
-                <code className="text-sm font-mono">
-                  {formatNamespace(grant.namespace)}
-                </code>
+                <code className="text-sm font-mono">{formatNamespace(grant.namespace)}</code>
               </div>
             </div>
           )}
@@ -189,9 +187,7 @@ export function ViewGrantDetailsModal({
           <div className="space-y-2 border-t pt-4">
             <h3 className="text-sm font-medium">Grant Resource</h3>
             <div className="rounded-md border bg-muted/50 p-3">
-              <pre className="text-xs overflow-x-auto">
-                {JSON.stringify(grant, null, 2)}
-              </pre>
+              <pre className="text-xs overflow-x-auto">{JSON.stringify(grant, null, 2)}</pre>
             </div>
           </div>
         </div>
@@ -209,4 +205,3 @@ export function ViewGrantDetailsModal({
     </Dialog>
   )
 }
-

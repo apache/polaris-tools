@@ -42,12 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Info } from "lucide-react"
 import { privilegesApi } from "@/api/management/privileges"
 import { catalogRolesApi } from "@/api/management/catalog-roles"
@@ -66,16 +61,33 @@ import type {
 function getPrivilegesForEntityType(
   entityType: string
 ): Array<{ value: string; label: string; category: string }> {
-  const allPrivileges: Record<
-    string,
-    Array<{ value: string; label: string; category: string }>
-  > = {
+  const allPrivileges: Record<string, Array<{ value: string; label: string; category: string }>> = {
     catalog: [
-      { value: "CATALOG_MANAGE_ACCESS", label: "CATALOG_MANAGE_ACCESS", category: "Access Control" },
-      { value: "CATALOG_MANAGE_CONTENT", label: "CATALOG_MANAGE_CONTENT", category: "Content Management" },
-      { value: "CATALOG_MANAGE_METADATA", label: "CATALOG_MANAGE_METADATA", category: "Content Management" },
-      { value: "CATALOG_READ_PROPERTIES", label: "CATALOG_READ_PROPERTIES", category: "Properties" },
-      { value: "CATALOG_WRITE_PROPERTIES", label: "CATALOG_WRITE_PROPERTIES", category: "Properties" },
+      {
+        value: "CATALOG_MANAGE_ACCESS",
+        label: "CATALOG_MANAGE_ACCESS",
+        category: "Access Control",
+      },
+      {
+        value: "CATALOG_MANAGE_CONTENT",
+        label: "CATALOG_MANAGE_CONTENT",
+        category: "Content Management",
+      },
+      {
+        value: "CATALOG_MANAGE_METADATA",
+        label: "CATALOG_MANAGE_METADATA",
+        category: "Content Management",
+      },
+      {
+        value: "CATALOG_READ_PROPERTIES",
+        label: "CATALOG_READ_PROPERTIES",
+        category: "Properties",
+      },
+      {
+        value: "CATALOG_WRITE_PROPERTIES",
+        label: "CATALOG_WRITE_PROPERTIES",
+        category: "Properties",
+      },
       { value: "NAMESPACE_CREATE", label: "NAMESPACE_CREATE", category: "Namespace Operations" },
       { value: "TABLE_CREATE", label: "TABLE_CREATE", category: "Table Operations" },
       { value: "VIEW_CREATE", label: "VIEW_CREATE", category: "View Operations" },
@@ -85,10 +97,18 @@ function getPrivilegesForEntityType(
       { value: "NAMESPACE_LIST", label: "NAMESPACE_LIST", category: "Namespace Operations" },
       { value: "TABLE_LIST", label: "TABLE_LIST", category: "Table Operations" },
       { value: "VIEW_LIST", label: "VIEW_LIST", category: "View Operations" },
-      { value: "NAMESPACE_READ_PROPERTIES", label: "NAMESPACE_READ_PROPERTIES", category: "Properties" },
+      {
+        value: "NAMESPACE_READ_PROPERTIES",
+        label: "NAMESPACE_READ_PROPERTIES",
+        category: "Properties",
+      },
       { value: "TABLE_READ_PROPERTIES", label: "TABLE_READ_PROPERTIES", category: "Properties" },
       { value: "VIEW_READ_PROPERTIES", label: "VIEW_READ_PROPERTIES", category: "Properties" },
-      { value: "NAMESPACE_WRITE_PROPERTIES", label: "NAMESPACE_WRITE_PROPERTIES", category: "Properties" },
+      {
+        value: "NAMESPACE_WRITE_PROPERTIES",
+        label: "NAMESPACE_WRITE_PROPERTIES",
+        category: "Properties",
+      },
       { value: "TABLE_WRITE_PROPERTIES", label: "TABLE_WRITE_PROPERTIES", category: "Properties" },
       { value: "VIEW_WRITE_PROPERTIES", label: "VIEW_WRITE_PROPERTIES", category: "Properties" },
       { value: "TABLE_READ_DATA", label: "TABLE_READ_DATA", category: "Data Operations" },
@@ -102,31 +122,115 @@ function getPrivilegesForEntityType(
       { value: "POLICY_DROP", label: "POLICY_DROP", category: "Policy Operations" },
       { value: "POLICY_LIST", label: "POLICY_LIST", category: "Policy Operations" },
       { value: "POLICY_FULL_METADATA", label: "POLICY_FULL_METADATA", category: "Metadata" },
-      { value: "CATALOG_ATTACH_POLICY", label: "CATALOG_ATTACH_POLICY", category: "Policy Operations" },
-      { value: "CATALOG_DETACH_POLICY", label: "CATALOG_DETACH_POLICY", category: "Policy Operations" },
+      {
+        value: "CATALOG_ATTACH_POLICY",
+        label: "CATALOG_ATTACH_POLICY",
+        category: "Policy Operations",
+      },
+      {
+        value: "CATALOG_DETACH_POLICY",
+        label: "CATALOG_DETACH_POLICY",
+        category: "Policy Operations",
+      },
       { value: "TABLE_ASSIGN_UUID", label: "TABLE_ASSIGN_UUID", category: "Structure Operations" },
-      { value: "TABLE_UPGRADE_FORMAT_VERSION", label: "TABLE_UPGRADE_FORMAT_VERSION", category: "Structure Operations" },
+      {
+        value: "TABLE_UPGRADE_FORMAT_VERSION",
+        label: "TABLE_UPGRADE_FORMAT_VERSION",
+        category: "Structure Operations",
+      },
       { value: "TABLE_ADD_SCHEMA", label: "TABLE_ADD_SCHEMA", category: "Structure Operations" },
-      { value: "TABLE_SET_CURRENT_SCHEMA", label: "TABLE_SET_CURRENT_SCHEMA", category: "Structure Operations" },
-      { value: "TABLE_ADD_PARTITION_SPEC", label: "TABLE_ADD_PARTITION_SPEC", category: "Structure Operations" },
-      { value: "TABLE_ADD_SORT_ORDER", label: "TABLE_ADD_SORT_ORDER", category: "Structure Operations" },
-      { value: "TABLE_SET_DEFAULT_SORT_ORDER", label: "TABLE_SET_DEFAULT_SORT_ORDER", category: "Structure Operations" },
-      { value: "TABLE_ADD_SNAPSHOT", label: "TABLE_ADD_SNAPSHOT", category: "Structure Operations" },
-      { value: "TABLE_SET_SNAPSHOT_REF", label: "TABLE_SET_SNAPSHOT_REF", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_SNAPSHOTS", label: "TABLE_REMOVE_SNAPSHOTS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_SNAPSHOT_REF", label: "TABLE_REMOVE_SNAPSHOT_REF", category: "Structure Operations" },
-      { value: "TABLE_SET_LOCATION", label: "TABLE_SET_LOCATION", category: "Structure Operations" },
-      { value: "TABLE_SET_PROPERTIES", label: "TABLE_SET_PROPERTIES", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_PROPERTIES", label: "TABLE_REMOVE_PROPERTIES", category: "Structure Operations" },
-      { value: "TABLE_SET_STATISTICS", label: "TABLE_SET_STATISTICS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_STATISTICS", label: "TABLE_REMOVE_STATISTICS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_PARTITION_SPECS", label: "TABLE_REMOVE_PARTITION_SPECS", category: "Structure Operations" },
-      { value: "TABLE_MANAGE_STRUCTURE", label: "TABLE_MANAGE_STRUCTURE", category: "Structure Operations" },
+      {
+        value: "TABLE_SET_CURRENT_SCHEMA",
+        label: "TABLE_SET_CURRENT_SCHEMA",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_PARTITION_SPEC",
+        label: "TABLE_ADD_PARTITION_SPEC",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_SORT_ORDER",
+        label: "TABLE_ADD_SORT_ORDER",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_DEFAULT_SORT_ORDER",
+        label: "TABLE_SET_DEFAULT_SORT_ORDER",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_SNAPSHOT",
+        label: "TABLE_ADD_SNAPSHOT",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_SNAPSHOT_REF",
+        label: "TABLE_SET_SNAPSHOT_REF",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_SNAPSHOTS",
+        label: "TABLE_REMOVE_SNAPSHOTS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_SNAPSHOT_REF",
+        label: "TABLE_REMOVE_SNAPSHOT_REF",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_LOCATION",
+        label: "TABLE_SET_LOCATION",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_PROPERTIES",
+        label: "TABLE_SET_PROPERTIES",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_PROPERTIES",
+        label: "TABLE_REMOVE_PROPERTIES",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_STATISTICS",
+        label: "TABLE_SET_STATISTICS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_STATISTICS",
+        label: "TABLE_REMOVE_STATISTICS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_PARTITION_SPECS",
+        label: "TABLE_REMOVE_PARTITION_SPECS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_MANAGE_STRUCTURE",
+        label: "TABLE_MANAGE_STRUCTURE",
+        category: "Structure Operations",
+      },
     ],
     namespace: [
-      { value: "CATALOG_MANAGE_ACCESS", label: "CATALOG_MANAGE_ACCESS", category: "Access Control" },
-      { value: "CATALOG_MANAGE_CONTENT", label: "CATALOG_MANAGE_CONTENT", category: "Content Management" },
-      { value: "CATALOG_MANAGE_METADATA", label: "CATALOG_MANAGE_METADATA", category: "Content Management" },
+      {
+        value: "CATALOG_MANAGE_ACCESS",
+        label: "CATALOG_MANAGE_ACCESS",
+        category: "Access Control",
+      },
+      {
+        value: "CATALOG_MANAGE_CONTENT",
+        label: "CATALOG_MANAGE_CONTENT",
+        category: "Content Management",
+      },
+      {
+        value: "CATALOG_MANAGE_METADATA",
+        label: "CATALOG_MANAGE_METADATA",
+        category: "Content Management",
+      },
       { value: "NAMESPACE_CREATE", label: "NAMESPACE_CREATE", category: "Namespace Operations" },
       { value: "TABLE_CREATE", label: "TABLE_CREATE", category: "Table Operations" },
       { value: "VIEW_CREATE", label: "VIEW_CREATE", category: "View Operations" },
@@ -136,10 +240,18 @@ function getPrivilegesForEntityType(
       { value: "NAMESPACE_LIST", label: "NAMESPACE_LIST", category: "Namespace Operations" },
       { value: "TABLE_LIST", label: "TABLE_LIST", category: "Table Operations" },
       { value: "VIEW_LIST", label: "VIEW_LIST", category: "View Operations" },
-      { value: "NAMESPACE_READ_PROPERTIES", label: "NAMESPACE_READ_PROPERTIES", category: "Properties" },
+      {
+        value: "NAMESPACE_READ_PROPERTIES",
+        label: "NAMESPACE_READ_PROPERTIES",
+        category: "Properties",
+      },
       { value: "TABLE_READ_PROPERTIES", label: "TABLE_READ_PROPERTIES", category: "Properties" },
       { value: "VIEW_READ_PROPERTIES", label: "VIEW_READ_PROPERTIES", category: "Properties" },
-      { value: "NAMESPACE_WRITE_PROPERTIES", label: "NAMESPACE_WRITE_PROPERTIES", category: "Properties" },
+      {
+        value: "NAMESPACE_WRITE_PROPERTIES",
+        label: "NAMESPACE_WRITE_PROPERTIES",
+        category: "Properties",
+      },
       { value: "TABLE_WRITE_PROPERTIES", label: "TABLE_WRITE_PROPERTIES", category: "Properties" },
       { value: "VIEW_WRITE_PROPERTIES", label: "VIEW_WRITE_PROPERTIES", category: "Properties" },
       { value: "TABLE_READ_DATA", label: "TABLE_READ_DATA", category: "Data Operations" },
@@ -153,29 +265,105 @@ function getPrivilegesForEntityType(
       { value: "POLICY_DROP", label: "POLICY_DROP", category: "Policy Operations" },
       { value: "POLICY_LIST", label: "POLICY_LIST", category: "Policy Operations" },
       { value: "POLICY_FULL_METADATA", label: "POLICY_FULL_METADATA", category: "Metadata" },
-      { value: "NAMESPACE_ATTACH_POLICY", label: "NAMESPACE_ATTACH_POLICY", category: "Policy Operations" },
-      { value: "NAMESPACE_DETACH_POLICY", label: "NAMESPACE_DETACH_POLICY", category: "Policy Operations" },
+      {
+        value: "NAMESPACE_ATTACH_POLICY",
+        label: "NAMESPACE_ATTACH_POLICY",
+        category: "Policy Operations",
+      },
+      {
+        value: "NAMESPACE_DETACH_POLICY",
+        label: "NAMESPACE_DETACH_POLICY",
+        category: "Policy Operations",
+      },
       { value: "TABLE_ASSIGN_UUID", label: "TABLE_ASSIGN_UUID", category: "Structure Operations" },
-      { value: "TABLE_UPGRADE_FORMAT_VERSION", label: "TABLE_UPGRADE_FORMAT_VERSION", category: "Structure Operations" },
+      {
+        value: "TABLE_UPGRADE_FORMAT_VERSION",
+        label: "TABLE_UPGRADE_FORMAT_VERSION",
+        category: "Structure Operations",
+      },
       { value: "TABLE_ADD_SCHEMA", label: "TABLE_ADD_SCHEMA", category: "Structure Operations" },
-      { value: "TABLE_SET_CURRENT_SCHEMA", label: "TABLE_SET_CURRENT_SCHEMA", category: "Structure Operations" },
-      { value: "TABLE_ADD_PARTITION_SPEC", label: "TABLE_ADD_PARTITION_SPEC", category: "Structure Operations" },
-      { value: "TABLE_ADD_SORT_ORDER", label: "TABLE_ADD_SORT_ORDER", category: "Structure Operations" },
-      { value: "TABLE_SET_DEFAULT_SORT_ORDER", label: "TABLE_SET_DEFAULT_SORT_ORDER", category: "Structure Operations" },
-      { value: "TABLE_ADD_SNAPSHOT", label: "TABLE_ADD_SNAPSHOT", category: "Structure Operations" },
-      { value: "TABLE_SET_SNAPSHOT_REF", label: "TABLE_SET_SNAPSHOT_REF", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_SNAPSHOTS", label: "TABLE_REMOVE_SNAPSHOTS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_SNAPSHOT_REF", label: "TABLE_REMOVE_SNAPSHOT_REF", category: "Structure Operations" },
-      { value: "TABLE_SET_LOCATION", label: "TABLE_SET_LOCATION", category: "Structure Operations" },
-      { value: "TABLE_SET_PROPERTIES", label: "TABLE_SET_PROPERTIES", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_PROPERTIES", label: "TABLE_REMOVE_PROPERTIES", category: "Structure Operations" },
-      { value: "TABLE_SET_STATISTICS", label: "TABLE_SET_STATISTICS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_STATISTICS", label: "TABLE_REMOVE_STATISTICS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_PARTITION_SPECS", label: "TABLE_REMOVE_PARTITION_SPECS", category: "Structure Operations" },
-      { value: "TABLE_MANAGE_STRUCTURE", label: "TABLE_MANAGE_STRUCTURE", category: "Structure Operations" },
+      {
+        value: "TABLE_SET_CURRENT_SCHEMA",
+        label: "TABLE_SET_CURRENT_SCHEMA",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_PARTITION_SPEC",
+        label: "TABLE_ADD_PARTITION_SPEC",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_SORT_ORDER",
+        label: "TABLE_ADD_SORT_ORDER",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_DEFAULT_SORT_ORDER",
+        label: "TABLE_SET_DEFAULT_SORT_ORDER",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_SNAPSHOT",
+        label: "TABLE_ADD_SNAPSHOT",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_SNAPSHOT_REF",
+        label: "TABLE_SET_SNAPSHOT_REF",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_SNAPSHOTS",
+        label: "TABLE_REMOVE_SNAPSHOTS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_SNAPSHOT_REF",
+        label: "TABLE_REMOVE_SNAPSHOT_REF",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_LOCATION",
+        label: "TABLE_SET_LOCATION",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_PROPERTIES",
+        label: "TABLE_SET_PROPERTIES",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_PROPERTIES",
+        label: "TABLE_REMOVE_PROPERTIES",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_STATISTICS",
+        label: "TABLE_SET_STATISTICS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_STATISTICS",
+        label: "TABLE_REMOVE_STATISTICS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_PARTITION_SPECS",
+        label: "TABLE_REMOVE_PARTITION_SPECS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_MANAGE_STRUCTURE",
+        label: "TABLE_MANAGE_STRUCTURE",
+        category: "Structure Operations",
+      },
     ],
     table: [
-      { value: "CATALOG_MANAGE_ACCESS", label: "CATALOG_MANAGE_ACCESS", category: "Access Control" },
+      {
+        value: "CATALOG_MANAGE_ACCESS",
+        label: "CATALOG_MANAGE_ACCESS",
+        category: "Access Control",
+      },
       { value: "TABLE_DROP", label: "TABLE_DROP", category: "Table Operations" },
       { value: "TABLE_LIST", label: "TABLE_LIST", category: "Table Operations" },
       { value: "TABLE_READ_PROPERTIES", label: "TABLE_READ_PROPERTIES", category: "Properties" },
@@ -186,26 +374,94 @@ function getPrivilegesForEntityType(
       { value: "TABLE_ATTACH_POLICY", label: "TABLE_ATTACH_POLICY", category: "Policy Operations" },
       { value: "TABLE_DETACH_POLICY", label: "TABLE_DETACH_POLICY", category: "Policy Operations" },
       { value: "TABLE_ASSIGN_UUID", label: "TABLE_ASSIGN_UUID", category: "Structure Operations" },
-      { value: "TABLE_UPGRADE_FORMAT_VERSION", label: "TABLE_UPGRADE_FORMAT_VERSION", category: "Structure Operations" },
+      {
+        value: "TABLE_UPGRADE_FORMAT_VERSION",
+        label: "TABLE_UPGRADE_FORMAT_VERSION",
+        category: "Structure Operations",
+      },
       { value: "TABLE_ADD_SCHEMA", label: "TABLE_ADD_SCHEMA", category: "Structure Operations" },
-      { value: "TABLE_SET_CURRENT_SCHEMA", label: "TABLE_SET_CURRENT_SCHEMA", category: "Structure Operations" },
-      { value: "TABLE_ADD_PARTITION_SPEC", label: "TABLE_ADD_PARTITION_SPEC", category: "Structure Operations" },
-      { value: "TABLE_ADD_SORT_ORDER", label: "TABLE_ADD_SORT_ORDER", category: "Structure Operations" },
-      { value: "TABLE_SET_DEFAULT_SORT_ORDER", label: "TABLE_SET_DEFAULT_SORT_ORDER", category: "Structure Operations" },
-      { value: "TABLE_ADD_SNAPSHOT", label: "TABLE_ADD_SNAPSHOT", category: "Structure Operations" },
-      { value: "TABLE_SET_SNAPSHOT_REF", label: "TABLE_SET_SNAPSHOT_REF", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_SNAPSHOTS", label: "TABLE_REMOVE_SNAPSHOTS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_SNAPSHOT_REF", label: "TABLE_REMOVE_SNAPSHOT_REF", category: "Structure Operations" },
-      { value: "TABLE_SET_LOCATION", label: "TABLE_SET_LOCATION", category: "Structure Operations" },
-      { value: "TABLE_SET_PROPERTIES", label: "TABLE_SET_PROPERTIES", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_PROPERTIES", label: "TABLE_REMOVE_PROPERTIES", category: "Structure Operations" },
-      { value: "TABLE_SET_STATISTICS", label: "TABLE_SET_STATISTICS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_STATISTICS", label: "TABLE_REMOVE_STATISTICS", category: "Structure Operations" },
-      { value: "TABLE_REMOVE_PARTITION_SPECS", label: "TABLE_REMOVE_PARTITION_SPECS", category: "Structure Operations" },
-      { value: "TABLE_MANAGE_STRUCTURE", label: "TABLE_MANAGE_STRUCTURE", category: "Structure Operations" },
+      {
+        value: "TABLE_SET_CURRENT_SCHEMA",
+        label: "TABLE_SET_CURRENT_SCHEMA",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_PARTITION_SPEC",
+        label: "TABLE_ADD_PARTITION_SPEC",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_SORT_ORDER",
+        label: "TABLE_ADD_SORT_ORDER",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_DEFAULT_SORT_ORDER",
+        label: "TABLE_SET_DEFAULT_SORT_ORDER",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_ADD_SNAPSHOT",
+        label: "TABLE_ADD_SNAPSHOT",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_SNAPSHOT_REF",
+        label: "TABLE_SET_SNAPSHOT_REF",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_SNAPSHOTS",
+        label: "TABLE_REMOVE_SNAPSHOTS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_SNAPSHOT_REF",
+        label: "TABLE_REMOVE_SNAPSHOT_REF",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_LOCATION",
+        label: "TABLE_SET_LOCATION",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_PROPERTIES",
+        label: "TABLE_SET_PROPERTIES",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_PROPERTIES",
+        label: "TABLE_REMOVE_PROPERTIES",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_SET_STATISTICS",
+        label: "TABLE_SET_STATISTICS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_STATISTICS",
+        label: "TABLE_REMOVE_STATISTICS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_REMOVE_PARTITION_SPECS",
+        label: "TABLE_REMOVE_PARTITION_SPECS",
+        category: "Structure Operations",
+      },
+      {
+        value: "TABLE_MANAGE_STRUCTURE",
+        label: "TABLE_MANAGE_STRUCTURE",
+        category: "Structure Operations",
+      },
     ],
     view: [
-      { value: "CATALOG_MANAGE_ACCESS", label: "CATALOG_MANAGE_ACCESS", category: "Access Control" },
+      {
+        value: "CATALOG_MANAGE_ACCESS",
+        label: "CATALOG_MANAGE_ACCESS",
+        category: "Access Control",
+      },
       { value: "VIEW_DROP", label: "VIEW_DROP", category: "View Operations" },
       { value: "VIEW_LIST", label: "VIEW_LIST", category: "View Operations" },
       { value: "VIEW_READ_PROPERTIES", label: "VIEW_READ_PROPERTIES", category: "Properties" },
@@ -213,7 +469,11 @@ function getPrivilegesForEntityType(
       { value: "VIEW_FULL_METADATA", label: "VIEW_FULL_METADATA", category: "Metadata" },
     ],
     policy: [
-      { value: "CATALOG_MANAGE_ACCESS", label: "CATALOG_MANAGE_ACCESS", category: "Access Control" },
+      {
+        value: "CATALOG_MANAGE_ACCESS",
+        label: "CATALOG_MANAGE_ACCESS",
+        category: "Access Control",
+      },
       { value: "POLICY_READ", label: "POLICY_READ", category: "Policy Operations" },
       { value: "POLICY_DROP", label: "POLICY_DROP", category: "Policy Operations" },
       { value: "POLICY_WRITE", label: "POLICY_WRITE", category: "Policy Operations" },
@@ -230,7 +490,10 @@ function getPrivilegesForEntityType(
 // Helper to parse namespace path
 function parseNamespacePath(path: string): string[] {
   if (!path.trim()) return []
-  return path.split(".").map((s) => s.trim()).filter((s) => s.length > 0)
+  return path
+    .split(".")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
 }
 
 // Helper function to get privilege description
@@ -336,11 +599,7 @@ interface GrantPrivilegeModalProps {
   onSuccess?: () => void
 }
 
-export function GrantPrivilegeModal({
-  open,
-  onOpenChange,
-  onSuccess,
-}: GrantPrivilegeModalProps) {
+export function GrantPrivilegeModal({ open, onOpenChange, onSuccess }: GrantPrivilegeModalProps) {
   const queryClient = useQueryClient()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -479,14 +738,17 @@ export function GrantPrivilegeModal({
     if (checked) {
       form.setValue("privileges", [...currentPrivileges, privilege])
     } else {
-      form.setValue("privileges", currentPrivileges.filter((p) => p !== privilege))
+      form.setValue(
+        "privileges",
+        currentPrivileges.filter((p) => p !== privilege)
+      )
     }
   }
 
   const handleSelectAllCategory = (_category: string, privileges: Array<{ value: string }>) => {
     const categoryPrivileges = privileges.map((p) => p.value)
     const allSelected = categoryPrivileges.every((p) => currentPrivileges.includes(p))
-    
+
     if (allSelected) {
       // Deselect all in category
       const newSelection = currentPrivileges.filter((p) => !categoryPrivileges.includes(p))
@@ -502,255 +764,249 @@ export function GrantPrivilegeModal({
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[700px]">
-        <DialogHeader>
-          <DialogTitle>Grant Privilege</DialogTitle>
-          <DialogDescription>
-            Grant privileges to a catalog role on a specific entity.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Catalog Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="catalogName">Catalog *</Label>
-            <Select
-              value={form.watch("catalogName")}
-              onValueChange={(value) => {
-                form.setValue("catalogName", value)
-                form.setValue("catalogRoleName", "") // Reset role when catalog changes
-              }}
-            >
-              <SelectTrigger id="catalogName">
-                <SelectValue placeholder="Select a catalog" />
-              </SelectTrigger>
-              <SelectContent>
-                {catalogsQuery.isLoading ? (
-                  <SelectItem value="loading" disabled>
-                    Loading catalogs...
-                  </SelectItem>
-                ) : catalogsQuery.data && catalogsQuery.data.length === 0 ? (
-                  <SelectItem value="none" disabled>
-                    No catalogs available
-                  </SelectItem>
-                ) : (
-                  catalogsQuery.data?.map((catalog) => (
-                    <SelectItem key={catalog.name} value={catalog.name}>
-                      {catalog.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.catalogName && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.catalogName.message}
-              </p>
-            )}
-          </div>
-
-          {/* Catalog Role Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="catalogRoleName">Catalog Role *</Label>
-            <Select
-              value={form.watch("catalogRoleName")}
-              onValueChange={(value) => form.setValue("catalogRoleName", value)}
-              disabled={!catalogName}
-            >
-              <SelectTrigger id="catalogRoleName">
-                <SelectValue placeholder="Select a catalog role" />
-              </SelectTrigger>
-              <SelectContent>
-                {!catalogName ? (
-                  <SelectItem value="disabled" disabled>
-                    Select a catalog first
-                  </SelectItem>
-                ) : catalogRolesQuery.isLoading ? (
-                  <SelectItem value="loading" disabled>
-                    Loading roles...
-                  </SelectItem>
-                ) : catalogRolesQuery.data && catalogRolesQuery.data.length === 0 ? (
-                  <SelectItem value="none" disabled>
-                    No catalog roles available
-                  </SelectItem>
-                ) : (
-                  catalogRolesQuery.data?.map((role) => (
-                    <SelectItem key={role.name} value={role.name}>
-                      {role.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.catalogRoleName && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.catalogRoleName.message}
-              </p>
-            )}
-          </div>
-
-          {/* Entity Type Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="entityType">Entity Type *</Label>
-            <Select
-              value={form.watch("entityType")}
-              onValueChange={(value) => {
-                form.setValue("entityType", value as "catalog" | "namespace" | "table" | "view" | "policy")
-                form.setValue("namespacePath", "")
-                form.setValue("entityName", "")
-                form.setValue("privileges", [])
-              }}
-            >
-              <SelectTrigger id="entityType">
-                <SelectValue placeholder="Select entity type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="catalog">Catalog</SelectItem>
-                <SelectItem value="namespace">Namespace</SelectItem>
-                <SelectItem value="table">Table</SelectItem>
-                <SelectItem value="view">View</SelectItem>
-                <SelectItem value="policy">Policy</SelectItem>
-              </SelectContent>
-            </Select>
-            {form.formState.errors.entityType && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.entityType.message}
-              </p>
-            )}
-          </div>
-
-          {/* Namespace Path (conditional) */}
-          {entityType !== "catalog" && (
+          <DialogHeader>
+            <DialogTitle>Grant Privilege</DialogTitle>
+            <DialogDescription>
+              Grant privileges to a catalog role on a specific entity.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Catalog Selection */}
             <div className="space-y-2">
-              <Label htmlFor="namespacePath">
-                Namespace Path {entityType === "namespace" ? "(optional)" : "*"}
-              </Label>
-              <Input
-                id="namespacePath"
-                {...form.register("namespacePath")}
-                placeholder="ns1.ns2 (period-delimited, leave empty for root)"
-              />
-              {form.formState.errors.namespacePath && (
-                <p className="text-sm text-red-600">
-                  {form.formState.errors.namespacePath.message}
-                </p>
+              <Label htmlFor="catalogName">Catalog *</Label>
+              <Select
+                value={form.watch("catalogName")}
+                onValueChange={(value) => {
+                  form.setValue("catalogName", value)
+                  form.setValue("catalogRoleName", "") // Reset role when catalog changes
+                }}
+              >
+                <SelectTrigger id="catalogName">
+                  <SelectValue placeholder="Select a catalog" />
+                </SelectTrigger>
+                <SelectContent>
+                  {catalogsQuery.isLoading ? (
+                    <SelectItem value="loading" disabled>
+                      Loading catalogs...
+                    </SelectItem>
+                  ) : catalogsQuery.data && catalogsQuery.data.length === 0 ? (
+                    <SelectItem value="none" disabled>
+                      No catalogs available
+                    </SelectItem>
+                  ) : (
+                    catalogsQuery.data?.map((catalog) => (
+                      <SelectItem key={catalog.name} value={catalog.name}>
+                        {catalog.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.catalogName && (
+                <p className="text-sm text-red-600">{form.formState.errors.catalogName.message}</p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Enter namespace path as period-delimited segments (e.g., "sales.2024"). Leave empty
-                for root namespace.
-              </p>
             </div>
-          )}
 
-          {/* Entity Name (conditional) */}
-          {["table", "view", "policy"].includes(entityType) && (
+            {/* Catalog Role Selection */}
             <div className="space-y-2">
-              <Label htmlFor="entityName">
-                {entityType.charAt(0).toUpperCase() + entityType.slice(1)} Name *
-              </Label>
-              <Input
-                id="entityName"
-                {...form.register("entityName")}
-                placeholder={`Enter ${entityType} name`}
-              />
-              {form.formState.errors.entityName && (
+              <Label htmlFor="catalogRoleName">Catalog Role *</Label>
+              <Select
+                value={form.watch("catalogRoleName")}
+                onValueChange={(value) => form.setValue("catalogRoleName", value)}
+                disabled={!catalogName}
+              >
+                <SelectTrigger id="catalogRoleName">
+                  <SelectValue placeholder="Select a catalog role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {!catalogName ? (
+                    <SelectItem value="disabled" disabled>
+                      Select a catalog first
+                    </SelectItem>
+                  ) : catalogRolesQuery.isLoading ? (
+                    <SelectItem value="loading" disabled>
+                      Loading roles...
+                    </SelectItem>
+                  ) : catalogRolesQuery.data && catalogRolesQuery.data.length === 0 ? (
+                    <SelectItem value="none" disabled>
+                      No catalog roles available
+                    </SelectItem>
+                  ) : (
+                    catalogRolesQuery.data?.map((role) => (
+                      <SelectItem key={role.name} value={role.name}>
+                        {role.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.catalogRoleName && (
                 <p className="text-sm text-red-600">
-                  {form.formState.errors.entityName.message}
+                  {form.formState.errors.catalogRoleName.message}
                 </p>
               )}
             </div>
-          )}
 
-          {/* Privilege Selection */}
-          <div className="space-y-2">
-            <Label>Privileges *</Label>
-            <div className="border rounded-md p-4 max-h-[300px] overflow-y-auto space-y-4">
-              {Object.entries(privilegesByCategory).map(([category, privileges]) => (
-                <div key={category} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium">{category}</h4>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 text-xs"
-                      onClick={() => handleSelectAllCategory(category, privileges)}
-                    >
-                      {privileges.every((p) => currentPrivileges.includes(p.value))
-                        ? "Deselect All"
-                        : "Select All"}
-                    </Button>
-                  </div>
-                  <div className="space-y-2 pl-4">
-                    {privileges.map((privilege) => (
-                      <div key={privilege.value} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={privilege.value}
-                          checked={currentPrivileges.includes(privilege.value)}
-                          onCheckedChange={(checked) =>
-                            handlePrivilegeToggle(privilege.value, checked === true)
-                          }
-                        />
-                        <Label
-                          htmlFor={privilege.value}
-                          className="text-sm font-normal cursor-pointer"
-                        >
-                          {privilege.label}
-                        </Label>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              <p>
-                                <strong>{privilege.label}</strong>
-                                <br />
-                                {getPrivilegeDescription(privilege.value)}
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            {/* Entity Type Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="entityType">Entity Type *</Label>
+              <Select
+                value={form.watch("entityType")}
+                onValueChange={(value) => {
+                  form.setValue(
+                    "entityType",
+                    value as "catalog" | "namespace" | "table" | "view" | "policy"
+                  )
+                  form.setValue("namespacePath", "")
+                  form.setValue("entityName", "")
+                  form.setValue("privileges", [])
+                }}
+              >
+                <SelectTrigger id="entityType">
+                  <SelectValue placeholder="Select entity type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="catalog">Catalog</SelectItem>
+                  <SelectItem value="namespace">Namespace</SelectItem>
+                  <SelectItem value="table">Table</SelectItem>
+                  <SelectItem value="view">View</SelectItem>
+                  <SelectItem value="policy">Policy</SelectItem>
+                </SelectContent>
+              </Select>
+              {form.formState.errors.entityType && (
+                <p className="text-sm text-red-600">{form.formState.errors.entityType.message}</p>
+              )}
             </div>
-            {form.formState.errors.privileges && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.privileges.message}
-              </p>
-            )}
-            {currentPrivileges.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {currentPrivileges.length} privilege{currentPrivileges.length === 1 ? "" : "s"}{" "}
-                selected
-              </p>
-            )}
-          </div>
 
-          {errorMessage && (
-            <div className="rounded-md bg-red-50 border border-red-200 p-3">
-              <p className="text-sm text-red-800">{errorMessage}</p>
+            {/* Namespace Path (conditional) */}
+            {entityType !== "catalog" && (
+              <div className="space-y-2">
+                <Label htmlFor="namespacePath">
+                  Namespace Path {entityType === "namespace" ? "(optional)" : "*"}
+                </Label>
+                <Input
+                  id="namespacePath"
+                  {...form.register("namespacePath")}
+                  placeholder="ns1.ns2 (period-delimited, leave empty for root)"
+                />
+                {form.formState.errors.namespacePath && (
+                  <p className="text-sm text-red-600">
+                    {form.formState.errors.namespacePath.message}
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Enter namespace path as period-delimited segments (e.g., "sales.2024"). Leave
+                  empty for root namespace.
+                </p>
+              </div>
+            )}
+
+            {/* Entity Name (conditional) */}
+            {["table", "view", "policy"].includes(entityType) && (
+              <div className="space-y-2">
+                <Label htmlFor="entityName">
+                  {entityType.charAt(0).toUpperCase() + entityType.slice(1)} Name *
+                </Label>
+                <Input
+                  id="entityName"
+                  {...form.register("entityName")}
+                  placeholder={`Enter ${entityType} name`}
+                />
+                {form.formState.errors.entityName && (
+                  <p className="text-sm text-red-600">{form.formState.errors.entityName.message}</p>
+                )}
+              </div>
+            )}
+
+            {/* Privilege Selection */}
+            <div className="space-y-2">
+              <Label>Privileges *</Label>
+              <div className="border rounded-md p-4 max-h-[300px] overflow-y-auto space-y-4">
+                {Object.entries(privilegesByCategory).map(([category, privileges]) => (
+                  <div key={category} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium">{category}</h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs"
+                        onClick={() => handleSelectAllCategory(category, privileges)}
+                      >
+                        {privileges.every((p) => currentPrivileges.includes(p.value))
+                          ? "Deselect All"
+                          : "Select All"}
+                      </Button>
+                    </div>
+                    <div className="space-y-2 pl-4">
+                      {privileges.map((privilege) => (
+                        <div key={privilege.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={privilege.value}
+                            checked={currentPrivileges.includes(privilege.value)}
+                            onCheckedChange={(checked) =>
+                              handlePrivilegeToggle(privilege.value, checked === true)
+                            }
+                          />
+                          <Label
+                            htmlFor={privilege.value}
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            {privilege.label}
+                          </Label>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>
+                                  <strong>{privilege.label}</strong>
+                                  <br />
+                                  {getPrivilegeDescription(privilege.value)}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {form.formState.errors.privileges && (
+                <p className="text-sm text-red-600">{form.formState.errors.privileges.message}</p>
+              )}
+              {currentPrivileges.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {currentPrivileges.length} privilege{currentPrivileges.length === 1 ? "" : "s"}{" "}
+                  selected
+                </p>
+              )}
             </div>
-          )}
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={grantMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={grantMutation.isPending}>
-              {grantMutation.isPending ? "Granting..." : "Grant Privilege"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            {errorMessage && (
+              <div className="rounded-md bg-red-50 border border-red-200 p-3">
+                <p className="text-sm text-red-800">{errorMessage}</p>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={grantMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={grantMutation.isPending}>
+                {grantMutation.isPending ? "Granting..." : "Grant Privilege"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   )
 }
-

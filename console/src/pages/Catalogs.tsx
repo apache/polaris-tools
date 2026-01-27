@@ -68,9 +68,7 @@ export function Catalogs() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "name", desc: false },
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
   const [catalogToDelete, setCatalogToDelete] = useState<Catalog | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [selectedCatalogName, setSelectedCatalogName] = useState<string>()
@@ -161,13 +159,20 @@ export function Catalogs() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => navigate(`/catalogs/${encodeURIComponent(row.original.name)}`)}>
+              <DropdownMenuItem
+                onClick={() => navigate(`/catalogs/${encodeURIComponent(row.original.name)}`)}
+              >
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/catalogs/${encodeURIComponent(row.original.name)}`)}>
+              <DropdownMenuItem
+                onClick={() => navigate(`/catalogs/${encodeURIComponent(row.original.name)}`)}
+              >
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600" onClick={() => setCatalogToDelete(row.original)}>
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => setCatalogToDelete(row.original)}
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -205,9 +210,7 @@ export function Catalogs() {
                 <Database className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">Catalogs</h1>
               </div>
-              <p className="text-muted-foreground">
-                Manage your Iceberg catalogs
-              </p>
+              <p className="text-muted-foreground">Manage your Iceberg catalogs</p>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -219,7 +222,11 @@ export function Catalogs() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <Button variant="secondary" onClick={() => catalogsQuery.refetch()} disabled={catalogsQuery.isFetching}>
+              <Button
+                variant="secondary"
+                onClick={() => catalogsQuery.refetch()}
+                disabled={catalogsQuery.isFetching}
+              >
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh
               </Button>
@@ -232,7 +239,9 @@ export function Catalogs() {
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {catalogsQuery.isLoading ? "Loading catalogs..." : `${filtered.length} catalog${filtered.length === 1 ? "" : "s"}`}
+              {catalogsQuery.isLoading
+                ? "Loading catalogs..."
+                : `${filtered.length} catalog${filtered.length === 1 ? "" : "s"}`}
             </p>
           </div>
 
@@ -242,7 +251,13 @@ export function Catalogs() {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} onClick={header.column.getToggleSortingHandler()} className={header.column.getCanSort() ? "cursor-pointer select-none" : undefined}>
+                      <TableHead
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={
+                          header.column.getCanSort() ? "cursor-pointer select-none" : undefined
+                        }
+                      >
                         {header.isPlaceholder ? null : (
                           <div className="flex items-center gap-1">
                             {flexRender(header.column.columnDef.header, header.getContext())}
@@ -285,20 +300,27 @@ export function Catalogs() {
                   ))
                 )}
               </TableBody>
-          </Table>
+            </Table>
           </div>
 
-          <Dialog open={!!catalogToDelete} onOpenChange={(open) => !open && setCatalogToDelete(null)}>
+          <Dialog
+            open={!!catalogToDelete}
+            onOpenChange={(open) => !open && setCatalogToDelete(null)}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Delete catalog</DialogTitle>
                 <DialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  the catalog <span className="font-medium">{catalogToDelete?.name}</span>.
+                  This action cannot be undone. This will permanently delete the catalog{" "}
+                  <span className="font-medium">{catalogToDelete?.name}</span>.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setCatalogToDelete(null)} disabled={deleteMutation.isPending}>
+                <Button
+                  variant="outline"
+                  onClick={() => setCatalogToDelete(null)}
+                  disabled={deleteMutation.isPending}
+                >
                   Cancel
                 </Button>
                 <Button
@@ -322,4 +344,3 @@ export function Catalogs() {
     </div>
   )
 }
-

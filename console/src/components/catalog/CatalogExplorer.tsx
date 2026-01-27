@@ -36,11 +36,11 @@ interface CatalogExplorerProps {
 }
 
 const CatalogEntityType = {
-    TABLE: "table",
-    VIEW: "view",
+  TABLE: "table",
+  VIEW: "view",
 } as const
 
-type CatalogEntityType = typeof CatalogEntityType[keyof typeof CatalogEntityType]
+type CatalogEntityType = (typeof CatalogEntityType)[keyof typeof CatalogEntityType]
 
 interface SelectedCatalogEntity {
   catalogName: string
@@ -58,7 +58,9 @@ export function CatalogExplorer({
   const [selectedNodeId, setSelectedNodeId] = useState<string>()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedCatalogEntity, setSelectedCatalogEntity] = useState<SelectedCatalogEntity | null>(null)
+  const [selectedCatalogEntity, setSelectedCatalogEntity] = useState<SelectedCatalogEntity | null>(
+    null
+  )
 
   // Use custom hook for resizable width
   const { width, isResizing, handleMouseDown } = useResizableWidth()
@@ -82,27 +84,22 @@ export function CatalogExplorer({
     })
   }, [])
 
-  const handleSelectNode = useCallback((node: TreeNode) => {
-    setSelectedNodeId(node.id)
-    if (node.type === "catalog") {
-      onSelectCatalog?.(node.name)
-    }
-  }, [onSelectCatalog])
+  const handleSelectNode = useCallback(
+    (node: TreeNode) => {
+      setSelectedNodeId(node.id)
+      if (node.type === "catalog") {
+        onSelectCatalog?.(node.name)
+      }
+    },
+    [onSelectCatalog]
+  )
 
-  const handleTableClick = useCallback((
-    catalogName: string,
-    namespace: string[],
-    name: string
-  ) => {
+  const handleTableClick = useCallback((catalogName: string, namespace: string[], name: string) => {
     setSelectedCatalogEntity({ catalogName, namespace, name, type: CatalogEntityType.TABLE })
     setDrawerOpen(true)
   }, [])
 
-  const handleViewClick = useCallback((
-    catalogName: string,
-    namespace: string[],
-    name: string
-  ) => {
+  const handleViewClick = useCallback((catalogName: string, namespace: string[], name: string) => {
     setSelectedCatalogEntity({ catalogName, namespace, name, type: CatalogEntityType.VIEW })
     setDrawerOpen(true)
   }, [])
@@ -124,12 +121,13 @@ export function CatalogExplorer({
   }, [selectedCatalogName, catalogs])
 
   const catalogNodes: TreeNode[] = useMemo(
-    () => catalogs.map((catalog) => ({
-      type: "catalog" as const,
-      id: `${CATALOG_NODE_PREFIX}${catalog.name}`,
-      name: catalog.name,
-      catalogName: catalog.name,
-    })),
+    () =>
+      catalogs.map((catalog) => ({
+        type: "catalog" as const,
+        id: `${CATALOG_NODE_PREFIX}${catalog.name}`,
+        name: catalog.name,
+        catalogName: catalog.name,
+      })),
     [catalogs]
   )
 
@@ -181,9 +179,7 @@ export function CatalogExplorer({
             </div>
           ) : catalogNodes.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-sm text-muted-foreground text-center">
-                No catalogs found
-              </div>
+              <div className="text-sm text-muted-foreground text-center">No catalogs found</div>
             </div>
           ) : (
             <div className="space-y-0.5">
@@ -243,17 +239,16 @@ export function CatalogExplorer({
         />
       )}
 
-        {/* View Details Drawer */}
+      {/* View Details Drawer */}
       {selectedCatalogEntity && selectedCatalogEntity.type === CatalogEntityType.VIEW && (
-          <ViewDetailsDrawer
-            open={drawerOpen}
-            onOpenChange={setDrawerOpen}
-            catalogName={selectedCatalogEntity.catalogName}
-            namespace={selectedCatalogEntity.namespace}
-            viewName={selectedCatalogEntity.name}
-          />
-        )}
+        <ViewDetailsDrawer
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+          catalogName={selectedCatalogEntity.catalogName}
+          namespace={selectedCatalogEntity.namespace}
+          viewName={selectedCatalogEntity.name}
+        />
+      )}
     </>
   )
 }
-

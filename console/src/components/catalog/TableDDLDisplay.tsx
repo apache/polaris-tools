@@ -52,17 +52,8 @@ export function TableDDLDisplay({
     <div>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold">DDL</h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          className="h-7 px-2"
-        >
-          {copied ? (
-            <Check className="h-3 w-3 mr-1" />
-          ) : (
-            <Copy className="h-3 w-3 mr-1" />
-          )}
+        <Button variant="outline" size="sm" onClick={handleCopy} className="h-7 px-2">
+          {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
           {copied ? "Copied" : "Copy"}
         </Button>
       </div>
@@ -82,15 +73,17 @@ function generateDDL(
   metadata: TableMetadata
 ): string {
   const lines: string[] = []
-  
+
   // CREATE TABLE statement
-  lines.push(`CREATE TABLE ${catalogName}.${namespace.length > 0 ? namespace.join(".") + "." : ""}${tableName} (`)
-  
+  lines.push(
+    `CREATE TABLE ${catalogName}.${namespace.length > 0 ? namespace.join(".") + "." : ""}${tableName} (`
+  )
+
   // Schema fields
   const currentSchema = metadata.schemas.find(
     (s) => s["schema-id"] === metadata["current-schema-id"]
   )
-  
+
   if (currentSchema?.fields && currentSchema.fields.length > 0) {
     const fieldDefs = currentSchema.fields.map((field) => {
       const typeStr = formatFieldTypeForDDL(field)
@@ -99,9 +92,9 @@ function generateDDL(
     })
     lines.push(fieldDefs.join(",\n"))
   }
-  
+
   lines.push(")")
-  
+
   // Properties
   if (metadata.properties && Object.keys(metadata.properties).length > 0) {
     lines.push("TBLPROPERTIES (")
@@ -111,33 +104,38 @@ function generateDDL(
     lines.push(propEntries.join(",\n"))
     lines.push(")")
   }
-  
+
   // Location
   if (metadata.location) {
     lines.push(`LOCATION '${metadata.location}'`)
   }
-  
+
   return lines.join("\n")
 }
 
-function formatFieldTypeForDDL(field: SchemaField | { type: string | { type: string; [key: string]: unknown } }): string {
+function formatFieldTypeForDDL(
+  field: SchemaField | { type: string | { type: string; [key: string]: unknown } }
+): string {
   if (typeof field.type === "string") {
     // Handle primitive types
     return field.type.toUpperCase()
   }
-  
+
   if (typeof field.type === "object" && field.type !== null) {
     if (field.type.type === "list") {
-      const element = (field.type as { element?: string | { type: string; [key: string]: unknown } }).element
+      const element = (
+        field.type as { element?: string | { type: string; [key: string]: unknown } }
+      ).element
       const elementType = formatFieldTypeForDDL({
         type: element || "unknown",
       } as SchemaField)
       return `ARRAY<${elementType}>`
     }
-    
+
     if (field.type.type === "map") {
       const key = (field.type as { key?: string | { type: string; [key: string]: unknown } }).key
-      const value = (field.type as { value?: string | { type: string; [key: string]: unknown } }).value
+      const value = (field.type as { value?: string | { type: string; [key: string]: unknown } })
+        .value
       const keyType = formatFieldTypeForDDL({
         type: key || "unknown",
       } as SchemaField)
@@ -146,17 +144,23 @@ function formatFieldTypeForDDL(field: SchemaField | { type: string | { type: str
       } as SchemaField)
       return `MAP<${keyType}, ${valueType}>`
     }
-    
+
     if (field.type.type === "struct") {
-      const structFields = (field.type as { fields?: Array<{ name: string; type: string | { type: string; [key: string]: unknown } }> })
-        .fields || []
+      const structFields =
+        (
+          field.type as {
+            fields?: Array<{
+              name: string
+              type: string | { type: string; [key: string]: unknown }
+            }>
+          }
+        ).fields || []
       const fieldDefs = structFields.map(
         (f) => `${f.name}: ${formatFieldTypeForDDL({ type: f.type } as SchemaField)}`
       )
       return `STRUCT<${fieldDefs.join(", ")}>`
     }
   }
-  
+
   return "STRING"
 }
-

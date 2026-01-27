@@ -59,12 +59,7 @@ import type { SortingState } from "@tanstack/react-table"
 import { GrantPrivilegeModal } from "@/components/forms/GrantPrivilegeModal"
 import { RevokePrivilegeDialog } from "@/components/forms/RevokePrivilegeDialog"
 import { ViewGrantDetailsModal } from "@/components/forms/ViewGrantDetailsModal"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 // Extended grant type with metadata for display
 type GrantWithMetadata = GrantResource & {
@@ -172,9 +167,7 @@ export function PrivilegesTab() {
   const [selectedCatalog, setSelectedCatalog] = useState<string>("all")
   const [selectedCatalogRole, setSelectedCatalogRole] = useState<string>("all")
   const [selectedEntityType, setSelectedEntityType] = useState<string>("all")
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "catalogRoleName", desc: false },
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: "catalogRoleName", desc: false }])
   const [grantToView, setGrantToView] = useState<GrantWithMetadata | null>(null)
   const [grantToRevoke, setGrantToRevoke] = useState<GrantWithMetadata | null>(null)
   const [showGrantModal, setShowGrantModal] = useState(false)
@@ -283,8 +276,7 @@ export function PrivilegesTab() {
             <span className="font-medium">{row.original.catalogRoleName}</span>
           </div>
         ),
-        sortingFn: (a, b) =>
-          a.original.catalogRoleName.localeCompare(b.original.catalogRoleName),
+        sortingFn: (a, b) => a.original.catalogRoleName.localeCompare(b.original.catalogRoleName),
       }),
       columnHelper.display({
         id: "catalog",
@@ -310,10 +302,7 @@ export function PrivilegesTab() {
             policy: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
           }
           return (
-            <Badge
-              variant="secondary"
-              className={badgeColors[type] || "bg-gray-100 text-gray-800"}
-            >
+            <Badge variant="secondary" className={badgeColors[type] || "bg-gray-100 text-gray-800"}>
               {type.charAt(0).toUpperCase() + type.slice(1)}
             </Badge>
           )
@@ -427,221 +416,217 @@ export function PrivilegesTab() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              onClick={handleRefresh}
-              disabled={grantsQuery.isFetching || catalogRolesQuery.isFetching}
-            >
-              <RefreshCw
-                className={`mr-2 h-4 w-4 ${grantsQuery.isFetching || catalogRolesQuery.isFetching ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
-            <Button onClick={() => setShowGrantModal(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Grant Privilege
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={handleRefresh}
+                disabled={grantsQuery.isFetching || catalogRolesQuery.isFetching}
+              >
+                <RefreshCw
+                  className={`mr-2 h-4 w-4 ${grantsQuery.isFetching || catalogRolesQuery.isFetching ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </Button>
+              <Button onClick={() => setShowGrantModal(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Grant Privilege
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Filter Bar */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl flex items-center gap-4 flex-wrap">
-          <Select value={selectedCatalog} onValueChange={handleCatalogChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Catalogs" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Catalogs</SelectItem>
-              {catalogsQuery.data?.map((catalog) => (
-                <SelectItem key={catalog.name} value={catalog.name}>
-                  {catalog.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Filter Bar */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-4xl flex items-center gap-4 flex-wrap">
+            <Select value={selectedCatalog} onValueChange={handleCatalogChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Catalogs" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Catalogs</SelectItem>
+                {catalogsQuery.data?.map((catalog) => (
+                  <SelectItem key={catalog.name} value={catalog.name}>
+                    {catalog.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select
-            value={selectedCatalogRole}
-            onValueChange={setSelectedCatalogRole}
-            disabled={selectedCatalog === "all" && availableCatalogRoles.length === 0}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Roles" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Catalog Roles</SelectItem>
-              {availableCatalogRoles.map((roleName) => (
-                <SelectItem key={roleName} value={roleName}>
-                  {roleName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select
+              value={selectedCatalogRole}
+              onValueChange={setSelectedCatalogRole}
+              disabled={selectedCatalog === "all" && availableCatalogRoles.length === 0}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Catalog Roles</SelectItem>
+                {availableCatalogRoles.map((roleName) => (
+                  <SelectItem key={roleName} value={roleName}>
+                    {roleName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select value={selectedEntityType} onValueChange={setSelectedEntityType}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Types" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="catalog">Catalog</SelectItem>
-              <SelectItem value="namespace">Namespace</SelectItem>
-              <SelectItem value="table">Table</SelectItem>
-              <SelectItem value="view">View</SelectItem>
-              <SelectItem value="policy">Policy</SelectItem>
-            </SelectContent>
-          </Select>
+            <Select value={selectedEntityType} onValueChange={setSelectedEntityType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="catalog">Catalog</SelectItem>
+                <SelectItem value="namespace">Namespace</SelectItem>
+                <SelectItem value="table">Table</SelectItem>
+                <SelectItem value="view">View</SelectItem>
+                <SelectItem value="policy">Policy</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
 
-      {/* Summary */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl">
-          <p className="text-sm text-muted-foreground">
-            {grantsQuery.isLoading
-              ? "Loading privileges..."
-              : `${filtered.length} privilege${filtered.length === 1 ? "" : "s"}`}
-          </p>
+        {/* Summary */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-4xl">
+            <p className="text-sm text-muted-foreground">
+              {grantsQuery.isLoading
+                ? "Loading privileges..."
+                : `${filtered.length} privilege${filtered.length === 1 ? "" : "s"}`}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-4xl rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className={`${
-                        header.column.getCanSort() ? "cursor-pointer select-none" : ""
-                      } h-9 px-3 py-2 text-xs font-medium`}
-                    >
-                      {header.isPlaceholder ? null : (
-                        <div className="flex items-center gap-1">
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {header.column.getIsSorted() === "asc" && (
-                            <span className="text-xs">▲</span>
-                          )}
-                          {header.column.getIsSorted() === "desc" && (
-                            <span className="text-xs">▼</span>
-                          )}
+        {/* Table */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-4xl rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`${
+                          header.column.getCanSort() ? "cursor-pointer select-none" : ""
+                        } h-9 px-3 py-2 text-xs font-medium`}
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div className="flex items-center gap-1">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {header.column.getIsSorted() === "asc" && (
+                              <span className="text-xs">▲</span>
+                            )}
+                            {header.column.getIsSorted() === "desc" && (
+                              <span className="text-xs">▼</span>
+                            )}
+                          </div>
+                        )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {grantsQuery.isLoading ? (
+                  // Skeleton loading rows
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <TableRow key={`skeleton-${idx}`}>
+                      <TableCell colSpan={6} className="py-3">
+                        <div className="flex items-center gap-4">
+                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                          <div className="h-4 w-20 bg-muted animate-pulse rounded" />
+                          <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+                          <div className="h-4 w-28 bg-muted animate-pulse rounded" />
                         </div>
-                      )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {grantsQuery.isLoading ? (
-                // Skeleton loading rows
-                Array.from({ length: 5 }).map((_, idx) => (
-                  <TableRow key={`skeleton-${idx}`}>
-                    <TableCell colSpan={6} className="py-3">
-                      <div className="flex items-center gap-4">
-                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                        <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                        <div className="h-4 w-20 bg-muted animate-pulse rounded" />
-                        <div className="h-4 w-40 bg-muted animate-pulse rounded" />
-                        <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : grantsQuery.isError ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-destructive">
+                          Failed to load privileges
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {grantsQuery.error instanceof Error
+                            ? grantsQuery.error.message
+                            : "An error occurred while fetching privileges. Please try refreshing."}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => grantsQuery.refetch()}
+                          className="mt-2"
+                        >
+                          <RefreshCw className="mr-2 h-3 w-3" />
+                          Retry
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : grantsQuery.isError ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground py-8"
-                  >
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-destructive">
-                        Failed to load privileges
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {grantsQuery.error instanceof Error
-                          ? grantsQuery.error.message
-                          : "An error occurred while fetching privileges. Please try refreshing."}
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => grantsQuery.refetch()}
-                        className="mt-2"
-                      >
-                        <RefreshCw className="mr-2 h-3 w-3" />
-                        Retry
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground py-3 text-sm"
-                  >
-                    {grantsQuery.data && grantsQuery.data.length === 0
-                      ? "No privileges granted. Click '+ Grant Privilege' to get started."
-                      : "No privileges match your filters. Try adjusting your search criteria."}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-2 px-3 text-sm">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+                ) : filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-muted-foreground py-3 text-sm"
+                    >
+                      {grantsQuery.data && grantsQuery.data.length === 0
+                        ? "No privileges granted. Click '+ Grant Privilege' to get started."
+                        : "No privileges match your filters. Try adjusting your search criteria."}
+                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="py-2 px-3 text-sm">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
 
-      {/* View Details Modal */}
-      <ViewGrantDetailsModal
-        open={!!grantToView}
-        onOpenChange={(open) => !open && setGrantToView(null)}
-        grant={grantToView}
-        onRevoke={() => {
-          if (grantToView) {
-            setGrantToRevoke(grantToView)
-            setGrantToView(null)
-          }
-        }}
-      />
+        {/* View Details Modal */}
+        <ViewGrantDetailsModal
+          open={!!grantToView}
+          onOpenChange={(open) => !open && setGrantToView(null)}
+          grant={grantToView}
+          onRevoke={() => {
+            if (grantToView) {
+              setGrantToRevoke(grantToView)
+              setGrantToView(null)
+            }
+          }}
+        />
 
-      {/* Revoke Dialog */}
-      <RevokePrivilegeDialog
-        open={!!grantToRevoke}
-        onOpenChange={(open) => !open && setGrantToRevoke(null)}
-        grant={grantToRevoke}
-        onSuccess={() => {
-          handleRefresh()
-        }}
-      />
+        {/* Revoke Dialog */}
+        <RevokePrivilegeDialog
+          open={!!grantToRevoke}
+          onOpenChange={(open) => !open && setGrantToRevoke(null)}
+          grant={grantToRevoke}
+          onSuccess={() => {
+            handleRefresh()
+          }}
+        />
 
-      {/* Grant Privilege Modal */}
-      <GrantPrivilegeModal
-        open={showGrantModal}
-        onOpenChange={setShowGrantModal}
-        onSuccess={() => {
-          handleRefresh()
-        }}
-      />
+        {/* Grant Privilege Modal */}
+        <GrantPrivilegeModal
+          open={showGrantModal}
+          onOpenChange={setShowGrantModal}
+          onSuccess={() => {
+            handleRefresh()
+          }}
+        />
       </div>
     </TooltipProvider>
   )
 }
-

@@ -20,7 +20,14 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { tablesApi } from "@/api/catalog/tables"
@@ -34,7 +41,14 @@ interface RenameTableModalProps {
   onRenamed?: (newName: string) => void
 }
 
-export function RenameTableModal({ open, onOpenChange, catalogName, namespace, currentName, onRenamed }: RenameTableModalProps) {
+export function RenameTableModal({
+  open,
+  onOpenChange,
+  catalogName,
+  namespace,
+  currentName,
+  onRenamed,
+}: RenameTableModalProps) {
   const [newName, setNewName] = useState(currentName)
   const queryClient = useQueryClient()
 
@@ -66,11 +80,24 @@ export function RenameTableModal({ open, onOpenChange, catalogName, namespace, c
         </DialogHeader>
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">New name</label>
-          <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={currentName} />
+          <Input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder={currentName}
+          />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={renameMutation.isPending}>Cancel</Button>
-          <Button onClick={() => renameMutation.mutate()} disabled={renameMutation.isPending || newName.trim().length === 0}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={renameMutation.isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => renameMutation.mutate()}
+            disabled={renameMutation.isPending || newName.trim().length === 0}
+          >
             {renameMutation.isPending ? "Renaming..." : "Rename"}
           </Button>
         </DialogFooter>
@@ -80,5 +107,3 @@ export function RenameTableModal({ open, onOpenChange, catalogName, namespace, c
 }
 
 export default RenameTableModal
-
-

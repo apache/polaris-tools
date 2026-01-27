@@ -23,7 +23,7 @@ import type { AxiosError } from "axios"
 /**
  * Extracts a user-friendly error message from an error object
  * Handles various error formats from the API
- * 
+ *
  * @param error - The error object (can be unknown, AxiosError, Error, etc.)
  * @param defaultMessage - Default message to return if error cannot be parsed
  * @returns A user-friendly error message string
@@ -32,43 +32,53 @@ export function extractErrorMessage(error: unknown, defaultMessage: string): str
   // Handle Axios errors
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<unknown>
-    
+
     // Check for error message in response data first
     if (axiosError.response?.data) {
       const data = axiosError.response.data as Record<string, unknown>
-      
+
       // Try nested error.message first (e.g., { error: { message: "..." } })
-      if (data && typeof data === 'object' && 'error' in data) {
+      if (data && typeof data === "object" && "error" in data) {
         const errorObj = data.error as Record<string, unknown>
-        if (errorObj && typeof errorObj === 'object' && 'message' in errorObj && typeof errorObj.message === 'string') {
+        if (
+          errorObj &&
+          typeof errorObj === "object" &&
+          "message" in errorObj &&
+          typeof errorObj.message === "string"
+        ) {
           return errorObj.message
         }
       }
-      
+
       // Try top-level message (e.g., { message: "..." })
-      if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
+      if (
+        data &&
+        typeof data === "object" &&
+        "message" in data &&
+        typeof data.message === "string"
+      ) {
         return data.message
       }
     }
-    
+
     // Use Axios error message if available
     if (axiosError.message) {
       return axiosError.message
     }
   }
-  
+
   // Handle standard Error objects
   if (error instanceof Error) {
     return error.message
   }
-  
+
   // Fallback to default message
   return defaultMessage
 }
 
 /**
  * Gets a user-friendly error message based on HTTP status code
- * 
+ *
  * @param status - HTTP status code
  * @param resource - The resource being accessed (e.g., "catalog", "privilege")
  * @param action - The action being performed (e.g., "create", "delete")
@@ -104,7 +114,7 @@ export function getStatusErrorMessage(
 /**
  * Extracts error message with status code handling
  * Combines extractErrorMessage and getStatusErrorMessage
- * 
+ *
  * @param error - The error object
  * @param defaultMessage - Default message to return
  * @param resource - The resource being accessed (optional)
@@ -120,40 +130,46 @@ export function getErrorMessage(
   // First, try to extract message from HTTP response (prioritizes response data over axios error message)
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<unknown>
-    
+
     // Check for error message in HTTP response data first
     if (axiosError.response?.data) {
       const data = axiosError.response.data as Record<string, unknown>
-      
+
       // Try nested error.message first (e.g., { error: { message: "..." } })
-      if (data && typeof data === 'object' && 'error' in data) {
+      if (data && typeof data === "object" && "error" in data) {
         const errorObj = data.error as Record<string, unknown>
-        if (errorObj && typeof errorObj === 'object' && 'message' in errorObj && typeof errorObj.message === 'string') {
+        if (
+          errorObj &&
+          typeof errorObj === "object" &&
+          "message" in errorObj &&
+          typeof errorObj.message === "string"
+        ) {
           return errorObj.message
         }
       }
-      
+
       // Try top-level message (e.g., { message: "..." })
-      if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
+      if (
+        data &&
+        typeof data === "object" &&
+        "message" in data &&
+        typeof data.message === "string"
+      ) {
         return data.message
       }
     }
-    
+
     // If no message in response data, fallback to axios error message
     if (axiosError.message) {
       return axiosError.message
     }
-    
+
     // If we have a status code but no specific message, use status-based message
     if (axiosError.response?.status) {
-      return getStatusErrorMessage(
-        axiosError.response.status,
-        resource,
-        action
-      )
+      return getStatusErrorMessage(axiosError.response.status, resource, action)
     }
   }
-  
+
   // Fall back to extracting message (handles non-Axios errors)
   return extractErrorMessage(error, defaultMessage)
 }
@@ -164,4 +180,3 @@ export function getErrorMessage(
 export function isAxiosErrorWithResponse(error: unknown): error is AxiosError {
   return axios.isAxiosError(error) && error.response !== undefined
 }
-

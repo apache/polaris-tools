@@ -69,9 +69,18 @@ function App() {
                   <Route path="/connections" element={<Connections />} />
                   <Route path="/catalogs" element={<Catalogs />} />
                   <Route path="/catalogs/:catalogName" element={<CatalogDetails />} />
-                  <Route path="/catalogs/:catalogName/namespaces/:namespace" element={<NamespaceDetails />} />
-                  <Route path="/catalogs/:catalogName/namespaces/:namespace/tables/:tableName" element={<TableDetails />} />
-                  <Route path="/catalogs/:catalogName/namespaces/:namespace/views/:viewName" element={<ViewDetails />} />
+                  <Route
+                    path="/catalogs/:catalogName/namespaces/:namespace"
+                    element={<NamespaceDetails />}
+                  />
+                  <Route
+                    path="/catalogs/:catalogName/namespaces/:namespace/tables/:tableName"
+                    element={<TableDetails />}
+                  />
+                  <Route
+                    path="/catalogs/:catalogName/namespaces/:namespace/views/:viewName"
+                    element={<ViewDetails />}
+                  />
                   <Route path="/access-control" element={<AccessControl />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />

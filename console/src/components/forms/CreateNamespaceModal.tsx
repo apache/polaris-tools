@@ -46,11 +46,7 @@ const schema = z.object({
         // Validate namespace path format: allows nested namespaces like "outer.inner"
         // Each part should be alphanumeric with underscores and hyphens
         const parts = val.split(".")
-        return parts.every(
-          (part) =>
-            part.trim().length > 0 &&
-            /^[a-zA-Z0-9_-]+$/.test(part.trim())
-        )
+        return parts.every((part) => part.trim().length > 0 && /^[a-zA-Z0-9_-]+$/.test(part.trim()))
       },
       {
         message:
@@ -73,12 +69,14 @@ const schema = z.object({
         message: "Location must be a valid URL (s3://, https://, file://, etc.) or absolute path",
       }
     ),
-  properties: z.array(
-    z.object({
-      key: z.string().min(1, "Key is required"),
-      value: z.string(),
-    })
-  ).optional(),
+  properties: z
+    .array(
+      z.object({
+        key: z.string().min(1, "Key is required"),
+        value: z.string(),
+      })
+    )
+    .optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -130,7 +128,7 @@ export function CreateNamespaceModal({
 
       // Build properties object from key-value pairs
       const propertiesObj: Record<string, string> = {}
-      
+
       // Add location if provided (location property takes precedence)
       if (values.location && values.location.trim()) {
         propertiesObj.location = values.location.trim()
@@ -204,7 +202,8 @@ export function CreateNamespaceModal({
         <DialogHeader>
           <DialogTitle>Create namespace</DialogTitle>
           <DialogDescription>
-            Create a new namespace in the catalog. Namespaces support nested paths like "outer.inner".
+            Create a new namespace in the catalog. Namespaces support nested paths like
+            "outer.inner".
             {parentNamespace && (
               <span className="block mt-1 text-xs">
                 Parent namespace: {parentNamespace.join(".")}
@@ -242,9 +241,7 @@ export function CreateNamespaceModal({
               placeholder="e.g. s3://bucket/prefix/ or file:///path/to/namespace"
               {...register("location")}
             />
-            {errors.location && (
-              <p className="text-sm text-red-600">{errors.location.message}</p>
-            )}
+            {errors.location && <p className="text-sm text-red-600">{errors.location.message}</p>}
             <p className="text-xs text-muted-foreground">
               Storage location for this namespace. Must be within the catalog's base location and
               allowed locations.
@@ -322,4 +319,3 @@ export function CreateNamespaceModal({
     </Dialog>
   )
 }
-

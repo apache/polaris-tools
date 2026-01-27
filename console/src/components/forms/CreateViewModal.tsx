@@ -138,26 +138,14 @@ export function CreateViewModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">View Name</Label>
-            <Input
-              id="name"
-              placeholder="my_view"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-600">{errors.name.message}</p>
-            )}
+            <Input id="name" placeholder="my_view" {...register("name")} />
+            {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="dialect">SQL Dialect</Label>
-            <Input
-              id="dialect"
-              placeholder="spark"
-              {...register("dialect")}
-            />
-            {errors.dialect && (
-              <p className="text-sm text-red-600">{errors.dialect.message}</p>
-            )}
+            <Input id="dialect" placeholder="spark" {...register("dialect")} />
+            {errors.dialect && <p className="text-sm text-red-600">{errors.dialect.message}</p>}
             <p className="text-xs text-muted-foreground">
               The SQL dialect used for the view (e.g., spark, trino, presto)
             </p>
@@ -171,20 +159,12 @@ export function CreateViewModal({
               className="min-h-[150px] font-mono text-sm"
               {...register("sql")}
             />
-            {errors.sql && (
-              <p className="text-sm text-red-600">{errors.sql.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              The SQL query that defines this view
-            </p>
+            {errors.sql && <p className="text-sm text-red-600">{errors.sql.message}</p>}
+            <p className="text-xs text-muted-foreground">The SQL query that defines this view</p>
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
@@ -196,4 +176,3 @@ export function CreateViewModal({
     </Dialog>
   )
 }
-

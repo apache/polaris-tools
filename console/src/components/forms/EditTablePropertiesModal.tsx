@@ -20,7 +20,14 @@
 import { useEffect, useMemo, useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { tablesApi } from "@/api/catalog/tables"
@@ -36,12 +43,22 @@ interface EditTablePropertiesModalProps {
   properties: Record<string, string> | undefined
 }
 
-export function EditTablePropertiesModal({ open, onOpenChange, catalogName, namespace, tableName, properties }: EditTablePropertiesModalProps) {
+export function EditTablePropertiesModal({
+  open,
+  onOpenChange,
+  catalogName,
+  namespace,
+  tableName,
+  properties,
+}: EditTablePropertiesModalProps) {
   const [rows, setRows] = useState<KV[]>([])
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const initial: KV[] = Object.entries(properties || {}).map(([k, v]) => ({ key: k, value: String(v) }))
+    const initial: KV[] = Object.entries(properties || {}).map(([k, v]) => ({
+      key: k,
+      value: String(v),
+    }))
     setRows(initial.length > 0 ? initial : [{ key: "", value: "" }])
   }, [properties, open])
 
@@ -55,10 +72,14 @@ export function EditTablePropertiesModal({ open, onOpenChange, catalogName, name
     return map
   }, [rows])
 
-  const removals = useMemo(() => rows.filter((r) => r.toRemove && r.key.trim().length > 0).map((r) => r.key.trim()), [rows])
+  const removals = useMemo(
+    () => rows.filter((r) => r.toRemove && r.key.trim().length > 0).map((r) => r.key.trim()),
+    [rows]
+  )
 
   const saveMutation = useMutation({
-    mutationFn: async () => tablesApi.updateProperties(catalogName, namespace, tableName, updates, removals),
+    mutationFn: async () =>
+      tablesApi.updateProperties(catalogName, namespace, tableName, updates, removals),
     onSuccess: () => {
       toast.success("Table properties updated successfully")
       queryClient.invalidateQueries({ queryKey: ["table", catalogName] })
@@ -72,9 +93,12 @@ export function EditTablePropertiesModal({ open, onOpenChange, catalogName, name
   })
 
   const addRow = () => setRows((r) => [...r, { key: "", value: "" }])
-  const setKey = (i: number, v: string) => setRows((r) => r.map((x, idx) => (idx === i ? { ...x, key: v } : x)))
-  const setValue = (i: number, v: string) => setRows((r) => r.map((x, idx) => (idx === i ? { ...x, value: v } : x)))
-  const toggleRemove = (i: number) => setRows((r) => r.map((x, idx) => (idx === i ? { ...x, toRemove: !x.toRemove } : x)))
+  const setKey = (i: number, v: string) =>
+    setRows((r) => r.map((x, idx) => (idx === i ? { ...x, key: v } : x)))
+  const setValue = (i: number, v: string) =>
+    setRows((r) => r.map((x, idx) => (idx === i ? { ...x, value: v } : x)))
+  const toggleRemove = (i: number) =>
+    setRows((r) => r.map((x, idx) => (idx === i ? { ...x, toRemove: !x.toRemove } : x)))
   const removeRow = (i: number) => setRows((r) => r.filter((_, idx) => idx !== i))
 
   return (
@@ -86,27 +110,52 @@ export function EditTablePropertiesModal({ open, onOpenChange, catalogName, name
         </DialogHeader>
         <div className="space-y-3">
           {rows.map((row, idx) => (
-            <div key={idx} className={`grid grid-cols-12 gap-2 items-center ${row.toRemove ? "opacity-60" : ""}`}>
+            <div
+              key={idx}
+              className={`grid grid-cols-12 gap-2 items-center ${row.toRemove ? "opacity-60" : ""}`}
+            >
               <div className="col-span-5">
-                <Input placeholder="key" value={row.key} onChange={(e) => setKey(idx, e.target.value)} />
+                <Input
+                  placeholder="key"
+                  value={row.key}
+                  onChange={(e) => setKey(idx, e.target.value)}
+                />
               </div>
               <div className="col-span-5">
-                <Input placeholder="value" value={row.value} onChange={(e) => setValue(idx, e.target.value)} />
+                <Input
+                  placeholder="value"
+                  value={row.value}
+                  onChange={(e) => setValue(idx, e.target.value)}
+                />
               </div>
               <div className="col-span-2 flex gap-2">
-                <Button variant={row.toRemove ? "secondary" : "outline"} size="sm" onClick={() => toggleRemove(idx)}>
+                <Button
+                  variant={row.toRemove ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={() => toggleRemove(idx)}
+                >
                   {row.toRemove ? "Keep" : "Remove"}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => removeRow(idx)}>Delete</Button>
+                <Button variant="ghost" size="sm" onClick={() => removeRow(idx)}>
+                  Delete
+                </Button>
               </div>
             </div>
           ))}
           <div>
-            <Button variant="outline" size="sm" onClick={addRow}>Add property</Button>
+            <Button variant="outline" size="sm" onClick={addRow}>
+              Add property
+            </Button>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saveMutation.isPending}>Cancel</Button>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={saveMutation.isPending}
+          >
+            Cancel
+          </Button>
           <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
             {saveMutation.isPending ? "Saving..." : "Save"}
           </Button>
@@ -117,5 +166,3 @@ export function EditTablePropertiesModal({ open, onOpenChange, catalogName, name
 }
 
 export default EditTablePropertiesModal
-
-

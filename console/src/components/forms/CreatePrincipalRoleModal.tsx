@@ -125,7 +125,9 @@ export function CreatePrincipalRoleModal({
       }
     },
     onSuccess: () => {
-      toast.success(isNew ? "Principal role created successfully" : "Principal role updated successfully")
+      toast.success(
+        isNew ? "Principal role created successfully" : "Principal role updated successfully"
+      )
       queryClient.invalidateQueries({ queryKey: ["principal-roles"] })
       onSuccess?.()
       onOpenChange(false)
@@ -145,9 +147,7 @@ export function CreatePrincipalRoleModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>
-            {isNew ? "Create Principal Role" : "Edit Principal Role"}
-          </DialogTitle>
+          <DialogTitle>{isNew ? "Create Principal Role" : "Edit Principal Role"}</DialogTitle>
           <DialogDescription>
             {isNew
               ? "Create a new principal role in the system."
@@ -157,16 +157,9 @@ export function CreatePrincipalRoleModal({
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              {...form.register("name")}
-              placeholder="role-name"
-              disabled={!isNew}
-            />
+            <Input id="name" {...form.register("name")} placeholder="role-name" disabled={!isNew} />
             {form.formState.errors.name && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.name.message}
-              </p>
+              <p className="text-sm text-red-600">{form.formState.errors.name.message}</p>
             )}
             <p className="text-xs text-muted-foreground">
               {isNew
@@ -208,4 +201,3 @@ export function CreatePrincipalRoleModal({
     </Dialog>
   )
 }
-

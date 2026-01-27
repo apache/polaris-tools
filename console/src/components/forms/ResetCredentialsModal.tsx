@@ -108,12 +108,7 @@ export function ResetCredentialsModal({
       onOpenChange(false)
     },
     onError: (error: unknown) => {
-      const errorMsg = getErrorMessage(
-        error,
-        "Failed to reset credentials",
-        "credentials",
-        "reset"
-      )
+      const errorMsg = getErrorMessage(error, "Failed to reset credentials", "credentials", "reset")
       toast.error("Failed to reset credentials", {
         description: errorMsg,
       })
@@ -135,8 +130,8 @@ export function ResetCredentialsModal({
         <DialogHeader>
           <DialogTitle>Reset Credentials</DialogTitle>
           <DialogDescription>
-            Reset credentials for <span className="font-medium">{principalName}</span>.
-            You can provide custom credentials or let the system generate new ones.
+            Reset credentials for <span className="font-medium">{principalName}</span>. You can
+            provide custom credentials or let the system generate new ones.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -227,4 +222,3 @@ export function ResetCredentialsModal({
     </Dialog>
   )
 }
-

@@ -27,9 +27,7 @@ import type {
 
 export const catalogsApi = {
   list: async (): Promise<Catalog[]> => {
-    const response = await apiClient
-      .getManagementClient()
-      .get<CatalogsResponse>("/catalogs")
+    const response = await apiClient.getManagementClient().get<CatalogsResponse>("/catalogs")
     return response.data.catalogs
   },
 
@@ -41,29 +39,18 @@ export const catalogsApi = {
   },
 
   create: async (request: CreateCatalogRequest): Promise<Catalog> => {
-    const response = await apiClient
-      .getManagementClient()
-      .post<Catalog>("/catalogs", request)
+    const response = await apiClient.getManagementClient().post<Catalog>("/catalogs", request)
     return response.data
   },
 
-  update: async (
-    catalogName: string,
-    request: UpdateCatalogRequest
-  ): Promise<Catalog> => {
+  update: async (catalogName: string, request: UpdateCatalogRequest): Promise<Catalog> => {
     const response = await apiClient
       .getManagementClient()
-      .put<Catalog>(
-        `/catalogs/${encodeURIComponent(catalogName)}`,
-        request
-      )
+      .put<Catalog>(`/catalogs/${encodeURIComponent(catalogName)}`, request)
     return response.data
   },
 
   delete: async (catalogName: string): Promise<void> => {
-    await apiClient
-      .getManagementClient()
-      .delete(`/catalogs/${encodeURIComponent(catalogName)}`)
+    await apiClient.getManagementClient().delete(`/catalogs/${encodeURIComponent(catalogName)}`)
   },
 }
-

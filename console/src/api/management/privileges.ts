@@ -32,10 +32,7 @@ export const privilegesApi = {
    * @param catalogRoleName - The name of the catalog role
    * @returns Promise resolving to an array of grant resources
    */
-  listGrants: async (
-    catalogName: string,
-    catalogRoleName: string
-  ): Promise<GrantResource[]> => {
+  listGrants: async (catalogName: string, catalogRoleName: string): Promise<GrantResource[]> => {
     const response = await apiClient
       .getManagementClient()
       .get<GrantResources>(
@@ -98,4 +95,3 @@ export const privilegesApi = {
       )
   },
 }
-

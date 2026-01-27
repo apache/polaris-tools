@@ -27,11 +27,22 @@ import { namespacesApi } from "@/api/catalog/namespaces"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { SchemaViewer } from "@/components/table/SchemaViewer"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 
 export function ViewDetails() {
-  const { catalogName, namespace: namespaceParam, viewName } = useParams<{
+  const {
+    catalogName,
+    namespace: namespaceParam,
+    viewName,
+  } = useParams<{
     catalogName: string
     namespace: string
     viewName: string
@@ -70,7 +81,9 @@ export function ViewDetails() {
       toast.success("View deleted successfully")
       queryClient.invalidateQueries({ queryKey: ["views", catalogName, namespaceArray] })
       queryClient.invalidateQueries({ queryKey: ["namespace", catalogName, namespaceArray] })
-      navigate(`/catalogs/${encodeURIComponent(catalogName!)}/namespaces/${encodeURIComponent(namespaceParam!)}`)
+      navigate(
+        `/catalogs/${encodeURIComponent(catalogName!)}/namespaces/${encodeURIComponent(namespaceParam!)}`
+      )
     },
     onError: (error: Error) => {
       toast.error("Failed to delete view", {
@@ -84,7 +97,8 @@ export function ViewDetails() {
   }
 
   const nsPath = namespaceArray.join(".")
-  const refreshDisabled = viewQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
+  const refreshDisabled =
+    viewQuery.isFetching || namespaceQuery.isFetching || catalogQuery.isFetching
 
   const viewData = viewQuery.data
 
@@ -92,17 +106,16 @@ export function ViewDetails() {
     deleteMutation.mutate()
   }
 
-  const currentSchema = viewData?.metadata?.schemas?.find(
-    (s) => s["schema-id"] === viewData.metadata["current-version-id"]
-  ) || viewData?.metadata?.schemas?.[0]
+  const currentSchema =
+    viewData?.metadata?.schemas?.find(
+      (s) => s["schema-id"] === viewData.metadata["current-version-id"]
+    ) || viewData?.metadata?.schemas?.[0]
 
   const currentVersion = viewData?.metadata?.versions?.find(
     (v) => v["version-id"] === viewData.metadata["current-version-id"]
   )
 
-  const currentSql = currentVersion?.representations?.find(
-    (r) => r.type === "sql"
-  )
+  const currentSql = currentVersion?.representations?.find((r) => r.type === "sql")
 
   return (
     <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
@@ -185,16 +198,22 @@ export function ViewDetails() {
                     <p className="mt-1 text-sm font-mono">{viewData.metadata["view-uuid"]}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Format Version</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Format Version
+                    </label>
                     <p className="mt-1 text-sm">{viewData.metadata["format-version"]}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Current Version ID</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Current Version ID
+                    </label>
                     <p className="mt-1 text-sm">{viewData.metadata["current-version-id"]}</p>
                   </div>
                   {currentSql && (
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">SQL Dialect</label>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        SQL Dialect
+                      </label>
                       <p className="mt-1 text-sm">{currentSql.dialect}</p>
                     </div>
                   )}
@@ -204,8 +223,12 @@ export function ViewDetails() {
                   </div>
                   {viewData["metadata-location"] && (
                     <div className="md:col-span-2">
-                      <label className="text-sm font-medium text-muted-foreground">Metadata Location</label>
-                      <p className="mt-1 text-sm font-mono break-all">{viewData["metadata-location"]}</p>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Metadata Location
+                      </label>
+                      <p className="mt-1 text-sm font-mono break-all">
+                        {viewData["metadata-location"]}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -282,7 +305,8 @@ export function ViewDetails() {
                 <div className="space-y-3">
                   {viewData.metadata.versions.map((version) => {
                     const sqlRep = version.representations?.find((r) => r.type === "sql")
-                    const isCurrent = version["version-id"] === viewData.metadata["current-version-id"]
+                    const isCurrent =
+                      version["version-id"] === viewData.metadata["current-version-id"]
                     return (
                       <div
                         key={version["version-id"]}

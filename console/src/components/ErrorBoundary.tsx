@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (import.meta.env.DEV) {
       console.error("ErrorBoundary caught an error:", error, errorInfo)
     }
-    
+
     // In production, you might want to log to an error reporting service
     // e.g., Sentry, LogRocket, etc.
   }
@@ -79,19 +79,14 @@ export class ErrorBoundary extends Component<Props, State> {
             <CardContent className="space-y-4">
               {import.meta.env.DEV && this.state.error && (
                 <div className="rounded-md bg-muted p-3">
-                  <p className="text-sm font-mono text-destructive">
-                    {this.state.error.message}
-                  </p>
+                  <p className="text-sm font-mono text-destructive">{this.state.error.message}</p>
                 </div>
               )}
               <div className="flex gap-2">
                 <Button onClick={this.handleReset} variant="default">
                   Go to Home
                 </Button>
-                <Button
-                  onClick={() => window.location.reload()}
-                  variant="outline"
-                >
+                <Button onClick={() => window.location.reload()} variant="outline">
                   Refresh Page
                 </Button>
               </div>
@@ -104,4 +99,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
-

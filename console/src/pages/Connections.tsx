@@ -84,12 +84,7 @@ export function Connections() {
       setConnectionToDelete(null)
     },
     onError: (error: unknown) => {
-      const errorMsg = getErrorMessage(
-        error,
-        "Failed to delete connection",
-        "connection",
-        "delete"
-      )
+      const errorMsg = getErrorMessage(error, "Failed to delete connection", "connection", "delete")
       toast.error("Failed to delete connection", {
         description: errorMsg,
       })
@@ -97,8 +92,7 @@ export function Connections() {
   })
 
   const rotateMutation = useMutation({
-    mutationFn: (principalName: string) =>
-      principalsApi.rotateCredentials(principalName),
+    mutationFn: (principalName: string) => principalsApi.rotateCredentials(principalName),
     onSuccess: (data) => {
       toast.success("Credentials rotated successfully")
       setGeneratedCredentials({
@@ -132,7 +126,6 @@ export function Connections() {
     principal.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-
   const handleCreateSuccess = (credentials: { clientId: string; clientSecret: string }) => {
     setGeneratedCredentials(credentials)
     setIsConfigureModalOpen(false)
@@ -161,13 +154,14 @@ export function Connections() {
                 <Search className="h-4 w-4" />
               </Button>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => queryClient.invalidateQueries({ queryKey: ["principals"] })}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => queryClient.invalidateQueries({ queryKey: ["principals"] })}
+            >
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button
-              onClick={() => setIsConfigureModalOpen(true)}
-              variant="default"
-            >
+            <Button onClick={() => setIsConfigureModalOpen(true)} variant="default">
               <Plus className="mr-2 h-4 w-4" />
               Connection
             </Button>
@@ -213,12 +207,13 @@ export function Connections() {
                   (typeof principalWithTimestamps.properties?.createTimestamp === "string"
                     ? parseInt(principalWithTimestamps.properties.createTimestamp, 10)
                     : typeof principalWithTimestamps.properties?.createTimestamp === "number"
-                    ? principalWithTimestamps.properties.createTimestamp
-                    : typeof principalWithTimestamps.properties?.lastUpdateTimestamp === "string"
-                    ? parseInt(principalWithTimestamps.properties.lastUpdateTimestamp, 10)
-                    : typeof principalWithTimestamps.properties?.lastUpdateTimestamp === "number"
-                    ? principalWithTimestamps.properties.lastUpdateTimestamp
-                    : undefined)
+                      ? principalWithTimestamps.properties.createTimestamp
+                      : typeof principalWithTimestamps.properties?.lastUpdateTimestamp === "string"
+                        ? parseInt(principalWithTimestamps.properties.lastUpdateTimestamp, 10)
+                        : typeof principalWithTimestamps.properties?.lastUpdateTimestamp ===
+                            "number"
+                          ? principalWithTimestamps.properties.lastUpdateTimestamp
+                          : undefined)
 
                 return (
                   <TableRow key={principal.name}>
@@ -236,53 +231,53 @@ export function Connections() {
                         : "Unknown"}
                     </TableCell>
                     <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setPrincipalToView(principal)
-                          }}
-                        >
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setPrincipalToEdit(principal)
-                          }}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            rotateMutation.mutate(principal.name)
-                          }}
-                        >
-                          Rotate Credentials
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setConnectionToReset(principal.name)
-                          }}
-                        >
-                          Reset Credentials
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive focus:text-destructive"
-                          onClick={() => {
-                            setConnectionToDelete(principal.name)
-                          }}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setPrincipalToView(principal)
+                            }}
+                          >
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setPrincipalToEdit(principal)
+                            }}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              rotateMutation.mutate(principal.name)
+                            }}
+                          >
+                            Rotate Credentials
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setConnectionToReset(principal.name)
+                            }}
+                          >
+                            Reset Credentials
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => {
+                              setConnectionToDelete(principal.name)
+                            }}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
                 )
               })
             )}
@@ -339,8 +334,8 @@ export function Connections() {
           <DialogHeader>
             <DialogTitle>Delete Connection</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the
-              connection <span className="font-medium">{connectionToDelete}</span>.
+              This action cannot be undone. This will permanently delete the connection{" "}
+              <span className="font-medium">{connectionToDelete}</span>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -353,9 +348,7 @@ export function Connections() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() =>
-                connectionToDelete && deleteMutation.mutate(connectionToDelete)
-              }
+              onClick={() => connectionToDelete && deleteMutation.mutate(connectionToDelete)}
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}

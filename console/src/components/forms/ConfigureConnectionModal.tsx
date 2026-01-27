@@ -69,7 +69,13 @@ export function ConfigureConnectionModal({
 }: ConfigureConnectionModalProps) {
   const [createNewRole, setCreateNewRole] = useState(false)
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ConfigureConnectionFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<ConfigureConnectionFormData>({
     resolver: zodResolver(configureConnectionSchema),
     defaultValues: {
       createNewPrincipalRole: false,
@@ -121,9 +127,7 @@ export function ConfigureConnectionModal({
   const onSubmit = (formData: ConfigureConnectionFormData) => {
     createMutation.mutate({
       principalName: formData.principalName,
-      principalRoleName: formData.createNewPrincipalRole
-        ? formData.principalRoleName
-        : undefined,
+      principalRoleName: formData.createNewPrincipalRole ? formData.principalRoleName : undefined,
       createRole: formData.createNewPrincipalRole,
     })
   }
@@ -178,13 +182,9 @@ export function ConfigureConnectionModal({
               {...register("principalName")}
               placeholder="polaris_demo_connection_spark"
             />
-            <p className="text-xs text-gray-500">
-              A new principal will be created.
-            </p>
+            <p className="text-xs text-gray-500">A new principal will be created.</p>
             {errors.principalName && (
-              <p className="text-sm text-red-600">
-                {errors.principalName.message}
-              </p>
+              <p className="text-sm text-red-600">{errors.principalName.message}</p>
             )}
           </div>
 
@@ -209,9 +209,7 @@ export function ConfigureConnectionModal({
                 placeholder="Enter role name"
               />
               {errors.principalRoleName && (
-                <p className="text-sm text-red-600">
-                  {errors.principalRoleName.message}
-                </p>
+                <p className="text-sm text-red-600">{errors.principalRoleName.message}</p>
               )}
             </div>
           ) : (
@@ -235,17 +233,11 @@ export function ConfigureConnectionModal({
           )}
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Close
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>
-              {createMutation.isPending
-                ? "Creating..."
-                : "Create and generate credentials"}
+              {createMutation.isPending ? "Creating..." : "Create and generate credentials"}
             </Button>
           </DialogFooter>
         </form>
@@ -253,4 +245,3 @@ export function ConfigureConnectionModal({
     </Dialog>
   )
 }
-

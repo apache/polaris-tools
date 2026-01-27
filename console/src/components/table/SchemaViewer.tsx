@@ -29,5 +29,3 @@ export function SchemaViewer({ schema }: SchemaViewerProps) {
 }
 
 export default SchemaViewer
-
-

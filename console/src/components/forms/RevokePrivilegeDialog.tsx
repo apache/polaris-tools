@@ -76,7 +76,7 @@ function getEntityName(grant: GrantResource): string {
 interface RevokePrivilegeDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  grant: GrantResource & { catalogName: string; catalogRoleName: string } | null
+  grant: (GrantResource & { catalogName: string; catalogRoleName: string }) | null
   onSuccess?: () => void
 }
 
@@ -235,11 +235,7 @@ export function RevokePrivilegeDialog({
           >
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleRevoke}
-            disabled={revokeMutation.isPending}
-          >
+          <Button variant="destructive" onClick={handleRevoke} disabled={revokeMutation.isPending}>
             {revokeMutation.isPending ? "Revoking..." : "Revoke"}
           </Button>
         </DialogFooter>
@@ -247,4 +243,3 @@ export function RevokePrivilegeDialog({
     </Dialog>
   )
 }
-

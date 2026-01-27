@@ -592,12 +592,7 @@ export type PolicyPrivilege =
   | "POLICY_DETACH"
 
 // Grant Resource Types (Discriminated Union)
-export type GrantResource =
-  | CatalogGrant
-  | NamespaceGrant
-  | TableGrant
-  | ViewGrant
-  | PolicyGrant
+export type GrantResource = CatalogGrant | NamespaceGrant | TableGrant | ViewGrant | PolicyGrant
 
 export interface CatalogGrant {
   type: "catalog"
@@ -643,4 +638,3 @@ export interface AddGrantRequest {
 export interface RevokeGrantRequest {
   grant: GrantResource
 }
-
