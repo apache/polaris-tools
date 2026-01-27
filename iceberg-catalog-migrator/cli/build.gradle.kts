@@ -21,8 +21,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
   `java-library`
-  `maven-publish`
-  signing
   alias(libs.plugins.nessie.run)
   `build-conventions`
 }

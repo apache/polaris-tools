@@ -39,3 +39,6 @@ if (hasSrcMain || hasSrcTest) {
     configureTestTasks()
   }
 }
+
+// Configure publishing for all projects
+configurePublishing()

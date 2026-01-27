@@ -17,13 +17,13 @@
  * under the License.
  */
 
+import java.net.URI
 import org.nosphere.apache.rat.RatTask
 
 plugins {
-  `maven-publish`
-  signing
   `build-conventions`
   alias(libs.plugins.rat)
+  alias(libs.plugins.nexus.publish.plugin)
 }
 
 spotless {
@@ -76,4 +76,36 @@ tasks.named<RatTask>("rat").configure {
 
   // Rat can't scan binary images
   excludes.add("**/*.png")
+}
+
+// Pass environment variables:
+//    ORG_GRADLE_PROJECT_apacheUsername
+//    ORG_GRADLE_PROJECT_apachePassword
+// OR in ~/.gradle/gradle.properties set
+//    apacheUsername
+//    apachePassword
+// Call targets:
+//    publishToApache
+//    closeApacheStagingRepository
+//    releaseApacheStagingRepository
+//       or closeAndReleaseApacheStagingRepository
+//
+// Username is your ASF ID
+// Password: your ASF LDAP password - or better: a token generated via
+// https://repository.apache.org/
+nexusPublishing {
+  transitionCheckOptions {
+    // default==60 (10 minutes), wait up to 120 minutes
+    maxRetries = 720
+    // default 10s
+    delayBetween = java.time.Duration.ofSeconds(10)
+  }
+
+  repositories {
+    register("apache") {
+      nexusUrl = URI.create("https://repository.apache.org/service/local/")
+      snapshotRepositoryUrl =
+        URI.create("https://repository.apache.org/content/repositories/snapshots/")
+    }
+  }
 }
