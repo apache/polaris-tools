@@ -16,24 +16,6 @@
           "scope": "PRINCIPAL_ROLE:ALL"
         }
       ]
-    },
-    {
-      "name": "External",
-      "description": "External Realm Polaris Workspace",
-      "is_default": false,
-      "realm-header": "Polaris-Realm",
-      "realm": "EXTERNAL",
-      "server": {
-        "api": "http://localhost:8181"
-      },
-      "auth": [
-        {
-          "type": "oidc",
-          "url": "http://keycloak:8080/realms/EXTERNAL/protocol/openid-connect",
-          "client_id": "keycloak-client-id",
-          "scope": "openid"
-        }
-      ]
     }
   ]
 }

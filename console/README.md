@@ -43,7 +43,7 @@ make build
 
 The console is configured via `public/workspaces.json` which defines one or more workspaces. Each workspace represents a Polaris instance with its own authentication and API configuration.
 
-Example `workspaces.json`:
+Default `workspaces.json`:
 
 ```json
 {
@@ -166,7 +166,6 @@ The app will be available at `http://localhost:5173`
 
 ```bash
 make lint
-make format-check
 make format
 ```
 
