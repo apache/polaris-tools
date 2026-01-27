@@ -17,13 +17,22 @@
  * under the License.
  */
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
+import { apiClient } from "@/api/client"
+import { setCurrentWorkspace, clearCurrentWorkspace, getCurrentWorkspace } from "@/lib/workspaces"
+import type { Workspace } from "@/types/workspaces"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  login: (clientId: string, clientSecret: string, scope: string, realm: string) => Promise<void>
+  login: (
+    clientId: string,
+    clientSecret: string,
+    scope: string,
+    realm: string,
+    workspace?: Workspace
+  ) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -32,15 +41,46 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
-  const [loading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
 
-  const login = async (clientId: string, clientSecret: string, scope: string, realm: string) => {
+  const checkAuth = () => {
+    const workspace = getCurrentWorkspace()
+    const token = apiClient.getAccessToken()
+    setIsAuthenticated(!!(token && workspace))
+  }
+
+  useEffect(() => {
+    checkAuth()
+    setLoading(false)
+
+    const handleWorkspaceChange = () => {
+      checkAuth()
+    }
+
+    window.addEventListener("workspace-changed", handleWorkspaceChange)
+    return () => window.removeEventListener("workspace-changed", handleWorkspaceChange)
+  }, [])
+
+  const login = async (
+    clientId: string,
+    clientSecret: string,
+    scope: string,
+    realm: string,
+    workspace?: Workspace
+  ) => {
     try {
-      // Store realm in localStorage (non-sensitive configuration)
-      if (realm) {
-        localStorage.setItem("polaris_realm", realm)
+      if (workspace) {
+        setCurrentWorkspace(workspace)
+        await authApi.getToken(
+          clientId,
+          clientSecret,
+          scope,
+          workspace.realm,
+          workspace["realm-header"]
+        )
+      } else {
+        await authApi.getToken(clientId, clientSecret, scope, realm, "Polaris-Realm")
       }
-      await authApi.getToken(clientId, clientSecret, scope, realm)
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
@@ -49,9 +89,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    toast.success("Logged out successfully")
-    authApi.logout()
+    const currentWorkspace = getCurrentWorkspace()
+    if (currentWorkspace) {
+      apiClient.clearAccessToken(currentWorkspace.name)
+      toast.success(`Logged out from "${currentWorkspace.name}"`)
+    }
+    clearCurrentWorkspace()
     setIsAuthenticated(false)
+    setTimeout(() => {
+      window.location.href = "/login"
+    }, 100)
   }
 
   return (
