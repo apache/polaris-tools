@@ -48,8 +48,10 @@ VITE_POLARIS_API_URL=http://localhost:8181
 VITE_POLARIS_REALM=POLARIS
 VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # optional, defaults to "Polaris-Realm"
-VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/v1/oauth/tokens  # optional
+VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/catalog/v1/oauth/tokens  # optional, defaults to ${VITE_POLARIS_API_URL}/api/catalog/v1/oauth/tokens
 ```
+
+> **Note:** The console makes direct API calls to the Polaris server. Ensure CORS is properly configured on the server (see below).
 
 ### Server-Side CORS Configuration
 
