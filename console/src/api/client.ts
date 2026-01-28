@@ -25,7 +25,7 @@ import { config } from "@/lib/config"
 const API_BASE_URL = config.POLARIS_API_URL
 const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
 const CATALOG_BASE_URL = `${API_BASE_URL}/api/catalog/v1`
-const POLARIS_BASE_URL = `${API_BASE_URL}/api/catalog/polaris/v1`
+const GENERIC_TABLES_BASE_URL = `${API_BASE_URL}/api/catalog/polaris/v1`
 
 class ApiClient {
   private managementClient: AxiosInstance
@@ -50,7 +50,7 @@ class ApiClient {
     })
 
     this.polarisClient = axios.create({
-      baseURL: POLARIS_BASE_URL,
+      baseURL: GENERIC_TABLES_BASE_URL,
       headers: {
         "Content-Type": "application/json",
       },
