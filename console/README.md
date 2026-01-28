@@ -114,8 +114,6 @@ advancedConfig:
    quarkus.http.cors.enabled: "true"
 ```
 
-Mount it in your Polaris deployment at `/deployment/config/application.properties`.
-
 See [Quarkus CORS documentation](https://quarkus.io/guides/security-cors) for more details.
 
 ## Project Structure
