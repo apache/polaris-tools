@@ -45,11 +45,67 @@ Create a `.env` file based on `.env.example`:
 
 ```env
 VITE_POLARIS_API_URL=http://localhost:8181
-VITE_POLARIS_REALM=POLARIS 
+VITE_POLARIS_REALM=POLARIS
 VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # optional, defaults to "Polaris-Realm"
 VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/v1/oauth/tokens  # optional
 ```
+
+### Server-Side CORS Configuration
+
+The console makes direct API calls to the Polaris server. Configure CORS on your Polaris server (Quarkus-based).
+
+#### Option 1: Using application.properties
+
+Add to your Polaris `application.properties` file:
+
+```properties
+quarkus.http.cors.enabled=true
+quarkus.http.cors.origins=http://localhost:5173,https://your-console-domain.com
+quarkus.http.cors.methods=GET,POST,PUT,DELETE,PATCH,OPTIONS
+quarkus.http.cors.headers=Content-Type,Authorization,Polaris-Realm
+quarkus.http.cors.exposed-headers=*
+quarkus.http.cors.access-control-allow-credentials=true
+quarkus.http.cors.access-control-max-age=PT10M
+```
+
+#### Option 2: Using Environment Variables
+
+Set these environment variables:
+
+```bash
+QUARKUS_HTTP_CORS_ENABLED=true
+QUARKUS_HTTP_CORS_ORIGINS=http://localhost:5173,https://your-console-domain.com
+QUARKUS_HTTP_CORS_METHODS=GET,POST,PUT,DELETE,PATCH,OPTIONS
+QUARKUS_HTTP_CORS_HEADERS=Content-Type,Authorization,Polaris-Realm
+QUARKUS_HTTP_CORS_EXPOSED_HEADERS=*
+QUARKUS_HTTP_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS=true
+QUARKUS_HTTP_CORS_ACCESS_CONTROL_MAX_AGE=PT10M
+```
+
+#### Option 3: Using Kubernetes ConfigMap
+
+For Kubernetes/Helm deployments, create a ConfigMap:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: polaris-config
+data:
+  application.properties: |
+    quarkus.http.cors.enabled=true
+    quarkus.http.cors.origins=http://localhost:5173,https://your-console-domain.com
+    quarkus.http.cors.methods=GET,POST,PUT,DELETE,PATCH,OPTIONS
+    quarkus.http.cors.headers=Content-Type,Authorization,Polaris-Realm
+    quarkus.http.cors.exposed-headers=*
+    quarkus.http.cors.access-control-allow-credentials=true
+    quarkus.http.cors.access-control-max-age=PT10M
+```
+
+Mount it in your Polaris deployment at `/deployment/config/application.properties`.
+
+See [Quarkus CORS documentation](https://quarkus.io/guides/security-cors) for more details.
 
 ## Project Structure
 
