@@ -87,7 +87,7 @@ QUARKUS_HTTP_CORS_ACCESS_CONTROL_MAX_AGE=PT10M
 
 #### Option 3: Using Kubernetes ConfigMap
 
-For Kubernetes/Helm deployments, create a ConfigMap:
+For Kubernetes/Helm deployments you need configure `cors` section in [values.yaml](https://polaris.apache.org/releases/1.3.0/helm/):
 
 ```yaml
 cors:
