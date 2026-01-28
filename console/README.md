@@ -45,11 +45,76 @@ Create a `.env` file based on `.env.example`:
 
 ```env
 VITE_POLARIS_API_URL=http://localhost:8181
-VITE_POLARIS_REALM=POLARIS 
+VITE_POLARIS_REALM=POLARIS
 VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # optional, defaults to "Polaris-Realm"
-VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/v1/oauth/tokens  # optional
+VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/catalog/v1/oauth/tokens  # optional, defaults to ${VITE_POLARIS_API_URL}/api/catalog/v1/oauth/tokens
 ```
+
+> **Note:** The console makes direct API calls to the Polaris server. Ensure CORS is properly configured on the server (see below).
+
+### Server-Side CORS Configuration
+
+The console makes direct API calls to the Polaris server. Configure CORS on your Polaris server (Quarkus-based).
+
+#### Option 1: Using application.properties
+
+Add to your Polaris `application.properties` file:
+
+```properties
+quarkus.http.cors.enabled=true
+quarkus.http.cors.origins=https://console.polaris.service
+quarkus.http.cors.methods=GET,POST,PUT,DELETE,PATCH,OPTIONS
+quarkus.http.cors.headers=Content-Type,Authorization,Polaris-Realm
+quarkus.http.cors.exposed-headers=*
+quarkus.http.cors.access-control-allow-credentials=true
+quarkus.http.cors.access-control-max-age=PT10M
+```
+
+#### Option 2: Using Environment Variables
+
+Set these environment variables:
+
+```bash
+QUARKUS_HTTP_CORS_ENABLED=true
+QUARKUS_HTTP_CORS_ORIGINS=https://console.polaris.service
+QUARKUS_HTTP_CORS_METHODS=GET,POST,PUT,DELETE,PATCH,OPTIONS
+QUARKUS_HTTP_CORS_HEADERS=Content-Type,Authorization,Polaris-Realm,X-Request-ID
+QUARKUS_HTTP_CORS_EXPOSED_HEADERS=*
+QUARKUS_HTTP_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS=true
+QUARKUS_HTTP_CORS_ACCESS_CONTROL_MAX_AGE=PT10M
+```
+
+#### Option 3: Using Kubernetes ConfigMap
+
+For Kubernetes/Helm deployments you need configure `cors` section in [values.yaml](https://polaris.apache.org/releases/1.3.0/helm/):
+
+```yaml
+cors:
+   allowedOrigins:
+      - "https://console.polaris.service"
+   allowedMethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "PATCH"
+      - "OPTIONS"
+   allowedHeaders:
+      - "Content-Type"
+      - "Authorization"
+      - "Polaris-Realm"
+      - "X-Request-ID"
+   exposedHeaders:
+      - "*"
+   accessControlMaxAge: "PT10M"
+   accessControlAllowCredentials: true
+
+advancedConfig:
+   quarkus.http.cors.enabled: "true"
+```
+
+See [Quarkus CORS documentation](https://quarkus.io/guides/security-cors) for more details.
 
 ## Project Structure
 

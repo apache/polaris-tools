@@ -16,10 +16,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Generate nginx configuration with the backend URL
-envsubst '${VITE_POLARIS_API_URL}' < /opt/app-root/etc/nginx.d/default.conf.template > /opt/app-root/etc/nginx.d/default.conf
+# Copy nginx configuration (no substitution needed since we use direct API calls)
+cp /opt/app-root/etc/nginx.d/default.conf.template /opt/app-root/etc/nginx.d/default.conf
 
-echo "Generated nginx config with backend: ${VITE_POLARIS_API_URL}"
+echo "Configured nginx for static file serving"
 
 # Generate runtime configuration from environment variables
 cat > /opt/app-root/src/config.js << EOF
