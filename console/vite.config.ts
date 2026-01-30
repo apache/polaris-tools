@@ -16,62 +16,57 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
-import path from "path"
+import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig, loadEnv } from "vite";
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    proxy: {
-      "/api": {
-        target: process.env.VITE_POLARIS_API_URL || "http://localhost:8181",
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy) => {
-          // Only log in development mode
-          if (process.env.NODE_ENV === "development") {
-            proxy.on("error", (err) => {
-              console.error("Proxy error:", err)
-            })
-            proxy.on("proxyReq", (proxyReq, req) => {
-              const target = process.env.VITE_POLARIS_API_URL || "http://localhost:8181"
-              console.log("📤 Proxying:", req.method, req.url, "→", target + proxyReq.path)
-            })
-            proxy.on("proxyRes", (proxyRes, req) => {
-              console.log("Received Response from the Target:", proxyRes.statusCode, req.url)
-            })
-          }
-        },
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  return {
+    plugins: [TanStackRouterVite({ autoCodeSplitting: true }), react()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
       },
-      "/polaris": {
-        target: process.env.VITE_POLARIS_API_URL || "http://localhost:8181",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/polaris/, "/api/catalog/polaris"),
-        configure: (proxy) => {
-          // Only log in development mode
-          if (process.env.NODE_ENV === "development") {
-            proxy.on("error", (err) => {
-              console.error("Proxy error:", err)
-            })
-            proxy.on("proxyReq", (proxyReq, req) => {
-              const target = process.env.VITE_POLARIS_API_URL || "http://localhost:8181"
-              console.log("📤 Proxying:", req.method, req.url, "→", target + proxyReq.path)
-            })
-            proxy.on("proxyRes", (proxyRes, req) => {
-              console.log("Received Response from the Target:", proxyRes.statusCode, req.url)
-            })
-          }
+    },
+    build: {
+      // Reproducibility options
+      cssCodeSplit: false,
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          // Use content hash for deterministic chunk names
+          chunkFileNames: "assets/[name]-[hash].js",
+          entryFileNames: "assets/[name]-[hash].js",
+          assetFileNames: "assets/[name]-[hash][extname]",
+          // Ensure consistent chunk ordering
+          manualChunks: (id) => {
+            if (id.includes("node_modules")) {
+              return "vendor";
+            }
+          },
         },
       },
     },
-  },
-})
+    server: {
+      proxy: {
+        "/api": {
+          target: env.POLARIS_API_BASE_URL || "http://localhost:8181",
+          changeOrigin: true,
+          configure: (proxy) => {
+            proxy.on("proxyReq", (proxyReq, req) => {
+              console.log(
+                `📤 Proxying: ${req.method} ${req.url} → ${env.POLARIS_API_BASE_URL || "http://localhost:8181"}${req.url}`
+              );
+            });
+            proxy.on("error", (err) => {
+              console.error("Proxy error:", err);
+            });
+          },
+        },
+      },
+    },
+  };
+});

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": ["nodejs@22.12.0"],
+  "shell": {
+    "init_hook": ["npm ci"],
+    "scripts": {
+      "build": ["npm run build"],
+      "dev": ["npm run dev"],
+      "lint": ["npm run lint"],
+      "verify-reproducible": ["bash -c 'npm run build && tar --sort=name --mtime=\"1980-01-01 00:00:00 UTC\" --owner=0 --group=0 --numeric-owner -cf a.tar dist/ && rm -rf dist && npm run build && tar --sort=name --mtime=\"1980-01-01 00:00:00 UTC\" --owner=0 --group=0 --numeric-owner -cf b.tar dist/ && echo \"Build A:\" && sha256sum a.tar && echo \"Build B:\" && sha256sum b.tar && diff <(sha256sum a.tar | cut -d\" \" -f1) <(sha256sum b.tar | cut -d\" \" -f1) && echo \"✅ Builds are reproducible!\" || echo \"❌ Builds are NOT reproducible\"'"]
+    }
+  }
+}

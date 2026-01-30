@@ -15,50 +15,33 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Build stage
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
-
-# Default environment variables (can be overridden at runtime)
-ENV VITE_POLARIS_API_URL=http://polaris:8181
-ENV VITE_POLARIS_REALM=POLARIS
-ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
-ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
-ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
+# Stage 1: Build the application
+FROM node:22.12.0-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json ./
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Use npm ci for reproducible installs
+RUN npm ci
 
-# Copy source code (excluding docker directory via .dockerignore)
+# Copy source files
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
+# Stage 2: Serve the application
+FROM nginx:1.27.4-alpine
 
-# Copy DISCLAIMER, LICENSE, NOTICE files
-COPY DISCLAIMER /DISCLAIMER
-COPY LICENSE-BUNDLE /LICENSE
-COPY NOTICE /NOTICE
+# Copy built assets from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx configuration as template
-COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
+# Copy nginx configuration
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Copy runtime config generation script
-COPY --chmod=755 docker/generate-config.sh /generate-config.sh
+EXPOSE 8080
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist /opt/app-root/src
-
-# Expose port 80
-EXPOSE 80
-
-# Use the script as entrypoint to generate config.js from env vars at startup
-ENTRYPOINT ["/generate-config.sh"]
+CMD ["nginx", "-g", "daemon off;"]
 
