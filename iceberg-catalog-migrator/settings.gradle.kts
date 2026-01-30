@@ -22,7 +22,7 @@ val baseVersion = file("version.txt").readText().trim()
 rootProject.name = "polaris-iceberg-catalog-migrator"
 
 gradle.beforeProject {
-  group = "org.apache.polaris.tools"
+  group = "org.apache.polaris.tools.iceberg-catalog-migrator"
   version = baseVersion
   description =
     when (name) {
