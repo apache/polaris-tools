@@ -41,6 +41,4 @@ java {
   targetCompatibility = JavaVersion.VERSION_21
 }
 
-kotlinDslPluginOptions { jvmTarget.set(JavaVersion.VERSION_21.toString()) }
-
 tasks.withType<Test>().configureEach { useJUnitPlatform() }
