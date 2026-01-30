@@ -43,5 +43,3 @@ catalogMigratorProject("api")
 catalogMigratorProject("api-test")
 
 catalogMigratorProject("cli")
-
-catalogMigratorProject("bom")
