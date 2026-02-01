@@ -298,7 +298,7 @@ export function WorkspaceFormModal({
                       value={authConfig.url}
                       onChange={(e) => updateAuthConfig(index, "url", e.target.value)}
                       required
-                      placeholder="http://localhost:8181/api/v1/oauth/tokens"
+                      placeholder="http://localhost:8181/api/catalog/v1/oauth/tokens"
                     />
                   </div>
 
