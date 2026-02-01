@@ -60,7 +60,7 @@ Default `workspaces.json`:
       "auth": [
         {
           "type": "internal",
-          "url": "http://localhost:8181/api/v1/oauth/tokens",
+          "url": "http://localhost:8181/api/catalog/v1/oauth/tokens",
           "scope": "PRINCIPAL_ROLE:ALL"
         }
       ]
@@ -166,7 +166,7 @@ The app will be available at `http://localhost:5173`
 
 ```bash
 make lint
-make format
+make lint-fix
 ```
 
 ## Building
@@ -198,7 +198,6 @@ Then, you run Polaris Console using:
 
 ```bash
 docker run -p 8080:80 \
-  -e POLARIS_PROXY_URL=http://polaris:8181 \
   -v $(pwd)/workspaces.json:/opt/app-root/src/workspaces.json:ro \
   apache/polaris-console:latest
 ```
@@ -206,9 +205,7 @@ docker run -p 8080:80 \
 Or use the default embedded configuration:
 
 ```bash
-docker run -p 8080:80 \
-  -e POLARIS_PROXY_URL=http://polaris:8181 \
-  apache/polaris-console:latest
+docker run -p 8080:80 apache/polaris-console:latest
 ```
 
 NB: Hopefully, the Apache Polaris official docker image will be available soon.
@@ -247,9 +244,6 @@ and start Polaris instance in `polaris` namespace via helm.
 Customize the deployment by creating a `values.yaml` file:
 
 ```yaml
-# Polaris backend URL for nginx proxy
-polarisProxyUrl: "http://polaris:8181"
-
 workspaces:
   workspaces:
     - name: "Production Polaris"
@@ -261,7 +255,7 @@ workspaces:
         api: "http://polaris:8181"
       auth:
         - type: "internal"
-          url: "http://polaris:8181/api/v1/oauth/tokens"
+          url: "http://polaris:8181/api/catalog/v1/oauth/tokens"
           scope: "PRINCIPAL_ROLE:ALL"
 
 service:
