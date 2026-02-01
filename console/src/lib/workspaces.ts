@@ -31,7 +31,7 @@ const DEFAULT_WORKSPACE: Workspace = {
   auth: [
     {
       type: AuthProviderType.INTERNAL,
-      url: "http://localhost:8181/api/v1/oauth/tokens",
+      url: "http://localhost:8181/api/catalog/v1/oauth/tokens",
       scope: "PRINCIPAL_ROLE:ALL",
     },
   ],
@@ -143,4 +143,14 @@ export async function reloadFromServer(): Promise<WorkspacesConfig> {
   const serverConfig = await loadWorkspacesFromServer()
   saveWorkspacesConfig(serverConfig)
   return serverConfig
+}
+
+export function getDefaultWorkspaceDefaults() {
+  return {
+    realm: DEFAULT_WORKSPACE.realm,
+    realmHeader: DEFAULT_WORKSPACE["realm-header"],
+    apiUrl: DEFAULT_WORKSPACE.server?.api || "",
+    authUrl: DEFAULT_WORKSPACE.auth[0]?.url || "",
+    authScope: DEFAULT_WORKSPACE.auth[0]?.scope || "PRINCIPAL_ROLE:ALL",
+  }
 }

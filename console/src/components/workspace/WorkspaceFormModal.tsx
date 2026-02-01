@@ -31,7 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { addWorkspace, updateWorkspace } from "@/lib/workspaces"
+import { addWorkspace, updateWorkspace, getDefaultWorkspaceDefaults } from "@/lib/workspaces"
 import {
   AuthProviderType,
   type Workspace,
@@ -89,17 +89,18 @@ export function WorkspaceFormModal({
             ]
       )
     } else {
+      const defaults = getDefaultWorkspaceDefaults()
       setName("")
       setDescription("")
       setIsDefault(false)
-      setRealm("")
-      setRealmHeader("Polaris-Realm")
-      setApiUrl("")
+      setRealm(defaults.realm)
+      setRealmHeader(defaults.realmHeader)
+      setApiUrl(defaults.apiUrl)
       setAuthConfigs([
         {
           type: AuthProviderType.INTERNAL,
-          url: "",
-          scope: "PRINCIPAL_ROLE:ALL",
+          url: defaults.authUrl,
+          scope: defaults.authScope,
         },
       ])
     }
