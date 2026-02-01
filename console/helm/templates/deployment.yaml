@@ -43,9 +43,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 80
-          env:
-            - name: POLARIS_PROXY_URL
-              value: {{ .Values.polarisProxyUrl | quote }}
           volumeMounts:
             - name: workspaces-config
               mountPath: /opt/app-root/src/workspaces.json

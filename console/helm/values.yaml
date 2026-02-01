@@ -29,9 +29,6 @@ service:
   type: ClusterIP
   port: 80
 
-# Polaris backend URL for nginx proxy
-polarisProxyUrl: "http://polaris:8181"
-
 workspaces:
   workspaces:
     - name: "Default Polaris"
