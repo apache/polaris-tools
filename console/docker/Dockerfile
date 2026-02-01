@@ -45,13 +45,9 @@ COPY docker/nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist /opt/app-root/src
-
-# Default proxy URL (can be overridden at runtime)
-ENV POLARIS_PROXY_URL=http://polaris:8181
-
 # Expose port 80
 EXPOSE 80
 
-# Start nginx with envsubst to replace variables
-CMD ["/bin/sh", "-c", "envsubst '$$POLARIS_PROXY_URL' < /etc/nginx/templates/default.conf.template > /opt/app-root/etc/nginx.d/default.conf && nginx -g 'daemon off;'"]
+# Start nginx
+CMD ["/bin/sh", "-c", "/etc/nginx/templates/default.conf.template > /opt/app-root/etc/nginx.d/default.conf && nginx -g 'daemon off;'"]
 
