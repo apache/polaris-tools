@@ -12,7 +12,7 @@
       "auth": [
         {
           "type": "internal",
-          "url": "http://localhost:8181/api/v1/oauth/tokens",
+          "url": "http://localhost:8181/api/catalog/v1/oauth/tokens",
           "scope": "PRINCIPAL_ROLE:ALL"
         }
       ]
