@@ -19,49 +19,25 @@
 
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios"
 import { navigate } from "@/lib/navigation"
-import { config } from "@/lib/config"
 import { getCurrentWorkspace } from "@/lib/workspaces"
 
-const API_BASE_URL = config.POLARIS_API_URL
-const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
-const CATALOG_BASE_URL = `${API_BASE_URL}/api/catalog/v1`
-const GENERIC_TABLES_BASE_URL = `${API_BASE_URL}/api/catalog/polaris/v1`
-
 class ApiClient {
-  private managementClient: AxiosInstance
-  private catalogClient: AxiosInstance
-  private polarisClient: AxiosInstance
   private readonly TOKENS_KEY = "polaris_workspace_tokens"
 
-  constructor() {
-    this.managementClient = axios.create({
-      baseURL: MANAGEMENT_BASE_URL,
+  private createClient(pathSuffix: string): AxiosInstance {
+    const client = axios.create({
       headers: {
         "Content-Type": "application/json",
       },
     })
 
-    this.catalogClient = axios.create({
-      baseURL: CATALOG_BASE_URL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-
-    this.polarisClient = axios.create({
-      baseURL: GENERIC_TABLES_BASE_URL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-
-    this.setupInterceptors()
-  }
-
-  private setupInterceptors() {
-    const requestInterceptor = (config: InternalAxiosRequestConfig) => {
-      const token = this.getAccessToken()
+    client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       const workspace = getCurrentWorkspace()
+      const token = this.getAccessToken()
+
+      if (workspace?.server?.api) {
+        config.baseURL = `${workspace.server.api}${pathSuffix}`
+      }
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
@@ -73,29 +49,22 @@ class ApiClient {
       }
 
       return config
-    }
+    })
 
-    // Response interceptor for error handling
-    const responseErrorInterceptor = (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          // Unauthorized - clear token and redirect to login
-          this.clearAccessToken()
-          navigate("/login", true)
-        }
-      }
-      return Promise.reject(error)
-    }
-
-    this.managementClient.interceptors.request.use(requestInterceptor)
-    this.catalogClient.interceptors.request.use(requestInterceptor)
-    this.polarisClient.interceptors.request.use(requestInterceptor)
-    this.managementClient.interceptors.response.use(
+    client.interceptors.response.use(
       (response) => response,
-      responseErrorInterceptor
+      (error: unknown) => {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            this.clearAccessToken()
+            navigate("/login", true)
+          }
+        }
+        return Promise.reject(error)
+      }
     )
-    this.catalogClient.interceptors.response.use((response) => response, responseErrorInterceptor)
-    this.polarisClient.interceptors.response.use((response) => response, responseErrorInterceptor)
+
+    return client
   }
 
   private getTokensMap(): Record<string, string> {
@@ -146,15 +115,15 @@ class ApiClient {
   }
 
   getManagementClient(): AxiosInstance {
-    return this.managementClient
+    return this.createClient("/api/management/v1")
   }
 
   getCatalogClient(): AxiosInstance {
-    return this.catalogClient
+    return this.createClient("/api/catalog/v1")
   }
 
   getPolarisClient(): AxiosInstance {
-    return this.polarisClient
+    return this.createClient("/api/catalog/polaris/v1")
   }
 }
 
