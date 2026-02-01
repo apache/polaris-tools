@@ -21,14 +21,11 @@ import axios from "axios"
 import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
 import { REALM_HEADER_NAME } from "@/lib/constants"
+import { config } from "@/lib/config"
 import type { OAuthTokenResponse } from "@/types/api"
 
-// Always use relative URL to go through the proxy (dev server or production server)
-// This avoids CORS issues by proxying requests through the server
-// The server.ts proxy handles /api routes in production, and Vite handles them in development
-const TOKEN_URL = "/api/catalog/v1/oauth/tokens"
+const TOKEN_URL = config.OAUTH_TOKEN_URL || `${config.POLARIS_API_URL}/api/catalog/v1/oauth/tokens`
 
-// Log OAuth URL in development only
 if (import.meta.env.DEV) {
   console.log("🔐 Using OAuth token URL:", TOKEN_URL)
 }
