@@ -29,4 +29,90 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+ build: {
+    // reproducibility: disable non-deterministic options
+    cssCodeSplit: false,
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        // using content hash for deterministic chunk names
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
+        // ensure consistent chunk ordering by grouping node_modules
+        manualChunks: (id) => {
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
+        },
+      },
+    },
+  },
+  server: {
+    proxy: {
+      "/api": {
+        target: process.env.VITE_POLARIS_API_URL || "http://localhost:8181",
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy) => {
+          // Only log in development mode
+          if (process.env.NODE_ENV === "development") {
+            proxy.on("error", (err) => {
+              console.error("Proxy error:", err)
+            })
+            proxy.on("proxyReq", (proxyReq, req) => {
+              const target =
+                process.env.VITE_POLARIS_API_URL || "http://localhost:8181"
+              console.log(
+                "📤 Proxying:",
+                req.method,
+                req.url,
+                "→",
+                target + proxyReq.path
+              )
+            })
+            proxy.on("proxyRes", (proxyRes, req) => {
+              console.log(
+                "Received Response from the Target:",
+                proxyRes.statusCode,
+                req.url
+              )
+            })
+          }
+        },
+      },
+      "/polaris": {
+        target: process.env.VITE_POLARIS_API_URL || "http://localhost:8181",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/polaris/, "/api/catalog/polaris"),
+        configure: (proxy) => {
+          // Only log in development mode
+          if (process.env.NODE_ENV === "development") {
+            proxy.on("error", (err) => {
+              console.error("Proxy error:", err)
+            })
+            proxy.on("proxyReq", (proxyReq, req) => {
+              const target =
+                process.env.VITE_POLARIS_API_URL || "http://localhost:8181"
+              console.log(
+                "📤 Proxying:",
+                req.method,
+                req.url,
+                "→",
+                target + proxyReq.path
+              )
+            })
+            proxy.on("proxyRes", (proxyRes, req) => {
+              console.log(
+                "Received Response from the Target:",
+                proxyRes.statusCode,
+                req.url
+              )
+            })
+          }
+        },
+      },
+    },
+  },
 })
