@@ -18,11 +18,13 @@
  */
 package org.apache.polaris.benchmarks.parameters
 
-case class WorkloadParameters(
-    createCommits: CreateCommitsParameters,
-    readTreeDataset: ReadTreeDatasetParameters,
-    createTreeDataset: CreateTreeDatasetParameters,
-    readUpdateTreeDataset: ReadUpdateTreeDatasetParameters,
-    weightedWorkloadOnTreeDataset: WeightedWorkloadOnTreeDatasetParameters,
-    s3SignRequest: S3SignRequestParameters
-) {}
+/**
+ * Case class to hold the parameters for the S3SignRequest simulation.
+ *
+ * @param tableThroughput The number of table S3 sign operations to perform simultaneously.
+ */
+case class S3SignRequestParameters(
+    tableThroughput: Int
+) {
+  require(tableThroughput >= 0, "Table throughput cannot be negative")
+}

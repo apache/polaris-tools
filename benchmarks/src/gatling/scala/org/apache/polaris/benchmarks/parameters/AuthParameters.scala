@@ -32,7 +32,9 @@ case class AuthParameters(
     clientSecret: String,
     refreshIntervalSeconds: Int,
     maxRetries: Int,
-    retryableHttpCodes: Set[Int]
+    retryableHttpCodes: Set[Int],
+    catalogRole: String,
+    privileges: Seq[String]
 ) {
   require(clientId != null && clientId.nonEmpty, "Client ID cannot be null or empty")
   require(clientSecret != null && clientSecret.nonEmpty, "Client secret cannot be null or empty")

@@ -129,4 +129,42 @@ case class CatalogActions(
       .header("Content-Type", "application/json")
       .check(status.is(200))
   )
+
+  /**
+   * Grants a specified privilege to a catalog role for a catalog. This is a fire-and-forget
+   * operation that does not validate the response, allowing for maximum throughput. The catalog
+   * name, catalog role name, and privilege should be available in the session.
+   */
+  val grantCatalogPrivilege: ChainBuilder = exec(
+    http("Grant catalog privilege")
+      .put("/api/management/v1/catalogs/#{catalogName}/catalog-roles/#{catalogRoleName}/grants")
+      .header("Authorization", "Bearer #{accessToken}")
+      .header("Content-Type", "application/json")
+      .body(
+        StringBody(
+          """{
+            |  "grant": {
+            |    "type": "catalog",
+            |    "privilege": "#{privilege}"
+            |  }
+            |}""".stripMargin
+        )
+      )
+  )
+
+  /**
+   * Verifies that a specific privilege is granted to a catalog role for a catalog. The catalog
+   * name, catalog role name, and privilege should be available in the session. If the privilege is
+   * not found, the check will fail and the request will be marked as failed.
+   */
+  val checkCatalogPrivilegeGranted: ChainBuilder = exec(
+    http("Check catalog privilege granted")
+      .get("/api/management/v1/catalogs/#{catalogName}/catalog-roles/#{catalogRoleName}/grants")
+      .header("Authorization", "Bearer #{accessToken}")
+      .header("Content-Type", "application/json")
+      .check(status.is(200))
+      .check(
+        jsonPath("$.grants[?(@.type == 'catalog' && @.privilege == '#{privilege}')]").exists
+      )
+  )
 }
