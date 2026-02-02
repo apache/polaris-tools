@@ -74,6 +74,7 @@ dependencies {
     exclude("com.google.protobuf", "protobuf-java")
     exclude("org.apache.calcite")
     exclude("org.apache.calcite.avatica")
+    exclude("org.apache.curator", "apache-curator") // this is just a pom, but referenced as a jar
     exclude("com.google.code.findbugs", "jsr305")
   }
   runtimeOnly("org.apache.hadoop:hadoop-mapreduce-client-core:${libs.versions.hadoop.get()}")
