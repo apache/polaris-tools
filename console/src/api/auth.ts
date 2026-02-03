@@ -23,6 +23,15 @@ import { navigate } from "@/lib/navigation"
 import { REALM_HEADER_NAME } from "@/lib/constants"
 import { config } from "@/lib/config"
 import type { OAuthTokenResponse } from "@/types/api"
+import {
+  generatePKCE,
+  generateState,
+  storePKCEVerifier,
+  getPKCEVerifier,
+  storeState,
+  getState,
+  clearPKCESession,
+} from "@/lib/pkce"
 
 const TOKEN_URL = config.OAUTH_TOKEN_URL || `${config.POLARIS_API_URL}/api/catalog/v1/oauth/tokens`
 
@@ -107,9 +116,109 @@ export const authApi = {
 
   logout: (): void => {
     apiClient.clearAccessToken()
-    // Use a small delay to allow toast to show before redirect
+    clearPKCESession()
     setTimeout(() => {
       navigate("/login", true)
     }, 100)
+  },
+
+  initiateOIDCFlow: async (realm?: string): Promise<void> => {
+    const authorizationUrl = config.OIDC_AUTHORIZATION_URL
+    const clientId = config.OIDC_CLIENT_ID
+    const redirectUri = config.OIDC_REDIRECT_URI
+    const scope = config.OIDC_SCOPE
+
+    if (!authorizationUrl || !clientId || !redirectUri) {
+      throw new Error("OIDC configuration is incomplete. Please check environment variables.")
+    }
+
+    const { verifier, challenge } = await generatePKCE()
+    const state = generateState()
+
+    storePKCEVerifier(verifier)
+    storeState(state)
+
+    if (realm) {
+      sessionStorage.setItem("polaris_realm", realm)
+    }
+
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: scope,
+      state: state,
+      code_challenge: challenge,
+      code_challenge_method: "S256",
+    })
+
+    window.location.href = `${authorizationUrl}?${params.toString()}`
+  },
+
+  handleOIDCCallback: async (code: string, state: string): Promise<OAuthTokenResponse> => {
+    const storedState = getState()
+    if (!storedState || storedState !== state) {
+      clearPKCESession()
+      throw new Error("Invalid state parameter. Possible CSRF attack.")
+    }
+
+    const verifier = getPKCEVerifier()
+    if (!verifier) {
+      clearPKCESession()
+      throw new Error("Code verifier not found. Please restart the login process.")
+    }
+
+    const redirectUri = config.OIDC_REDIRECT_URI
+    if (!redirectUri) {
+      clearPKCESession()
+      throw new Error("Redirect URI not configured.")
+    }
+
+    try {
+      const response = await authApi.exchangeAuthCode(code, verifier, redirectUri)
+      clearPKCESession()
+      return response
+    } catch (error) {
+      clearPKCESession()
+      throw error
+    }
+  },
+
+  exchangeAuthCode: async (
+    code: string,
+    codeVerifier: string,
+    redirectUri: string,
+    realm?: string
+  ): Promise<OAuthTokenResponse> => {
+    const clientId = config.OIDC_CLIENT_ID
+    if (!clientId) {
+      throw new Error("OIDC client ID not configured.")
+    }
+
+    const formData = new URLSearchParams()
+    formData.append("grant_type", "authorization_code")
+    formData.append("code", code)
+    formData.append("client_id", clientId)
+    formData.append("redirect_uri", redirectUri)
+    formData.append("code_verifier", codeVerifier)
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    const storedRealm = realm || sessionStorage.getItem("polaris_realm")
+    if (storedRealm) {
+      headers[REALM_HEADER_NAME] = storedRealm
+    }
+
+    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+      headers,
+    })
+
+    if (response.data.access_token) {
+      apiClient.setAccessToken(response.data.access_token)
+    }
+
+    return response.data
   },
 }

@@ -429,6 +429,9 @@ export interface OAuthTokenResponse {
   token_type: string
   expires_in?: number
   issued_token_type?: string
+  refresh_token?: string
+  id_token?: string
+  scope?: string
 }
 
 // Error Responses

@@ -24,6 +24,7 @@ import { authApi } from "@/api/auth"
 interface AuthContextType {
   isAuthenticated: boolean
   login: (clientId: string, clientSecret: string, scope: string, realm: string) => Promise<void>
+  loginWithOIDC: (realm?: string) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -48,6 +49,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const loginWithOIDC = async (realm?: string) => {
+    try {
+      await authApi.initiateOIDCFlow(realm)
+    } catch (error) {
+      setIsAuthenticated(false)
+      throw error
+    }
+  }
+
   const logout = () => {
     toast.success("Logged out successfully")
     authApi.logout()
@@ -55,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, loginWithOIDC, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

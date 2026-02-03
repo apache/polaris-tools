@@ -26,6 +26,7 @@ import { Layout } from "@/components/layout/Layout"
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { Login } from "@/pages/Login"
+import { AuthCallback } from "@/pages/AuthCallback"
 import { Home } from "@/pages/Home"
 import { Connections } from "@/pages/Connections"
 import { Catalogs } from "@/pages/Catalogs"
@@ -58,6 +59,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route
                   element={
                     <ProtectedRoute>

@@ -26,17 +26,22 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Logo } from "@/components/layout/Logo"
 import { Footer } from "@/components/layout/Footer"
+import { config } from "@/lib/config"
 
 export function Login() {
   const [clientId, setClientId] = useState("")
   const [clientSecret, setClientSecret] = useState("")
-  // Initialize realm with value from .env file if present
   const [realm, setRealm] = useState(import.meta.env.VITE_POLARIS_REALM || "")
   const [scope, setScope] = useState(import.meta.env.VITE_POLARIS_PRINCIPAL_SCOPE || "")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, loginWithOIDC } = useAuth()
   const navigate = useNavigate()
+  const isOIDCConfigured = !!(
+    config.OIDC_AUTHORIZATION_URL &&
+    config.OIDC_CLIENT_ID &&
+    config.OIDC_REDIRECT_URI
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,6 +58,18 @@ export function Login() {
           : "Failed to authenticate. Please check your credentials."
       )
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOIDCLogin = async () => {
+    setError("")
+    setLoading(true)
+
+    try {
+      await loginWithOIDC(realm)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to initiate OIDC login.")
       setLoading(false)
     }
   }
@@ -118,8 +135,29 @@ export function Login() {
                 </div>
               )}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign in"}
+                {loading ? "Signing in..." : "Sign in with Client Credentials"}
               </Button>
+              {isOIDCConfigured && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">Or</span>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleOIDCLogin}
+                    disabled={loading}
+                  >
+                    {loading ? "Redirecting..." : "Sign in with OIDC"}
+                  </Button>
+                </>
+              )}
             </form>
           </CardContent>
         </Card>
