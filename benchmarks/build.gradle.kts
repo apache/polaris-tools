@@ -21,7 +21,7 @@ import org.nosphere.apache.rat.RatTask
 
 plugins {
     scala
-    id("io.gatling.gradle") version "3.13.5.2"
+    id("io.gatling.gradle") version "3.14.9.8"
     id("com.diffplug.spotless") version "7.0.2"
     id("org.nosphere.apache.rat") version "0.8.1"
 }
