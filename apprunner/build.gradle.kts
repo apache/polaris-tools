@@ -66,6 +66,8 @@ eclipse { project { name = ideName } }
 tasks.named<RatTask>("rat").configure {
   // These are Gradle file pattern syntax
   excludes.add("**/build/**")
+  excludes.add("gradle/wrapper/gradle-wrapper*")
+  excludes.add("**/gradle/wrapper/gradle-wrapper*")
 
   excludes.add("LICENSE")
   excludes.add("NOTICE")
