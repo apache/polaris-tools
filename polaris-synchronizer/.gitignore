@@ -90,3 +90,7 @@ site/site
 
 # Ignore Gradle build output directory
 build
+
+# Ignore Gradle wrapper jar file
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper-*.sha256
