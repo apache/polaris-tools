@@ -43,15 +43,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 80
-          env:
-            - name: VITE_POLARIS_API_URL
-              value: {{ .Values.env.polarisApiUrl | quote }}
-            - name: VITE_POLARIS_REALM
-              value: {{ .Values.env.polarisRealm | quote }}
-            - name: VITE_POLARIS_PRINCIPAL_SCOPE
-              value: {{ .Values.env.polarisPrincipalScope | quote }}
-            - name: VITE_OAUTH_TOKEN_URL
-              value: {{ .Values.env.oauthTokenUrl | quote }}
+          volumeMounts:
+            - name: workspaces-config
+              mountPath: /opt/app-root/src/workspaces.json
+              subPath: workspaces.json
+              readOnly: true
           readinessProbe:
             httpGet:
               path: /health
@@ -70,3 +66,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
+      volumes:
+        - name: workspaces-config
+          configMap:
+            name: {{ include "polaris-console.fullname" . }}-workspaces

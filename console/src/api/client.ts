@@ -19,110 +19,111 @@
 
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios"
 import { navigate } from "@/lib/navigation"
-import { REALM_HEADER_NAME } from "@/lib/constants"
-import { config } from "@/lib/config"
-
-const API_BASE_URL = config.POLARIS_API_URL
-const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
-const CATALOG_BASE_URL = `${API_BASE_URL}/api/catalog/v1`
-const GENERIC_TABLES_BASE_URL = `${API_BASE_URL}/api/catalog/polaris/v1`
+import { getCurrentWorkspace } from "@/lib/workspaces"
 
 class ApiClient {
-  private managementClient: AxiosInstance
-  private catalogClient: AxiosInstance
-  private polarisClient: AxiosInstance
-  // Store access token in memory only (not in localStorage for security)
-  private accessToken: string | null = null
+  private readonly TOKENS_KEY = "polaris_workspace_tokens"
 
-  constructor() {
-    this.managementClient = axios.create({
-      baseURL: MANAGEMENT_BASE_URL,
+  private createClient(pathSuffix: string): AxiosInstance {
+    const client = axios.create({
       headers: {
         "Content-Type": "application/json",
       },
     })
 
-    this.catalogClient = axios.create({
-      baseURL: CATALOG_BASE_URL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-
-    this.polarisClient = axios.create({
-      baseURL: GENERIC_TABLES_BASE_URL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-
-    this.setupInterceptors()
-  }
-
-  private setupInterceptors() {
-    // Request interceptor to add auth token
-    const requestInterceptor = (config: InternalAxiosRequestConfig) => {
+    client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+      const workspace = getCurrentWorkspace()
       const token = this.getAccessToken()
-      // Read realm from localStorage (non-sensitive configuration)
-      const realm = localStorage.getItem("polaris_realm") || import.meta.env.VITE_POLARIS_REALM
+
+      if (workspace?.server?.api) {
+        config.baseURL = `${workspace.server.api}${pathSuffix}`
+      }
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
 
-      if (realm) {
-        config.headers[REALM_HEADER_NAME] = realm
+      if (workspace) {
+        const realmHeaderName = workspace["realm-header"] || "Polaris-Realm"
+        config.headers[realmHeaderName] = workspace.realm
       }
 
       return config
-    }
+    })
 
-    // Response interceptor for error handling
-    const responseErrorInterceptor = (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          // Unauthorized - clear token and redirect to login
-          this.clearAccessToken()
-          navigate("/login", true)
-        }
-      }
-      return Promise.reject(error)
-    }
-
-    this.managementClient.interceptors.request.use(requestInterceptor)
-    this.catalogClient.interceptors.request.use(requestInterceptor)
-    this.polarisClient.interceptors.request.use(requestInterceptor)
-    this.managementClient.interceptors.response.use(
+    client.interceptors.response.use(
       (response) => response,
-      responseErrorInterceptor
+      (error: unknown) => {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            this.clearAccessToken()
+            navigate("/login", true)
+          }
+        }
+        return Promise.reject(error)
+      }
     )
-    this.catalogClient.interceptors.response.use((response) => response, responseErrorInterceptor)
-    this.polarisClient.interceptors.response.use((response) => response, responseErrorInterceptor)
+
+    return client
   }
 
-  getAccessToken(): string | null {
-    return this.accessToken
+  private getTokensMap(): Record<string, string> {
+    const stored = sessionStorage.getItem(this.TOKENS_KEY)
+    if (stored) {
+      try {
+        return JSON.parse(stored)
+      } catch {
+        return {}
+      }
+    }
+    return {}
   }
 
-  clearAccessToken(): void {
-    this.accessToken = null
-    localStorage.removeItem("polaris_realm")
+  private saveTokensMap(tokens: Record<string, string>): void {
+    sessionStorage.setItem(this.TOKENS_KEY, JSON.stringify(tokens))
   }
 
-  setAccessToken(token: string): void {
-    this.accessToken = token
+  getAccessToken(workspaceName?: string): string | null {
+    const workspace = workspaceName || getCurrentWorkspace()?.name
+    if (!workspace) return null
+
+    const tokens = this.getTokensMap()
+    return tokens[workspace] || null
+  }
+
+  clearAccessToken(workspaceName?: string): void {
+    const workspace = workspaceName || getCurrentWorkspace()?.name
+    if (!workspace) return
+
+    const tokens = this.getTokensMap()
+    delete tokens[workspace]
+    this.saveTokensMap(tokens)
+  }
+
+  setAccessToken(token: string, workspaceName?: string): void {
+    const workspace = workspaceName || getCurrentWorkspace()?.name
+    if (!workspace) return
+
+    const tokens = this.getTokensMap()
+    tokens[workspace] = token
+    this.saveTokensMap(tokens)
+  }
+
+  hasToken(workspaceName: string): boolean {
+    const tokens = this.getTokensMap()
+    return !!tokens[workspaceName]
   }
 
   getManagementClient(): AxiosInstance {
-    return this.managementClient
+    return this.createClient("/api/management/v1")
   }
 
   getCatalogClient(): AxiosInstance {
-    return this.catalogClient
+    return this.createClient("/api/catalog/v1")
   }
 
   getPolarisClient(): AxiosInstance {
-    return this.polarisClient
+    return this.createClient("/api/catalog/polaris/v1")
   }
 }
 

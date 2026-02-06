@@ -17,13 +17,19 @@
  * under the License.
  */
 
+import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { catalogsApi } from "@/api/management/catalogs"
 import { principalsApi } from "@/api/management/principals"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sparkles } from "lucide-react"
+import { Logo } from "@/components/layout/Logo.tsx"
+import { setPageTitle } from "@/lib/pageTitle"
 
 export function Home() {
+  useEffect(() => {
+    setPageTitle("Home")
+  }, [])
   const { data: catalogs } = useQuery({
     queryKey: ["catalogs"],
     queryFn: () => catalogsApi.list(),
@@ -39,7 +45,7 @@ export function Home() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">
-          Get started with Apache Polaris (incubating)
+          <Logo clickable={false} />
         </h1>
       </div>
 

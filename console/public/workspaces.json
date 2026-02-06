@@ -1,0 +1,22 @@
+{
+  "workspaces": [
+    {
+      "name": "Default Polaris",
+      "description": "Default Polaris Workspace",
+      "is_default": true,
+      "realm-header": "Polaris-Realm",
+      "realm": "POLARIS",
+      "server": {
+        "api": "http://localhost:8181"
+      },
+      "auth": [
+        {
+          "type": "internal",
+          "url": "http://localhost:8181/api/catalog/v1/oauth/tokens",
+          "scope": "PRINCIPAL_ROLE:ALL"
+        }
+      ]
+    }
+  ]
+}
+

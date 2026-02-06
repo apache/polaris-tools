@@ -17,13 +17,14 @@
  * under the License.
  */
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 import { Link as LinkIcon, Plus, RefreshCw, Search, MoreVertical } from "lucide-react"
 import { principalsApi } from "@/api/management/principals"
 import { getErrorMessage } from "@/lib/errorHandler"
+import { setPageTitle } from "@/lib/pageTitle"
 import type { Principal } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -57,6 +58,10 @@ import { EditPrincipalModal } from "@/components/forms/EditPrincipalModal"
 import { ResetCredentialsModal } from "@/components/forms/ResetCredentialsModal"
 
 export function Connections() {
+  useEffect(() => {
+    setPageTitle("Connections")
+  }, [])
+
   const [searchQuery, setSearchQuery] = useState("")
   const [isConfigureModalOpen, setIsConfigureModalOpen] = useState(false)
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false)

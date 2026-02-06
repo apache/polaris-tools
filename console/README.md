@@ -39,19 +39,37 @@ make dev
 make build
 ```
 
-### Environment Variables
+### Configuration
 
-Create a `.env` file based on `.env.example`:
+The console is configured via `public/workspaces.json` which defines one or more workspaces. Each workspace represents a Polaris instance with its own authentication and API configuration.
 
-```env
-VITE_POLARIS_API_URL=http://localhost:8181
-VITE_POLARIS_REALM=POLARIS
-VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
-VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # optional, defaults to "Polaris-Realm"
-VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/catalog/v1/oauth/tokens  # optional, defaults to ${VITE_POLARIS_API_URL}/api/catalog/v1/oauth/tokens
+Default `workspaces.json`:
+
+```json
+{
+  "workspaces": [
+    {
+      "name": "Default Polaris",
+      "description": "Default Polaris Workspace",
+      "is_default": true,
+      "realm-header": "Polaris-Realm",
+      "realm": "POLARIS",
+      "server": {
+        "api": "http://localhost:8181"
+      },
+      "auth": [
+        {
+          "type": "internal",
+          "url": "http://localhost:8181/api/catalog/v1/oauth/tokens",
+          "scope": "PRINCIPAL_ROLE:ALL"
+        }
+      ]
+    }
+  ]
+}
 ```
 
-> **Note:** The console makes direct API calls to the Polaris server. Ensure CORS is properly configured on the server (see below).
+The console loads this configuration at startup and allows users to manage workspaces through the UI.
 
 ### Server-Side CORS Configuration
 
@@ -116,25 +134,6 @@ advancedConfig:
 
 See [Quarkus CORS documentation](https://quarkus.io/guides/security-cors) for more details.
 
-## Project Structure
-
-```
-src/
-├── api/              # API client and endpoints
-│   ├── client.ts     # Axios instance with interceptors
-│   ├── auth.ts       # Authentication API
-│   └── management/   # Management Service APIs
-├── components/        # React components
-│   ├── ui/           # Shadcn UI components
-│   ├── layout/       # Layout components
-│   └── forms/        # Form components
-├── hooks/            # Custom React hooks
-├── lib/              # Utilities
-├── pages/            # Page components
-├── types/            # TypeScript type definitions
-└── App.tsx           # Main app component
-```
-
 ## Technology Stack
 
 - **Framework**: React 19 with TypeScript
@@ -157,10 +156,18 @@ The project uses:
 To start developing:
 
 ```bash
+make install
 make dev
 ```
 
 The app will be available at `http://localhost:5173`
+
+## Linting
+
+```bash
+make lint
+make lint-fix
+```
 
 ## Building
 
@@ -191,10 +198,14 @@ Then, you run Polaris Console using:
 
 ```bash
 docker run -p 8080:80 \
-  -e VITE_POLARIS_API_URL=http://polaris:8181 \
-  -e VITE_POLARIS_REALM=POLARIS \
-  -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
+  -v $(pwd)/workspaces.json:/opt/app-root/src/workspaces.json:ro \
   apache/polaris-console:latest
+```
+
+Or use the default embedded configuration:
+
+```bash
+docker run -p 8080:80 apache/polaris-console:latest
 ```
 
 NB: Hopefully, the Apache Polaris official docker image will be available soon.
@@ -233,10 +244,19 @@ and start Polaris instance in `polaris` namespace via helm.
 Customize the deployment by creating a `values.yaml` file:
 
 ```yaml
-env:
-  polarisApiUrl: "http://polaris:8181"
-  polarisRealm: "POLARIS"
-  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+workspaces:
+  workspaces:
+    - name: "Production Polaris"
+      description: "Production Polaris Workspace"
+      is_default: true
+      realm-header: "Polaris-Realm"
+      realm: "POLARIS"
+      server:
+        api: "http://polaris:8181"
+      auth:
+        - type: "internal"
+          url: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+          scope: "PRINCIPAL_ROLE:ALL"
 
 service:
   type: ClusterIP

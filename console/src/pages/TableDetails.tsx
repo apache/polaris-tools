@@ -17,13 +17,14 @@
  * under the License.
  */
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, RefreshCw, Table as TableIcon, Pencil, Trash2 } from "lucide-react"
 import { tablesApi } from "@/api/catalog/tables"
 import { catalogsApi } from "@/api/management/catalogs"
 import { namespacesApi } from "@/api/catalog/namespaces"
+import { setPageTitle } from "@/lib/pageTitle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TableDDLDisplay } from "@/components/catalog/TableDDLDisplay"
@@ -62,6 +63,10 @@ export function TableDetails() {
   const queryClient = useQueryClient()
 
   const namespaceArray = namespaceParam?.split(".") || []
+
+  useEffect(() => {
+    setPageTitle(tableName || "Table")
+  }, [tableName])
 
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],
