@@ -29,4 +29,20 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    cssCodeSplit: false,
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
+        manualChunks: (id) => {
+          if (id.includes("node_modules")) {
+            return "vendor"
+          }
+        },
+      },
+    },
+  },
 })
