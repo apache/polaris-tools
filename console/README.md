@@ -44,11 +44,20 @@ make build
 Create a `.env` file based on `.env.example`:
 
 ```env
+# Required
 VITE_POLARIS_API_URL=http://localhost:8181
 VITE_POLARIS_REALM=POLARIS
 VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
-VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # optional, defaults to "Polaris-Realm"
-VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/catalog/v1/oauth/tokens  # optional, defaults to ${VITE_POLARIS_API_URL}/api/catalog/v1/oauth/tokens
+
+# Optional
+VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm  # defaults to "Polaris-Realm"
+VITE_OAUTH_TOKEN_URL=http://localhost:8181/api/catalog/v1/oauth/tokens  # defaults to ${VITE_POLARIS_API_URL}/api/catalog/v1/oauth/tokens
+
+# OIDC Authentication (optional)
+VITE_OIDC_ISSUER_URL=http://localhost:8080/realms/EXTERNAL
+VITE_OIDC_CLIENT_ID=polaris-console
+VITE_OIDC_REDIRECT_URI=http://localhost:5173/auth/callback
+VITE_OIDC_SCOPE=openid profile email
 ```
 
 > **Note:** The console makes direct API calls to the Polaris server. Ensure CORS is properly configured on the server (see below).
@@ -115,6 +124,47 @@ advancedConfig:
 ```
 
 See [Quarkus CORS documentation](https://quarkus.io/guides/security-cors) for more details.
+
+## Authentication
+
+The console supports two authentication methods:
+
+### 1. Client Credentials (Default)
+
+Standard OAuth 2.0 client credentials flow using username/password. This is the default authentication method.
+
+### 2. OIDC Authentication (Optional)
+
+The console supports OpenID Connect (OIDC) authentication with PKCE flow. When configured, users can authenticate using an external identity provider (e.g., Keycloak, Auth0, Okta).
+
+#### OIDC Configuration
+
+Set these environment variables to enable OIDC:
+
+```env
+VITE_OIDC_ISSUER_URL=http://localhost:8080/realms/EXTERNAL
+VITE_OIDC_CLIENT_ID=polaris-console
+VITE_OIDC_REDIRECT_URI=http://localhost:5173/auth/callback
+VITE_OIDC_SCOPE=openid profile email
+```
+
+**Configuration Details:**
+
+- `VITE_OIDC_ISSUER_URL`: Your OIDC provider's issuer URL. The console will automatically discover endpoints using `.well-known/openid-configuration`
+- `VITE_OIDC_CLIENT_ID`: Client ID registered with your OIDC provider
+- `VITE_OIDC_REDIRECT_URI`: Callback URL where the OIDC provider redirects after authentication (must match your app URL + `/auth/callback`)
+- `VITE_OIDC_SCOPE`: OAuth scopes to request (typically `openid profile email`)
+
+#### OIDC Provider Setup (Keycloak Example)
+
+1. Create a new client in Keycloak
+2. Set **Client ID** to match `VITE_OIDC_CLIENT_ID`
+3. Set **Access Type** to `public` (PKCE flow)
+4. Add **Valid Redirect URIs**: `http://localhost:5173/auth/callback`
+5. Enable **Standard Flow** (Authorization Code Flow)
+6. Configure token claims to include user principal information
+
+**Note:** Both the console and Polaris server must use the same OIDC provider.
 
 ## Project Structure
 
@@ -193,7 +243,21 @@ Then, you run Polaris Console using:
 docker run -p 8080:80 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
-  -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
+  -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
+  apache/polaris-console:latest
+```
+
+To enable OIDC authentication, add OIDC environment variables:
+
+```bash
+docker run -p 8080:80 \
+  -e VITE_POLARIS_API_URL=http://polaris:8181 \
+  -e VITE_POLARIS_REALM=POLARIS \
+  -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
+  -e VITE_OIDC_ISSUER_URL=http://keycloak:8080/realms/EXTERNAL \
+  -e VITE_OIDC_CLIENT_ID=polaris-console \
+  -e VITE_OIDC_REDIRECT_URI=http://localhost:8080/auth/callback \
+  -e VITE_OIDC_SCOPE="openid profile email" \
   apache/polaris-console:latest
 ```
 
@@ -237,6 +301,12 @@ env:
   polarisApiUrl: "http://polaris:8181"
   polarisRealm: "POLARIS"
   oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+
+  # OIDC Configuration (optional)
+  oidcIssuerUrl: "http://keycloak:8080/realms/EXTERNAL"
+  oidcClientId: "polaris-console"
+  oidcRedirectUri: "http://localhost:4000/auth/callback"
+  oidcScope: "openid profile email"
 
 service:
   type: ClusterIP
