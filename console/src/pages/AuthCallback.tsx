@@ -69,7 +69,7 @@ export function AuthCallback() {
     }
 
     handleCallback()
-  }, [searchParams, navigate])
+  }, [searchParams, navigate, completeOIDCLogin])
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -101,4 +101,3 @@ export function AuthCallback() {
     </div>
   )
 }
-

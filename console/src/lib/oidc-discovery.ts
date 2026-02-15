@@ -86,9 +86,7 @@ export async function discoverOIDCEndpoints(issuer: string): Promise<OIDCDiscove
     return response.data
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to discover OIDC endpoints from ${wellKnownUrl}: ${error.message}`
-      )
+      throw new Error(`Failed to discover OIDC endpoints from ${wellKnownUrl}: ${error.message}`)
     }
     throw error
   }

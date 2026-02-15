@@ -113,7 +113,8 @@ export function Login() {
                       <div className="space-y-2">
                         <h4 className="font-medium text-sm">Realm Configuration</h4>
                         <p className="text-xs text-muted-foreground">
-                          This UI console is configured to connect to a specific Polaris server realm.
+                          This UI console is configured to connect to a specific Polaris server
+                          realm.
                         </p>
                       </div>
                     </PopoverContent>

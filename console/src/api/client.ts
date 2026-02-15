@@ -76,8 +76,9 @@ class ApiClient {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           this.clearAccessToken()
-          const errorMessage = error.response?.data?.message ||
-                               "Authentication failed. User may not exist in Polaris or token is invalid."
+          const errorMessage =
+            error.response?.data?.message ||
+            "Authentication failed. User may not exist in Polaris or token is invalid."
           sessionStorage.setItem("auth_error", errorMessage)
           navigate("/login", true)
         }
