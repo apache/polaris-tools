@@ -145,6 +145,7 @@ export const authApi = {
       state: state,
       code_challenge: challenge,
       code_challenge_method: "S256",
+      prompt: "login",
     })
 
     window.location.href = `${authorizationUrl}?${params.toString()}`

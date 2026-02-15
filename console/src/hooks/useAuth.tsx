@@ -20,6 +20,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
+import { apiClient } from "@/api/client"
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -61,15 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
-      authApi.logout()
+      apiClient.clearAccessToken()
       throw error
     }
   }
 
   const logout = () => {
     toast.success("Logged out successfully")
-    authApi.logout()
     setIsAuthenticated(false)
+    authApi.logout()
   }
 
   return (

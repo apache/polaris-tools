@@ -61,7 +61,9 @@ export function AuthCallback() {
         await completeOIDCLogin(code, state)
         navigate("/")
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Authentication failed")
+        const errorMessage = err instanceof Error ? err.message : "Authentication failed"
+        setError(errorMessage)
+        sessionStorage.setItem("auth_error", errorMessage)
         setTimeout(() => navigate("/login"), 3000)
       }
     }

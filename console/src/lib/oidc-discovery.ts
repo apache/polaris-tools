@@ -93,4 +93,3 @@ export async function discoverOIDCEndpoints(issuer: string): Promise<OIDCDiscove
     throw error
   }
 }
-

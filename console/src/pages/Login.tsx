@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Info } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
@@ -43,6 +43,14 @@ export function Login() {
     config.OIDC_CLIENT_ID &&
     config.OIDC_REDIRECT_URI
   )
+
+  useEffect(() => {
+    const authError = sessionStorage.getItem("auth_error")
+    if (authError) {
+      setError(authError)
+      sessionStorage.removeItem("auth_error")
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -145,11 +153,6 @@ export function Login() {
                   placeholder="Enter the scope"
                 />
               </div>
-              {error && (
-                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                  {error}
-                </div>
-              )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Signing in..." : "Sign in with Client Credentials"}
               </Button>
@@ -173,6 +176,11 @@ export function Login() {
                     {loading ? "Redirecting..." : "Sign in with OIDC"}
                   </Button>
                 </>
+              )}
+              {error && (
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                  {error}
+                </div>
               )}
             </form>
           </CardContent>
