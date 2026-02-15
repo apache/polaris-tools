@@ -39,7 +39,7 @@ export function Login() {
   const { login, loginWithOIDC } = useAuth()
   const navigate = useNavigate()
   const isOIDCConfigured = !!(
-    config.OIDC_AUTHORIZATION_URL &&
+    config.OIDC_ISSUER_URL &&
     config.OIDC_CLIENT_ID &&
     config.OIDC_REDIRECT_URI
   )

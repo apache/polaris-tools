@@ -31,6 +31,7 @@ import {
   getState,
   clearPKCESession,
 } from "@/lib/pkce"
+import { discoverOIDCEndpoints } from "@/lib/oidc-discovery"
 
 const TOKEN_URL = config.OAUTH_TOKEN_URL || `${config.POLARIS_API_URL}/api/catalog/v1/oauth/tokens`
 
@@ -120,13 +121,23 @@ export const authApi = {
   },
 
   initiateOIDCFlow: async (): Promise<void> => {
-    const authorizationUrl = config.OIDC_AUTHORIZATION_URL
+    const issuerUrl = config.OIDC_ISSUER_URL
     const clientId = config.OIDC_CLIENT_ID
     const redirectUri = config.OIDC_REDIRECT_URI
     const scope = config.OIDC_SCOPE
 
-    if (!authorizationUrl || !clientId || !redirectUri) {
+    if (!issuerUrl || !clientId || !redirectUri) {
       throw new Error("OIDC configuration is incomplete. Please check environment variables.")
+    }
+
+    clearPKCESession()
+
+    const discovery = await discoverOIDCEndpoints(issuerUrl)
+    const authorizationUrl = discovery.authorization_endpoint
+
+    if (import.meta.env.DEV) {
+      console.log("🔐 OIDC Discovery:", discovery)
+      console.log("🔐 Authorization URL:", authorizationUrl)
     }
 
     const { verifier, challenge } = await generatePKCE()
@@ -149,6 +160,11 @@ export const authApi = {
   },
 
   handleOIDCCallback: async (code: string, state: string): Promise<OAuthTokenResponse> => {
+    if (import.meta.env.DEV) {
+      console.log("🔐 Handling OIDC callback with code:", code.substring(0, 10) + "...")
+      console.log("🔐 State:", state)
+    }
+
     const storedState = getState()
     if (!storedState || storedState !== state) {
       clearPKCESession()
@@ -168,11 +184,35 @@ export const authApi = {
     }
 
     try {
-      const response = await authApi.exchangeAuthCode(code, verifier, redirectUri)
+      const oidcTokenResponse = await authApi.exchangeAuthCode(code, verifier, redirectUri)
       clearPKCESession()
-      return response
+
+      if (import.meta.env.DEV) {
+        console.log("🔐 Got OIDC token:", {
+          token_type: oidcTokenResponse.token_type,
+          expires_in: oidcTokenResponse.expires_in,
+          scope: oidcTokenResponse.scope,
+        })
+        console.log("🔐 Token (first 20 chars):", oidcTokenResponse.access_token.substring(0, 20))
+
+        try {
+          const parts = oidcTokenResponse.access_token.split('.')
+          if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1]))
+            console.log("🔐 Token claims:", payload)
+            console.log("🔐 Audience (aud):", Array.isArray(payload.aud) ? payload.aud : [payload.aud])
+          }
+        } catch (e) {
+          console.log("🔐 Could not decode token:", e)
+        }
+      }
+
+      return oidcTokenResponse
     } catch (error) {
       clearPKCESession()
+      if (import.meta.env.DEV) {
+        console.error("🔐 OIDC callback error:", error)
+      }
       throw error
     }
   },
@@ -182,9 +222,20 @@ export const authApi = {
     codeVerifier: string,
     redirectUri: string
   ): Promise<OAuthTokenResponse> => {
+    const issuerUrl = config.OIDC_ISSUER_URL
     const clientId = config.OIDC_CLIENT_ID
-    if (!clientId) {
-      throw new Error("OIDC client ID not configured.")
+
+    if (!issuerUrl || !clientId) {
+      throw new Error("OIDC configuration is incomplete. Please check environment variables.")
+    }
+
+    const discovery = await discoverOIDCEndpoints(issuerUrl)
+    const tokenUrl = discovery.token_endpoint
+
+    if (import.meta.env.DEV) {
+      console.log("🔐 Exchanging code at token URL:", tokenUrl)
+      console.log("🔐 Client ID:", clientId)
+      console.log("🔐 Redirect URI:", redirectUri)
     }
 
     const formData = new URLSearchParams()
@@ -198,11 +249,7 @@ export const authApi = {
       "Content-Type": "application/x-www-form-urlencoded",
     }
 
-    if (config.POLARIS_REALM) {
-      headers[config.REALM_HEADER_NAME] = config.POLARIS_REALM
-    }
-
-    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+    const response = await axios.post<OAuthTokenResponse>(tokenUrl, formData, {
       headers,
     })
 

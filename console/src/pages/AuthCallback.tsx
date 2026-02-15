@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import { authApi } from "@/api/auth"
+import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Logo } from "@/components/layout/Logo"
 import { Footer } from "@/components/layout/Footer"
@@ -28,9 +28,15 @@ import { Loader2 } from "lucide-react"
 export function AuthCallback() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { completeOIDCLogin } = useAuth()
   const [error, setError] = useState<string>("")
+  const hasProcessed = useRef(false)
 
   useEffect(() => {
+    if (hasProcessed.current) {
+      return
+    }
+
     const handleCallback = async () => {
       const code = searchParams.get("code")
       const state = searchParams.get("state")
@@ -49,8 +55,10 @@ export function AuthCallback() {
         return
       }
 
+      hasProcessed.current = true
+
       try {
-        await authApi.handleOIDCCallback(code, state)
+        await completeOIDCLogin(code, state)
         navigate("/")
       } catch (err) {
         setError(err instanceof Error ? err.message : "Authentication failed")
