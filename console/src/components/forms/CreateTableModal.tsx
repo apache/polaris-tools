@@ -77,7 +77,7 @@ interface SchemaFieldState extends Omit<SchemaField, "type"> {
 
 interface FieldTypeObject {
   type: string
-  fields?: SchemaFieldState[] | SchemaField[]
+  fields?: Array<SchemaFieldState | SchemaField>
   [key: string]: unknown
 }
 
@@ -290,7 +290,7 @@ export function CreateTableModal({
           if (field.elementType.type === "struct" && field.elementType.fields) {
             elementType = {
               type: "struct",
-              fields: field.elementType.fields.map(convertFieldToApi),
+              fields: (field.elementType.fields as SchemaFieldState[]).map(convertFieldToApi),
             }
           } else {
             elementType = field.elementType
@@ -357,7 +357,8 @@ export function CreateTableModal({
       }
 
       // Convert parsed JSON to SchemaFieldState
-      const convertFromJson = (jsonField: Record<string, unknown>): SchemaFieldState => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const convertFromJson = (jsonField: any): SchemaFieldState => {
         let fieldType: string
         let typeCategory: FieldTypeCategory = "primitive"
         let decimalPrecision: number | undefined
