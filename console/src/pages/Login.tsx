@@ -155,7 +155,7 @@ export function Login() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign in with Client Credentials"}
+                {loading ? "Signing in..." : "Sign in"}
               </Button>
               {isOIDCConfigured && (
                 <>
