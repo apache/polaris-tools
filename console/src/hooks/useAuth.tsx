@@ -23,8 +23,8 @@ import { authApi } from "@/api/auth"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  login: (clientId: string, clientSecret: string, scope: string, realm: string) => Promise<void>
-  loginWithOIDC: (realm?: string) => Promise<void>
+  login: (clientId: string, clientSecret: string, scope: string) => Promise<void>
+  loginWithOIDC: () => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -35,13 +35,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [loading] = useState<boolean>(false)
 
-  const login = async (clientId: string, clientSecret: string, scope: string, realm: string) => {
+  const login = async (clientId: string, clientSecret: string, scope: string) => {
     try {
-      // Store realm in localStorage (non-sensitive configuration)
-      if (realm) {
-        localStorage.setItem("polaris_realm", realm)
-      }
-      await authApi.getToken(clientId, clientSecret, scope, realm)
+      await authApi.getToken(clientId, clientSecret, scope)
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
@@ -49,9 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const loginWithOIDC = async (realm?: string) => {
+  const loginWithOIDC = async () => {
     try {
-      await authApi.initiateOIDCFlow(realm)
+      await authApi.initiateOIDCFlow()
     } catch (error) {
       setIsAuthenticated(false)
       throw error

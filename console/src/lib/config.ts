@@ -54,7 +54,7 @@ function getConfig<T extends string | undefined>(key: keyof AppConfig, defaultVa
 
 export const config = {
   POLARIS_API_URL: getConfig("VITE_POLARIS_API_URL", ""),
-  POLARIS_REALM: getConfig("VITE_POLARIS_REALM", ""),
+  POLARIS_REALM: getConfig("VITE_POLARIS_REALM", "POLARIS"),
   POLARIS_PRINCIPAL_SCOPE: getConfig("VITE_POLARIS_PRINCIPAL_SCOPE", ""),
   OAUTH_TOKEN_URL: getConfig("VITE_OAUTH_TOKEN_URL", ""),
   REALM_HEADER_NAME: getConfig("VITE_POLARIS_REALM_HEADER_NAME", "Polaris-Realm"),

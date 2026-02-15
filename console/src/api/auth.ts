@@ -20,7 +20,6 @@
 import axios from "axios"
 import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
-import { REALM_HEADER_NAME } from "@/lib/constants"
 import { config } from "@/lib/config"
 import type { OAuthTokenResponse } from "@/types/api"
 import {
@@ -43,8 +42,7 @@ export const authApi = {
   getToken: async (
     clientId: string,
     clientSecret: string,
-    scope: string,
-    realm?: string
+    scope: string
   ): Promise<OAuthTokenResponse> => {
     const formData = new URLSearchParams()
     formData.append("grant_type", "client_credentials")
@@ -56,9 +54,8 @@ export const authApi = {
       "Content-Type": "application/x-www-form-urlencoded",
     }
 
-    // Add realm header if provided
-    if (realm) {
-      headers[REALM_HEADER_NAME] = realm
+    if (config.POLARIS_REALM) {
+      headers[config.REALM_HEADER_NAME] = config.POLARIS_REALM
     }
 
     const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
@@ -122,7 +119,7 @@ export const authApi = {
     }, 100)
   },
 
-  initiateOIDCFlow: async (realm?: string): Promise<void> => {
+  initiateOIDCFlow: async (): Promise<void> => {
     const authorizationUrl = config.OIDC_AUTHORIZATION_URL
     const clientId = config.OIDC_CLIENT_ID
     const redirectUri = config.OIDC_REDIRECT_URI
@@ -137,10 +134,6 @@ export const authApi = {
 
     storePKCEVerifier(verifier)
     storeState(state)
-
-    if (realm) {
-      sessionStorage.setItem("polaris_realm", realm)
-    }
 
     const params = new URLSearchParams({
       response_type: "code",
@@ -187,8 +180,7 @@ export const authApi = {
   exchangeAuthCode: async (
     code: string,
     codeVerifier: string,
-    redirectUri: string,
-    realm?: string
+    redirectUri: string
   ): Promise<OAuthTokenResponse> => {
     const clientId = config.OIDC_CLIENT_ID
     if (!clientId) {
@@ -206,9 +198,8 @@ export const authApi = {
       "Content-Type": "application/x-www-form-urlencoded",
     }
 
-    const storedRealm = realm || sessionStorage.getItem("polaris_realm")
-    if (storedRealm) {
-      headers[REALM_HEADER_NAME] = storedRealm
+    if (config.POLARIS_REALM) {
+      headers[config.REALM_HEADER_NAME] = config.POLARIS_REALM
     }
 
     const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {

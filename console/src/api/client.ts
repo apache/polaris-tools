@@ -19,10 +19,9 @@
 
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios"
 import { navigate } from "@/lib/navigation"
-import { REALM_HEADER_NAME } from "@/lib/constants"
-import { config } from "@/lib/config"
+import { config as appConfig } from "@/lib/config"
 
-const API_BASE_URL = config.POLARIS_API_URL
+const API_BASE_URL = appConfig.POLARIS_API_URL
 const MANAGEMENT_BASE_URL = `${API_BASE_URL}/api/management/v1`
 const CATALOG_BASE_URL = `${API_BASE_URL}/api/catalog/v1`
 const GENERIC_TABLES_BASE_URL = `${API_BASE_URL}/api/catalog/polaris/v1`
@@ -31,7 +30,6 @@ class ApiClient {
   private managementClient: AxiosInstance
   private catalogClient: AxiosInstance
   private polarisClient: AxiosInstance
-  // Store access token in memory only (not in localStorage for security)
   private accessToken: string | null = null
 
   constructor() {
@@ -60,18 +58,15 @@ class ApiClient {
   }
 
   private setupInterceptors() {
-    // Request interceptor to add auth token
     const requestInterceptor = (config: InternalAxiosRequestConfig) => {
       const token = this.getAccessToken()
-      // Read realm from localStorage (non-sensitive configuration)
-      const realm = localStorage.getItem("polaris_realm") || import.meta.env.VITE_POLARIS_REALM
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
 
-      if (realm) {
-        config.headers[REALM_HEADER_NAME] = realm
+      if (appConfig.POLARIS_REALM) {
+        config.headers[appConfig.REALM_HEADER_NAME] = appConfig.POLARIS_REALM
       }
 
       return config
@@ -106,7 +101,6 @@ class ApiClient {
 
   clearAccessToken(): void {
     this.accessToken = null
-    localStorage.removeItem("polaris_realm")
   }
 
   setAccessToken(token: string): void {

@@ -19,20 +19,21 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Info } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Logo } from "@/components/layout/Logo"
 import { Footer } from "@/components/layout/Footer"
 import { config } from "@/lib/config"
 
 export function Login() {
-  const [clientId, setClientId] = useState("")
-  const [clientSecret, setClientSecret] = useState("")
-  const [realm, setRealm] = useState(import.meta.env.VITE_POLARIS_REALM || "")
-  const [scope, setScope] = useState(import.meta.env.VITE_POLARIS_PRINCIPAL_SCOPE || "")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [scope, setScope] = useState(config.POLARIS_PRINCIPAL_SCOPE)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const { login, loginWithOIDC } = useAuth()
@@ -49,7 +50,7 @@ export function Login() {
     setLoading(true)
 
     try {
-      await login(clientId, clientSecret, scope, realm)
+      await login(username, password, scope)
       navigate("/")
     } catch (err) {
       setError(
@@ -67,7 +68,7 @@ export function Login() {
     setLoading(true)
 
     try {
-      await loginWithOIDC(realm)
+      await loginWithOIDC()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to initiate OIDC login.")
       setLoading(false)
@@ -85,37 +86,52 @@ export function Login() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="rounded-md border p-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">{config.REALM_HEADER_NAME}:</span>
+                    <span className="font-medium">{config.POLARIS_REALM}</span>
+                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Realm Configuration</h4>
+                        <p className="text-xs text-muted-foreground">
+                          This UI console is configured to connect to a specific Polaris server realm.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="clientId">Client ID</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="clientId"
+                  id="username"
                   type="text"
-                  value={clientId}
-                  onChange={(e) => setClientId(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
-                  placeholder="Enter your client ID"
+                  placeholder="Enter your username"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="clientSecret">Client Secret</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
-                  id="clientSecret"
+                  id="password"
                   type="password"
-                  value={clientSecret}
-                  onChange={(e) => setClientSecret(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Enter your client secret"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="realm">Realm</Label>
-                <Input
-                  id="realm"
-                  type="text"
-                  value={realm}
-                  onChange={(e) => setRealm(e.target.value)}
-                  required
-                  placeholder="Enter your realm"
+                  placeholder="Enter your password"
                 />
               </div>
               <div className="space-y-2">
@@ -144,7 +160,7 @@ export function Login() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">Or</span>
+                      <span className="bg-background px-2 text-muted-foreground">External IDP</span>
                     </div>
                   </div>
                   <Button
