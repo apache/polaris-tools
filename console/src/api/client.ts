@@ -63,12 +63,6 @@ class ApiClient {
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
-        if (import.meta.env.DEV) {
-          console.log("🔐 API Request:", config.method?.toUpperCase(), config.url, {
-            hasToken: !!token,
-            tokenPrefix: token.substring(0, 20),
-          })
-        }
       }
 
       if (appConfig.POLARIS_REALM) {
@@ -78,19 +72,9 @@ class ApiClient {
       return config
     }
 
-    // Response interceptor for error handling
     const responseErrorInterceptor = (error: unknown) => {
       if (axios.isAxiosError(error)) {
-        if (import.meta.env.DEV) {
-          console.error("🔐 API Error:", {
-            url: error.config?.url,
-            status: error.response?.status,
-            message: error.message,
-            data: error.response?.data,
-          })
-        }
         if (error.response?.status === 401) {
-          // Unauthorized - clear token and redirect to login
           this.clearAccessToken()
           navigate("/login", true)
         }

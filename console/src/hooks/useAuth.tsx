@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
+      authApi.logout()
       throw error
     }
   }

@@ -35,10 +35,6 @@ import { discoverOIDCEndpoints } from "@/lib/oidc-discovery"
 
 const TOKEN_URL = config.OAUTH_TOKEN_URL || `${config.POLARIS_API_URL}/api/catalog/v1/oauth/tokens`
 
-if (import.meta.env.DEV) {
-  console.log("🔐 Using OAuth token URL:", TOKEN_URL)
-}
-
 export const authApi = {
   getToken: async (
     clientId: string,
@@ -135,11 +131,6 @@ export const authApi = {
     const discovery = await discoverOIDCEndpoints(issuerUrl)
     const authorizationUrl = discovery.authorization_endpoint
 
-    if (import.meta.env.DEV) {
-      console.log("🔐 OIDC Discovery:", discovery)
-      console.log("🔐 Authorization URL:", authorizationUrl)
-    }
-
     const { verifier, challenge } = await generatePKCE()
     const state = generateState()
 
@@ -160,11 +151,6 @@ export const authApi = {
   },
 
   handleOIDCCallback: async (code: string, state: string): Promise<OAuthTokenResponse> => {
-    if (import.meta.env.DEV) {
-      console.log("🔐 Handling OIDC callback with code:", code.substring(0, 10) + "...")
-      console.log("🔐 State:", state)
-    }
-
     const storedState = getState()
     if (!storedState || storedState !== state) {
       clearPKCESession()
@@ -186,33 +172,9 @@ export const authApi = {
     try {
       const oidcTokenResponse = await authApi.exchangeAuthCode(code, verifier, redirectUri)
       clearPKCESession()
-
-      if (import.meta.env.DEV) {
-        console.log("🔐 Got OIDC token:", {
-          token_type: oidcTokenResponse.token_type,
-          expires_in: oidcTokenResponse.expires_in,
-          scope: oidcTokenResponse.scope,
-        })
-        console.log("🔐 Token (first 20 chars):", oidcTokenResponse.access_token.substring(0, 20))
-
-        try {
-          const parts = oidcTokenResponse.access_token.split('.')
-          if (parts.length === 3) {
-            const payload = JSON.parse(atob(parts[1]))
-            console.log("🔐 Token claims:", payload)
-            console.log("🔐 Audience (aud):", Array.isArray(payload.aud) ? payload.aud : [payload.aud])
-          }
-        } catch (e) {
-          console.log("🔐 Could not decode token:", e)
-        }
-      }
-
       return oidcTokenResponse
     } catch (error) {
       clearPKCESession()
-      if (import.meta.env.DEV) {
-        console.error("🔐 OIDC callback error:", error)
-      }
       throw error
     }
   },
@@ -231,12 +193,6 @@ export const authApi = {
 
     const discovery = await discoverOIDCEndpoints(issuerUrl)
     const tokenUrl = discovery.token_endpoint
-
-    if (import.meta.env.DEV) {
-      console.log("🔐 Exchanging code at token URL:", tokenUrl)
-      console.log("🔐 Client ID:", clientId)
-      console.log("🔐 Redirect URI:", redirectUri)
-    }
 
     const formData = new URLSearchParams()
     formData.append("grant_type", "authorization_code")
