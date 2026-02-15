@@ -36,12 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
   SelectContent,
@@ -56,10 +51,10 @@ import type { CreateTableRequest, SchemaField } from "@/types/api"
 // Primitive types supported in Iceberg (defined for reference)
 const COMPLEX_TYPES = ["struct", "list", "map"] as const
 
-type ComplexType = typeof COMPLEX_TYPES[number]
+type ComplexType = (typeof COMPLEX_TYPES)[number]
 type FieldTypeCategory = "primitive" | "complex"
 
-interface SchemaFieldState extends Omit<SchemaField, 'type'> {
+interface SchemaFieldState extends Omit<SchemaField, "type"> {
   type: string | FieldTypeObject
   typeCategory: FieldTypeCategory
   // For parameterized types
@@ -83,6 +78,7 @@ interface SchemaFieldState extends Omit<SchemaField, 'type'> {
 
 interface FieldTypeObject {
   type: string
+  fields?: any[] // SchemaField[] when used in API format, SchemaFieldState[] when in UI state
   [key: string]: unknown
 }
 
@@ -109,12 +105,14 @@ const schema = z.object({
       }
     ),
   schemaJson: z.string().optional(),
-  properties: z.array(
-    z.object({
-      key: z.string().min(1, "Key is required"),
-      value: z.string(),
-    })
-  ).optional(),
+  properties: z
+    .array(
+      z.object({
+        key: z.string().min(1, "Key is required"),
+        value: z.string(),
+      })
+    )
+    .optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -138,7 +136,9 @@ export function CreateTableModal({
   const [fields, setFields] = useState<SchemaFieldState[]>([])
   const [nextFieldId, setNextFieldId] = useState(1)
   const [properties, setProperties] = useState<Array<{ key: string; value: string }>>([])
-  const [partitionFields, setPartitionFields] = useState<Array<{ sourceColumn: string; transform: string }>>([])
+  const [partitionFields, setPartitionFields] = useState<
+    Array<{ sourceColumn: string; transform: string }>
+  >([])
 
   const {
     register,
@@ -162,26 +162,29 @@ export function CreateTableModal({
   // Helper function to get next available ID recursively
   const getNextId = (currentId: number, fieldsToCheck: SchemaFieldState[]): number => {
     let maxId = currentId
-    
+
     for (const field of fieldsToCheck) {
       if (field.id > maxId) maxId = field.id
       if (field.elementId && field.elementId > maxId) maxId = field.elementId
       if (field.keyId && field.keyId > maxId) maxId = field.keyId
       if (field.valueId && field.valueId > maxId) maxId = field.valueId
-      
+
       if (field.nestedFields && field.nestedFields.length > 0) {
         maxId = getNextId(maxId, field.nestedFields)
       }
     }
-    
+
     return maxId + 1
   }
 
   // Add a new field to the schema
-  const addField = (parentFields?: SchemaFieldState[], parentSetter?: (fields: SchemaFieldState[]) => void) => {
+  const addField = (
+    parentFields?: SchemaFieldState[],
+    parentSetter?: (fields: SchemaFieldState[]) => void
+  ) => {
     const targetFields = parentFields !== undefined ? parentFields : fields
     const setter = parentSetter !== undefined ? parentSetter : setFields
-    
+
     const newField: SchemaFieldState = {
       id: nextFieldId,
       name: "",
@@ -189,16 +192,20 @@ export function CreateTableModal({
       typeCategory: "primitive",
       required: true,
     }
-    
+
     setter([...targetFields, newField])
     setNextFieldId(nextFieldId + 1)
   }
 
   // Remove a field from the schema
-  const removeField = (index: number, parentFields?: SchemaFieldState[], parentSetter?: (fields: SchemaFieldState[]) => void) => {
+  const removeField = (
+    index: number,
+    parentFields?: SchemaFieldState[],
+    parentSetter?: (fields: SchemaFieldState[]) => void
+  ) => {
     const targetFields = parentFields !== undefined ? parentFields : fields
     const setter = parentSetter !== undefined ? parentSetter : setFields
-    
+
     setter(targetFields.filter((_, i) => i !== index))
   }
 
@@ -211,7 +218,7 @@ export function CreateTableModal({
   ) => {
     const targetFields = parentFields !== undefined ? parentFields : fields
     const setter = parentSetter !== undefined ? parentSetter : setFields
-    
+
     const updated = [...targetFields]
     updated[index] = { ...updated[index], ...updates }
     setter(updated)
@@ -226,14 +233,14 @@ export function CreateTableModal({
   ) => {
     const targetFields = parentFields !== undefined ? parentFields : fields
     const setter = parentSetter !== undefined ? parentSetter : setFields
-    
+
     const updated = [...targetFields]
     const field = updated[index]
-    
+
     if (COMPLEX_TYPES.includes(newType as ComplexType)) {
       field.typeCategory = "complex"
       field.type = newType
-      
+
       // Initialize complex type properties
       if (newType === "struct") {
         field.nestedFields = []
@@ -253,7 +260,7 @@ export function CreateTableModal({
     } else {
       field.typeCategory = "primitive"
       field.type = newType
-      
+
       // Clear complex type properties
       delete field.nestedFields
       delete field.elementType
@@ -266,14 +273,14 @@ export function CreateTableModal({
       delete field.keyId
       delete field.valueId
     }
-    
+
     setter(updated)
   }
 
   // Convert SchemaFieldState to API SchemaField format
   const convertFieldToApi = (field: SchemaFieldState): SchemaField => {
     let fieldType: string | FieldTypeObject
-    
+
     if (field.typeCategory === "complex") {
       if (field.type === "struct" && field.nestedFields) {
         fieldType = {
@@ -281,10 +288,23 @@ export function CreateTableModal({
           fields: field.nestedFields.map(convertFieldToApi),
         }
       } else if (field.type === "list" && field.elementType) {
-        const elementType = typeof field.elementType === "string" 
-          ? field.elementType 
-          : field.elementType
-        
+        let elementType: string | FieldTypeObject
+
+        if (typeof field.elementType === "object") {
+          // Complex element type (e.g., struct)
+          if (field.elementType.type === "struct" && field.elementType.fields) {
+            elementType = {
+              type: "struct",
+              fields: field.elementType.fields.map(convertFieldToApi),
+            }
+          } else {
+            elementType = field.elementType
+          }
+        } else {
+          // Simple element type
+          elementType = field.elementType
+        }
+
         fieldType = {
           type: "list",
           "element-id": field.elementId!,
@@ -313,7 +333,7 @@ export function CreateTableModal({
         fieldType = String(field.type)
       }
     }
-    
+
     return {
       id: field.id,
       name: field.name,
@@ -329,20 +349,20 @@ export function CreateTableModal({
       toast.error("Please provide a JSON schema")
       return
     }
-    
+
     try {
       const parsed = JSON.parse(schemaJson)
-      
+
       if (!parsed.type || parsed.type !== "struct") {
         toast.error("Schema must be a struct type with a fields array")
         return
       }
-      
+
       if (!Array.isArray(parsed.fields)) {
         toast.error("Schema must have a fields array")
         return
       }
-      
+
       // Convert parsed JSON to SchemaFieldState
       const convertFromJson = (jsonField: any): SchemaFieldState => {
         let fieldType: string
@@ -350,11 +370,11 @@ export function CreateTableModal({
         let decimalPrecision: number | undefined
         let decimalScale: number | undefined
         let fixedLength: number | undefined
-        
+
         // Parse the type
         if (typeof jsonField.type === "string") {
           fieldType = jsonField.type
-          
+
           // Check for parameterized types
           // decimal(10,2)
           const decimalMatch = fieldType.match(/^decimal\((\d+),(\d+)\)$/)
@@ -363,7 +383,7 @@ export function CreateTableModal({
             decimalPrecision = parseInt(decimalMatch[1])
             decimalScale = parseInt(decimalMatch[2])
           }
-          
+
           // fixed[16]
           const fixedMatch = fieldType.match(/^fixed\[(\d+)\]$/)
           if (fixedMatch) {
@@ -375,7 +395,7 @@ export function CreateTableModal({
           fieldType = jsonField.type.type
           typeCategory = "complex"
         }
-        
+
         const baseField: SchemaFieldState = {
           id: jsonField.id,
           name: jsonField.name,
@@ -387,7 +407,7 @@ export function CreateTableModal({
           ...(decimalScale !== undefined && { decimalScale }),
           ...(fixedLength !== undefined && { fixedLength }),
         }
-        
+
         if (typeof jsonField.type === "object") {
           if (jsonField.type.type === "struct") {
             baseField.nestedFields = jsonField.type.fields.map(convertFromJson)
@@ -403,17 +423,17 @@ export function CreateTableModal({
             baseField.valueId = jsonField.type["value-id"]
           }
         }
-        
+
         return baseField
       }
-      
+
       const parsedFields = parsed.fields.map(convertFromJson)
       setFields(parsedFields)
-      
+
       // Update next field ID
       const maxId = getNextId(0, parsedFields)
       setNextFieldId(maxId)
-      
+
       toast.success("Schema imported successfully")
       setSchemaMode("manual")
     } catch (error) {
@@ -426,7 +446,7 @@ export function CreateTableModal({
   const createMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       let schemaFields: SchemaField[]
-      
+
       if (schemaMode === "json" && values.schemaJson) {
         const parsed = JSON.parse(values.schemaJson)
         schemaFields = parsed.fields
@@ -436,7 +456,7 @@ export function CreateTableModal({
         }
         schemaFields = fields.map(convertFieldToApi)
       }
-      
+
       const request: CreateTableRequest = {
         name: values.name,
         schema: {
@@ -445,11 +465,11 @@ export function CreateTableModal({
         },
         properties: {},
       }
-      
+
       if (values.location && values.location.trim()) {
         request.properties!.location = values.location.trim()
       }
-      
+
       // Add custom properties
       if (values.properties && values.properties.length > 0) {
         values.properties.forEach((prop) => {
@@ -458,19 +478,19 @@ export function CreateTableModal({
           }
         })
       }
-      
+
       // Add partition spec if configured
       if (partitionFields.length > 0) {
         request.partitionSpec = {
           fields: partitionFields.map((pf, idx) => ({
-            "source-id": fields.find(f => f.name === pf.sourceColumn)?.id || 0,
+            "source-id": fields.find((f) => f.name === pf.sourceColumn)?.id || 0,
             "field-id": 1000 + idx,
             name: `${pf.sourceColumn}_${pf.transform}`,
             transform: pf.transform,
           })),
         }
       }
-      
+
       return tablesApi.create(catalogName, namespace, request)
     },
     onSuccess: () => {
@@ -532,7 +552,11 @@ export function CreateTableModal({
     setPartitionFields(partitionFields.filter((_, i) => i !== index))
   }
 
-  const updatePartitionField = (index: number, field: "sourceColumn" | "transform", value: string) => {
+  const updatePartitionField = (
+    index: number,
+    field: "sourceColumn" | "transform",
+    value: string
+  ) => {
     const updated = [...partitionFields]
     updated[index] = { ...updated[index], [field]: value }
     setPartitionFields(updated)
@@ -553,14 +577,8 @@ export function CreateTableModal({
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Table Name *</Label>
-              <Input
-                id="name"
-                placeholder="my_table"
-                {...register("name")}
-              />
-              {errors.name && (
-                <p className="text-sm text-red-600">{errors.name.message}</p>
-              )}
+              <Input id="name" placeholder="my_table" {...register("name")} />
+              {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -570,9 +588,7 @@ export function CreateTableModal({
                 placeholder="s3://bucket/path/to/table"
                 {...register("location")}
               />
-              {errors.location && (
-                <p className="text-sm text-red-600">{errors.location.message}</p>
-              )}
+              {errors.location && <p className="text-sm text-red-600">{errors.location.message}</p>}
               <p className="text-xs text-muted-foreground">
                 Storage location for this table. Must be within the catalog's allowed locations.
               </p>
@@ -594,12 +610,7 @@ export function CreateTableModal({
                     <p className="text-sm text-muted-foreground">
                       Define your table schema by adding fields
                     </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addField()}
-                    >
+                    <Button type="button" variant="outline" size="sm" onClick={() => addField()}>
                       <Plus className="h-4 w-4 mr-1" />
                       Add Field
                     </Button>
@@ -652,11 +663,7 @@ export function CreateTableModal({
                   <p className="text-xs text-muted-foreground">
                     Paste your Iceberg table schema in JSON format
                   </p>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={parseJsonSchema}
-                  >
+                  <Button type="button" variant="secondary" onClick={parseJsonSchema}>
                     Import & Validate
                   </Button>
                 </div>
@@ -674,12 +681,7 @@ export function CreateTableModal({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Partition Spec (optional)</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addPartitionField}
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={addPartitionField}>
                     <Plus className="h-3 w-3 mr-1" />
                     Add Partition
                   </Button>
@@ -711,9 +713,7 @@ export function CreateTableModal({
                         </Select>
                         <Select
                           value={pf.transform}
-                          onValueChange={(value) =>
-                            updatePartitionField(index, "transform", value)
-                          }
+                          onValueChange={(value) => updatePartitionField(index, "transform", value)}
                         >
                           <SelectTrigger className="flex-1">
                             <SelectValue />
@@ -746,20 +746,13 @@ export function CreateTableModal({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Table Properties (optional)</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addProperty}
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={addProperty}>
                     <Plus className="h-3 w-3 mr-1" />
                     Add Property
                   </Button>
                 </div>
                 {properties.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    No properties added.
-                  </p>
+                  <p className="text-xs text-muted-foreground">No properties added.</p>
                 ) : (
                   <div className="space-y-2">
                     {properties.map((prop, index) => (
@@ -815,10 +808,27 @@ export function CreateTableModal({
 interface SchemaFieldEditorProps {
   fields: SchemaFieldState[]
   setFields: (fields: SchemaFieldState[]) => void
-  updateField: (index: number, updates: Partial<SchemaFieldState>, parentFields?: SchemaFieldState[], parentSetter?: (fields: SchemaFieldState[]) => void) => void
-  removeField: (index: number, parentFields?: SchemaFieldState[], parentSetter?: (fields: SchemaFieldState[]) => void) => void
-  changeFieldType: (index: number, newType: string, parentFields?: SchemaFieldState[], parentSetter?: (fields: SchemaFieldState[]) => void) => void
-  addField: (parentFields?: SchemaFieldState[], parentSetter?: (fields: SchemaFieldState[]) => void) => void
+  updateField: (
+    index: number,
+    updates: Partial<SchemaFieldState>,
+    parentFields?: SchemaFieldState[],
+    parentSetter?: (fields: SchemaFieldState[]) => void
+  ) => void
+  removeField: (
+    index: number,
+    parentFields?: SchemaFieldState[],
+    parentSetter?: (fields: SchemaFieldState[]) => void
+  ) => void
+  changeFieldType: (
+    index: number,
+    newType: string,
+    parentFields?: SchemaFieldState[],
+    parentSetter?: (fields: SchemaFieldState[]) => void
+  ) => void
+  addField: (
+    parentFields?: SchemaFieldState[],
+    parentSetter?: (fields: SchemaFieldState[]) => void
+  ) => void
   nextFieldId: number
   setNextFieldId: (id: number) => void
   level?: number
@@ -849,9 +859,7 @@ function SchemaFieldEditor({
               <Input
                 placeholder="Field name"
                 value={field.name}
-                onChange={(e) =>
-                  updateField(index, { name: e.target.value }, fields, setFields)
-                }
+                onChange={(e) => updateField(index, { name: e.target.value }, fields, setFields)}
               />
             </div>
 
@@ -904,9 +912,7 @@ function SchemaFieldEditor({
               <Input
                 placeholder="Description (optional)"
                 value={field.comment || ""}
-                onChange={(e) =>
-                  updateField(index, { comment: e.target.value }, fields, setFields)
-                }
+                onChange={(e) => updateField(index, { comment: e.target.value }, fields, setFields)}
               />
             </div>
 
@@ -1023,48 +1029,128 @@ function SchemaFieldEditor({
           )}
 
           {field.type === "list" && (
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <Label className="text-sm">Element Type</Label>
-                <Select
-                  value={String(field.elementType || "string")}
-                  onValueChange={(value) =>
-                    updateField(index, { elementType: value }, fields, setFields)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="string">String</SelectItem>
-                    <SelectItem value="int">Int</SelectItem>
-                    <SelectItem value="long">Long</SelectItem>
-                    <SelectItem value="float">Float</SelectItem>
-                    <SelectItem value="double">Double</SelectItem>
-                    <SelectItem value="boolean">Boolean</SelectItem>
-                    <SelectItem value="date">Date</SelectItem>
-                    <SelectItem value="timestamp">Timestamp</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={field.elementRequired ?? true}
-                    onChange={(e) =>
-                      updateField(
-                        index,
-                        { elementRequired: e.target.checked },
-                        fields,
-                        setFields
-                      )
+            <div className="mt-3 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
+                  <Label className="text-sm">Element Type</Label>
+                  <Select
+                    value={
+                      typeof field.elementType === "object"
+                        ? field.elementType.type
+                        : String(field.elementType || "string")
                     }
-                    className="h-4 w-4"
-                  />
-                  <label className="text-sm">Element Required</label>
+                    onValueChange={(value) => {
+                      if (value === "struct") {
+                        updateField(
+                          index,
+                          {
+                            elementType: { type: "struct", fields: [] },
+                          },
+                          fields,
+                          setFields
+                        )
+                      } else {
+                        updateField(index, { elementType: value }, fields, setFields)
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="string">String</SelectItem>
+                      <SelectItem value="int">Int</SelectItem>
+                      <SelectItem value="long">Long</SelectItem>
+                      <SelectItem value="float">Float</SelectItem>
+                      <SelectItem value="double">Double</SelectItem>
+                      <SelectItem value="boolean">Boolean</SelectItem>
+                      <SelectItem value="date">Date</SelectItem>
+                      <SelectItem value="timestamp">Timestamp</SelectItem>
+                      <SelectItem value="struct">Struct</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={field.elementRequired ?? true}
+                      onChange={(e) =>
+                        updateField(index, { elementRequired: e.target.checked }, fields, setFields)
+                      }
+                      className="h-4 w-4"
+                    />
+                    <label className="text-sm">Element Required</label>
+                  </div>
                 </div>
               </div>
+
+              {/* Nested fields for struct element type */}
+              {typeof field.elementType === "object" && field.elementType.type === "struct" && (
+                <div className="space-y-2 border-l-2 border-muted pl-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm">Struct Fields</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const structFields =
+                          (typeof field.elementType === "object" && field.elementType.fields) || []
+                        const newField: SchemaFieldState = {
+                          id: nextFieldId,
+                          name: "",
+                          type: "string",
+                          typeCategory: "primitive",
+                          required: true,
+                        }
+                        updateField(
+                          index,
+                          {
+                            elementType: {
+                              type: "struct",
+                              fields: [...structFields, newField],
+                            },
+                          },
+                          fields,
+                          setFields
+                        )
+                        setNextFieldId(nextFieldId + 1)
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add Field
+                    </Button>
+                  </div>
+                  {typeof field.elementType === "object" &&
+                    field.elementType.fields &&
+                    field.elementType.fields.length > 0 && (
+                      <SchemaFieldEditor
+                        fields={field.elementType.fields as SchemaFieldState[]}
+                        setFields={(newFields) =>
+                          updateField(
+                            index,
+                            {
+                              elementType: {
+                                type: "struct",
+                                fields: newFields,
+                              },
+                            },
+                            fields,
+                            setFields
+                          )
+                        }
+                        updateField={updateField}
+                        removeField={removeField}
+                        changeFieldType={changeFieldType}
+                        addField={addField}
+                        nextFieldId={nextFieldId}
+                        setNextFieldId={setNextFieldId}
+                        level={level + 1}
+                      />
+                    )}
+                </div>
+              )}
             </div>
           )}
 
