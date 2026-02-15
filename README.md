@@ -17,9 +17,9 @@
   under the License.
 -->
 
-# Apache Polaris (Incubating) Tools
+# Apache Polaris Tools
 
-Apache Polaris Tools provide a set of tools to help users of [Apache Polaris (Incubating)](https://github.com/apache/polaris) to perform various tasks.
+Apache Polaris Tools provide a set of tools to help users of [Apache Polaris](https://github.com/apache/polaris) to perform various tasks.
 This repository is maintained by the [Apache Polaris community](https://polaris.apache.org/).
 
 ## Tools

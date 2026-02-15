@@ -93,7 +93,7 @@ potentially the working directory.
       configurations.creating { description = "Used to reference the distribution tarball" }
 
     dependencies {
-      polarisTarball("org.apache.polaris:polaris-quarkus-server:1.0.0-incubating-SNAPSHOT:@tgz")
+      polarisTarball("org.apache.polaris:polaris-quarkus-server:1.0.0-SNAPSHOT:@tgz")
     }
     
     // Directory where the Polaris tarball is extracted to
@@ -350,7 +350,7 @@ or Nessie or something else.
 Make sure that Quarkus emits a line like the following:
 
 ```
-2025-01-16 13:29:25,959 INFO  [io.quarkus] (main) Apache Polaris Server (incubating) 1.0.0-incubating-SNAPSHOT on JVM (powered by Quarkus 3.17.7) started in 0.998s. Listening on: http://0.0.0.0:8181. Management interface listening on http://0.0.0.0:8182.
+2025-01-16 13:29:25,959 INFO  [io.quarkus] (main) Apache Polaris Server 1.0.0-SNAPSHOT on JVM (powered by Quarkus 3.17.7) started in 0.998s. Listening on: http://0.0.0.0:8181. Management interface listening on http://0.0.0.0:8182.
 ```
 
 The important part is `Listening on: http://0.0.0.0:8181. Management interface listening on http://0.0.0.0:8182.`,
