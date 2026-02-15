@@ -48,7 +48,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, X } from "lucide-react"
 import type { CreateTableRequest, SchemaField } from "@/types/api"
 
-// Primitive types supported in Iceberg (defined for reference)
 const COMPLEX_TYPES = ["struct", "list", "map"] as const
 
 type ComplexType = (typeof COMPLEX_TYPES)[number]
@@ -78,7 +77,7 @@ interface SchemaFieldState extends Omit<SchemaField, "type"> {
 
 interface FieldTypeObject {
   type: string
-  fields?: any[] // SchemaField[] when used in API format, SchemaFieldState[] when in UI state
+  fields?: SchemaFieldState[] | SchemaField[]
   [key: string]: unknown
 }
 
@@ -209,7 +208,6 @@ export function CreateTableModal({
     setter(targetFields.filter((_, i) => i !== index))
   }
 
-  // Update a field
   const updateField = (
     index: number,
     updates: Partial<SchemaFieldState>,
@@ -224,7 +222,6 @@ export function CreateTableModal({
     setter(updated)
   }
 
-  // Change field type
   const changeFieldType = (
     index: number,
     newType: string,
@@ -277,7 +274,6 @@ export function CreateTableModal({
     setter(updated)
   }
 
-  // Convert SchemaFieldState to API SchemaField format
   const convertFieldToApi = (field: SchemaFieldState): SchemaField => {
     let fieldType: string | FieldTypeObject
 
@@ -291,7 +287,6 @@ export function CreateTableModal({
         let elementType: string | FieldTypeObject
 
         if (typeof field.elementType === "object") {
-          // Complex element type (e.g., struct)
           if (field.elementType.type === "struct" && field.elementType.fields) {
             elementType = {
               type: "struct",
@@ -301,7 +296,6 @@ export function CreateTableModal({
             elementType = field.elementType
           }
         } else {
-          // Simple element type
           elementType = field.elementType
         }
 
@@ -343,7 +337,6 @@ export function CreateTableModal({
     }
   }
 
-  // Parse JSON schema
   const parseJsonSchema = () => {
     if (!schemaJson) {
       toast.error("Please provide a JSON schema")
@@ -364,7 +357,7 @@ export function CreateTableModal({
       }
 
       // Convert parsed JSON to SchemaFieldState
-      const convertFromJson = (jsonField: any): SchemaFieldState => {
+      const convertFromJson = (jsonField: Record<string, unknown>): SchemaFieldState => {
         let fieldType: string
         let typeCategory: FieldTypeCategory = "primitive"
         let decimalPrecision: number | undefined
