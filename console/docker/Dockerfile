@@ -18,13 +18,6 @@
 # Build stage
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
 
-# Default environment variables (can be overridden at runtime)
-ENV VITE_POLARIS_API_URL=http://polaris:8181
-ENV VITE_POLARIS_REALM=POLARIS
-ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
-ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
-ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
-
 WORKDIR /app
 
 # Copy package files
@@ -48,17 +41,13 @@ COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
 # Copy custom nginx configuration as template
-COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
-
-# Copy runtime config generation script
-COPY --chmod=755 docker/generate-config.sh /generate-config.sh
+COPY docker/nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist /opt/app-root/src
-
 # Expose port 80
 EXPOSE 80
 
-# Use the script as entrypoint to generate config.js from env vars at startup
-ENTRYPOINT ["/generate-config.sh"]
+# Start nginx
+CMD ["/bin/sh", "-c", "/etc/nginx/templates/default.conf.template > /opt/app-root/etc/nginx.d/default.conf && nginx -g 'daemon off;'"]
 

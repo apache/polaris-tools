@@ -35,9 +35,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatDistanceToNow } from "date-fns"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { EditCatalogModal } from "@/components/forms/EditCatalogModal"
 import { CreateNamespaceModal } from "@/components/forms/CreateNamespaceModal"
+import { setPageTitle } from "@/lib/pageTitle"
 
 export function CatalogDetails() {
   const { catalogName } = useParams<{ catalogName: string }>()
@@ -45,6 +46,10 @@ export function CatalogDetails() {
   const queryClient = useQueryClient()
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isCreateNamespaceOpen, setIsCreateNamespaceOpen] = useState(false)
+
+  useEffect(() => {
+    setPageTitle(catalogName || "Catalog")
+  }, [catalogName])
 
   const catalogQuery = useQuery({
     queryKey: ["catalog", catalogName],

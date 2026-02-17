@@ -20,23 +20,29 @@
 import axios from "axios"
 import { apiClient } from "./client"
 import { navigate } from "@/lib/navigation"
-import { REALM_HEADER_NAME } from "@/lib/constants"
-import { config } from "@/lib/config"
+import { getCurrentWorkspace } from "@/lib/workspaces"
 import type { OAuthTokenResponse } from "@/types/api"
-
-const TOKEN_URL = config.OAUTH_TOKEN_URL || `${config.POLARIS_API_URL}/api/catalog/v1/oauth/tokens`
-
-if (import.meta.env.DEV) {
-  console.log("🔐 Using OAuth token URL:", TOKEN_URL)
-}
 
 export const authApi = {
   getToken: async (
     clientId: string,
     clientSecret: string,
     scope: string,
-    realm?: string
+    realm?: string,
+    realmHeaderName?: string,
+    tokenUrl?: string
   ): Promise<OAuthTokenResponse> => {
+    const workspace = getCurrentWorkspace()
+    const url = tokenUrl || workspace?.auth[0]?.url
+
+    if (!url) {
+      throw new Error("No authentication URL configured for workspace")
+    }
+
+    if (import.meta.env.DEV) {
+      console.log("🔐 Using OAuth token URL:", url)
+    }
+
     const formData = new URLSearchParams()
     formData.append("grant_type", "client_credentials")
     formData.append("client_id", clientId)
@@ -47,12 +53,11 @@ export const authApi = {
       "Content-Type": "application/x-www-form-urlencoded",
     }
 
-    // Add realm header if provided
-    if (realm) {
-      headers[REALM_HEADER_NAME] = realm
+    if (realm && realmHeaderName) {
+      headers[realmHeaderName] = realm
     }
 
-    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+    const response = await axios.post<OAuthTokenResponse>(url, formData, {
       headers,
     })
 
@@ -65,14 +70,22 @@ export const authApi = {
 
   exchangeToken: async (
     subjectToken: string,
-    subjectTokenType: string
+    subjectTokenType: string,
+    tokenUrl?: string
   ): Promise<OAuthTokenResponse> => {
+    const workspace = getCurrentWorkspace()
+    const url = tokenUrl || workspace?.auth[0]?.url
+
+    if (!url) {
+      throw new Error("No authentication URL configured for workspace")
+    }
+
     const formData = new URLSearchParams()
     formData.append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
     formData.append("subject_token", subjectToken)
     formData.append("subject_token_type", subjectTokenType)
 
-    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+    const response = await axios.post<OAuthTokenResponse>(url, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: `Bearer ${apiClient.getAccessToken()}`,
@@ -86,13 +99,20 @@ export const authApi = {
     return response.data
   },
 
-  refreshToken: async (accessToken: string): Promise<OAuthTokenResponse> => {
+  refreshToken: async (accessToken: string, tokenUrl?: string): Promise<OAuthTokenResponse> => {
+    const workspace = getCurrentWorkspace()
+    const url = tokenUrl || workspace?.auth[0]?.url
+
+    if (!url) {
+      throw new Error("No authentication URL configured for workspace")
+    }
+
     const formData = new URLSearchParams()
     formData.append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
     formData.append("subject_token", accessToken)
     formData.append("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
 
-    const response = await axios.post<OAuthTokenResponse>(TOKEN_URL, formData, {
+    const response = await axios.post<OAuthTokenResponse>(url, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -107,7 +127,6 @@ export const authApi = {
 
   logout: (): void => {
     apiClient.clearAccessToken()
-    // Use a small delay to allow toast to show before redirect
     setTimeout(() => {
       navigate("/login", true)
     }, 100)
