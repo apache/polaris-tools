@@ -17,6 +17,30 @@
 # under the License.
 #
 
+.PHONY: help
+help:
+	@echo "Available commands:"
+	@echo ""
+	@echo "Benchmark Simulations:"
+	@echo "  make s3-sign-request-simulation    - Run S3 sign request simulation"
+	@echo "  make create-dataset-simulation     - Run create tree dataset simulation"
+	@echo "  make read-simulation               - Run read tree dataset simulation"
+	@echo "  make read-update-simulation        - Run read/update tree dataset simulation"
+	@echo "  make create-commits-simulation     - Run create commits simulation"
+	@echo "  make weighted-workload-simulation  - Run weighted workload simulation"
+	@echo ""
+	@echo "Reports:"
+	@echo "  make reports-list                  - List all generated reports"
+	@echo "  make reports-clean                 - Clean all generated reports"
+	@echo ""
+	@echo "Help:"
+	@echo "  make help                          - Show this help message"
+
+.PHONY: s3-sign-request-simulation
+s3-sign-request-simulation:
+	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.S3SignRequest \
+      -Dconfig.file=./application.conf
+
 .PHONY: create-dataset-simulation
 create-dataset-simulation:
 	./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.CreateTreeDataset \
@@ -54,7 +78,7 @@ reports-list:
 			millis="$$(echo $$timestamp | cut -c15-17)"; \
 			formatted_date="$$(echo $$date | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3/')"; \
 			formatted_time="$$(echo $$time | sed 's/\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1:\2:\3/')"; \
-			index_path="$${report}index.html"; \
+			index_path="./$${report}index.html"; \
 			if [ -f "$$index_path" ]; then \
 				echo "$$name | $$formatted_date $$formatted_time.$$millis | $$index_path"; \
 			else \
