@@ -10,7 +10,7 @@ build-docker:
 
 .PHONY: install
 install:
-	npm install
+	npm ci
 
 .PHONY: lint
 lint: format-check

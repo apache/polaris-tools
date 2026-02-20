@@ -28,10 +28,10 @@ ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy source code (excluding docker directory via .dockerignore)
 COPY . .
