@@ -35,21 +35,18 @@ declare global {
   }
 }
 
-function getConfig<T extends string | undefined>(key: keyof AppConfig, defaultValue?: T): T {
-  // First try runtime config
+function getConfig(key: keyof AppConfig, defaultValue: string = ""): string {
   const runtimeValue = window.APP_CONFIG?.[key]
   if (runtimeValue !== undefined && runtimeValue !== "") {
-    return runtimeValue as T
+    return runtimeValue
   }
 
-  // Then try build-time config
   const buildTimeValue = import.meta.env[key]
   if (buildTimeValue !== undefined && buildTimeValue !== "") {
-    return buildTimeValue as T
+    return buildTimeValue
   }
 
-  // Finally use default
-  return defaultValue as T
+  return defaultValue
 }
 
 export const config = {
