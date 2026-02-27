@@ -18,6 +18,11 @@
  */
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+import kotlin.jvm.java
 
 plugins {
   `java-library`
@@ -63,6 +68,8 @@ dependencies {
     exclude("com.tdunning", "json")
     exclude("javax.transaction", "transaction-api")
     exclude("com.zaxxer", "HikariCP")
+    exclude("javax.servlet", "jsp-api")
+    exclude("ant", "ant")
   }
   runtimeOnly("org.apache.hive:hive-exec:${libs.versions.hive.get()}:core") {
     // these are taken from iceberg repo configurations
@@ -152,34 +159,82 @@ val shadowJar =
   tasks.named<ShadowJar>("shadowJar") {
     isZip64 = true
 
-    // Exclude non-reproducible jandex indexes
-    exclude("META-INF/jandex.idx")
-    exclude("**/jandex.idx")
+    // Includes _all_ duplicates
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    // Ideally this should be set to `true`, but we have a bunch of dependency conflicts leading to
+    // duplicate classes coming from different artifacts and as a surprise via uber-jars.
+    failOnDuplicateEntries = false
 
-    // Exclude dependency metadata files
-    exclude("META-INF/DEPENDENCIES")
-    exclude("META-INF/groovy/DISCLAIMER")
+    // Generally, preserve META-INF/maven/*/*/pom.* files for downstream tools that
+    // can analyze dependency jars.
+    //
+    // There are quite a few _duplicated_ occurrences of failureaccess, guava,
+    // listenablefuture, error_prone_annotations, j2objc-annotations, gson.
+    // Leave those here so that dependency analyzing tools can pick those up.
 
-    // Exclude all LICENSE/NOTICE/DISCLAIMER files from dependencies
-    exclude("META-INF/**/*LICENSE*")
-    exclude("META-INF/**/*NOTICE*")
-    exclude("LICENSE*")
-    exclude("NOTICE*")
-    exclude("DISCLAIMER")
-    exclude("META-INF/DISCLAIMER")
+    exclude(
+      // Exclude Jandex indexes
+      "META-INF/jandex.idx",
 
-    // Exclude build metadata to avoid duplicates
-    exclude("iceberg-build.properties")
-    exclude("META-INF/maven/**/pom.xml")
-    exclude("META-INF/maven/**/pom.properties")
-    exclude("META-INF/proguard/**")
-    exclude("META-INF/README.txt")
-    exclude("plugin.xml")
-    exclude("about.html")
-    exclude("META-INF/ASL2.0")
+      // Exclude all LICENSE/NOTICE/DISCLAIMER files from dependencies
+      "META-INF/**/*LICENSE*",
+      "META-INF/**/*NOTICE*",
+      "META-INF/**/DISCLAIMER",
+      "LICENSE*",
+      "NOTICE*",
+      "DISCLAIMER",
+      "META-INF/DISCLAIMER",
+      "META-INF/ASL2.0",
 
-    // Take first occurrence for duplicates (handles version conflicts silently)
-    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+      // Proguard configurations used during the Guava build (don't care about those)
+      "META-INF/proguard/**",
+      // irrelevant for the CLI
+      "META-INF/README.txt",
+      "META-INF/jersey-module-version",
+      // JDO stuff :shrug:
+      "plugin.xml",
+      "about.html",
+
+      // From Hive/Hadoop - exclude those to not confuse people.
+      "META-INF/DEPENDENCIES",
+    )
+
+    // Note: transformers do NOT handle *.class files, only relocators do.
+
+    transform(PreserveFirstFoundResourceTransformer::class.java) {
+      include("javax/**/*.dtd", "javax/**/*.xsd")
+    }
+
+    // There are a few Java service files, let "Shadow" handle those
+    mergeServiceFiles()
+
+    // Merge properties files contents
+    transform(PropertiesFileTransformer::class.java) {
+      mergeStrategy = MergeStrategy.Append
+      paths.addAll(
+        "META-INF/maven/.+/pom[.]properties",
+        "org/apache/tools/ant/.+/defaults.properties",
+        "javax/servlet/.+[.]properties",
+        "javax/jdo/Bundle.properties",
+        "META-INF/io.netty.versions.properties",
+        "com/sun/jersey/json/impl/impl.properties",
+        "iceberg-build.properties",
+      )
+    }
+
+    // This transformer deduplicates files. It will fail with an exception, for duplicate files with
+    // non-identical content.
+    transform(DeduplicatingResourceTransformer::class.java) {
+      exclude(
+        // Known duplicates (see above)
+        "META-INF/maven/com.google.guava/failureaccess/pom.xml",
+        "META-INF/maven/com.google.guava/listenablefuture/pom.xml",
+        "META-INF/maven/com.google.guava/guava/pom.xml",
+        "META-INF/maven/com.google.errorprone/error_prone_annotations/pom.xml",
+        "META-INF/maven/com.google.j2objc/j2objc-annotations/pom.xml",
+        "META-INF/maven/com.google.code.gson/gson/pom.xml",
+      )
+    }
 
     // Add customized LICENSE and NOTICE (renamed from BUNDLE-* to avoid exclusion above)
     from("${projectDir}/BUNDLE-LICENSE") {
