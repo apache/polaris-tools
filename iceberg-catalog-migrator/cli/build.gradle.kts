@@ -152,21 +152,46 @@ val shadowJar =
   tasks.named<ShadowJar>("shadowJar") {
     isZip64 = true
 
-    // recursively remove all LICENSE and NOTICE file under META-INF, includes
-    // directories contains 'license' in the name
+    // Exclude non-reproducible jandex indexes
+    exclude("META-INF/jandex.idx")
+    exclude("**/jandex.idx")
+
+    // Exclude dependency metadata files
+    exclude("META-INF/DEPENDENCIES")
+    exclude("META-INF/groovy/DISCLAIMER")
+
+    // Exclude all LICENSE/NOTICE/DISCLAIMER files from dependencies
     exclude("META-INF/**/*LICENSE*")
     exclude("META-INF/**/*NOTICE*")
-    // exclude the top level LICENSE, LICENSE-*.txt and NOTICE
     exclude("LICENSE*")
     exclude("NOTICE*")
+    exclude("DISCLAIMER")
+    exclude("META-INF/DISCLAIMER")
 
-    // add customized LICENSE and NOTICE for the bundle jar at top level. Note that the
-    // customized LICENSE and NOTICE file are called BUNDLE-LICENSE and BUNDLE-NOTICE,
-    // and renamed to LICENSE and NOTICE after include, this is to avoid the file
-    // being excluded due to the exclude pattern matching used above.
-    from("${projectDir}/BUNDLE-LICENSE") { rename { "LICENSE" } }
-    from("${projectDir}/BUNDLE-NOTICE") { rename { "NOTICE" } }
-    from("${projectDir}/../DISCLAIMER") { rename { "DISCLAIMER" } }
+    // Exclude build metadata to avoid duplicates
+    exclude("iceberg-build.properties")
+    exclude("META-INF/maven/**/pom.xml")
+    exclude("META-INF/maven/**/pom.properties")
+    exclude("META-INF/proguard/**")
+    exclude("META-INF/README.txt")
+    exclude("plugin.xml")
+    exclude("about.html")
+    exclude("META-INF/ASL2.0")
+
+    // Take first occurrence for duplicates (handles version conflicts silently)
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+
+    // Add customized LICENSE and NOTICE (renamed from BUNDLE-* to avoid exclusion above)
+    from("${projectDir}/BUNDLE-LICENSE") {
+      into("META-INF")
+      rename { "LICENSE" }
+      filePermissions { unix("0644") }
+    }
+    from("${projectDir}/BUNDLE-NOTICE") {
+      into("META-INF")
+      rename { "NOTICE" }
+      filePermissions { unix("0644") }
+    }
   }
 
 shadowJar { manifest { attributes["Main-Class"] = mainClassName } }
