@@ -33,6 +33,7 @@ import type {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormField } from "@/components/ui/form-field"
 import {
   Select,
   SelectContent,
@@ -280,14 +281,11 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
           onSubmit={handleSubmit((values) => createMutation.mutate(values))}
           className="space-y-4"
         >
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+          <FormField label="Name" htmlFor="name" error={errors.name?.message}>
             <Input id="name" placeholder="e.g. prod" {...register("name")} />
-            {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label>Type</Label>
+          <FormField label="Type" error={errors.type?.message}>
             <Select
               onValueChange={(v) =>
                 setValue("type", v as FormValues["type"], { shouldValidate: true })
@@ -302,23 +300,24 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                 <SelectItem value="EXTERNAL">EXTERNAL</SelectItem>
               </SelectContent>
             </Select>
-            {errors.type && <p className="text-sm text-red-600">{errors.type.message}</p>}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="defaultBaseLocation">Default base location</Label>
+          <FormField
+            label="Default base location"
+            htmlFor="defaultBaseLocation"
+            error={errors.defaultBaseLocation?.message}
+          >
             <Input
               id="defaultBaseLocation"
               placeholder="e.g. s3://bucket/prefix or file:///path"
               {...register("defaultBaseLocation")}
             />
-            {errors.defaultBaseLocation && (
-              <p className="text-sm text-red-600">{errors.defaultBaseLocation.message}</p>
-            )}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label>Storage provider</Label>
+          <FormField
+            label="Storage provider"
+            hint="Select the cloud/storage provider used by this catalog."
+          >
             <Controller
               name="storageType"
               control={control}
@@ -336,22 +335,19 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                 </Select>
               )}
             />
-            <p className="text-xs text-muted-foreground">
-              Select the cloud/storage provider used by this catalog.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="allowedLocations">Allowed locations (comma-separated)</Label>
+          </FormField>
+
+          <FormField
+            label="Allowed locations (comma-separated)"
+            htmlFor="allowedLocations"
+            hint="Optional list of storage locations allowed for this catalog. Example: s3://bucket/prefix/"
+          >
             <Input
               id="allowedLocations"
               placeholder="s3://bucket1/, s3://bucket2/"
               {...register("allowedLocations")}
             />
-            <p className="text-xs text-muted-foreground">
-              Optional list of storage locations allowed for this catalog. Example:
-              s3://bucket/prefix/
-            </p>
-          </div>
+          </FormField>
 
           {/* Provider-specific fields */}
           {storageType === "S3" && (

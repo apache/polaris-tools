@@ -33,8 +33,8 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FormField } from "@/components/ui/form-field"
 import {
   Select,
   SelectContent,
@@ -178,8 +178,16 @@ export function CreateCatalogRoleModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="catalogName">Catalog</Label>
+          <FormField
+            label="Catalog"
+            htmlFor="catalogName"
+            error={form.formState.errors.catalogName?.message}
+            hint={
+              isNew
+                ? "Select the catalog where this role will be created."
+                : "Catalog cannot be changed."
+            }
+          >
             <Select
               value={form.watch("catalogName")}
               onValueChange={(value) => form.setValue("catalogName", value)}
@@ -206,31 +214,26 @@ export function CreateCatalogRoleModal({
                 )}
               </SelectContent>
             </Select>
-            {form.formState.errors.catalogName && (
-              <p className="text-sm text-red-600">{form.formState.errors.catalogName.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {isNew
-                ? "Select the catalog where this role will be created."
-                : "Catalog cannot be changed."}
-            </p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" {...form.register("name")} placeholder="role-name" disabled={!isNew} />
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-600">{form.formState.errors.name.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {isNew
+          <FormField
+            label="Name"
+            htmlFor="name"
+            error={form.formState.errors.name?.message}
+            hint={
+              isNew
                 ? "The unique name for this catalog role."
-                : "Catalog role name cannot be changed."}
-            </p>
-          </div>
+                : "Catalog role name cannot be changed."
+            }
+          >
+            <Input id="name" {...form.register("name")} placeholder="role-name" disabled={!isNew} />
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="properties">Properties</Label>
+          <FormField
+            label="Properties"
+            htmlFor="properties"
+            hint="Enter properties as key=value pairs, one per line."
+          >
             <Textarea
               id="properties"
               value={propertiesText}
@@ -239,10 +242,7 @@ export function CreateCatalogRoleModal({
               className="font-mono text-sm"
               rows={6}
             />
-            <p className="text-xs text-muted-foreground">
-              Enter properties as key=value pairs, one per line.
-            </p>
-          </div>
+          </FormField>
 
           <DialogFooter>
             <Button

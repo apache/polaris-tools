@@ -25,8 +25,8 @@ import { toast } from "sonner"
 import { viewsApi } from "@/api/catalog/views"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FormField } from "@/components/ui/form-field"
 import {
   Dialog,
   DialogContent,
@@ -136,32 +136,32 @@ export function CreateViewModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">View Name</Label>
+          <FormField label="View Name" htmlFor="name" error={errors.name?.message}>
             <Input id="name" placeholder="my_view" {...register("name")} />
-            {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="dialect">SQL Dialect</Label>
+          <FormField
+            label="SQL Dialect"
+            htmlFor="dialect"
+            error={errors.dialect?.message}
+            hint="The SQL dialect used for the view (e.g., spark, trino, presto)"
+          >
             <Input id="dialect" placeholder="spark" {...register("dialect")} />
-            {errors.dialect && <p className="text-sm text-red-600">{errors.dialect.message}</p>}
-            <p className="text-xs text-muted-foreground">
-              The SQL dialect used for the view (e.g., spark, trino, presto)
-            </p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="sql">SQL Query</Label>
+          <FormField
+            label="SQL Query"
+            htmlFor="sql"
+            error={errors.sql?.message}
+            hint="The SQL query that defines this view"
+          >
             <Textarea
               id="sql"
               placeholder="SELECT * FROM my_table WHERE ..."
               className="min-h-[150px] font-mono text-sm"
               {...register("sql")}
             />
-            {errors.sql && <p className="text-sm text-red-600">{errors.sql.message}</p>}
-            <p className="text-xs text-muted-foreground">The SQL query that defines this view</p>
-          </div>
+          </FormField>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

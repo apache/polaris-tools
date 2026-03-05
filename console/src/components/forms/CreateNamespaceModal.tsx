@@ -27,6 +27,7 @@ import { namespacesApi } from "@/api/catalog/namespaces"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormField } from "@/components/ui/form-field"
 import {
   Dialog,
   DialogContent,
@@ -216,37 +217,31 @@ export function CreateNamespaceModal({
           onSubmit={handleSubmit((values) => createMutation.mutate(values))}
           className="space-y-4"
         >
-          <div className="space-y-2">
-            <Label htmlFor="namespacePath">
-              Namespace path {parentNamespace && "(relative to parent)"}
-            </Label>
+          <FormField
+            label={<>Namespace path {parentNamespace && "(relative to parent)"}</>}
+            htmlFor="namespacePath"
+            error={errors.namespacePath?.message}
+            hint='Use dots to create nested namespaces (e.g., "outer.inner"). Each part must contain only alphanumeric characters, underscores, or hyphens.'
+          >
             <Input
               id="namespacePath"
               placeholder={parentNamespace ? "e.g. inner" : "e.g. accounting or accounting.tax"}
               {...register("namespacePath")}
             />
-            {errors.namespacePath && (
-              <p className="text-sm text-red-600">{errors.namespacePath.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Use dots to create nested namespaces (e.g., "outer.inner"). Each part must contain
-              only alphanumeric characters, underscores, or hyphens.
-            </p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="location">Location (optional)</Label>
+          <FormField
+            label="Location (optional)"
+            htmlFor="location"
+            error={errors.location?.message}
+            hint="Storage location for this namespace. Must be within the catalog's base location and allowed locations."
+          >
             <Input
               id="location"
               placeholder="e.g. s3://bucket/prefix/ or file:///path/to/namespace"
               {...register("location")}
             />
-            {errors.location && <p className="text-sm text-red-600">{errors.location.message}</p>}
-            <p className="text-xs text-muted-foreground">
-              Storage location for this namespace. Must be within the catalog's base location and
-              allowed locations.
-            </p>
-          </div>
+          </FormField>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
