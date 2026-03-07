@@ -472,7 +472,7 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 
 --------------------------------------------------------------------------------
 
-This artfiact bundles Apache Commons Codec.
+This artifact bundles Apache Commons Codec.
 Project URL: https://commons.apache.org/proper/commons-codec/
 License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
@@ -969,7 +969,7 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 
 --------------------------------------------------------------------------------
 
-This artfifact bundles Apache Curator.
+This artifact bundles Apache Curator.
 
 Project URL: https://curator.apache.org
 License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
@@ -985,7 +985,7 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 
 This artifact bundles Apache Hadoop.
 
-Project URL: httsp://hadoop.apache.org
+Project URL: https://hadoop.apache.org
 License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
 --------------------------------------------------------------------------------
@@ -1004,7 +1004,7 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 
 --------------------------------------------------------------------------------
 
-This artiifact bundles Apache Iceberg.
+This artifact bundles Apache Iceberg.
 
 Project URL: https://iceberg.apache.org
 License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
@@ -1342,6 +1342,27 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 This artifact bundles Apache Tomcat.
 
 Project URL: https://tomcat.apache.org/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Google FindBugs JSR305 annotations.
+
+Project URL: http://findbugs.sourceforge.net/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles Mortbay Jetty 6.1.26.
+
+Project URL: http://www.mortbay.org/jetty/
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This artifact bundles cglib.
+
+Project URL: https://github.com/cglib/cglib
 License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
 
 --------------------------------------------------------------------------------
