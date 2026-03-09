@@ -48,6 +48,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { CreateViewModal } from "@/components/forms/CreateViewModal"
+import { CreateTableModal } from "@/components/forms/CreateTableModal"
 
 export function NamespaceDetails() {
   const { catalogName, namespace: namespaceParam } = useParams<{
@@ -59,6 +60,7 @@ export function NamespaceDetails() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [createGenericTableOpen, setCreateGenericTableOpen] = useState(false)
   const [createViewOpen, setCreateViewOpen] = useState(false)
+  const [createTableOpen, setCreateTableOpen] = useState(false)
   const [genericTableForm, setGenericTableForm] = useState({
     name: "",
     format: "",
@@ -363,10 +365,8 @@ export function NamespaceDetails() {
                   <CardDescription>Iceberg tables in this namespace</CardDescription>
                 </div>
                 <Button
-                  onClick={() => {
-                    // TODO: Open create table modal (future implementation)
-                    console.log("Create table - to be implemented")
-                  }}
+                  onClick={() => setCreateTableOpen(true)}
+                  disabled={!catalogName || !namespaceParam}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Iceberg Table
@@ -699,6 +699,17 @@ export function NamespaceDetails() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Create Iceberg Table Modal */}
+      <CreateTableModal
+        open={createTableOpen}
+        onOpenChange={setCreateTableOpen}
+        catalogName={catalogName!}
+        namespace={namespaceArray}
+        onCreated={() => {
+          tablesQuery.refetch()
+        }}
+      />
 
       {/* Create Iceberg View Modal */}
       <CreateViewModal
