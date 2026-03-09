@@ -1323,14 +1323,7 @@ License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.
 
 --------------------------------------------------------------------------------
 
-This artifact bundles Google FindBugs JSR305 annotations.
-
-Project URL: http://findbugs.sourceforge.net/
-License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
-
---------------------------------------------------------------------------------
-
-This artifact bundles Mortbay Jetty (including jetty, jetty-util, jetty-sslengine, servlet-api, xml, log).
+This artifact bundles Mortbay Jetty.
 
 Project URL: http://www.mortbay.org/jetty/
 License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
