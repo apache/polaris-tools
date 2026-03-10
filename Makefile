@@ -100,3 +100,25 @@ console-lint-fix: ## Fix linting issues in the console project
 .PHONY: console-version
 console-version: ## Display version for console project
 	@$(MAKE) -C console version
+
+##@ MCP
+
+.PHONY: mcp-build
+mcp-build: ## Build the distribution files (sdist and wheel) for MCP project
+	@$(MAKE) -C mcp-server build
+
+.PHONY: mcp-cleanup
+mcp-cleanup: ## Cleanup virtual environment and build artifacts for MCP project
+	@$(MAKE) -C mcp-server cleanup
+
+.PHONY: mcp-lint
+mcp-lint: ## Lint the MCP project
+	@$(MAKE) -C mcp-server lint
+
+.PHONY: mcp-run
+mcp-run: ## Start MCP server (stdin/stdout transport)
+	@$(MAKE) -C mcp-server run
+
+.PHONY: mcp-test
+mcp-test: ## Run unit tests for MCP project
+	@$(MAKE) -C mcp-server test

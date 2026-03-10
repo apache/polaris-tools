@@ -28,6 +28,7 @@ from pathlib import Path
 
 def test_main_loads_default_config_file() -> None:
     with (
+        mock.patch("sys.argv", [""]),
         mock.patch("polaris_mcp.server.find_dotenv") as mock_find_dotenv,
         mock.patch("polaris_mcp.server.load_dotenv") as mock_load_dotenv,
         mock.patch("polaris_mcp.server.create_server") as mock_create_server,
@@ -48,6 +49,7 @@ def test_main_loads_default_config_file() -> None:
 
 def test_main_loads_custom_config_file() -> None:
     with (
+        mock.patch("sys.argv", [""]),
         mock.patch("polaris_mcp.server.find_dotenv") as mock_find_dotenv,
         mock.patch("polaris_mcp.server.load_dotenv") as mock_load_dotenv,
         mock.patch("polaris_mcp.server.create_server") as mock_create_server,
@@ -75,6 +77,7 @@ def test_config_loading_precedence(tmp_path: Path) -> None:
     )
 
     with (
+        mock.patch("sys.argv", [""]),
         mock.patch("polaris_mcp.server.create_server"),
         mock.patch.dict(
             os.environ,

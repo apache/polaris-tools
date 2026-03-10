@@ -83,7 +83,7 @@ jobs:
       - name: Sync dependencies
         working-directory: mcp-server
         run: |
-          uv sync --extra test --extra dev
+          uv sync --all-extras
 
       - name: Lint
         working-directory: mcp-server
