@@ -28,103 +28,75 @@ help: ## Display this help
 
 ##@ Benchmarks
 
-.PHONY: benchmarks-pre-requisite
-benchmarks-pre-requisite:
-	@if [ ! -f "benchmarks/application.conf" ]; then \
-		echo "ERROR: benchmarks/application.conf is missing"; \
-		exit 1; \
-	fi
-
-.PHONY: benchmarks-create-dataset-simulation
-benchmarks-create-dataset-simulation: benchmarks-pre-requisite ## Run create dataset simulation
-	@echo "--- Running create dataset simulation ---"
-	@$(MAKE) -C benchmarks create-dataset-simulation
-	@echo "--- Create dataset simulation completed ---"
-
-.PHONY: benchmarks-read-simulation
-benchmarks-read-simulation: benchmarks-pre-requisite ## Run read simulation
-	@echo "--- Running read simulation ---"
-	@$(MAKE) -C benchmarks read-simulation
-	@echo "--- Read simulation completed ---"
-
-.PHONY: benchmarks-read-update-simulation
-benchmarks-read-update-simulation: benchmarks-pre-requisite ## Run read/update simulation
-	@echo "--- Running read/update simulation ---"
-	@$(MAKE) -C benchmarks read-update-simulation
-	@echo "--- Read/Update simulation completed ---"
+# Note: APPLICATION_CONF_PATH can be passed to specify a custom config file path.
+# Can be an absolute path or relative to the benchmarks/ directory.
 
 .PHONY: benchmarks-create-commits-simulation
-benchmarks-create-commits-simulation: benchmarks-pre-requisite ## Run create commits simulation
-	@echo "--- Running create commits simulation ---"
+benchmarks-create-commits-simulation: ## Run create commits simulation
 	@$(MAKE) -C benchmarks create-commits-simulation
-	@echo "--- Create commits simulation completed ---"
 
-.PHONY: benchmarks-weighted-workload-simulation
-benchmarks-weighted-workload-simulation: benchmarks-pre-requisite ## Run weighted workload simulation
-	@echo "--- Running weighted workload simulation ---"
-	@$(MAKE) -C benchmarks weighted-workload-simulation
-	@echo "--- Weighted workload simulation completed ---"
+.PHONY: benchmarks-create-dataset-simulation
+benchmarks-create-dataset-simulation: ## Run create dataset simulation
+	@$(MAKE) -C benchmarks create-dataset-simulation
 
-.PHONY: benchmarks-reports-list
-benchmarks-reports-list: ## List benchmark reports
-	@echo "--- Listing benchmark reports ---"
-	@$(MAKE) -C benchmarks reports-list
-	@echo "--- List benchmark reports completed ---"
+.PHONY: benchmarks-read-simulation
+benchmarks-read-simulation: ## Run read simulation
+	@$(MAKE) -C benchmarks read-simulation
+
+.PHONY: benchmarks-read-update-simulation
+benchmarks-read-update-simulation: ## Run read/update simulation
+	@$(MAKE) -C benchmarks read-update-simulation
 
 .PHONY: benchmarks-reports-clean
 benchmarks-reports-clean: ## Clean benchmark reports
-	@echo "--- Cleaning benchmark reports ---"
 	@$(MAKE) -C benchmarks reports-clean
-	@echo "--- Clean benchmark reports completed ---"
 
+.PHONY: benchmarks-reports-list
+benchmarks-reports-list: ## List benchmark reports
+	@$(MAKE) -C benchmarks reports-list
+
+.PHONY: benchmarks-weighted-workload-simulation
+benchmarks-weighted-workload-simulation: ## Run weighted workload simulation
+	@$(MAKE) -C benchmarks weighted-workload-simulation
+
+.PHONY: benchmarks-version
+benchmarks-version: ## Display version for benchmarks project
+	@$(MAKE) -C benchmarks version
 
 ##@ Console
 
+.PHONY: console-build
+console-build: ## Build console project
+	@$(MAKE) -C console build
+
 .PHONY: console-build-docker
 console-build-docker: ## Build docker image for console project
-	@echo "--- Building docker image for console project---"
 	@$(MAKE) -C console build-docker
-	@echo "--- Docker image for console project built ---"
+
+.PHONY: console-dev
+console-dev: ## Run the console project in development mode
+	@$(MAKE) -C console dev
+
+.PHONY: console-format-check
+console-format-check: ## Check formatting in the console project
+	@$(MAKE) -C console format-check
+
+.PHONY: console-format-fix
+console-format-fix: ## Fix formatting in the console project
+	@$(MAKE) -C console format-fix
 
 .PHONY: console-install
 console-install: ## Install dependencies for console project
-	@echo "--- Install dependencies for console project ---"
 	@$(MAKE) -C console install
-	@echo "--- Dependencies for console project completed ---"
-
-.PHONY: console-build
-console-build: console-install ## Build console project
-	@echo "--- Building console project---"
-	@$(MAKE) -C console build
-	@echo "--- Console project built ---"
 
 .PHONY: console-lint
-console-lint: console-install ## Lint the console project
-	@echo "--- Linting the console project ---"
+console-lint: ## Lint the console project
 	@$(MAKE) -C console lint
-	@echo "--- Console project linted ---"
 
 .PHONY: console-lint-fix
-console-lint-fix: console-install ## Fix linting issues in the console project
-	@echo "--- Fixing linting issues in the console project ---"
+console-lint-fix: ## Fix linting issues in the console project
 	@$(MAKE) -C console lint-fix
-	@echo "--- Linting issues in the console project fixed ---"
 
-.PHONY: console-format-check
-console-format-check: console-install ## Check formatting in the console project
-	@echo "--- Checking formatting in the console project ---"
-	@$(MAKE) -C console format-check
-	@echo "--- Formatting in the console project checked ---"
-
-.PHONY: console-format-fix
-console-format-fix: console-install ## Fix formatting in the console project
-	@echo "--- Fixing formatting in the console project ---"
-	@$(MAKE) -C console format-fix
-	@echo "--- Formatting in the console project fixed ---"
-
-.PHONY: console-dev
-console-dev: console-install ## Run the console project in development mode
-	@echo "--- Running console project in development mode ---"
-	@$(MAKE) -C console dev
-	@echo "--- Console project in development mode completed ---"
-
+.PHONY: console-version
+console-version: ## Display version for console project
+	@$(MAKE) -C console version

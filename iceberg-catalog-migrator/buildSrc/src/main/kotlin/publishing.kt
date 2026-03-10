@@ -61,7 +61,7 @@ fun Project.configurePublishing() {
           version = project.version.toString()
 
           pom {
-            name.set("Apache Polaris Tools(incubating) - Iceberg Catalog Migrator")
+            name.set("Apache Polaris Tools - Iceberg Catalog Migrator")
             description.set("Iceberg Catalog Migrator from Apache Polaris Tools")
             url.set("https://polaris.apache.org/")
             inceptionYear.set("2024")

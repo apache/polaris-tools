@@ -38,9 +38,7 @@ export function Home() {
     <div className="space-y-8 p-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">
-          Get started with Apache Polaris (incubating)
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground">Get started with Apache Polaris</h1>
       </div>
 
       {/* Overview Card */}
@@ -48,15 +46,15 @@ export function Home() {
         <CardHeader>
           <CardTitle className="text-xl">
             Easily manage and secure Iceberg tables and catalogs with the{" "}
-            <span className="text-primary">Apache Polaris (incubating)</span>.
+            <span className="text-primary">Apache Polaris</span>.
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            Apache Polaris (incubating) is an open source catalog for Apache Iceberg. Built on the
-            open standard Apache Iceberg REST catalog protocol, Apache Polaris allows multiple
-            engines to read and write Iceberg tables while consistently managing security for all
-            queries from all engines.
+            Apache Polaris is an open source catalog for Apache Iceberg. Built on the open standard
+            Apache Iceberg REST catalog protocol, Apache Polaris allows multiple engines to read and
+            write Iceberg tables while consistently managing security for all queries from all
+            engines.
           </p>
           <div className="flex items-center justify-end">
             <Sparkles className="h-24 w-24 text-primary/20" />

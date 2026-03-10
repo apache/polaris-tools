@@ -31,6 +31,7 @@ on:
 
 jobs:
   publish-nightly:
+    if: github.repository == 'apache/polaris-tools'
     runs-on: ubuntu-latest
 
     steps:

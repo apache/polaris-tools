@@ -19,7 +19,7 @@
 
 # Objective
 
-To provide users of [Apache Polaris (Incubating)](https://github.com/apache/polaris) a tool to be able to easily and efficiently
+To provide users of [Apache Polaris](https://github.com/apache/polaris) a tool to be able to easily and efficiently
 migrate their entities from one Polaris instance to another.
 
 Polaris is a catalog of catalogs. It can become cumbersome to perform catalog-by-catalog migration of each and every catalog contained

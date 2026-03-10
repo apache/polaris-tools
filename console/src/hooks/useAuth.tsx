@@ -20,10 +20,13 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
+import { apiClient } from "@/api/client"
 
 interface AuthContextType {
   isAuthenticated: boolean
-  login: (clientId: string, clientSecret: string, scope: string, realm: string) => Promise<void>
+  login: (clientId: string, clientSecret: string, scope: string) => Promise<void>
+  loginWithOIDC: () => Promise<void>
+  completeOIDCLogin: (code: string, state: string) => Promise<void>
   logout: () => void
   loading: boolean
 }
@@ -34,13 +37,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [loading] = useState<boolean>(false)
 
-  const login = async (clientId: string, clientSecret: string, scope: string, realm: string) => {
+  const login = async (clientId: string, clientSecret: string, scope: string) => {
     try {
-      // Store realm in localStorage (non-sensitive configuration)
-      if (realm) {
-        localStorage.setItem("polaris_realm", realm)
-      }
-      await authApi.getToken(clientId, clientSecret, scope, realm)
+      await authApi.getToken(clientId, clientSecret, scope)
       setIsAuthenticated(true)
     } catch (error) {
       setIsAuthenticated(false)
@@ -48,14 +47,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const loginWithOIDC = async () => {
+    try {
+      await authApi.initiateOIDCFlow()
+    } catch (error) {
+      setIsAuthenticated(false)
+      throw error
+    }
+  }
+
+  const completeOIDCLogin = async (code: string, state: string) => {
+    try {
+      await authApi.handleOIDCCallback(code, state)
+      setIsAuthenticated(true)
+    } catch (error) {
+      setIsAuthenticated(false)
+      apiClient.clearAccessToken()
+      throw error
+    }
+  }
+
   const logout = () => {
     toast.success("Logged out successfully")
-    authApi.logout()
     setIsAuthenticated(false)
+    authApi.logout()
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, loginWithOIDC, completeOIDCLogin, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   )
