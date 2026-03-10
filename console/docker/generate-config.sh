@@ -17,12 +17,12 @@
 # under the License.
 
 # Copy nginx configuration (no substitution needed since we use direct API calls)
-cp /opt/app-root/etc/nginx.d/default.conf.template /opt/app-root/etc/nginx.d/default.conf
+cp /app/app-root/etc/nginx.d/default.conf.template /app/app-root/etc/nginx.d/default.conf
 
 echo "Configured nginx for static file serving"
 
 # Generate runtime configuration from environment variables
-cat > /opt/app-root/src/config.js << EOF
+cat > /app/app-root/src/config.js << EOF
 // Runtime configuration generated from environment variables
 window.APP_CONFIG = {
   VITE_POLARIS_API_URL: '${VITE_POLARIS_API_URL}',
@@ -38,7 +38,7 @@ window.APP_CONFIG = {
 EOF
 
 echo "Generated config.js with runtime configuration:"
-cat /opt/app-root/src/config.js
+cat /app/app-root/src/config.js
 
 # Start nginx
 exec nginx -g 'daemon off;'
