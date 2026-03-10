@@ -25,6 +25,8 @@ ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
 ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
 
+USER root
+
 WORKDIR /app
 
 # Copy package files
@@ -41,9 +43,9 @@ RUN npm run build
 
 # Production stage
 FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
-
+USER root
 RUN groupadd --gid 10001 polaris && \
-    useradd --uid 10000 --gid polaris polaris &&
+    useradd --uid 10000 --gid polaris polaris
 # Copy DISCLAIMER, LICENSE, NOTICE files
 COPY DISCLAIMER /DISCLAIMER
 COPY LICENSE-BUNDLE /LICENSE
