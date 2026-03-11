@@ -20,6 +20,8 @@ package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.jdk.CollectionConverters._
+
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
 
@@ -28,6 +30,7 @@ object BenchmarkConfig {
 
     val http: Config = config.getConfig("http")
     val auth: Config = config.getConfig("auth")
+    val rbac: Config = config.getConfig("rbac")
     val dataset: Config = config.getConfig("dataset.tree")
     val workload: Config = config.getConfig("workload")
 
@@ -97,7 +100,14 @@ object BenchmarkConfig {
       dataset.getBoolean("mangle-names")
     )
 
-    BenchmarkConfig(connectionParams, authParams, workloadParams, datasetParams)
+    val rbacParams = RbacParameters(
+      rbac.getBoolean("enabled"),
+      rbac.getInt("num-principals"),
+      rbac.getStringList("catalog-role-names").asScala.toSeq,
+      rbac.getStringList("principal-role-names").asScala.toSeq
+    )
+
+    BenchmarkConfig(connectionParams, authParams, workloadParams, datasetParams, rbacParams)
   }
 }
 
@@ -105,5 +115,6 @@ case class BenchmarkConfig(
     connectionParameters: ConnectionParameters,
     authParameters: AuthParameters,
     workloadParameters: WorkloadParameters,
-    datasetParameters: DatasetParameters
+    datasetParameters: DatasetParameters,
+    rbacParameters: RbacParameters
 ) {}

@@ -27,6 +27,7 @@ import org.apache.polaris.benchmarks.parameters.{
   AuthParameters,
   ConnectionParameters,
   DatasetParameters,
+  RbacParameters,
   WorkloadParameters
 }
 import org.slf4j.LoggerFactory
@@ -36,7 +37,8 @@ import scala.concurrent.duration._
 
 /**
  * This simulation is a 100% write workload that creates a tree dataset in Polaris. It is intended
- * to be used against an empty Polaris instance.
+ * to be used against an empty Polaris instance. When RBAC is enabled, it also creates principals,
+ * roles, and grants alongside the dataset.
  */
 class CreateTreeDataset extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -48,6 +50,7 @@ class CreateTreeDataset extends Simulation {
   val ap: AuthParameters = config.authParameters
   val dp: DatasetParameters = config.datasetParameters
   val wp: WorkloadParameters = config.workloadParameters
+  val rp: RbacParameters = config.rbacParameters
 
   // --------------------------------------------------------------------------------
   // Helper values
@@ -58,23 +61,109 @@ class CreateTreeDataset extends Simulation {
   private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
   private val tableActions = TableActions(dp, wp, setupActions.accessToken, 5, Set(500))
   private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 5, Set(500))
+  private val rbacActions = RbacActions(
+    dp,
+    rp,
+    namespaceActions,
+    tableActions,
+    viewActions,
+    setupActions.accessToken,
+    5,
+    Set(500)
+  )
 
+  private val createdPrincipals = new AtomicInteger()
+  private val createdPrincipalRoles = new AtomicInteger()
+  private val assignedPrincipalRoles = new AtomicInteger()
   private val createdCatalogs = new AtomicInteger()
+  private val createdCatalogRoles = new AtomicInteger()
+  private val assignedCatalogRoles = new AtomicInteger()
   private val createdNamespaces = new AtomicInteger()
   private val createdTables = new AtomicInteger()
   private val createdViews = new AtomicInteger()
 
   // --------------------------------------------------------------------------------
+  // Workload: Create principals
+  // --------------------------------------------------------------------------------
+  val createPrincipals: ScenarioBuilder =
+    scenario("Create principals")
+      .exec(setupActions.restoreAccessTokenInSession)
+      .asLongAs(session =>
+        createdPrincipals.getAndIncrement() < rbacActions.numPrincipals && session
+          .contains("accessToken")
+      )(
+        feed(rbacActions.principalFeeder())
+          .exec(rbacActions.createPrincipal)
+      )
+
+  // --------------------------------------------------------------------------------
+  // Workload: Create principal roles
+  // --------------------------------------------------------------------------------
+  val createPrincipalRoles: ScenarioBuilder =
+    scenario("Create principal roles")
+      .exec(setupActions.restoreAccessTokenInSession)
+      .asLongAs(session =>
+        createdPrincipalRoles.getAndIncrement() < rbacActions.numPrincipalRoles &&
+          session.contains("accessToken")
+      )(
+        feed(rbacActions.principalRoleFeeder())
+          .exec(rbacActions.createPrincipalRole)
+      )
+
+  // --------------------------------------------------------------------------------
+  // Workload: Assign principal roles to principals
+  // --------------------------------------------------------------------------------
+  val assignPrincipalRoles: ScenarioBuilder =
+    scenario("Assign principal roles to principals")
+      .exec(setupActions.restoreAccessTokenInSession)
+      .asLongAs(session =>
+        assignedPrincipalRoles
+          .getAndIncrement() < rbacActions.numPrincipalRoleAssignments && session
+          .contains("accessToken")
+      )(
+        feed(rbacActions.principalRoleAssignmentFeeder())
+          .exec(rbacActions.assignPrincipalRoleToPrincipal)
+      )
+
+  // --------------------------------------------------------------------------------
   // Workload: Create catalogs
   // --------------------------------------------------------------------------------
   val createCatalogs: ScenarioBuilder =
-    scenario("Create catalogs using the Polaris Management REST API")
+    scenario("Create catalogs")
       .exec(setupActions.restoreAccessTokenInSession)
       .asLongAs(session =>
         createdCatalogs.getAndIncrement() < dp.numCatalogs && session.contains("accessToken")
       )(
         feed(catalogActions.feeder())
           .exec(catalogActions.createCatalog)
+      )
+
+  // --------------------------------------------------------------------------------
+  // Workload: Create catalog roles
+  // --------------------------------------------------------------------------------
+  val createCatalogRoles: ScenarioBuilder =
+    scenario("Create catalog roles")
+      .exec(setupActions.restoreAccessTokenInSession)
+      .asLongAs(session =>
+        createdCatalogRoles.getAndIncrement() < rbacActions.numCatalogRoles &&
+          session.contains("accessToken")
+      )(
+        feed(rbacActions.catalogRoleFeeder())
+          .exec(rbacActions.createCatalogRole)
+      )
+
+  // --------------------------------------------------------------------------------
+  // Workload: Assign catalog roles to principal roles
+  // --------------------------------------------------------------------------------
+  val assignCatalogRoles: ScenarioBuilder =
+    scenario("Assign catalog roles to principal roles")
+      .exec(setupActions.restoreAccessTokenInSession)
+      .asLongAs(session =>
+        assignedCatalogRoles.getAndIncrement() < rbacActions.numCatalogRoleAssignments &&
+          session.contains("accessToken")
+      )(
+        feed(rbacActions.catalogRoleAssignmentFeeder())
+          .exec(rbacActions.assignCatalogRoleToPrincipalRole)
       )
 
   // --------------------------------------------------------------------------------
@@ -87,6 +176,10 @@ class CreateTreeDataset extends Simulation {
     )(
       feed(namespaceActions.namespaceCreationFeeder())
         .exec(namespaceActions.createNamespace)
+        .repeat(rbacActions.numGrantsPerNamespace) {
+          feed(rbacActions.namespaceGrantFeeder())
+            .exec(rbacActions.grantNamespacePrivilege)
+        }
     )
 
   // --------------------------------------------------------------------------------
@@ -99,6 +192,10 @@ class CreateTreeDataset extends Simulation {
     )(
       feed(tableActions.tableCreationFeeder())
         .exec(tableActions.createTable)
+        .repeat(rbacActions.numGrantsPerTable) {
+          feed(rbacActions.tableGrantFeeder())
+            .exec(rbacActions.grantTablePrivilege)
+        }
     )
 
   // --------------------------------------------------------------------------------
@@ -111,6 +208,10 @@ class CreateTreeDataset extends Simulation {
     )(
       feed(viewActions.viewCreationFeeder())
         .exec(viewActions.createView)
+        .repeat(rbacActions.numGrantsPerView) {
+          feed(rbacActions.viewGrantFeeder())
+            .exec(rbacActions.grantViewPrivilege)
+        }
     )
 
   // --------------------------------------------------------------------------------
@@ -126,11 +227,42 @@ class CreateTreeDataset extends Simulation {
   private val tableThroughput = wp.createTreeDataset.tableThroughput
   private val viewThroughput = wp.createTreeDataset.viewThroughput
 
+  // Build assertions separately based on whether RBAC is enabled
+  // This is necessary because an assertion requires at least one query to be executed, and that may not be the case if rbac is disabled.
+  private val baseAssertions = Seq(
+    details("Create Namespace").successfulRequests.count.is(numNamespaces),
+    details("Create Table").successfulRequests.count.is(dp.numTables),
+    details("Create View").successfulRequests.count.is(dp.numViews)
+  )
+
+  private val rbacAssertions = if (rp.enableRbac) {
+    Seq(
+      details("Create Principal").successfulRequests.count.is(rp.numPrincipals),
+      details("Create Principal Role").successfulRequests.count.is(rbacActions.numPrincipalRoles),
+      details("Assign Principal Role to Principal").successfulRequests.count
+        .is(rbacActions.numPrincipalRoleAssignments),
+      details("Create Catalog Role").successfulRequests.count.is(rbacActions.numCatalogRoles),
+      details("Assign Catalog Role to Principal Role").successfulRequests.count
+        .is(rbacActions.numCatalogRoleAssignments),
+      details("Grant Namespace Privilege").successfulRequests.count
+        .is(rbacActions.numNamespaceGrants),
+      details("Grant Table Privilege").successfulRequests.count.is(rbacActions.numTableGrants),
+      details("Grant View Privilege").successfulRequests.count.is(rbacActions.numViewGrants)
+    )
+  } else {
+    Seq.empty
+  }
+
   setUp(
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
     setupActions.waitForAuthentication
       .inject(atOnceUsers(1))
+      .andThen(createPrincipals.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(createPrincipalRoles.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(assignPrincipalRoles.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(createCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(createCatalogRoles.inject(atOnceUsers(1)).protocols(httpProtocol))
+      .andThen(assignCatalogRoles.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(
         createNamespaces
           .inject(
@@ -142,9 +274,5 @@ class CreateTreeDataset extends Simulation {
       .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
       .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
-  ).assertions(
-    details("Create Namespace").successfulRequests.count.is(numNamespaces),
-    details("Create Table").successfulRequests.count.is(dp.numTables),
-    details("Create View").successfulRequests.count.is(dp.numViews)
-  )
+  ).assertions(baseAssertions ++ rbacAssertions)
 }
