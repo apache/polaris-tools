@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FormField } from "@/components/ui/form-field"
 import {
   Select,
   SelectContent,
@@ -243,32 +244,30 @@ export function EditCatalogModal({
           onSubmit={handleSubmit((values) => updateMutation.mutate(values))}
           className="space-y-4"
         >
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+          <FormField label="Name" htmlFor="name" hint="Catalog name cannot be changed">
             <Input id="name" value={catalog.name} disabled />
-            <p className="text-xs text-muted-foreground">Catalog name cannot be changed</p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label>Type</Label>
+          <FormField label="Type" hint="Catalog type cannot be changed">
             <Input value={catalog.type} disabled />
-            <p className="text-xs text-muted-foreground">Catalog type cannot be changed</p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="defaultBaseLocation">Default base location</Label>
+          <FormField
+            label="Default base location"
+            htmlFor="defaultBaseLocation"
+            error={errors.defaultBaseLocation?.message}
+          >
             <Input
               id="defaultBaseLocation"
               placeholder="e.g. s3://bucket/prefix or file:///path"
               {...register("defaultBaseLocation")}
             />
-            {errors.defaultBaseLocation && (
-              <p className="text-sm text-red-600">{errors.defaultBaseLocation.message}</p>
-            )}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label>Storage provider</Label>
+          <FormField
+            label="Storage provider"
+            hint="Select the cloud/storage provider used by this catalog."
+          >
             <Controller
               name="storageType"
               control={control}
@@ -286,23 +285,19 @@ export function EditCatalogModal({
                 </Select>
               )}
             />
-            <p className="text-xs text-muted-foreground">
-              Select the cloud/storage provider used by this catalog.
-            </p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="allowedLocations">Allowed locations (comma-separated)</Label>
+          <FormField
+            label="Allowed locations (comma-separated)"
+            htmlFor="allowedLocations"
+            hint="Optional list of storage locations allowed for this catalog. Example: s3://bucket/prefix/"
+          >
             <Input
               id="allowedLocations"
               placeholder="s3://bucket1/, s3://bucket2/"
               {...register("allowedLocations")}
             />
-            <p className="text-xs text-muted-foreground">
-              Optional list of storage locations allowed for this catalog. Example:
-              s3://bucket/prefix/
-            </p>
-          </div>
+          </FormField>
 
           {/* Provider-specific fields */}
           {storageType === "S3" && (
@@ -389,18 +384,18 @@ export function EditCatalogModal({
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="propertiesJson">Properties (JSON format)</Label>
+          <FormField
+            label="Properties (JSON format)"
+            htmlFor="propertiesJson"
+            hint="Catalog properties as JSON. You can also use key=value format, one per line."
+          >
             <Textarea
               id="propertiesJson"
               placeholder='{"key": "value"}'
               rows={6}
               {...register("propertiesJson")}
             />
-            <p className="text-xs text-muted-foreground">
-              Catalog properties as JSON. You can also use key=value format, one per line.
-            </p>
-          </div>
+          </FormField>
 
           <DialogFooter>
             <Button

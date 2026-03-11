@@ -34,6 +34,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormField } from "@/components/ui/form-field"
 import {
   Select,
   SelectContent,
@@ -152,8 +153,7 @@ export function ConfigureConnectionModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="queryEngine">Query Engine</Label>
+          <FormField label="Query Engine" htmlFor="queryEngine" error={errors.queryEngine?.message}>
             <Select
               onValueChange={(value) => {
                 setValue("queryEngine", value)
@@ -170,23 +170,20 @@ export function ConfigureConnectionModal({
                 ))}
               </SelectContent>
             </Select>
-            {errors.queryEngine && (
-              <p className="text-sm text-red-600">{errors.queryEngine.message}</p>
-            )}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="principalName">Principal Name</Label>
+          <FormField
+            label="Principal Name"
+            htmlFor="principalName"
+            error={errors.principalName?.message}
+            hint="A new principal will be created."
+          >
             <Input
               id="principalName"
               {...register("principalName")}
               placeholder="polaris_demo_connection_spark"
             />
-            <p className="text-xs text-gray-500">A new principal will be created.</p>
-            {errors.principalName && (
-              <p className="text-sm text-red-600">{errors.principalName.message}</p>
-            )}
-          </div>
+          </FormField>
 
           <div className="flex items-center justify-between">
             <Label htmlFor="createRole">Create new principal role</Label>
@@ -201,17 +198,17 @@ export function ConfigureConnectionModal({
           </div>
 
           {createNewRole ? (
-            <div className="space-y-2">
-              <Label htmlFor="principalRoleName">Principal Role Name</Label>
+            <FormField
+              label="Principal Role Name"
+              htmlFor="principalRoleName"
+              error={errors.principalRoleName?.message}
+            >
               <Input
                 id="principalRoleName"
                 {...register("principalRoleName")}
                 placeholder="Enter role name"
               />
-              {errors.principalRoleName && (
-                <p className="text-sm text-red-600">{errors.principalRoleName.message}</p>
-              )}
-            </div>
+            </FormField>
           ) : (
             <div className="space-y-2">
               <Label htmlFor="principalRole">Principal Role</Label>
