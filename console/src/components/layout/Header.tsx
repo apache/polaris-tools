@@ -107,9 +107,9 @@ export function Header({ onSearchOpen }: HeaderProps) {
           <Search className="h-4 w-4" />
           Search…
         </span>
-        <kbd className="pointer-events-none hidden select-none rounded border bg-muted px-1.5 py-0.5 text-xs font-mono text-muted-foreground sm:inline-flex">
-          ⌘K
-        </kbd>
+        <span className="pointer-events-none hidden select-none rounded border bg-muted px-1.5 py-0.5 text-xs font-mono text-muted-foreground sm:inline-flex">
+          Ctrl+K
+        </span>
       </Button>
 
       {/* User Profile with Dropdown - Right Side */}
