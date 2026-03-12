@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { LogOut, ChevronDown, Sun, Moon, Monitor } from "lucide-react"
+import { LogOut, ChevronDown, Sun, Moon, Monitor, Search } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { useTheme } from "@/hooks/useTheme"
@@ -32,7 +32,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 
-export function Header() {
+interface HeaderProps {
+  onSearchOpen: () => void
+}
+
+export function Header({ onSearchOpen }: HeaderProps) {
   const { logout } = useAuth()
   const { principal, principalRoles, loading } = useCurrentUser()
   const { theme, setTheme } = useTheme()
@@ -92,6 +96,21 @@ export function Header() {
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Search Trigger - Center */}
+      <Button
+        variant="outline"
+        onClick={onSearchOpen}
+        className="flex h-9 w-72 items-center justify-between gap-2 rounded-md border px-3 text-sm text-muted-foreground shadow-none hover:text-foreground"
+      >
+        <span className="flex items-center gap-2">
+          <Search className="h-4 w-4" />
+          Search…
+        </span>
+        <kbd className="pointer-events-none hidden select-none rounded border bg-muted px-1.5 py-0.5 text-xs font-mono text-muted-foreground sm:inline-flex">
+          ⌘K
+        </kbd>
+      </Button>
 
       {/* User Profile with Dropdown - Right Side */}
       <DropdownMenu>
