@@ -23,8 +23,9 @@ import { principalsApi } from "@/api/management/principals"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { tablesApi } from "@/api/catalog/tables"
 import { viewsApi } from "@/api/catalog/views"
+import { type SearchResultType } from "@/types/search"
 
-export type SearchResultType = "catalog" | "namespace" | "table" | "view" | "principal"
+export type { SearchResultType }
 
 export interface SearchResult {
   id: string
@@ -32,6 +33,11 @@ export interface SearchResult {
   label: string
   sublabel: string
   path: string
+}
+
+export interface SearchData {
+  results: SearchResult[]
+  isLoading: boolean
 }
 
 interface NamespaceEntry {
@@ -49,15 +55,15 @@ function encodeNamespace(namespace: string[]): string {
   return namespace.join("\x1F")
 }
 
-export function useSearchData(enabled: boolean): SearchResult[] {
-  const { data: catalogs = [] } = useQuery({
+export function useSearchData(enabled: boolean): SearchData {
+  const { data: catalogs = [], isLoading: catalogsLoading } = useQuery({
     queryKey: ["catalogs"],
     queryFn: () => catalogsApi.list(),
     enabled,
     staleTime: 30_000,
   })
 
-  const { data: principals = [] } = useQuery({
+  const { data: principals = [], isLoading: principalsLoading } = useQuery({
     queryKey: ["principals"],
     queryFn: () => principalsApi.list(),
     enabled,
@@ -66,7 +72,7 @@ export function useSearchData(enabled: boolean): SearchResult[] {
 
   const catalogNames = catalogs.map((c) => c.name).sort()
 
-  const { data: namespacesMap = {} } = useQuery({
+  const { data: namespacesMap = {}, isLoading: namespacesLoading } = useQuery({
     queryKey: ["search-namespaces", catalogNames],
     queryFn: async () => {
       const results = await Promise.allSettled(
@@ -93,7 +99,7 @@ export function useSearchData(enabled: boolean): SearchResult[] {
 
   const pairKeys = allNamespacePairs.map((p) => `${p.catalog}/${p.namespace.join(".")}`).sort()
 
-  const { data: tablesData = [] } = useQuery({
+  const { data: tablesData = [], isLoading: tablesLoading } = useQuery({
     queryKey: ["search-tables", pairKeys],
     queryFn: async () => {
       const results = await Promise.allSettled(
@@ -116,7 +122,7 @@ export function useSearchData(enabled: boolean): SearchResult[] {
     staleTime: 30_000,
   })
 
-  const { data: viewsData = [] } = useQuery({
+  const { data: viewsData = [], isLoading: viewsLoading } = useQuery({
     queryKey: ["search-views", pairKeys],
     queryFn: async () => {
       const results = await Promise.allSettled(
@@ -147,6 +153,7 @@ export function useSearchData(enabled: boolean): SearchResult[] {
     path: `/catalogs/${encodeURIComponent(c.name)}`,
   }))
 
+  // TODO: when individual principal detail pages are added, update this path
   const principalResults: SearchResult[] = principals.map((p) => ({
     id: `principal:${p.name}`,
     type: "principal",
@@ -182,11 +189,20 @@ export function useSearchData(enabled: boolean): SearchResult[] {
     path: `/catalogs/${encodeURIComponent(v.catalog)}/namespaces/${encodeURIComponent(encodeNamespace(v.namespace))}/views/${encodeURIComponent(v.name)}`,
   }))
 
-  return [
-    ...catalogResults,
-    ...principalResults,
-    ...namespaceResults,
-    ...tableResults,
-    ...viewResults,
-  ]
+  const isLoading =
+    catalogsLoading || principalsLoading || namespacesLoading || tablesLoading || viewsLoading
+
+  // NOTE: this fetches all catalogs, namespaces, tables and views eagerly.
+  // For large installations this can result in many parallel requests.
+  // Consider server-side search or lazy loading as a follow-up improvement.
+  return {
+    results: [
+      ...catalogResults,
+      ...principalResults,
+      ...namespaceResults,
+      ...tableResults,
+      ...viewResults,
+    ],
+    isLoading,
+  }
 }

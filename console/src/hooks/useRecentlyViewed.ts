@@ -18,8 +18,9 @@
  */
 
 import { useState, useCallback } from "react"
+import { type SearchResultType } from "@/types/search"
 
-export type RecentItemType = "catalog" | "namespace" | "table" | "view" | "principal"
+export type RecentItemType = SearchResultType
 
 export interface RecentItem {
   id: string

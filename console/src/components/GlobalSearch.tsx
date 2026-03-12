@@ -19,7 +19,7 @@
 
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Database, Table2, Eye, FolderOpen, User, Clock } from "lucide-react"
+import { Database, Table2, Eye, FolderOpen, User, Clock, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import {
@@ -77,7 +77,7 @@ function matchesQuery(text: string, query: string): boolean {
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const navigate = useNavigate()
   const { items: recentItems, trackVisit, clearAll } = useRecentlyViewed()
-  const allResults = useSearchData(open)
+  const { results: allResults, isLoading } = useSearchData(open)
   const [query, setQuery] = useState("")
 
   useEffect(() => {
@@ -95,13 +95,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     return acc
   }, {})
 
-  const handleSelect = (item: {
-    id: string
-    type: SearchResultType
-    label: string
-    sublabel?: string
-    path: string
-  }) => {
+  const handleSelect = (item: SearchResult | RecentItem) => {
     trackVisit({
       id: item.id,
       type: item.type,
@@ -131,7 +125,16 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
           <CommandList>
             {!hasResults && !showRecent && (
               <CommandEmpty>
-                {query.trim().length > 0 ? "No results found." : "Start typing to search…"}
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading…
+                  </span>
+                ) : query.trim().length > 0 ? (
+                  "No results found."
+                ) : (
+                  "Start typing to search…"
+                )}
               </CommandEmpty>
             )}
 
@@ -170,32 +173,37 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
               </CommandGroup>
             )}
 
-            {TYPE_ORDER.map((type, idx) => {
-              const results = grouped[type]
-              if (!results || results.length === 0) return null
-              return (
-                <div key={type}>
-                  {idx > 0 && <CommandSeparator />}
-                  <CommandGroup heading={`${TYPE_LABELS[type]}s`}>
-                    {results.map((result) => (
-                      <CommandItem
-                        key={result.id}
-                        value={result.id}
-                        onSelect={() => handleSelect(result)}
-                      >
-                        {TYPE_ICONS[result.type]}
-                        <span className="flex-1 truncate">{result.label}</span>
-                        {result.sublabel && (
-                          <span className="truncate text-xs text-muted-foreground max-w-[200px]">
-                            {result.sublabel}
-                          </span>
-                        )}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </div>
-              )
-            })}
+            {(() => {
+              let firstGroup = true
+              return TYPE_ORDER.map((type) => {
+                const results = grouped[type]
+                if (!results?.length) return null
+                const showSep = !firstGroup
+                firstGroup = false
+                return (
+                  <div key={type}>
+                    {showSep && <CommandSeparator />}
+                    <CommandGroup heading={`${TYPE_LABELS[type]}s`}>
+                      {results.map((result) => (
+                        <CommandItem
+                          key={result.id}
+                          value={result.id}
+                          onSelect={() => handleSelect(result)}
+                        >
+                          {TYPE_ICONS[result.type]}
+                          <span className="flex-1 truncate">{result.label}</span>
+                          {result.sublabel && (
+                            <span className="truncate text-xs text-muted-foreground max-w-[200px]">
+                              {result.sublabel}
+                            </span>
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </div>
+                )
+              })
+            })()}
           </CommandList>
         </Command>
       </DialogContent>
