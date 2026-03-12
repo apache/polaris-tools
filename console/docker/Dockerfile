@@ -18,12 +18,12 @@
 # Build stage
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
 
-# Default environment variables (can be overridden at runtime)
-ENV VITE_POLARIS_API_URL=http://polaris:8181
-ENV VITE_POLARIS_REALM=POLARIS
-ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
-ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
-ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
+# Default environment variables required (need to be set at runtime)
+#ENV VITE_POLARIS_API_URL=http://polaris:8181
+#ENV VITE_POLARIS_REALM=POLARIS
+#ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
+#ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
+#ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ RUN npm run build
 FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
 
 # Copy DISCLAIMER, LICENSE, NOTICE files
-COPY DISCLAIMER /DISCLAIMER
+#COPY DISCLAIMER /DISCLAIMER
 COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
