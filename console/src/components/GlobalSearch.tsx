@@ -59,19 +59,21 @@ const TYPE_LABELS: Record<SearchResultType, string> = {
 const TYPE_ORDER: SearchResultType[] = ["catalog", "namespace", "table", "view", "principal"]
 
 /**
- * Word-prefix match: the query must match the start of at least one
- * word/segment in the text (split on spaces, underscores, hyphens, dots, slashes).
- * "on"  → matches "online_store"   ✓  (word "online" starts with "on")
- * "sto" → matches "online_store"   ✓  (word "store" starts with "sto")
- * "a"   → does NOT match "online_store" ✗  (no word starts with "a")
- * "a"   → matches "accounting"     ✓  (word "accounting" starts with "a")
+ * Word-prefix match: splits both the query and the text on common delimiters.
+ * Every query word must match the start of at least one text segment.
+ * "on"          → matches "online_store"         ✓  (segment "online" starts with "on")
+ * "sto"         → matches "online_store"         ✓  (segment "store" starts with "sto")
+ * "a"           → does NOT match "online_store"  ✗  (no segment starts with "a")
+ * "on sto"      → matches "online_store"         ✓  ("on" matches "online", "sto" matches "store")
+ * "on xyz"      → does NOT match "online_store"  ✗  (no segment starts with "xyz")
  */
 function matchesQuery(text: string, query: string): boolean {
-  const q = query.toLowerCase()
-  return text
+  const segments = text.toLowerCase().split(/[\s_\-./]+/)
+  return query
     .toLowerCase()
-    .split(/[\s_\-./]+/)
-    .some((word) => word.startsWith(q))
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((qw) => segments.some((seg) => seg.startsWith(qw)))
 }
 
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {

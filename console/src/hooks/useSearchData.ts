@@ -75,6 +75,9 @@ export function useSearchData(enabled: boolean): SearchData {
   const { data: namespacesMap = {}, isLoading: namespacesLoading } = useQuery({
     queryKey: ["search-namespaces", catalogNames],
     queryFn: async () => {
+      // This fires one request per catalog. For large installations with many catalogs,
+      // namespaces, tables and views this can result in hundreds of parallel requests.
+      // TODO: add a cap or pagination strategy to handle large deployments.
       const results = await Promise.allSettled(
         catalogs.map(async (catalog) => {
           const nsList = await namespacesApi.list(catalog.name)
@@ -192,9 +195,6 @@ export function useSearchData(enabled: boolean): SearchData {
   const isLoading =
     catalogsLoading || principalsLoading || namespacesLoading || tablesLoading || viewsLoading
 
-  // NOTE: this fetches all catalogs, namespaces, tables and views eagerly.
-  // For large installations this can result in many parallel requests.
-  // Consider server-side search or lazy loading as a follow-up improvement.
   return {
     results: [
       ...catalogResults,
