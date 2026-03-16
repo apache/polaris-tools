@@ -25,6 +25,8 @@ ENV VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL
 ENV VITE_OAUTH_TOKEN_URL=http://polaris:8181/api/catalog/v1/oauth/tokens
 ENV VITE_POLARIS_REALM_HEADER_NAME=Polaris-Realm
 
+USER root
+
 WORKDIR /app
 
 # Copy package files
@@ -41,7 +43,9 @@ RUN npm run build
 
 # Production stage
 FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
-
+USER root
+RUN groupadd --gid 10001 polaris && \
+    useradd --uid 10000 --gid polaris polaris
 # Copy DISCLAIMER, LICENSE, NOTICE files
 COPY DISCLAIMER /DISCLAIMER
 COPY LICENSE-BUNDLE /LICENSE
@@ -49,16 +53,20 @@ COPY NOTICE /NOTICE
 
 # Copy custom nginx configuration as template
 COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
-
 # Copy runtime config generation script
-COPY --chmod=755 docker/generate-config.sh /generate-config.sh
-
+COPY --chown=10000:10001 --chmod=744 docker/generate-config.sh /generate-config.sh
 # Copy built application from builder stage
 COPY --from=builder /app/dist /opt/app-root/src
 
+RUN chown -R polaris:polaris /opt/app-root
 # Expose port 80
 EXPOSE 80
-
+RUN chown -R polaris:polaris /var/log/nginx \
+    && chown -R polaris:polaris /etc/nginx/conf.d \
+    && chown -R polaris:polaris /var/lib/nginx \
+    && touch /var/run/nginx.pid \
+    && chown -R polaris:polaris /var/run/nginx.pid
+USER polaris
 # Use the script as entrypoint to generate config.js from env vars at startup
 ENTRYPOINT ["/generate-config.sh"]
 
