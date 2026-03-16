@@ -52,16 +52,15 @@ COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
 # Copy custom nginx configuration as template
-COPY docker/nginx.conf /app/app-root/etc/nginx.d/default.conf.template
-
+COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
 # Copy runtime config generation script
 COPY --chown=10000:10001 --chmod=744 docker/generate-config.sh /generate-config.sh
 # Copy built application from builder stage
-COPY --from=builder /app/dist /app/app-root/src
+COPY --from=builder /app/dist /opt/app-root/src
 
+RUN chown -R polaris:polaris /opt/app-root
 # Expose port 80
 EXPOSE 80
-RUN chown -R polaris:polaris /app
 RUN chown -R polaris:polaris /var/log/nginx \
     && chown -R polaris:polaris /etc/nginx/conf.d \
     && chown -R polaris:polaris /var/lib/nginx \
