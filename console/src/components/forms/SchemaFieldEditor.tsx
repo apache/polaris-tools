@@ -157,7 +157,12 @@ export function SchemaFieldEditor({
                 value={field.decimalPrecision ?? ""}
                 onChange={(e) => {
                   const n = parseInt(e.target.value, 10)
-                  updateField(index, { decimalPrecision: isNaN(n) ? undefined : n }, fields, setFields)
+                  updateField(
+                    index,
+                    { decimalPrecision: isNaN(n) ? undefined : n },
+                    fields,
+                    setFields
+                  )
                 }}
               />
               <Input
