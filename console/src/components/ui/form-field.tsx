@@ -34,7 +34,7 @@ function FormField({ label, htmlFor, error, hint, children, className }: FormFie
     <div className={className ?? "space-y-2"}>
       <Label htmlFor={htmlFor}>{label}</Label>
       {children}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   )
