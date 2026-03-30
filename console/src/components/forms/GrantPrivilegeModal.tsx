@@ -34,6 +34,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { FormField } from "@/components/ui/form-field"
 import {
   Select,
   SelectContent,
@@ -772,8 +773,11 @@ export function GrantPrivilegeModal({ open, onOpenChange, onSuccess }: GrantPriv
           </DialogHeader>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Catalog Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="catalogName">Catalog *</Label>
+            <FormField
+              label="Catalog *"
+              htmlFor="catalogName"
+              error={form.formState.errors.catalogName?.message}
+            >
               <Select
                 value={form.watch("catalogName")}
                 onValueChange={(value) => {
@@ -802,14 +806,14 @@ export function GrantPrivilegeModal({ open, onOpenChange, onSuccess }: GrantPriv
                   )}
                 </SelectContent>
               </Select>
-              {form.formState.errors.catalogName && (
-                <p className="text-sm text-red-600">{form.formState.errors.catalogName.message}</p>
-              )}
-            </div>
+            </FormField>
 
             {/* Catalog Role Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="catalogRoleName">Catalog Role *</Label>
+            <FormField
+              label="Catalog Role *"
+              htmlFor="catalogRoleName"
+              error={form.formState.errors.catalogRoleName?.message}
+            >
               <Select
                 value={form.watch("catalogRoleName")}
                 onValueChange={(value) => form.setValue("catalogRoleName", value)}
@@ -840,16 +844,14 @@ export function GrantPrivilegeModal({ open, onOpenChange, onSuccess }: GrantPriv
                   )}
                 </SelectContent>
               </Select>
-              {form.formState.errors.catalogRoleName && (
-                <p className="text-sm text-red-600">
-                  {form.formState.errors.catalogRoleName.message}
-                </p>
-              )}
-            </div>
+            </FormField>
 
             {/* Entity Type Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="entityType">Entity Type *</Label>
+            <FormField
+              label="Entity Type *"
+              htmlFor="entityType"
+              error={form.formState.errors.entityType?.message}
+            >
               <Select
                 value={form.watch("entityType")}
                 onValueChange={(value) => {
@@ -873,49 +875,37 @@ export function GrantPrivilegeModal({ open, onOpenChange, onSuccess }: GrantPriv
                   <SelectItem value="policy">Policy</SelectItem>
                 </SelectContent>
               </Select>
-              {form.formState.errors.entityType && (
-                <p className="text-sm text-red-600">{form.formState.errors.entityType.message}</p>
-              )}
-            </div>
+            </FormField>
 
             {/* Namespace Path (conditional) */}
             {entityType !== "catalog" && (
-              <div className="space-y-2">
-                <Label htmlFor="namespacePath">
-                  Namespace Path {entityType === "namespace" ? "(optional)" : "*"}
-                </Label>
+              <FormField
+                label={`Namespace Path ${entityType === "namespace" ? "(optional)" : "*"}`}
+                htmlFor="namespacePath"
+                error={form.formState.errors.namespacePath?.message}
+                hint='Enter namespace path as period-delimited segments (e.g., "sales.2024"). Leave empty for root namespace.'
+              >
                 <Input
                   id="namespacePath"
                   {...form.register("namespacePath")}
                   placeholder="ns1.ns2 (period-delimited, leave empty for root)"
                 />
-                {form.formState.errors.namespacePath && (
-                  <p className="text-sm text-red-600">
-                    {form.formState.errors.namespacePath.message}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Enter namespace path as period-delimited segments (e.g., "sales.2024"). Leave
-                  empty for root namespace.
-                </p>
-              </div>
+              </FormField>
             )}
 
             {/* Entity Name (conditional) */}
             {["table", "view", "policy"].includes(entityType) && (
-              <div className="space-y-2">
-                <Label htmlFor="entityName">
-                  {entityType.charAt(0).toUpperCase() + entityType.slice(1)} Name *
-                </Label>
+              <FormField
+                label={`${entityType.charAt(0).toUpperCase() + entityType.slice(1)} Name *`}
+                htmlFor="entityName"
+                error={form.formState.errors.entityName?.message}
+              >
                 <Input
                   id="entityName"
                   {...form.register("entityName")}
                   placeholder={`Enter ${entityType} name`}
                 />
-                {form.formState.errors.entityName && (
-                  <p className="text-sm text-red-600">{form.formState.errors.entityName.message}</p>
-                )}
-              </div>
+              </FormField>
             )}
 
             {/* Privilege Selection */}

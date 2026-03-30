@@ -33,8 +33,8 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FormField } from "@/components/ui/form-field"
 import { principalsApi } from "@/api/management/principals"
 import type { Principal, PrincipalWithCredentials } from "@/types/api"
 
@@ -153,24 +153,27 @@ export function EditPrincipalModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+          <FormField
+            label="Name"
+            htmlFor="name"
+            error={form.formState.errors.name?.message}
+            hint={
+              isNew ? "The unique name for this principal." : "Principal name cannot be changed."
+            }
+          >
             <Input
               id="name"
               {...form.register("name")}
               placeholder="principal-name"
               disabled={!isNew}
             />
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-600">{form.formState.errors.name.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {isNew ? "The unique name for this principal." : "Principal name cannot be changed."}
-            </p>
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="properties">Properties</Label>
+          <FormField
+            label="Properties"
+            htmlFor="properties"
+            hint="Enter properties as key=value pairs, one per line."
+          >
             <Textarea
               id="properties"
               value={propertiesText}
@@ -179,10 +182,7 @@ export function EditPrincipalModal({
               className="font-mono text-sm"
               rows={6}
             />
-            <p className="text-xs text-muted-foreground">
-              Enter properties as key=value pairs, one per line.
-            </p>
-          </div>
+          </FormField>
 
           <DialogFooter>
             <Button
