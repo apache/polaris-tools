@@ -20,8 +20,23 @@ package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.jdk.CollectionConverters._
+
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
+
+  private def readHeaders(http: Config): Map[String, String] = {
+    if (http.hasPath("headers")) {
+      val headersConfig = http.getConfig("headers")
+      val result = collection.mutable.Map[String, String]()
+      headersConfig.entrySet().asScala.foreach { entry =>
+        result(entry.getKey) = headersConfig.getString(entry.getKey)
+      }
+      result.toMap
+    } else {
+      Map.empty[String, String]
+    }
+  }
 
   def apply(): BenchmarkConfig = {
     val config: Config = ConfigFactory.load().withFallback(ConfigFactory.load("benchmark-defaults"))
@@ -32,7 +47,8 @@ object BenchmarkConfig {
     val workload: Config = config.getConfig("workload")
 
     val connectionParams = ConnectionParameters(
-      http.getString("base-url")
+      http.getString("base-url"),
+      readHeaders(http)
     )
 
     val authParams = AuthParameters(

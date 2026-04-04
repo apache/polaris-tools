@@ -23,7 +23,7 @@ package org.apache.polaris.benchmarks.parameters
  *
  * @param baseUrl The base URL of the Polaris service.
  */
-case class ConnectionParameters(baseUrl: String) {
+case class ConnectionParameters(baseUrl: String, headers: Map[String, String] = Map.empty) {
   require(baseUrl != null && baseUrl.nonEmpty, "Base URL cannot be null or empty")
   require(
     baseUrl.startsWith("http://") || baseUrl.startsWith("https://"),
