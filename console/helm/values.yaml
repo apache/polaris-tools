@@ -62,6 +62,8 @@ httproute:
   enabled: false
   annotations: {}
   port: 80
+  gatewayGroup: gateway.networking.k8s.io
+  gatewayKind: Gateway
   # Name of the httpGateway deployment
   gatewayName: ""
   # Namespace where the httpGateway is deployed
