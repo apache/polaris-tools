@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode, urljoin, urlsplit, urlunsplit, quote
 
 import urllib3
+from fastmcp.server.dependencies import get_http_headers
 
 from polaris_mcp.authorization import AuthorizationProvider, none
 from polaris_mcp.base import JSONDict, ToolExecutionResult
@@ -243,6 +244,11 @@ class PolarisRestTool:
             token = self._authorization.authorization_header(realm)
             if token:
                 header_values["Authorization"] = token
+            else:
+                incoming = get_http_headers(include={"authorization"})
+                incoming_auth = incoming.get("authorization", "")
+                if incoming_auth:
+                    header_values["Authorization"] = incoming_auth
         header_name = os.getenv("POLARIS_REALM_CONTEXT_HEADER_NAME", "Polaris-Realm")
         if realm and not any(
             name.lower() == header_name.lower() for name in header_values
