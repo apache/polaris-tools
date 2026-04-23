@@ -61,17 +61,21 @@ export function Header({ onSearchOpen }: HeaderProps) {
   const initials = getInitials(displayName)
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-6">
+    <header className="flex h-14 items-center justify-between bg-white px-6 shadow-[0_1px_0_0_hsl(var(--border))]">
       {/* Theme Toggle - Left Side */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          >
             {theme === "light" ? (
-              <Sun className="h-5 w-5" />
+              <Sun className="h-4 w-4" />
             ) : theme === "dark" ? (
-              <Moon className="h-5 w-5" />
+              <Moon className="h-4 w-4" />
             ) : (
-              <Monitor className="h-5 w-5" />
+              <Monitor className="h-4 w-4" />
             )}
             <span className="sr-only">Toggle theme</span>
           </Button>
@@ -98,48 +102,48 @@ export function Header({ onSearchOpen }: HeaderProps) {
       </DropdownMenu>
 
       {/* Search Trigger - Center */}
-      <Button
-        variant="outline"
+      <button
         onClick={onSearchOpen}
-        className="flex h-9 w-72 items-center justify-between gap-2 rounded-md border px-3 text-sm text-muted-foreground shadow-none hover:text-foreground"
+        className="flex h-9 w-80 items-center justify-between gap-2 rounded-lg border border-border bg-muted/60 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
       >
         <span className="flex items-center gap-2">
-          <Search className="h-4 w-4" />
+          <Search className="h-3.5 w-3.5" />
           Search…
         </span>
-        <span className="pointer-events-none hidden select-none rounded border bg-muted px-1.5 py-0.5 text-xs font-mono text-muted-foreground sm:inline-flex">
+        <kbd className="pointer-events-none hidden select-none rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground sm:inline-flex">
           Ctrl+K
-        </span>
-      </Button>
+        </kbd>
+      </button>
 
       {/* User Profile with Dropdown - Right Side */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
-              {loading ? "..." : initials}
+          <button className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+              {loading ? "…" : initials}
             </div>
             <div className="min-w-0 text-left">
-              <div className="text-sm font-medium text-foreground truncate">
-                {loading ? "Loading..." : displayName}
+              <div className="text-sm font-medium leading-tight text-foreground truncate">
+                {loading ? "Loading…" : displayName}
               </div>
               <div className="text-xs text-muted-foreground truncate">
-                {loading ? "..." : primaryRole}
-              </div>
-              <div className="text-xs text-muted-foreground/70 truncate">
-                {config.POLARIS_REALM}
+                {loading ? "…" : primaryRole}
               </div>
             </div>
-            <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
+          <div className="px-2 py-1.5 border-b border-border mb-1">
+            <p className="text-xs text-muted-foreground">Realm</p>
+            <p className="text-sm font-medium truncate">{config.POLARIS_REALM}</p>
+          </div>
           <DropdownMenuItem
             onClick={logout}
             className="text-destructive focus:text-destructive cursor-pointer"
           >
             <LogOut className="mr-2 h-4 w-4" />
-            <span>Logout</span>
+            <span>Sign out</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
