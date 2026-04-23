@@ -21,7 +21,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="flex h-12 items-center justify-center border-t bg-background px-6">
+    <footer className="flex h-10 items-center justify-center border-t border-border/60 bg-white px-6">
       <p className="text-sm text-muted-foreground">
         © {currentYear} The Apache Software Foundation. Licensed under the{" "}
         <a
