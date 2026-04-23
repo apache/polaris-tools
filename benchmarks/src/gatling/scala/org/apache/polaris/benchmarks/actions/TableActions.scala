@@ -75,6 +75,7 @@ case class TableActions(
             "catalogName" -> "C_0",
             "parentNamespacePath" -> parentNamespacePath,
             "multipartNamespace" -> parentNamespacePath.mkString("%1F"),
+            "namespaceJsonPath" -> Json.toJson(parentNamespacePath).toString(),
             "tableName" -> mangler.maybeMangleTable(tableId)
           )
         }
