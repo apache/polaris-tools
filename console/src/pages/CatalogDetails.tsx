@@ -325,7 +325,7 @@ export function CatalogDetails() {
                   No namespaces found. Create a namespace to get started.
                 </div>
               ) : (
-                <div className="rounded-md border">
+                <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
                   <Table>
                     <TableHeader>
                       <TableRow>

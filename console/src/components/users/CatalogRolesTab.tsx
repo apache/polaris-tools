@@ -333,7 +333,7 @@ export function CatalogRolesTab() {
 
       {/* Table */}
       <div className="flex justify-center">
-        <div className="w-full max-w-4xl rounded-md border">
+        <div className="w-full max-w-4xl rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -621,7 +621,7 @@ function CatalogRoleDetailsDialog({
             {principalRolesQuery.isLoading ? (
               <p className="text-sm text-muted-foreground">Loading principal roles...</p>
             ) : principalRolesQuery.data && principalRolesQuery.data.length > 0 ? (
-              <div className="rounded-md border">
+              <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>
