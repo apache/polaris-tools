@@ -46,8 +46,7 @@ FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
 USER root
 RUN groupadd --gid 10001 polaris && \
     useradd --uid 10000 --gid polaris polaris
-# Copy DISCLAIMER, LICENSE, NOTICE files
-COPY DISCLAIMER /DISCLAIMER
+# Copy LICENSE-BUNDLE and NOTICE files
 COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
