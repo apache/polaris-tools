@@ -42,7 +42,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 80
+            - port: {{ .Values.service.targetPort | default 80 }}
           env:
             - name: VITE_POLARIS_API_URL
               value: {{ .Values.env.polarisApiUrl | quote }}
@@ -55,14 +55,14 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: 80
+              port: {{ .Values.service.targetPort | default 80 }}
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /health
-              port: 80
+              port: {{ .Values.service.targetPort | default 80 }}
             initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 5
