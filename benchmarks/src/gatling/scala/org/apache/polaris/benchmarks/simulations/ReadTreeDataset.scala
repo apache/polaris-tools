@@ -120,6 +120,7 @@ class ReadTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   private val httpProtocol = http
     .baseUrl(cp.baseUrl)
+    .headers(cp.headers)
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
     .disableCaching
