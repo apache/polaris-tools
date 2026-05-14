@@ -17,16 +17,8 @@
   under the License.
 -->
 
-# Reporting Security Issues
+# Security Policy
 
-The Apache Iceberg Project uses the standard process outlined by the [Apache
-Security Team](https://www.apache.org/security/) for reporting vulnerabilities.
-Note that vulnerabilities should not be publicly disclosed until the project has
-responded.
+Apache Polaris follows the process from [ASF security team](https://www.apache.org/security/).
 
-To report a possible security vulnerability, please email <a href="mailto:security@iceberg.apache.org">security@iceberg.apache.org</a>.
-
-
-# Verifying Signed Releases
-
-Please refer to the instructions on the [Release Verification](https://www.apache.org/info/verification.html) page.
+Please report any security issues to [security@apache.org](mailto:security@apache.org).
