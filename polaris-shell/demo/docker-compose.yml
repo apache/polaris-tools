@@ -1,0 +1,60 @@
+# Demo environment for the Polaris SQL Engine
+# Usage: docker compose up -d && ./seed.sh && java -jar ../build/libs/polaris-shell-*-demo.jar demo.properties
+services:
+
+  minio:
+    image: minio/minio:latest
+    container_name: polaris-demo-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: demoaccesskey
+      MINIO_ROOT_PASSWORD: demosecretkey
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO console (http://localhost:9001)
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: polaris-demo-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 demoaccesskey demosecretkey &&
+        mc mb --ignore-existing local/demo-bucket
+      "
+
+  polaris:
+    image: apache/polaris:latest
+    container_name: polaris-demo
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "8181:8181"
+      - "8182:8182"
+    environment:
+      POLARIS_BOOTSTRAP_CREDENTIALS: "POLARIS,demo-client,demo-secret"
+      quarkus.otel.sdk.disabled: "true"
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: demoaccesskey
+      AWS_SECRET_ACCESS_KEY: demosecretkey
+      polaris.features."ALLOW_INSECURE_STORAGE_TYPES": "true"
+      polaris.features."SUPPORTED_CATALOG_STORAGE_TYPES": "[\"S3\"]"
+      # false → Polaris uses its own credentials and applies endpointInternal from storageConfigInfo
+      polaris.features."SKIP_CREDENTIAL_SUBSCOPING_INDIRECTION": "false"
+      polaris.readiness.ignore-severe-issues: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8182/q/health || exit 1"]
+      interval: 10s
+      retries: 18
+
+volumes:
+  minio-data:
