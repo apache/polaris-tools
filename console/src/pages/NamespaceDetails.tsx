@@ -312,7 +312,7 @@ export function NamespaceDetails() {
                   No child namespaces found.
                 </div>
               ) : (
-                <div className="rounded-md border">
+                <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -385,7 +385,7 @@ export function NamespaceDetails() {
                   No Iceberg tables found in this namespace.
                 </div>
               ) : (
-                <div className="rounded-md border">
+                <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -467,7 +467,7 @@ export function NamespaceDetails() {
               No Iceberg views found in this namespace.
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -540,7 +540,7 @@ export function NamespaceDetails() {
               No generic tables found in this namespace.
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>

@@ -24,7 +24,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Logo } from "@/components/layout/Logo"
 import { Footer } from "@/components/layout/Footer"
@@ -84,21 +84,25 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex flex-1 items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 via-background to-slate-100">
+      <div className="flex flex-1 items-center justify-center p-4">
+        <div className="w-full max-w-sm space-y-6">
+          {/* Logo + title */}
+          <div className="text-center space-y-2">
             <div className="flex justify-center">
               <Logo clickable={false} />
             </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="rounded-md border p-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">{config.REALM_HEADER_NAME}:</span>
-                    <span className="font-medium">{config.POLARIS_REALM}</span>
+            <p className="text-sm text-muted-foreground">Sign in to your workspace</p>
+          </div>
+
+          <Card className="shadow-dropdown">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Realm info */}
+                <div className="flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2.5 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-muted-foreground text-xs">{config.REALM_HEADER_NAME}</span>
+                    <span className="font-medium text-foreground">{config.POLARIS_REALM}</span>
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -106,86 +110,86 @@ export function Login() {
                         type="button"
                         className="text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        <Info className="h-4 w-4" />
+                        <Info className="h-3.5 w-3.5" />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80">
                       <div className="space-y-2">
                         <h4 className="font-medium text-sm">Realm Configuration</h4>
                         <p className="text-xs text-muted-foreground">
-                          This UI console is configured to connect to a specific Polaris server
-                          realm.
+                          This console is configured to connect to a specific Polaris server realm.
                         </p>
                       </div>
                     </PopoverContent>
                   </Popover>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  placeholder="Enter your username"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Enter your password"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="scope">Scope</Label>
-                <Input
-                  id="scope"
-                  type="text"
-                  value={scope}
-                  onChange={(e) => setScope(e.target.value)}
-                  required
-                  placeholder="Enter the scope"
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in..." : "Sign in"}
-              </Button>
-              {isOIDCConfigured && (
-                <>
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">External IDP</span>
-                    </div>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleOIDCLogin}
-                    disabled={loading}
-                  >
-                    {loading ? "Redirecting..." : "Sign in with OIDC"}
-                  </Button>
-                </>
-              )}
-              {error && (
-                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                  {error}
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="username" className="text-xs font-medium">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    placeholder="Enter your username"
+                  />
                 </div>
-              )}
-            </form>
-          </CardContent>
-        </Card>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-xs font-medium">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="scope" className="text-xs font-medium">Scope</Label>
+                  <Input
+                    id="scope"
+                    type="text"
+                    value={scope}
+                    onChange={(e) => setScope(e.target.value)}
+                    required
+                    placeholder="Enter the scope"
+                  />
+                </div>
+                <Button type="submit" className="w-full mt-2" disabled={loading}>
+                  {loading ? "Signing in…" : "Sign in"}
+                </Button>
+                {isOIDCConfigured && (
+                  <>
+                    <div className="relative py-1">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-border" />
+                      </div>
+                      <div className="relative flex justify-center text-xs">
+                        <span className="bg-card px-2 text-muted-foreground">or continue with</span>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleOIDCLogin}
+                      disabled={loading}
+                    >
+                      {loading ? "Redirecting…" : "Sign in with OIDC"}
+                    </Button>
+                  </>
+                )}
+                {error && (
+                  <div className="rounded-lg bg-destructive/8 border border-destructive/20 p-3 text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </div>
       <Footer />
     </div>

@@ -260,7 +260,7 @@ export function PrincipalRolesTab() {
 
       {/* Table */}
       <div className="flex justify-center">
-        <div className="w-full max-w-4xl rounded-md border">
+        <div className="w-full max-w-4xl rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -523,7 +523,7 @@ function PrincipalRoleDetailsDialog({
             {principalsQuery.isLoading ? (
               <p className="text-sm text-muted-foreground">Loading principals...</p>
             ) : principalsQuery.data && principalsQuery.data.length > 0 ? (
-              <div className="rounded-md border">
+              <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>
