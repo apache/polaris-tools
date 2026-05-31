@@ -42,7 +42,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - port: {{ .Values.service.targetPort | default 80 }}
+            - containerPort: {{ .Values.service.targetPort | default 80 }}
           env:
             - name: VITE_POLARIS_API_URL
               value: {{ .Values.env.polarisApiUrl | quote }}
