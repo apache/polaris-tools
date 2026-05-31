@@ -297,23 +297,29 @@ and start Polaris instance in `polaris` namespace via helm.
 Customize the deployment by creating a `values.yaml` file:
 
 ```yaml
-env:
-  polarisApiUrl: "http://polaris:8181"
-  polarisRealm: "POLARIS"
-  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
-
-  # OIDC Configuration (optional)
-  oidcIssuerUrl: "http://keycloak:8080/realms/EXTERNAL"
-  oidcClientId: "polaris-console"
-  oidcRedirectUri: "http://localhost:4000/auth/callback"
-  oidcScope: "openid profile email"
+config:
+  api:
+    polarisApiUrl: "http://polaris:8181"
+    polarisRealm: "POLARIS"
+    oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+  # OIDC Configuration (optional, PKCE flow — no client secret)
+  oidc:
+    issuerUrl: "http://keycloak:8080/realms/EXTERNAL"
+    clientId: "polaris-console"
+    redirectUri: "http://localhost:4000/auth/callback"
+    scope: "openid profile email"
 
 service:
   type: ClusterIP
-  port: 80
+  ports:
+    - name: http
+      port: 80
 
 replicaCount: 1
 ```
+
+See [`helm/values.yaml`](./helm/values.yaml) for the full list of configurable values
+(security context, autoscaling, PDB, ingress/HTTPRoute/Gateway, scheduling, etc.).
 
 Then deploy with:
 ```bash

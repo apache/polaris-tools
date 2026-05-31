@@ -17,59 +17,445 @@
 # under the License.
 #
 
-image:
-  repository: apache/polaris-console
-  tag: latest
-  pullPolicy: IfNotPresent
-  pullSecrets: []
-
+# @schema minimum: 1
+# -- The number of replicas to deploy (horizontal scaling).
+# @section -- Deployment
 replicaCount: 1
 
+image:
+  # -- The image repository to pull from.
+  # @section -- Image
+  repository: apache/polaris-console
+  # @schema enum: [Always, IfNotPresent, Never]
+  # -- The image pull policy.
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- The image tag. If empty, defaults to the chart's appVersion.
+  # @section -- Image
+  tag: ""
+
+# @schema item: string
+# -- References to secrets in the same namespace to use for pulling any of the images
+# used by this chart. Each entry is a string referring to an existing secret in the
+# namespace.
+# @section -- Image
+imagePullSecrets: []
+#  - registry-creds
+
+serviceAccount:
+  # -- Specifies whether a service account should be created.
+  # @section -- Service Account
+  create: true
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the service account.
+  # @section -- Service Account
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name
+  # is generated using the fullname template.
+  # @section -- Service Account
+  name: ""
+
+# @schema additionalProperties: {type: string}
+# -- Annotations to apply to console pods.
+# @section -- Pod Configuration
+podAnnotations: {}
+
+# @schema additionalProperties: {type: string}
+# -- Additional labels to apply to console pods.
+# @section -- Pod Configuration
+podLabels: {}
+
+# @schema additionalProperties: {type: string}
+# -- Additional labels to apply to the console configmap.
+# @section -- Pod Configuration
+configMapLabels: {}
+
+# @schema additionalProperties: {type: string}
+# -- Additional annotations to apply to the console deployment.
+# @section -- Deployment
+deploymentAnnotations: {}
+
+# @schema type:[boolean, null]
+# -- (bool) Specifies whether a pod should use the host's user namespace. See
+# [User Namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/).
+# @section -- Pod Configuration
+hostUsers: ~
+
+# Pod disruption budget settings.
+podDisruptionBudget:
+  # -- Specifies whether a pod disruption budget should be created.
+  # @section -- Pod Configuration
+  enabled: false
+  # @schema type:[string, integer]
+  # -- The minimum number of pods that should remain available during disruptions.
+  # IMPORTANT: Cannot be used simultaneously with maxUnavailable.
+  # @section -- Pod Configuration
+  minAvailable: 0
+  # @schema type:[string, integer]
+  # -- The maximum number of pods that can be unavailable during disruptions.
+  # IMPORTANT: Cannot be used simultaneously with minAvailable.
+  # @section -- Pod Configuration
+  maxUnavailable: 0
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the pod disruption budget.
+  # @section -- Pod Configuration
+  annotations: {}
+
+# @schema type:[integer, null]
+# -- (int) The number of old ReplicaSets to retain to allow rollback. Defaults to the
+# Kubernetes default (10) when null.
+# @section -- Deployment
+revisionHistoryLimit: ~
+
+# @schema type: object
+# -- Security context for the console pod. See
+# [Security Context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+# Defaults match the `apache/polaris-console` image (GID 10001).
+# @section -- Pod Configuration
+podSecurityContext:
+  # @schema hidden
+  fsGroup: 10001
+  # @schema hidden
+  seccompProfile:
+    type: RuntimeDefault
+
+# @schema type: object
+# -- Security context for the console container. Defaults harden the container per
+# Kubernetes Pod Security Standards "restricted" profile.
+# @section -- Pod Configuration
+containerSecurityContext:
+  # @schema hidden
+  allowPrivilegeEscalation: false
+  # @schema hidden
+  runAsNonRoot: true
+  # @schema hidden
+  # UID 10000 matches the `apache/polaris-console` image; change this if you use a different image.
+  runAsUser: 10000
+  # @schema hidden
+  capabilities:
+    drop: ["ALL"]
+  # @schema hidden
+  seccompProfile:
+    type: RuntimeDefault
+
+# @schema type: object
+# -- Lifecycle hooks for the console container. See
+# [Container Lifecycle Hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/).
+# @section -- Pod Configuration
+containerLifecycle: {}
+
+# @schema type: [integer, "null"]
+# @schema minimum: 0
+# -- (int) Duration in seconds the pod needs to terminate gracefully. Must be greater
+# than the preStop hook duration.
+# @section -- Pod Configuration
+terminationGracePeriodSeconds: ~
+
+# Runtime configuration for the console SPA. These values populate the VITE_* environment
+# variables that `generate-config.sh` in the console image consumes at startup to write
+# `/opt/app-root/src/config.js`. Empty values are omitted from the rendered ConfigMap so
+# the script's built-in defaults remain in effect.
+config:
+  api:
+    # -- Base URL of the Polaris API server (sets VITE_POLARIS_API_URL).
+    # @section -- Console Config
+    polarisApiUrl: "http://polaris:8181"
+    # -- Polaris realm name (sets VITE_POLARIS_REALM).
+    # @section -- Console Config
+    polarisRealm: "POLARIS"
+    # -- Default principal scope (sets VITE_POLARIS_PRINCIPAL_SCOPE).
+    # @section -- Console Config
+    polarisPrincipalScope: "PRINCIPAL_ROLE:ALL"
+    # -- HTTP header used to convey the realm to the Polaris server
+    # (sets VITE_POLARIS_REALM_HEADER_NAME).
+    # @section -- Console Config
+    polarisRealmHeaderName: "Polaris-Realm"
+    # -- OAuth token endpoint used for internal authentication
+    # (sets VITE_OAUTH_TOKEN_URL).
+    # @section -- Console Config
+    oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+  oidc:
+    # -- OIDC issuer URL (sets VITE_OIDC_ISSUER_URL). Leave empty to disable OIDC.
+    # @section -- Console Config
+    issuerUrl: ""
+    # -- OIDC client ID (sets VITE_OIDC_CLIENT_ID).
+    # @section -- Console Config
+    clientId: ""
+    # -- OIDC redirect URI (sets VITE_OIDC_REDIRECT_URI).
+    # @section -- Console Config
+    redirectUri: ""
+    # -- OIDC scopes, space-separated (sets VITE_OIDC_SCOPE).
+    # @section -- Console Config
+    scope: ""
+
+# @schema item: object
+# -- Additional environment variables to add to the console container. Each item must
+# be a valid Kubernetes [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#envvar-v1-core).
+# Templated against the global context.
+# @section -- Pod Configuration
+extraEnv: []
+#  - name: MY_VAR
+#    value: "my-value"
+
+# @schema item: object
+# -- envFrom sources beyond the chart-managed ConfigMap. Each item must be a valid
+# Kubernetes [EnvFromSource](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.29/#envfromsource-v1-core).
+# Templated against the global context.
+# @section -- Pod Configuration
+envFrom: []
+#  - configMapRef:
+#      name: my-extra-config
+
+# @schema item: object
+# -- Additional init containers for the console pod.
+# @section -- Pod Configuration
+extraInitContainers: []
+
+# @schema item: object
+# -- Additional volumes to attach to the pod.
+# @section -- Pod Configuration
+extraVolumes: []
+
+# @schema item: object
+# -- Additional volume mounts to attach to the console container.
+# @section -- Pod Configuration
+extraVolumeMounts: []
+
+# Polaris Console service settings.
 service:
+  # @schema enum: [ExternalName, ClusterIP, NodePort, LoadBalancer]
+  # -- The type of service to create.
+  # @section -- Service
   type: ClusterIP
+  # -- The port the service listens on.
+  # @section -- Service
   port: 80
-  targetPort: 80
-
-env:
-  polarisApiUrl: "http://polaris:8181"
-  polarisRealm: "POLARIS"
-  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
+  # @schema type: [integer, "null"]
+  # -- (int) Number of the port to access on the pods targeted by the service.
+  # Defaults to `port` when null.
+  # @section -- Service
+  targetPort: ~
+  # @schema type: [integer, "null"]
+  # -- (int) The port on each node on which this service is exposed when type is
+  # NodePort or LoadBalancer. Allocated by the system when null.
+  # @section -- Service
+  nodePort: ~
+  # @schema enum: [TCP, UDP, SCTP]
+  # -- The IP protocol for the port.
+  # @section -- Service
+  protocol: TCP
+  # @schema enum: [None, ClientIP]
+  # -- Session affinity for the service.
+  # @section -- Service
+  sessionAffinity: None
+  # -- Cluster IP override. Set to "None" for a headless service.
+  # @section -- Service
+  clusterIP: ""
+  # @schema enum: [Cluster, Local]
+  # -- Controls how traffic from internal sources is routed.
+  # @section -- Service
+  internalTrafficPolicy: Cluster
+  # @schema enum: [Cluster, Local]
+  # -- Controls how traffic from external sources is routed (NodePort/LoadBalancer only).
+  # @section -- Service
+  externalTrafficPolicy: Cluster
+  # @schema oneOf: [{type: string, enum: [PreferClose]}, {type: "null"}]
+  # -- Traffic distribution preference. Only valid value: PreferClose. Requires
+  # Kubernetes >= 1.31.
+  # @section -- Service
+  trafficDistribution: ~
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the service.
+  # @section -- Service
+  annotations: {}
 
 ingress:
+  # -- Whether to create an Ingress resource. Mutually exclusive with `httproute.enabled`.
+  # @section -- Routing
   enabled: false
+  # -- Ingress class name. Leave empty to use the cluster default.
+  # @section -- Routing
   className: ""
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to apply to the Ingress.
+  # @section -- Routing
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # cert-manager.io/cluster-issuer: letsencrypt-prod
+  # @schema item: object
+  # -- Hostnames and paths the Ingress will route.
+  # @section -- Routing
   hosts:
     - host: console.example.local
       paths:
         - path: /
           pathType: Prefix
+  # @schema item: object
+  # -- TLS configuration. Each entry must define `secretName` and `hosts`.
+  # @section -- Routing
   tls: []
   #  - secretName: polaris-console-tls
   #    hosts:
   #      - console.example.local
 
 httproute:
+  # -- Whether to create a Gateway API HTTPRoute. Mutually exclusive with `ingress.enabled`.
+  # @section -- Routing
   enabled: false
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to apply to the HTTPRoute.
+  # @section -- Routing
   annotations: {}
-  port: 80
-  gatewayGroup: gateway.networking.k8s.io
-  gatewayKind: Gateway
-  # Name of the httpGateway deployment
+  # -- Name of the parent Gateway resource.
+  # @section -- Routing
   gatewayName: ""
-  # Namespace where the httpGateway is deployed
+  # -- Namespace of the parent Gateway resource.
+  # @section -- Routing
   gatewayNamespace: default
-  # Section name within the gateway to use
+  # -- Optional listener section name within the parent Gateway.
+  # @section -- Routing
   sectionName: ""
+  # @schema item: string
+  # -- Hostnames the HTTPRoute will match.
+  # @section -- Routing
   hosts:
-    - example.local
+    - console.example.local
+
+gateway:
+  # -- Whether to create a Gateway API Gateway. Requires `httproute.enabled: true`.
+  # @section -- Routing
+  enabled: false
+  # -- The GatewayClass name to use.
+  # @section -- Routing
+  className: ""
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to apply to the Gateway.
+  # @section -- Routing
+  annotations: {}
+  # @schema item: object
+  # -- Listeners on the Gateway.
+  # @section -- Routing
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+  # @schema item: object
+  # -- Optional Gateway addresses.
+  # @section -- Routing
+  addresses: []
+
+autoscaling:
+  # -- Whether to enable horizontal autoscaling.
+  # @section -- Autoscaling
+  enabled: false
+  # @schema minimum: 1
+  # -- Minimum number of replicas to maintain.
+  # @section -- Autoscaling
+  minReplicas: 1
+  # @schema minimum: 1
+  # -- Maximum number of replicas to scale up to.
+  # @section -- Autoscaling
+  maxReplicas: 3
+  # @schema type:[integer, null]
+  # -- Target average CPU utilization (percentage). Set to null to disable.
+  # @section -- Autoscaling
+  targetCPUUtilizationPercentage: 80
+  # @schema type:[integer, null]
+  # -- Target average memory utilization (percentage). Set to null to disable.
+  # @section -- Autoscaling
+  targetMemoryUtilizationPercentage: ~
+
+# @schema additionalProperties: {type: string}
+# -- Node selector for pod assignment.
+# @section -- Scheduling
+nodeSelector: {}
+
+# @schema item: object
+# -- Tolerations for pod assignment.
+# @section -- Scheduling
+tolerations: []
+
+# @schema type: object
+# -- Affinity rules for pod assignment.
+# @section -- Scheduling
+affinity: {}
+
+# @schema item: object
+# -- Topology spread constraints for the pods.
+# @section -- Scheduling
+topologySpreadConstraints: []
+
+# -- Priority class name for the pods.
+# @section -- Scheduling
+priorityClassName: ""
+
+# @schema type: object
+# -- Compute resource requests and limits for the console container.
+# @section -- Resources
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+livenessProbe:
+  # @schema minimum: 0
+  # -- Number of seconds after the container has started before liveness probes are initiated.
+  # @section -- Probes
+  initialDelaySeconds: 30
+  # @schema minimum: 1
+  # -- How often (in seconds) to perform the probe.
+  # @section -- Probes
+  periodSeconds: 10
+  # @schema minimum: 1
+  # -- Number of seconds after which the probe times out.
+  # @section -- Probes
+  timeoutSeconds: 1
+  # @schema minimum: 1
+  # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+  # @section -- Probes
+  successThreshold: 1
+  # @schema minimum: 1
+  # -- Minimum consecutive failures for the probe to be considered failed.
+  # @section -- Probes
+  failureThreshold: 5
+  # @schema type: [integer, "null"]
+  # @schema minimum: 0
+  # -- (int) Optional duration in seconds the pod needs to terminate gracefully upon
+  # probe failure.
+  # @section -- Probes
+  terminationGracePeriodSeconds: ~
+
+readinessProbe:
+  # @schema minimum: 0
+  # -- Number of seconds after the container has started before readiness probes are initiated.
+  # @section -- Probes
+  initialDelaySeconds: 5
+  # @schema minimum: 1
+  # -- How often (in seconds) to perform the probe.
+  # @section -- Probes
+  periodSeconds: 5
+  # @schema minimum: 1
+  # -- Number of seconds after which the probe times out.
+  # @section -- Probes
+  timeoutSeconds: 1
+  # @schema minimum: 1
+  # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+  # @section -- Probes
+  successThreshold: 1
+  # @schema minimum: 1
+  # -- Minimum consecutive failures for the probe to be considered failed.
+  # @section -- Probes
+  failureThreshold: 3
+
+# -- Override the chart name. By default the chart's name is used as the name of all
+# resources.
+# @section -- Naming
+nameOverride: ""
+
+# -- Override the fully qualified application name. By default the release name is
+# combined with the chart name.
+# @section -- Naming
+fullnameOverride: ""

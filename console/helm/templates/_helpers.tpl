@@ -1,5 +1,4 @@
 {{/*
-
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements.  See the NOTICE file
   distributed with this work for additional information
@@ -7,27 +6,28 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
   KIND, either express or implied.  See the License for the
   specific language governing permissions and limitations
   under the License.
-
 */}}
 
 {{/*
-Expand the name of the chart.
+  Expand the name of the chart.
 */}}
 {{- define "polaris-console.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
+  Create a default fully qualified app name.
+  We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+  If release name contains chart name it will be used as a full name.
 */}}
 {{- define "polaris-console.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -43,14 +43,44 @@ Create a default fully qualified app name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
+  Create a default fully qualified app name, with a custom suffix. Useful when the name will
+  have a suffix appended to it, such as for the management service name.
+*/}}
+{{- define "polaris-console.fullnameWithSuffix" -}}
+{{- $global := index . 0 }}
+{{- $suffix := index . 1 }}
+{{- if not (hasPrefix "-" $suffix) }}
+{{- $suffix = printf "-%s" $suffix }}
+{{- end }}
+{{- $length := int (sub 63 (len $suffix)) }}
+{{- if $global.Values.fullnameOverride }}
+{{- $global.Values.fullnameOverride | trunc $length }}{{ $suffix }}
+{{- else }}
+{{- $name := default $global.Chart.Name $global.Values.nameOverride }}
+{{- if contains $name $global.Release.Name }}
+{{- $global.Release.Name | trunc $length }}{{ $suffix }}
+{{- else }}
+{{- printf "%s-%s" $global.Release.Name $name | trunc $length }}{{ $suffix }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+  Create chart name and version as used by the chart label.
 */}}
 {{- define "polaris-console.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Common labels
+  Create chart name and version as used by the chart label.
+*/}}
+{{- define "polaris-console.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+  Common labels
 */}}
 {{- define "polaris-console.labels" -}}
 helm.sh/chart: {{ include "polaris-console.chart" . }}
@@ -62,7 +92,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+  Selector labels
 */}}
 {{- define "polaris-console.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "polaris-console.name" . }}
@@ -70,11 +100,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Validate that only one of ingress or httproute is enabled
+  Validate that only one of ingress or httproute is enabled
 */}}
 {{- define "polaris-console.validateRouting" -}}
 {{- if and .Values.ingress.enabled .Values.httproute.enabled }}
 {{- fail "Cannot enable both ingress and httproute. Please enable only one." }}
 {{- end }}
+{{- if and (not .Values.httproute.enabled) .Values.gateway.enabled }}
+{{- fail "In order to use the gateway please enable the httproute and disable the ingress."}}
+{{- end }}
 {{- end }}
 
+{{/*
+  Create the name of the service account to use
+*/}}
+{{- define "polaris-console.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "polaris-console.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
