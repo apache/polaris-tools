@@ -318,9 +318,6 @@ service:
 replicaCount: 1
 ```
 
-See [`helm/values.yaml`](./helm/values.yaml) for the full list of configurable values
-(security context, autoscaling, PDB, ingress/HTTPRoute/Gateway, scheduling, etc.).
-
 Then deploy with:
 ```bash
 helm install polaris-console ./helm -f values.yaml -n polaris

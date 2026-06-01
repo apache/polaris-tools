@@ -90,9 +90,6 @@ lint-fix: format-fix ## Fix linting issues in the console project
 	@npm run lint -- --fix
 	@echo "--- Linting issues in the console project fixed ---"
 
-
-
-
 ##@ Helm
 
 .PHONY: helm
