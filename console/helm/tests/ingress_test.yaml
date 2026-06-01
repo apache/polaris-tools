@@ -168,7 +168,7 @@ tests:
                       service:
                         name: polaris-console-release
                         port:
-                          number: 4000
+                          number: 8080
 
   # spec.rules (with ingress enabled - custom paths)
   - it: should set ingress with custom paths
@@ -192,4 +192,4 @@ tests:
                       service:
                         name: polaris-console-release
                         port:
-                          number: 4000
+                          number: 8080

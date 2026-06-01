@@ -113,32 +113,32 @@ tests:
       - equal:
           path: spec.ports
           value:
-            - port: 4000
-              targetPort: 4000
+            - port: 8080
+              targetPort: 8080
               protocol: TCP
               name: http
   - it: should set service port
     set:
       service:
-        port: 8080
+        port: 18080
     asserts:
       - equal:
           path: spec.ports
           value:
-            - port: 8080
-              targetPort: 8080
+            - port: 18080
+              targetPort: 18080
               protocol: TCP
               name: http
   - it: should set service targetPort
     set:
       service:
-        port: 8080
+        port: 18080
         targetPort: 9090
     asserts:
       - equal:
           path: spec.ports
           value:
-            - port: 8080
+            - port: 18080
               targetPort: 9090
               protocol: TCP
               name: http
@@ -150,8 +150,8 @@ tests:
       - equal:
           path: spec.ports
           value:
-            - port: 4000
-              targetPort: 4000
+            - port: 8080
+              targetPort: 8080
               protocol: UDP
               name: http
 

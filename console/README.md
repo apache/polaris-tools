@@ -140,7 +140,7 @@ The console supports OpenID Connect (OIDC) authentication with PKCE flow. When c
 Set these environment variables to enable OIDC:
 
 ```env
-VITE_OIDC_ISSUER_URL=http://localhost:8080/realms/EXTERNAL
+VITE_OIDC_ISSUER_URL=http://keycloak:18080/realms/EXTERNAL
 VITE_OIDC_CLIENT_ID=polaris-console
 VITE_OIDC_REDIRECT_URI=http://localhost:5173/auth/callback
 VITE_OIDC_SCOPE=openid profile email
@@ -162,7 +162,7 @@ VITE_OIDC_SCOPE=openid profile email
 5. Enable **Standard Flow** (Authorization Code Flow)
 6. Configure token claims to include user principal information
 
-**Note:** Both the console and Polaris server must use the same OIDC provider.
+**Note:** Both the console and Polaris server must use the same OIDC provider. Also, use port `18080` for Keycloak, as port `8080` is being used by the Polaris console.
 
 ## Project Structure
 
@@ -238,7 +238,7 @@ make build-docker
 Then, you run Polaris Console using:
 
 ```bash
-docker run -p 4000:4000 \
+docker run -p 8080:8080 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
   -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
@@ -248,11 +248,11 @@ docker run -p 4000:4000 \
 To enable OIDC authentication, add OIDC environment variables:
 
 ```bash
-docker run -p 4000:4000 \
+docker run -p 8080:8080 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
   -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
-  -e VITE_OIDC_ISSUER_URL=http://keycloak:8080/realms/EXTERNAL \
+  -e VITE_OIDC_ISSUER_URL=http://keycloak:18080/realms/EXTERNAL \
   -e VITE_OIDC_CLIENT_ID=polaris-console \
   -e VITE_OIDC_REDIRECT_URI=http://localhost:8080/auth/callback \
   -e VITE_OIDC_SCOPE="openid profile email" \
@@ -286,9 +286,9 @@ and start Polaris instance in `polaris` namespace via helm.
 
 4. **Access the console:**
    ```bash
-   kubectl port-forward svc/polaris-console 4000:4000 -n polaris
+   kubectl port-forward svc/polaris-console 8080:8080 -n polaris
    ```
-   Open http://localhost:4000 in your browser.
+   Open http://localhost:8080 in your browser.
 
 ### Configuration
 
@@ -302,16 +302,16 @@ config:
     oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
   # OIDC Configuration (optional)
   oidc:
-    issuerUrl: "http://keycloak:8080/realms/EXTERNAL"
+    issuerUrl: "http://keycloak:18080/realms/EXTERNAL"
     clientId: "polaris-console"
-    redirectUri: "http://localhost:4000/auth/callback"
+    redirectUri: "http://localhost:8080/auth/callback"
     scope: "openid profile email"
 
 service:
   type: ClusterIP
   ports:
     - name: http
-      port: 4000
+      port: 8080
 
 replicaCount: 1
 ```
