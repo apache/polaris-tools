@@ -43,25 +43,15 @@ an open-source catalog for Apache Iceberg.
 - Extension points: `extraEnv`, `envFrom`, `extraVolumes`, `extraVolumeMounts`,
   `extraInitContainers`, container lifecycle hooks
 
-## Installing the Chart
-
-```bash
-helm install polaris-console ./console/helm \
-  --set config.api.polarisApiUrl=http://polaris:8181 \
-  --set config.api.polarisRealm=POLARIS
-```
-
-## Uninstalling the Chart
-
-```bash
-helm uninstall polaris-console
-```
-
 ## Configuration
 
 See [`values.yaml`](./values.yaml) for the full list of configurable values, including
 inline documentation. The chart enforces a JSON Schema (see `values.schema.json`) so
 invalid values fail fast at install time.
+
+## Documentation
+
+Full documentation for Helm Chart lives [on the website](https://github.com/apache/polaris-tools/tree/main/console/).
 
 ## Contributing
 

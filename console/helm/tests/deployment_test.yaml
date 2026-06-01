@@ -565,18 +565,11 @@ tests:
             timeoutSeconds: 55
 
   # spec.template.spec.containers[0].resources
-  - it: should set container resources by default
+  - it: should not set container resources by default
     template: deployment.yaml
     asserts:
-      - isSubset:
+      - notExists:
           path: spec.template.spec.containers[0].resources
-          content:
-            limits:
-              cpu: 500m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 64Mi
   - it: should set container resources
     template: deployment.yaml
     set:
