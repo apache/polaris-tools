@@ -17,13 +17,18 @@
  * under the License.
  */
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { catalogsApi } from "@/api/management/catalogs"
 import { principalsApi } from "@/api/management/principals"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sparkles } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Sparkles, Wand2 } from "lucide-react"
+import { QuickSetupWizard } from "@/components/forms/QuickSetupWizard"
 
 export function Home() {
+  const [isWizardOpen, setIsWizardOpen] = useState(false)
+
   const { data: catalogs } = useQuery({
     queryKey: ["catalogs"],
     queryFn: () => catalogsApi.list(),
@@ -61,6 +66,28 @@ export function Home() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Quick Setup Card */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wand2 className="h-5 w-5 text-primary" />
+            Quick Setup
+          </CardTitle>
+          <CardDescription>
+            Bootstrap a working Polaris environment in seconds — creates a catalog, principal,
+            roles, namespace, and privilege grants.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setIsWizardOpen(true)}>
+            <Wand2 className="mr-2 h-4 w-4" />
+            Run Quick Setup
+          </Button>
+        </CardContent>
+      </Card>
+
+      <QuickSetupWizard open={isWizardOpen} onOpenChange={setIsWizardOpen} />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-4">
