@@ -240,7 +240,7 @@ make build-docker
 Then, you run Polaris Console using:
 
 ```bash
-docker run -p 8080:80 \
+docker run -p 4000:4000 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
   -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
@@ -250,7 +250,7 @@ docker run -p 8080:80 \
 To enable OIDC authentication, add OIDC environment variables:
 
 ```bash
-docker run -p 8080:80 \
+docker run -p 4000:4000 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
   -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
@@ -288,7 +288,7 @@ and start Polaris instance in `polaris` namespace via helm.
 
 4. **Access the console:**
    ```bash
-   kubectl port-forward svc/polaris-console 4000:80 -n polaris
+   kubectl port-forward svc/polaris-console 4000:4000 -n polaris
    ```
    Open http://localhost:4000 in your browser.
 
@@ -310,7 +310,7 @@ env:
 
 service:
   type: ClusterIP
-  port: 80
+  port: 4000
 
 replicaCount: 1
 ```
