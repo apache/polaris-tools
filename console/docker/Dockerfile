@@ -58,8 +58,8 @@ COPY --chown=10000:10001 --chmod=744 docker/generate-config.sh /generate-config.
 COPY --from=builder /app/dist /opt/app-root/src
 
 RUN chown -R polaris:polaris /opt/app-root
-# Expose port 80
-EXPOSE 80
+# Expose port 4040
+EXPOSE 4040
 RUN chown -R polaris:polaris /var/log/nginx \
     && chown -R polaris:polaris /etc/nginx/conf.d \
     && chown -R polaris:polaris /var/lib/nginx \
@@ -68,4 +68,3 @@ RUN chown -R polaris:polaris /var/log/nginx \
 USER polaris
 # Use the script as entrypoint to generate config.js from env vars at startup
 ENTRYPOINT ["/generate-config.sh"]
-

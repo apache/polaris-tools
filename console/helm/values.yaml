@@ -27,8 +27,8 @@ replicaCount: 1
 
 service:
   type: ClusterIP
-  port: 80
-  targetPort: 80
+  port: 4000
+  targetPort: 4000
 
 env:
   polarisApiUrl: "http://polaris:8181"
