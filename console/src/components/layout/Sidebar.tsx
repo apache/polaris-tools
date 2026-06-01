@@ -47,7 +47,9 @@ export function Sidebar() {
         </p>
         {NAV_ITEMS.map((item) => {
           const Icon = iconMap[item.icon as keyof typeof iconMap]
-          const isActive = location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path))
+          const isActive =
+            location.pathname === item.path ||
+            (item.path !== "/" && location.pathname.startsWith(item.path))
 
           return (
             <Link
@@ -68,9 +70,7 @@ export function Sidebar() {
                 style={{ width: "1.125rem", height: "1.125rem" }}
               />
               <span>{item.label}</span>
-              {isActive && (
-                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-              )}
+              {isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />}
             </Link>
           )
         })}

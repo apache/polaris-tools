@@ -101,7 +101,9 @@ export function Login() {
                 {/* Realm info */}
                 <div className="flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2.5 text-sm">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-muted-foreground text-xs">{config.REALM_HEADER_NAME}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {config.REALM_HEADER_NAME}
+                    </span>
                     <span className="font-medium text-foreground">{config.POLARIS_REALM}</span>
                   </div>
                   <Popover>
@@ -125,7 +127,9 @@ export function Login() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="username" className="text-xs font-medium">Username</Label>
+                  <Label htmlFor="username" className="text-xs font-medium">
+                    Username
+                  </Label>
                   <Input
                     id="username"
                     type="text"
@@ -136,7 +140,9 @@ export function Login() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-xs font-medium">Password</Label>
+                  <Label htmlFor="password" className="text-xs font-medium">
+                    Password
+                  </Label>
                   <Input
                     id="password"
                     type="password"
@@ -147,7 +153,9 @@ export function Login() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="scope" className="text-xs font-medium">Scope</Label>
+                  <Label htmlFor="scope" className="text-xs font-medium">
+                    Scope
+                  </Label>
                   <Input
                     id="scope"
                     type="text"

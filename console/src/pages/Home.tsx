@@ -102,12 +102,10 @@ export function Home() {
               <Layers className="h-5 w-5 opacity-80" />
               <span className="text-sm font-medium opacity-80">Apache Iceberg REST Catalog</span>
             </div>
-            <h1 className="text-3xl font-bold leading-tight">
-              Welcome to Apache Polaris
-            </h1>
+            <h1 className="text-3xl font-bold leading-tight">Welcome to Apache Polaris</h1>
             <p className="max-w-lg text-sm leading-relaxed opacity-80">
-              Open-source catalog for Apache Iceberg. Manage and secure your tables across all
-              query engines with a single, consistent REST catalog protocol.
+              Open-source catalog for Apache Iceberg. Manage and secure your tables across all query
+              engines with a single, consistent REST catalog protocol.
             </p>
             <div className="flex items-center gap-3 pt-2">
               <Button
@@ -173,7 +171,10 @@ export function Home() {
               >
                 <CardContent className="p-5 space-y-3">
                   <div className={`inline-flex rounded-lg p-2.5 ${link.bg}`}>
-                    <Icon className={`h-4.5 w-4.5 ${link.color}`} style={{ width: "1.125rem", height: "1.125rem" }} />
+                    <Icon
+                      className={`h-4.5 w-4.5 ${link.color}`}
+                      style={{ width: "1.125rem", height: "1.125rem" }}
+                    />
                   </div>
                   <div>
                     <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
