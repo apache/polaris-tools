@@ -302,7 +302,7 @@ config:
     polarisApiUrl: "http://polaris:8181"
     polarisRealm: "POLARIS"
     oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
-  # OIDC Configuration (optional, PKCE flow — no client secret)
+  # OIDC Configuration (optional)
   oidc:
     issuerUrl: "http://keycloak:8080/realms/EXTERNAL"
     clientId: "polaris-console"

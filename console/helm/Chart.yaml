@@ -21,12 +21,12 @@ apiVersion: v2
 name: polaris-console
 description: A Helm chart for Apache Polaris Console
 type: application
-version: 0.1.0
-appVersion: "0.1.0"
+version: 1.4.0-SNAPSHOT
+appVersion: 1.4.0-SNAPSHOT
 home: https://polaris.apache.org/
 icon: https://raw.githubusercontent.com/apache/polaris/main/site/static/img/logos/polaris-brandmark.png
 sources:
-  - https://github.com/apache/polaris
+  - https://github.com/apache/polaris-tools
 keywords:
   - polaris
   - iceberg

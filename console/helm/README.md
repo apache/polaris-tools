@@ -17,10 +17,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Helm Chart for the Apache Polaris Console
+# Helm Chart for Apache Polaris Console
 
 The Apache Polaris Console is a web UI for [Apache Polaris](https://polaris.apache.org/),
-an open-source catalog for Apache Iceberg.
+an open-source catalog console for Apache Polaris.
 
 ## Requirements
 
@@ -30,24 +30,13 @@ an open-source catalog for Apache Iceberg.
 
 ## Features
 
-- Production-ready security defaults (non-root user, dropped capabilities, seccomp `RuntimeDefault`)
-- Runtime configuration via a ConfigMap injected with `envFrom` — config changes trigger
-  pod restarts via `checksum/config`
-- OIDC login via the Authorization Code + PKCE flow (no client secret required)
-- Horizontal Pod Autoscaler and PodDisruptionBudget support
-- Multiple ingress strategies: standard `Ingress`, Gateway API `HTTPRoute`, and an
-  optional managed `Gateway`
-- Full scheduling controls: `nodeSelector`, `tolerations`, `affinity`,
-  `topologySpreadConstraints`, `priorityClassName`
-- Multi-port `Service` with `sessionAffinity`, traffic policies, and `trafficDistribution`
-- Extension points: `extraEnv`, `envFrom`, `extraVolumes`, `extraVolumeMounts`,
-  `extraInitContainers`, container lifecycle hooks
-
-## Configuration
-
-See [`values.yaml`](./values.yaml) for the full list of configurable values, including
-inline documentation. The chart enforces a JSON Schema (see `values.schema.json`) so
-invalid values fail fast at install time.
+* Web-based administration UI for Apache Polaris, an open-source catalog platform
+* Centralized catalog, namespace, and table management through an intuitive interface
+* Centralized security and governance with principals, roles, and fine-grained privileges
+* OIDC login via the Authorization Code + PKCE flow (no client secret required)
+* Kubernetes-native deployment with support for horizontal scaling, Ingress, and Gateway API
+* Production-ready security defaults (non-root user, dropped capabilities, seccomp `RuntimeDefault`)
+* Open source and vendor neutral, governed by the Apache Polaris PMC under the Apache Software Foundation
 
 ## Documentation
 
