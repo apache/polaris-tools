@@ -89,3 +89,143 @@ lint-fix: format-fix ## Fix linting issues in the console project
 	@echo "--- Fixing linting issues in the console project ---"
 	@npm run lint -- --fix
 	@echo "--- Linting issues in the console project fixed ---"
+
+##@ Helm
+
+.PHONY: helm
+helm: helm-schema-generate helm-lint helm-unittest ## Run most Helm targets (schema, unittest, and lint)
+
+helm-install-plugins: DEPENDENCIES := helm
+.PHONY: helm-install-plugins
+helm-install-plugins: check-dependencies ## Install required Helm plugins (unittest, schema)
+	@echo "--- Installing Helm plugins ---"
+	@HELM_MAJOR_VERSION=$$(helm version --short | sed 's/^v//' | cut -d. -f1); \
+	if [ "$$HELM_MAJOR_VERSION" -ge 4 ] 2>/dev/null; then \
+		HELM_PLUGIN_FLAGS="--verify=false"; \
+	else \
+		HELM_PLUGIN_FLAGS=""; \
+	fi; \
+	if helm plugin list | grep -q "^unittest"; then \
+		echo "Plugin 'unittest' is already installed."; \
+	else \
+		echo "Installing 'unittest' plugin..."; \
+		helm plugin install $$HELM_PLUGIN_FLAGS https://github.com/helm-unittest/helm-unittest.git; \
+	fi; \
+	if helm plugin list | grep -q "^schema"; then \
+		echo "Plugin 'schema' is already installed."; \
+	else \
+		echo "Installing 'schema' plugin..."; \
+		helm plugin install $$HELM_PLUGIN_FLAGS https://github.com/losisin/helm-values-schema-json.git; \
+	fi
+	@echo "--- Helm plugins installed ---"
+
+helm-lint: DEPENDENCIES := ct yamllint
+.PHONY: helm-lint
+helm-lint: check-dependencies ## Run Helm chart lint check
+	@echo "--- Running Helm chart linting ---"
+	@ct lint --charts helm/ --validate-maintainers=false
+	@echo "--- Helm chart linting complete ---"
+
+helm-schema-generate: DEPENDENCIES := helm
+.PHONY: helm-schema-generate
+helm-schema-generate: helm-install-plugins ## Generate Helm chart JSON schema from values.yaml
+	@echo "--- Generating Helm values schema ---"
+	@helm schema -f helm/values.yaml -o helm/values.schema.json --use-helm-docs --draft 7
+	@echo "--- Helm values schema generated ---"
+
+helm-schema-verify: DEPENDENCIES := helm git
+.PHONY: helm-schema-verify
+helm-schema-verify: helm-schema-generate ## Verify Helm chart JSON schema is up to date
+	@echo "--- Verifying Helm values schema is up to date ---"
+	@if ! git diff --exit-code helm/values.schema.json; then \
+		echo "ERROR: Helm schema is out of date. Please run 'make helm-schema-generate' and commit the changes."; \
+		exit 1; \
+	fi
+	@echo "--- Helm values schema is up to date ---"
+
+helm-unittest: DEPENDENCIES := helm
+.PHONY: helm-unittest
+helm-unittest: helm-install-plugins ## Run Helm chart unittest
+	@echo "--- Running Helm chart unittest ---"
+	@helm unittest helm/
+	@echo "--- Helm chart unittest complete ---"
+
+##@ Dependencies
+
+.PHONY: check-dependencies
+check-dependencies: ## Check if all requested dependencies are present
+	@echo "--- Checking for requested dependencies ---"
+	@for dependency in $(DEPENDENCIES); do \
+		echo "Checking for $$dependency..."; \
+		if [ "$$dependency" = "java21" ]; then \
+			if java --version | head -n1 | cut -d' ' -f2 | grep -q '^21\.'; then \
+			echo "Java 21 is installed."; \
+			else \
+				echo "Java 21 is NOT installed."; \
+				echo "--- ERROR: Dependency 'Java 21' is missing. Please install it to proceed. Exiting. ---"; \
+				exit 1; \
+			fi ; \
+		elif command -v $$dependency >/dev/null 2>&1; then \
+			echo "$$dependency is installed."; \
+		else \
+			echo "$$dependency is NOT installed."; \
+			echo "--- ERROR: Dependency '$$dependency' is missing. Please install it to proceed. Exiting. ---"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "--- All checks complete. ---"
+
+.PHONY: check-brew
+check-brew:
+	@echo "--- Checking Homebrew installation ---"
+	@if command -v brew >/dev/null 2>&1; then \
+		echo "--- Homebrew is installed ---"; \
+	else \
+		echo "--- Homebrew is not installed. Aborting ---"; \
+		exit 1; \
+	fi
+
+.PHONY: install-dependencies-brew
+install-dependencies-brew: check-brew ## Install dependencies if not present via Brew
+	@echo "--- Checking and installing dependencies for this target ---"
+	@for dependency in $(DEPENDENCIES); do \
+		case $$dependency in \
+			java21) \
+				if java -version 2>&1 | grep -q '21'; then \
+					:; \
+				else \
+					echo "Java 21 is not installed. Installing openjdk@21 and jenv..."; \
+					brew install openjdk@21 jenv; \
+					$(shell brew --prefix jenv)/bin/jenv add $(shell brew --prefix openjdk@21); \
+					jenv local 21; \
+					echo "Java 21 installed."; \
+				fi ;; \
+			docker|podman) \
+				if command -v $$dependency >/dev/null 2>&1; then \
+					:; \
+				else \
+					echo "$$dependency is not installed. Manual installation required"; \
+				fi ;; \
+			ct) \
+				if command -v ct >/dev/null 2>&1; then \
+					:; \
+				else \
+					echo "ct is not installed. Installing with Homebrew..."; \
+					brew install chart-testing; \
+					echo "ct installed."; \
+				fi ;; \
+			*) \
+				if command -v $$dependency >/dev/null 2>&1; then \
+					:; \
+				else \
+					echo "$$dependency is not installed. Installing with Homebrew..."; \
+					brew install $$dependency; \
+					echo "$$dependency installed."; \
+				fi ;; \
+		esac; \
+	done
+	@echo "--- All requested dependencies checked/installed ---"
+
+install-optional-dependencies-brew: DEPENDENCIES := $(OPTIONAL_DEPENDENCIES)
+.PHONY: install-optional-dependencies-brew
+install-optional-dependencies-brew: install-dependencies-brew ## Install optional dependencies if not present via Brew

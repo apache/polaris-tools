@@ -17,59 +17,550 @@
 # under the License.
 #
 
-image:
-  repository: apache/polaris-console
-  tag: latest
-  pullPolicy: IfNotPresent
-  pullSecrets: []
-
+# @schema minimum: 1
+# -- The number of replicas to deploy (horizontal scaling).
+# @section -- Deployment
 replicaCount: 1
 
+image:
+  # -- The image repository to pull from.
+  # @section -- Image
+  repository: apache/polaris-console
+  # @schema enum: [Always, IfNotPresent, Never]
+  # -- The image pull policy.
+  # @section -- Image
+  pullPolicy: IfNotPresent
+  # -- The image tag.
+  # @section -- Image
+  tag: "latest"
+
+# @schema item: string
+# -- References to secrets in the same namespace to use for pulling any of the images used by this
+# chart. Each entry is a string referring to an existing secret in the namespace. The secret must
+# contain a `.dockerconfigjson` key with a base64-encoded Docker configuration file. See
+# [Pulling from Private Registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
+# for more information.
+# @section -- Image
+imagePullSecrets: []
+#  - registry-creds
+
+serviceAccount:
+  # -- Specifies whether a service account should be created.
+  # @section -- Service Account
+  create: true
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the service account.
+  # @section -- Service Account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template.
+  # @section -- Service Account
+  name: ""
+
+# @schema additionalProperties: {type: string}
+# -- Annotations to apply to polaris console pods.
+# @section -- Pod Configuration
+podAnnotations: {}
+
+# @schema type:[boolean, null]
+# -- (bool) Specifies whether a pod should use the host's user namespace (Linux-only feature). See [User Namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/).
+# @section -- Pod Configuration
+hostUsers: ~
+
+# @schema additionalProperties: {type: string}
+# -- Additional labels to apply to polaris console pods.
+# @section -- Pod Configuration
+podLabels: {}
+
+# @schema additionalProperties: {type: string}
+# -- Additional Labels to apply to polaris console configmap.
+# @section -- Pod Configuration
+configMapLabels: {}
+
+# @schema additionalProperties: {type: string}
+# -- Additional Annotations to apply to polaris console deployment.
+# @section -- Deployment
+deploymentAnnotations: {}
+
+# Pod disruption budget settings.
+podDisruptionBudget:
+  # -- Specifies whether a pod disruption budget should be created.
+  # @section -- Pod Configuration
+  enabled: false
+  # @schema type:[string, integer]
+  # -- The minimum number of pods that should remain available during disruptions.
+  # Can be an absolute number (ex: 5) or a percentage of desired pods (ex: 50%).
+  # IMPORTANT: Cannot be used simultaneously with maxUnavailable.
+  # @section -- Pod Configuration
+  minAvailable: 0
+  # @schema type:[string, integer]
+  # -- The maximum number of pods that can be unavailable during disruptions.
+  # Can be an absolute number (ex: 5) or a percentage of desired pods (ex: 50%).
+  # IMPORTANT: Cannot be used simultaneously with minAvailable.
+  # @section -- Pod Configuration
+  maxUnavailable: 0
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the pod disruption budget.
+  # @section -- Pod Configuration
+  annotations: {}
+
+# @schema type:[integer, null]
+# -- (int) The number of old ReplicaSets to retain to allow rollback (if not set, the default Kubernetes value is set to 10).
+# @section -- Deployment
+revisionHistoryLimit: ~
+
+# @schema type: object
+# -- Security context for the polaris console pods. See [Security Context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+# @section -- Pod Configuration
+podSecurityContext:
+  # @schema hidden
+  # GID 10001 is compatible with polaris console OSS default images; change this if you are using a different image.
+  fsGroup: 10001
+  # @schema hidden
+  seccompProfile:
+    type: RuntimeDefault
+
+# @schema type: object
+# -- Security context for the polaris container. See [Security Context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+# @section -- Pod Configuration
+containerSecurityContext:
+  # @schema hidden
+  allowPrivilegeEscalation: false
+  # @schema hidden
+  runAsNonRoot: true
+  # @schema hidden
+  # UID 10000 is compatible with polaris console OSS default images; change this if you are using a different image.
+  runAsUser: 10000
+  # @schema hidden
+  capabilities:
+    drop: ["ALL"]
+  # @schema hidden
+  seccompProfile:
+    type: RuntimeDefault
+
+# @schema type: object
+# -- Lifecycle hooks for the polaris console container. See [Container Lifecycle Hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/).
+# Use this to configure a preStop hook for graceful shutdown, e.g.:
+# containerLifecycle:
+#   preStop:
+#     exec:
+#       command: ["/bin/sh", "-c", "sleep 30"]
+# @section -- Pod Configuration
+containerLifecycle: {}
+
+# @schema type: [integer, "null"]
+# @schema minimum: 0
+# -- (int) Duration in seconds the pod needs to terminate gracefully. Must be greater than the preStop hook duration.
+# See [Termination of Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination).
+# When using a preStop hook, set this to at least the preStop sleep time plus the expected request completion time.
+# @section -- Pod Configuration
+terminationGracePeriodSeconds: ~
+
+# Polaris Console service settings.
 service:
+  # @schema enum: [ExternalName, ClusterIP, NodePort, LoadBalancer]
+  # -- The type of service to create. Valid values are: ExternalName, ClusterIP, NodePort, and LoadBalancer.
+  # The default value is ClusterIP.
+  # See [Networking](https://polaris.apache.org/in-dev/unreleased/helm-chart/networking/) for more information.
+  # @section -- Service
   type: ClusterIP
-  port: 4000
-  targetPort: 4000
+  # -- The name of the port.
+  # @section -- Service
+  name: http
+  # -- The port the service listens on. By default, the HTTP port is 8080.
+  # @section -- Service
+  port: 8080
+  # -- Number of the port to access on the pods targeted by the service.
+  # If this is not specified or zero, the value of the 'port' field is used.
+  # @section -- Service
+  targetPort: 0  # 8080
+  # -- The port on each node on which this service is exposed when type is NodePort or LoadBalancer.
+  # Usually assigned by the system. If not specified or zero, a port will be allocated if this
+  # Service requires one. If this field is specified when creating a Service which does not need
+  # it, creation will fail.
+  # @section -- Service
+  nodePort: 0  # 30000
+  # @schema enum: [TCP, UDP, SCTP]
+  # -- The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP.
+  # @section -- Service
+  protocol: TCP
+  # @schema enum: [None, ClientIP]
+  # -- The session affinity for the service. Valid values are: None, ClientIP. The default value is None.
+  # ClientIP enables sticky sessions based on the client's IP address.
+  # Also, this setting affects only internal clients, not external ones.
+  # If Ingress is enabled, it is recommended to set sessionAffinity to None.
+  # @section -- Service
+  sessionAffinity: None
+  # -- You can specify your own cluster IP address
+  # If you define a Service that has the .spec.clusterIP set to "None" then Kubernetes does not assign an IP address.
+  # Instead, DNS records for the service will return the IP addresses of each pod targeted by the server. This is
+  # called a headless service.
+  # See [Headless Services](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services).
+  # @section -- Service
+  clusterIP: ""
+  # @schema enum: [Cluster, Local]
+  # -- Controls how traffic from internal sources is routed.
+  # Valid values are Cluster and Local. The default value is Cluster.
+  # Set the field to Cluster to route traffic to all ready endpoints.
+  # Set the field to Local to only route to ready node-local endpoints.
+  # If the traffic policy is Local and there are no node-local endpoints, traffic is dropped by kube-proxy.
+  # @section -- Service
+  internalTrafficPolicy: Cluster
+  # @schema enum: [Cluster, Local]
+  # -- Controls how traffic from external sources is routed.
+  # Valid values are Cluster and Local. The default value is Cluster.
+  # Set the field to Cluster to route traffic to all ready endpoints.
+  # Set the field to Local to only route to ready node-local endpoints.
+  # If the traffic policy is Local and there are no node-local endpoints, traffic is dropped by kube-proxy.
+  # @section -- Service
+  externalTrafficPolicy: Cluster
+  # @schema oneOf: [{type: string, enum: [PreferClose]}, {type: "null"}]
+  # -- The traffic distribution field provides another way to influence traffic routing within a Kubernetes Service.
+  # While traffic policies focus on strict semantic guarantees, traffic distribution allows you to express preferences
+  # such as routing to topologically closer endpoints.
+  # The only valid value is: PreferClose. The default value is implementation-specific.
+  # @section -- Service
+  trafficDistribution: ~
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the service.
+  # @section -- Service
+  annotations: {}
 
-env:
-  polarisApiUrl: "http://polaris:8181"
-  polarisRealm: "POLARIS"
-  oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
-
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
-
+# Polaris Console Ingress settings.
+# These settings generate an Ingress resource that routes external traffic to the Polaris Console service
+# Check your ingress controller's documentation.
 ingress:
-  enabled: false
+  # -- Specifies the ingressClassName; leave empty if you don't want to customize it.
+  # See [Networking](https://polaris.apache.org/in-dev/unreleased/helm-chart/networking/) for more information.
+  # @section -- Ingress
   className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # cert-manager.io/cluster-issuer: letsencrypt-prod
-  hosts:
-    - host: console.example.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-  #  - secretName: polaris-console-tls
-  #    hosts:
-  #      - console.example.local
-
-httproute:
+  # -- Specifies whether an ingress should be created.
+  # @section -- Ingress
   enabled: false
-  annotations: {}
-  port: 80
-  gatewayGroup: gateway.networking.k8s.io
-  gatewayKind: Gateway
-  # Name of the httpGateway deployment
-  gatewayName: ""
-  # Namespace where the httpGateway is deployed
-  gatewayNamespace: default
-  # Section name within the gateway to use
-  sectionName: ""
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the ingress.
+  # @section -- Ingress
+  annotations: {
+    # nginx.ingress.kubernetes.io/upstream-hash-by: "$binary_remote_addr"
+  }
+  # A list of host paths used to configure the ingress.
   hosts:
-    - example.local
+    -  # @schema required
+      # -- The host name. Required.
+      # @section -- Ingress
+      host: chart-example.local
+      # @schema required; minItems: 1
+      # A list of paths used to configure the ingress.
+      paths:
+        -  # -- The path to match.
+          # @section -- Ingress
+          path: /
+          # @schema enum: [Exact, Prefix, ImplementationSpecific]
+          # -- The type of path. Valid values are: Exact, Prefix, and ImplementationSpecific.
+          # @section -- Ingress
+          pathType: Prefix
+  # TLS termination configuration.
+  tls:
+    -  # @schema required
+      # -- The name of the TLS secret to use to terminate TLS traffic on port 443. Required.
+      # @section -- Ingress
+      secretName: ""
+      # @schema minItems: 1
+      # -- A list of hosts in the certificate.
+      # @section -- Ingress
+      hosts:
+        - chart-example1.local
+        - chart-example2.local
+
+# Polaris Console Gateway settings.
+# These settings generate a Gateway resource for Gateway API-based routing.
+# A Gateway can be shared across multiple HTTPRoutes.
+gateway:
+  # -- Specifies whether a Gateway should be created.
+  # See [Networking](https://polaris.apache.org/in-dev/unreleased/helm-chart/networking/) for more information.
+  # @section -- Gateway
+  enabled: false
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the Gateway.
+  # @section -- Gateway
+  annotations: {}
+  # -- The name of the GatewayClass to use.
+  # @section -- Gateway
+  className: ""
+  # @schema minItems: 1
+  # Gateway listeners configuration.
+  listeners:
+    -  # @schema required
+      # -- The name of the listener. Required.
+      # @section -- Gateway
+      name: "http"
+      # -- Protocol specifies the network protocol this listener expects to receive.
+      # @section -- Gateway
+      protocol: HTTP
+      # -- The port number to use for the listener.
+      # @section -- Gateway
+      port: 80
+      # -- Hostname specifies the virtual hostname to match for protocol types that define this
+      # concept. When unspecified, all hostnames are matched.
+      # @section -- Gateway
+      hostname: ""  # *.example.local
+      # -- AllowedRoutes defines the types of routes that MAY be attached to a Listener and the
+      # trusted namespaces where those Route resources MAY be present.
+      # @section -- Gateway
+      allowedRoutes: {}
+        # namespaces:
+        #   from: Same
+  # @schema item: object
+  # -- Optional addresses to request for the Gateway.
+  # @section -- Gateway
+  addresses: []
+  #  - type: IPAddress
+  #    value: 192.168.1.1
+
+# Polaris Console HTTPRoute settings.
+# These settings generate an HTTPRoute resource for Gateway API-based routing.
+# HTTPRoute and Ingress are mutually exclusive; only one can be enabled at a time.
+httproute:
+  # -- Specifies whether an HTTPRoute should be created.
+  # See [Networking](https://polaris.apache.org/in-dev/unreleased/helm-chart/networking/) for more information.
+  # @section -- HTTPRoute
+  enabled: false
+  # @schema additionalProperties: {type: string}
+  # -- Annotations to add to the HTTPRoute.
+  # @section -- HTTPRoute
+  annotations: {}
+  # @schema required
+  # -- Name of the Gateway resource to attach to. Required.
+  # @section -- HTTPRoute
+  gatewayName: ""
+  # @schema required
+  # -- Namespace where the Gateway is deployed. Required.
+  # @section -- HTTPRoute
+  gatewayNamespace: default
+  # -- Section name within the gateway to use (optional).
+  # @section -- HTTPRoute
+  sectionName: ""
+  # -- A list of hostnames that the HTTPRoute should match.
+  # @section -- HTTPRoute
+  hosts:
+    - chart-example.local
+
+# @schema type: object
+# -- Configures the resources requests and limits for polaris console pods.
+# This chart does not specify default resources and leaves this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. See [Resource Management](https://polaris.apache.org/in-dev/unreleased/helm-chart/production/#resource-management) for production recommendations.
+# @section -- Resources and Autoscaling
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  # -- Specifies whether automatic horizontal scaling should be enabled.
+  # Do not enable this when using in-memory version store type.
+  # See [Scaling](https://polaris.apache.org/in-dev/unreleased/helm-chart/production/#scaling) for production recommendations.
+  # @section -- Resources and Autoscaling
+  enabled: false
+  # -- The minimum number of replicas to maintain.
+  # @section -- Resources and Autoscaling
+  minReplicas: 1
+  # -- The maximum number of replicas to maintain.
+  # @section -- Resources and Autoscaling
+  maxReplicas: 3
+  # -- Optional; set to zero or empty to disable.
+  # @section -- Resources and Autoscaling
+  targetCPUUtilizationPercentage: 80
+  # -- Optional; set to zero or empty to disable.
+  # @section -- Resources and Autoscaling
+  targetMemoryUtilizationPercentage: 0
+
+# -- Priority class name for polaris console pods. See [Pod Priority](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority)
+# @section -- Scheduling
+priorityClassName: ""
+
+# @schema additionalProperties: {type: string}
+# -- Node labels which must match for the polaris console pods to be scheduled on that node. See [Node Selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
+# @section -- Scheduling
+nodeSelector:
+  {}
+  # kubernetes.io/os: linux
+
+# @schema item: object
+# -- A list of tolerations to apply to polaris console pods. See [Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+# @section -- Scheduling
+tolerations: []
+#  - key: "node-role.kubernetes.io/control-plane"
+#    operator: "Exists"
+#    effect: "NoSchedule"
+
+# -- Affinity and anti-affinity for polaris console pods. See [Affinity and Anti-Affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity).
+# @section -- Scheduling
+affinity: {}
+#  podAffinity:
+#    preferredDuringSchedulingIgnoredDuringExecution:
+#      - weight: 100
+#        podAffinityTerm:
+#          topologyKey: kubernetes.io/hostname
+#          labelSelector:
+#            matchExpressions:
+#              - key: app.kubernetes.io/name
+#                operator: In
+#                values:
+#                  - polaris
+
+# @schema item: object
+# -- Topology spread constraints for polaris console pods. See [Topology Spread Constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field).
+# @section -- Scheduling
+topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: topology.kubernetes.io/zone
+  #   whenUnsatisfiable: DoNotSchedule
+
+# Configures the liveness probe for polaris console pods.
+livenessProbe:
+  # @schema minimum: 0
+  # -- Number of seconds after the container has started before liveness probes are initiated. Minimum value is 0.
+  # @section -- Probes
+  initialDelaySeconds: 5
+  # @schema minimum: 1
+  # -- How often (in seconds) to perform the probe. Minimum value is 1.
+  # @section -- Probes
+  periodSeconds: 10
+  # @schema minimum: 1
+  # -- Minimum consecutive successes for the probe to be considered successful after having failed. Minimum value is 1.
+  # @section -- Probes
+  successThreshold: 1
+  # @schema minimum: 1
+  # -- Minimum consecutive failures for the probe to be considered failed after having succeeded. Minimum value is 1.
+  # @section -- Probes
+  failureThreshold: 3
+  # @schema minimum: 1
+  # -- Number of seconds after which the probe times out. Minimum value is 1.
+  # @section -- Probes
+  timeoutSeconds: 10
+  # @schema minimum: 1
+  # -- Optional duration in seconds the pod needs to terminate gracefully upon probe failure. Minimum value is 1.
+  # @section -- Probes
+  terminationGracePeriodSeconds: 30
+
+# Configures the readiness probe for polaris console pods.
+readinessProbe:
+  # @schema minimum: 0
+  # -- Number of seconds after the container has started before readiness probes are initiated. Minimum value is 0.
+  # @section -- Probes
+  initialDelaySeconds: 5
+  # @schema minimum: 1
+  # -- How often (in seconds) to perform the probe. Minimum value is 1.
+  # @section -- Probes
+  periodSeconds: 10
+  # @schema minimum: 1
+  # -- Minimum consecutive successes for the probe to be considered successful after having failed. Minimum value is 1.
+  # @section -- Probes
+  successThreshold: 1
+  # @schema minimum: 1
+  # -- Minimum consecutive failures for the probe to be considered failed after having succeeded. Minimum value is 1.
+  # @section -- Probes
+  failureThreshold: 3
+  # @schema minimum: 1
+  # -- Number of seconds after which the probe times out. Minimum value is 1.
+  # @section -- Probes
+  timeoutSeconds: 10
+
+# Runtime configuration for the polaris console pods. These values populate the VITE_* environment
+# variables that `generate-config.sh` in the polaris console image consumes at startup to write
+# `/opt/app-root/src/config.js`. Empty values are omitted from the rendered ConfigMap so
+# the script's built-in defaults remain in effect.
+config:
+  api:
+    # -- Base URL of the Polaris API server (sets VITE_POLARIS_API_URL).
+    # @section -- Console Config
+    polarisApiUrl: "http://polaris:8181"
+    # -- Polaris realm name (sets VITE_POLARIS_REALM).
+    # @section -- Console Config
+    polarisRealm: "POLARIS"
+    # -- Default principal scope (sets VITE_POLARIS_PRINCIPAL_SCOPE).
+    # @section -- Console Config
+    polarisPrincipalScope: "PRINCIPAL_ROLE:ALL"
+    # -- HTTP header used to convey the realm to the Polaris server
+    # (sets VITE_POLARIS_REALM_HEADER_NAME).
+    # @section -- Console Config
+    polarisRealmHeaderName: "Polaris-Realm"
+    # -- OAuth token endpoint used for internal authentication
+    # (sets VITE_OAUTH_TOKEN_URL).
+    # @section -- Console Config
+    oauthTokenUrl: "http://polaris:8181/api/catalog/v1/oauth/tokens"
+  oidc:
+    # -- OIDC issuer URL (sets VITE_OIDC_ISSUER_URL). Leave empty to disable OIDC.
+    # @section -- Console Config
+    issuerUrl: ""
+    # -- OIDC client ID (sets VITE_OIDC_CLIENT_ID).
+    # @section -- Console Config
+    clientId: ""
+    # -- OIDC redirect URI (sets VITE_OIDC_REDIRECT_URI).
+    # @section -- Console Config
+    redirectUri: ""
+    # -- OIDC scopes, space-separated (sets VITE_OIDC_SCOPE).
+    # @section -- Console Config
+    scope: ""
+
+# @schema item: object
+# -- Advanced configuration via Environment Variables.
+# Extra environment variables to add to the Polaris server container.
+# You can pass here any valid EnvVar object:
+# [EnvVar API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#envvar-v1-core)
+# This can be useful to get configuration values from Kubernetes secrets or config maps.
+# @section -- Advanced Configuration
+extraEnv: []
+#  - name: AWS_STORAGE_BUCKET
+#    value: s3://xxxxx/
+#  - name: AWS_ACCESS_KEY_ID
+#    valueFrom:
+#      secretKeyRef:
+#        name: aws-secret
+#        key: access_key_id
+#  - name: AWS_SECRET_ACCESS_KEY
+#    valueFrom:
+#      secretKeyRef:
+#        name: aws-secret
+#        key: secret_access_key
+
+# @schema item: object
+# -- Bulk import environment variables from Secrets or ConfigMaps.
+# Defines sources to populate environment variables using Kubernetes `envFrom`.
+# Each referenced Secret or ConfigMap will expose all its key-value pairs
+# as environment variables inside the Polaris container.
+# [EnvFrom API](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#envfromsource-v1-core)
+# @section -- Advanced Configuration
+envFrom: []
+#  - secretRef:
+#      name: polaris-env-secret
+#  - configMapRef:
+#      name: polaris-env-configmap
+
+# @schema item: object
+# -- Extra volumes to add to the polaris console pods. See [Volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
+# @section -- Advanced Configuration
+extraVolumes: []
+  # - name: extra-volume
+  #   emptyDir: {}
+
+# @schema item: object
+# -- Extra volume mounts to add to the polaris console container. See [Volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
+# @section -- Advanced Configuration
+extraVolumeMounts: []
+  # - name: extra-volume
+  #   mountPath: /usr/share/extra-volume
+
+# @schema item: object
+# -- Add additional init containers to the polaris console pods See [Init Containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/).
+# @section -- Advanced Configuration
+extraInitContainers: []
+  # - name: your-image-name
+  #   image: your-image
+  #   imagePullPolicy: Always
+  #   command: ['sh', '-c', 'echo "hello world"']

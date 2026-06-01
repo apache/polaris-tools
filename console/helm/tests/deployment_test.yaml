@@ -1,0 +1,765 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+chart:
+  version: 1.2.3
+  appVersion: 4.5.6
+
+release:
+  name: polaris-console-release
+  namespace: polaris-ns
+
+templates:
+  - deployment.yaml
+  - configmap.yaml
+
+tests:
+
+  # metadata.name
+  - it: should set deployment name
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: polaris-console-release
+  - it: should set deployment name with override
+    template: deployment.yaml
+    set:
+      nameOverride: polaris-console-override
+    asserts:
+      - equal:
+          path: metadata.name
+          value: polaris-console-release-polaris-console-override
+  - it: should set deployment name with full override
+    template: deployment.yaml
+    set:
+      fullnameOverride: polaris-console-override
+    asserts:
+      - equal:
+          path: metadata.name
+          value: polaris-console-override
+
+  # metadata.namespace
+  - it: should set deployment namespace
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: polaris-ns
+
+  # metadata.labels
+  - it: should set deployment default labels
+    template: deployment.yaml
+    asserts:
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/name: polaris-console
+            app.kubernetes.io/instance: polaris-console-release
+            app.kubernetes.io/version: 4.5.6
+            app.kubernetes.io/managed-by: Helm
+            helm.sh/chart: polaris-console-1.2.3
+  - it: should set podLabels in deployment labels
+    template: deployment.yaml
+    set:
+      podLabels:
+        app.kubernetes.io/component: polaris-console
+    asserts:
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/component: polaris-console
+
+  # metadata.annotations
+  - it: should not set deployment annotations by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: metadata.annotations
+  - it: should set deployment annotations
+    template: deployment.yaml
+    set:
+      deploymentAnnotations:
+        foo: bar
+        baz: qux
+    asserts:
+      - isSubset:
+          path: metadata.annotations
+          content:
+            foo: bar
+            baz: qux
+
+  # spec.replicas
+  - it: should set default replicas
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+  - it: should set replicas
+    template: deployment.yaml
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+  - it: should not set replicas if autoscaling is enabled
+    template: deployment.yaml
+    set:
+      replicaCount: 3
+      autoscaling:
+        enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  # spec.revisionHistoryLimit
+  - it: should not set revisionHistoryLimit by default with null
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.revisionHistoryLimit
+  - it: should set revisionHistoryLimit
+    template: deployment.yaml
+    set:
+      revisionHistoryLimit: 1
+    asserts:
+      - equal:
+          path: spec.revisionHistoryLimit
+          value: 1
+  - it: should set revisionHistoryLimit (disabled revision history)
+    template: deployment.yaml
+    set:
+      revisionHistoryLimit: 0
+    asserts:
+      - equal:
+          path: spec.revisionHistoryLimit
+          value: 0
+
+  # spec.selector.matchLabels + spec.template.metadata.labels
+  - it: should set deployment selector labels
+    template: deployment.yaml
+    asserts:
+      - isSubset:
+          path: spec.selector.matchLabels
+          content:
+            app.kubernetes.io/name: polaris-console
+            app.kubernetes.io/instance: polaris-console-release
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/name: polaris-console
+            app.kubernetes.io/instance: polaris-console-release
+  - it: should include podLabels in spec.template.metadata.labels only
+    template: deployment.yaml
+    set:
+      podLabels:
+        app.kubernetes.io/component: polaris-console
+    asserts:
+      - isNotSubset:
+          path: spec.selector.matchLabels
+          content:
+              app.kubernetes.io/component: polaris-console
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/component: polaris-console
+
+  # spec.template.metadata.annotations
+  - it: should only set checksum annotation by default
+    template: deployment.yaml
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations.checksum/config
+      - matchRegex:
+          path: spec.template.metadata.annotations.checksum/config
+          pattern: "^[a-f0-9]{64}$"
+  - it: should set pod annotations
+    template: deployment.yaml
+    set:
+      podAnnotations:
+        foo: bar
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.annotations
+          content:
+            foo: bar
+
+  # spec.template.spec.imagePullSecrets
+  - it: should not set imagePullSecrets by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.imagePullSecrets
+  - it: should set imagePullSecrets
+    template: deployment.yaml
+    set:
+      imagePullSecrets:
+        - test-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: test-secret
+
+  # spec.template.spec.serviceAccountName
+  - it: should set default service account name
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: polaris-console-release
+  - it: should set service account name when serviceAccount.create is true
+    template: deployment.yaml
+    set:
+      serviceAccount:
+        create: true
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: polaris-console-release
+  - it: should set custom service account name when serviceAccount.create is true
+    template: deployment.yaml
+    set:
+      serviceAccount:
+        create: true
+        name: polaris-sa
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: polaris-sa
+  - it: should set service account name to default when serviceAccount.create is false
+    template: deployment.yaml
+    set:
+      serviceAccount:
+        create: false
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: default
+  - it: should set custom service account name when serviceAccount.create is false
+    template: deployment.yaml
+    set:
+      serviceAccount:
+        create: false
+        name: polaris-console-sa
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: polaris-console-sa
+
+  # spec.template.spec.priorityClassName
+  - it: should not set priorityClassName by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.priorityClassName
+  - it: should set custom priorityClassName
+    template: deployment.yaml
+    set:
+      priorityClassName: polaris-high-priority
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: polaris-high-priority
+
+  # spec.template.spec.hostUsers
+  - it: should not set hostUsers by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.hostUsers
+  - it: should set hostUsers
+    template: deployment.yaml
+    set:
+      hostUsers: false
+    asserts:
+      - equal:
+          path: spec.template.spec.hostUsers
+          value: false
+  - it: should set hostUsers
+    template: deployment.yaml
+    set:
+      hostUsers: true
+    asserts:
+      - equal:
+          path: spec.template.spec.hostUsers
+          value: true
+
+  # spec.template.spec.securityContext
+  - it: should set securityContext by default
+    template: deployment.yaml
+    asserts:
+      - isSubset:
+          path: spec.template.spec.securityContext
+          content:
+            fsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+  - it: should set custom securityContext
+    template: deployment.yaml
+    set:
+      podSecurityContext:
+        fsGroup: 1234
+    asserts:
+      - isSubset:
+          path: spec.template.spec.securityContext
+          content:
+            fsGroup: 1234
+
+  # spec.template.spec.containers
+  - it: should set container name
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: polaris-console
+
+  # spec.template.spec.containers[0].securityContext
+  - it: should set container securityContext by default
+    template: deployment.yaml
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].securityContext
+          content:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop: [ "ALL" ]
+            seccompProfile:
+              type: RuntimeDefault
+  - it: should set custom container securityContext
+    template: deployment.yaml
+    set:
+      containerSecurityContext:
+        allowPrivilegeEscalation: true
+        runAsNonRoot: false
+        runAsUser: 1234
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].securityContext
+          content:
+            allowPrivilegeEscalation: true
+            runAsNonRoot: false
+            runAsUser: 1234
+
+  # spec.template.spec.containers[0].lifecycle
+  - it: should not set container lifecycle by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle
+  - it: should set container lifecycle with preStop hook
+    template: deployment.yaml
+    set:
+      containerLifecycle:
+        preStop:
+          exec:
+            command: ["/bin/sh", "-c", "sleep 60"]
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].lifecycle
+          content:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 60"]
+
+  # spec.template.spec.terminationGracePeriodSeconds
+  - it: should not set terminationGracePeriodSeconds by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.terminationGracePeriodSeconds
+  - it: should set terminationGracePeriodSeconds
+    template: deployment.yaml
+    set:
+      terminationGracePeriodSeconds: 90
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 90
+  - it: should set terminationGracePeriodSeconds to zero
+    template: deployment.yaml
+    set:
+      terminationGracePeriodSeconds: 0
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 0
+
+  # spec.template.spec.containers[0].image
+  - it: should set container image
+    template: deployment.yaml
+    set:
+      image:
+        repository: test-repo
+        tag: test-tag
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test-repo:test-tag
+  - it: should set container image with template
+    template: deployment.yaml
+    set:
+      image:
+        repository: test-repo-{{ .Chart.Version }}
+        tag: test-tag-{{ .Release.Name }}
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test-repo-1.2.3:test-tag-polaris-console-release
+  - it: should set container image with chart app version if no tag provided
+    template: deployment.yaml
+    set:
+      image:
+        repository: test-repo
+        tag: ""
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: test-repo:4.5.6
+
+  # spec.template.spec.containers[0].imagePullPolicy
+  - it: should set container pull policy
+    template: deployment.yaml
+    set:
+      image:
+        pullPolicy: Always
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Always
+
+  # spec.template.spec.containers[0].env
+  - it: should not set container env by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env
+  - it: should set container env
+    template: deployment.yaml
+    set:
+      extraEnv:
+        - name: foo
+          value: bar
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: foo
+            value: bar
+
+  # spec.template.spec.containers[0].ports
+  - it: should set container ports by default
+    template: deployment.yaml
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: http
+            containerPort: 8080
+            protocol: TCP
+
+  - it: should use targetPort if defined
+    template: deployment.yaml
+    set:
+      service:
+        port: 8080
+        targetPort: 8080
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: http
+            containerPort: 8080
+            protocol: TCP
+
+  - it: should set port protocol
+    template: deployment.yaml
+    set:
+      service:
+        protocol: UDP
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: http
+            containerPort: 8080
+            protocol: UDP
+
+  # spec.template.spec.containers[0].livenessProbe
+  - it: should set container livenessProbe by default
+    template: deployment.yaml
+    set:
+      livenessProbe:
+        initialDelaySeconds: 11
+        periodSeconds: 22
+        successThreshold: 33
+        failureThreshold: 44
+        timeoutSeconds: 55
+        terminationGracePeriodSeconds: 66
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 11
+            periodSeconds: 22
+            successThreshold: 33
+            failureThreshold: 44
+            timeoutSeconds: 55
+            terminationGracePeriodSeconds: 66
+
+  # spec.template.spec.containers[0].readinessProbe
+  - it: should set container readinessProbe by default
+    template: deployment.yaml
+    set:
+      readinessProbe:
+        initialDelaySeconds: 11
+        periodSeconds: 22
+        successThreshold: 33
+        failureThreshold: 44
+        timeoutSeconds: 55
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe
+          value:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 11
+            periodSeconds: 22
+            successThreshold: 33
+            failureThreshold: 44
+            timeoutSeconds: 55
+
+  # spec.template.spec.containers[0].resources
+  - it: should not set container resources by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].resources
+  - it: should set container resources
+    template: deployment.yaml
+    set:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources
+          value:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+  # spec.template.spec.nodeSelector
+  - it: should not set nodeSelector by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.nodeSelector
+  - it: should set nodeSelector
+    template: deployment.yaml
+    set:
+      nodeSelector:
+        disktype: ssd
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            disktype: ssd
+
+  # spec.template.spec.affinity
+  - it: should not set affinity by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.affinity
+  - it: should set affinity
+    template: deployment.yaml
+    set:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: zone
+                    operator: In
+                    values:
+                      - zone1
+                      - zone2
+    asserts:
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: zone
+                        operator: In
+                        values:
+                          - zone1
+                          - zone2
+
+  # spec.template.spec.tolerations
+  - it: should not set tolerations by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.tolerations
+  - it: should set tolerations
+    template: deployment.yaml
+    set:
+      tolerations:
+        - key: "key"
+          operator: "Equal"
+          value: "value"
+          effect: "NoSchedule"
+    asserts:
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: "key"
+              operator: "Equal"
+              value: "value"
+              effect: "NoSchedule"
+
+  - it: should set extra env
+    template: deployment.yaml
+    set:
+      extraEnv:
+        - name: foo
+          value: bar
+        - name: baz
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: foo
+            value: bar
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: baz
+            valueFrom:
+              secretKeyRef:
+                name: secret
+                key: key
+
+  - it: should set envFrom
+    template: deployment.yaml
+    set:
+      envFrom:
+        - secretRef:
+            name: polaris-env-secret
+        - configMapRef:
+            name: polaris-env-configmap
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            secretRef:
+              name: polaris-env-secret
+      - contains:
+          path: spec.template.spec.containers[0].envFrom
+          content:
+            configMapRef:
+              name: polaris-env-configmap
+
+  - it: should not set any environment variables by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: should include extra volumes and volume mounts
+    template: deployment.yaml
+    set:
+      extraVolumes:
+        - name: extra-volume
+          emptyDir: {}
+      extraVolumeMounts:
+        - name: extra-volume
+          mountPath: /extra
+          readOnly: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: extra-volume
+            mountPath: /extra
+            readOnly: false
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: extra-volume
+            emptyDir: {}
+
+  - it: should not set topologySpreadConstraints by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: should set topologySpreadConstraints and inject label selector
+    template: deployment.yaml
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: DoNotSchedule
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value:
+            - maxSkew: 1
+              topologyKey: "kubernetes.io/hostname"
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: polaris-console
+                  app.kubernetes.io/instance: polaris-console-release
