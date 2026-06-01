@@ -167,13 +167,13 @@ service:
   # -- The name of the port.
   # @section -- Service
   name: http
-  # -- The port the service listens on. By default, the HTTP port is 80.
+  # -- The port the service listens on. By default, the HTTP port is 4000.
   # @section -- Service
-  port: 80
+  port: 4000
   # -- Number of the port to access on the pods targeted by the service.
   # If this is not specified or zero, the value of the 'port' field is used.
   # @section -- Service
-  targetPort: 0  # 80
+  targetPort: 0  # 4000
   # -- The port on each node on which this service is exposed when type is NodePort or LoadBalancer.
   # Usually assigned by the system. If not specified or zero, a port will be allocated if this
   # Service requires one. If this field is specified when creating a Service which does not need

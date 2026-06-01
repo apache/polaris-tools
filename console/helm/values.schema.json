@@ -533,7 +533,7 @@
                     "type": "integer"
                 },
                 "port": {
-                    "description": "The port the service listens on. By default, the HTTP port is 80.",
+                    "description": "The port the service listens on. By default, the HTTP port is 4000.",
                     "type": "integer"
                 },
                 "protocol": {

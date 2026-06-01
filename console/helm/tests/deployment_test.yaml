@@ -478,15 +478,15 @@ tests:
           path: spec.template.spec.containers[0].ports
           content:
             name: http
-            containerPort: 80
+            containerPort: 4000
             protocol: TCP
 
   - it: should use targetPort if defined
     template: deployment.yaml
     set:
       service:
-        port: 80
-        targetPort: 8080
+        port: 4000
+        targetPort: 4000
     asserts:
       - lengthEqual:
           path: spec.template.spec.containers[0].ports
@@ -495,7 +495,7 @@ tests:
           path: spec.template.spec.containers[0].ports
           content:
             name: http
-            containerPort: 8080
+            containerPort: 4000
             protocol: TCP
 
   - it: should set port protocol
@@ -511,7 +511,7 @@ tests:
           path: spec.template.spec.containers[0].ports
           content:
             name: http
-            containerPort: 80
+            containerPort: 4000
             protocol: UDP
 
   # spec.template.spec.containers[0].livenessProbe

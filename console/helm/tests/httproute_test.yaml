@@ -180,7 +180,7 @@ tests:
           value: polaris-console-release
       - equal:
           path: spec.rules[0].backendRefs[0].port
-          value: 80
+          value: 4000
 
   # validation
   - it: should fail when both ingress and httproute are enabled

@@ -16,7 +16,7 @@
 # under the License.
 
 # Build stage
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:9.7-1767673763 AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal:1-1779828907 AS builder
 
 # Default environment variables (can be overridden at runtime)
 ENV VITE_POLARIS_API_URL=http://polaris:8181
@@ -42,7 +42,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM registry.access.redhat.com/ubi9/nginx-126:9.7-1767846422
+FROM registry.access.redhat.com/ubi9/nginx-126:1-1779858291
 USER root
 RUN groupadd --gid 10001 polaris && \
     useradd --uid 10000 --gid polaris polaris
@@ -58,8 +58,8 @@ COPY --chown=10000:10001 --chmod=744 docker/generate-config.sh /generate-config.
 COPY --from=builder /app/dist /opt/app-root/src
 
 RUN chown -R polaris:polaris /opt/app-root
-# Expose port 80
-EXPOSE 80
+# Expose port 4040
+EXPOSE 4040
 RUN chown -R polaris:polaris /var/log/nginx \
     && chown -R polaris:polaris /etc/nginx/conf.d \
     && chown -R polaris:polaris /var/lib/nginx \
@@ -68,4 +68,3 @@ RUN chown -R polaris:polaris /var/log/nginx \
 USER polaris
 # Use the script as entrypoint to generate config.js from env vars at startup
 ENTRYPOINT ["/generate-config.sh"]
-

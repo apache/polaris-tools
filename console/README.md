@@ -96,10 +96,11 @@ QUARKUS_HTTP_CORS_ACCESS_CONTROL_MAX_AGE=PT10M
 
 #### Option 3: Using Kubernetes ConfigMap
 
-For Kubernetes/Helm deployments you need configure `cors` section in [values.yaml](https://polaris.apache.org/releases/1.3.0/helm/):
+For Kubernetes/Helm deployments you need configure `cors` section in [values.yaml](https://polaris.apache.org/releases/1.5.0/helm-chart/reference/#cors):
 
 ```yaml
 cors:
+   enabled: true
    allowedOrigins:
       - "https://console.polaris.service"
    allowedMethods:
@@ -118,9 +119,6 @@ cors:
       - "*"
    accessControlMaxAge: "PT10M"
    accessControlAllowCredentials: true
-
-advancedConfig:
-   quarkus.http.cors.enabled: "true"
 ```
 
 See [Quarkus CORS documentation](https://quarkus.io/guides/security-cors) for more details.
@@ -240,7 +238,7 @@ make build-docker
 Then, you run Polaris Console using:
 
 ```bash
-docker run -p 8080:80 \
+docker run -p 4000:4000 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
   -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
@@ -250,7 +248,7 @@ docker run -p 8080:80 \
 To enable OIDC authentication, add OIDC environment variables:
 
 ```bash
-docker run -p 8080:80 \
+docker run -p 4000:4000 \
   -e VITE_POLARIS_API_URL=http://polaris:8181 \
   -e VITE_POLARIS_REALM=POLARIS \
   -e VITE_POLARIS_PRINCIPAL_SCOPE=PRINCIPAL_ROLE:ALL \
@@ -288,7 +286,7 @@ and start Polaris instance in `polaris` namespace via helm.
 
 4. **Access the console:**
    ```bash
-   kubectl port-forward svc/polaris-console 4000:80 -n polaris
+   kubectl port-forward svc/polaris-console 4000:4000 -n polaris
    ```
    Open http://localhost:4000 in your browser.
 
@@ -313,7 +311,7 @@ service:
   type: ClusterIP
   ports:
     - name: http
-      port: 80
+      port: 4000
 
 replicaCount: 1
 ```
