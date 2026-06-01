@@ -182,7 +182,7 @@ export function Login() {
                   </>
                 )}
                 {error && (
-                  <div className="rounded-lg bg-destructive/8 border border-destructive/20 p-3 text-sm text-destructive">
+                  <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
                     {error}
                   </div>
                 )}

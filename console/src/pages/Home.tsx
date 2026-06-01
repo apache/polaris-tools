@@ -49,7 +49,7 @@ export function Home() {
     },
     {
       label: "Connections",
-      value: catalogs?.length ?? 0,
+      value: principals?.length ?? 0,
       icon: Link2,
       color: "text-blue-600",
       bg: "bg-blue-50",

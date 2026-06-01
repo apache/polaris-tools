@@ -61,7 +61,7 @@ export function Header({ onSearchOpen }: HeaderProps) {
   const initials = getInitials(displayName)
 
   return (
-    <header className="flex h-14 items-center justify-between bg-white px-6 shadow-[0_1px_0_0_hsl(var(--border))]">
+    <header className="flex h-14 items-center justify-between bg-background px-6 shadow-[0_1px_0_0_hsl(var(--border))]">
       {/* Theme Toggle - Left Side */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
