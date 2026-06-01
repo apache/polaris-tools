@@ -118,17 +118,17 @@ tests:
           scope: "openid profile email"
     asserts:
       - equal:
-        path: data.VITE_OIDC_ISSUER_URL
-        value: "http://localhost:8080/realms/EXTERNAL"
+          path: data.VITE_OIDC_ISSUER_URL
+          value: "http://localhost:8080/realms/EXTERNAL"
       - equal:
-        path: data.VITE_OIDC_CLIENT_ID
-        value: "polaris-console"
+          path: data.VITE_OIDC_CLIENT_ID
+          value: "polaris-console"
       - equal:
-        path: data.VITE_OIDC_REDIRECT_URI
-        value: "http://localhost:5173/auth/callback"
+          path: data.VITE_OIDC_REDIRECT_URI
+          value: "http://localhost:5173/auth/callback"
       - equal:
-        path: data.VITE_OIDC_SCOPE
-        value: "openid profile email"
+          path: data.VITE_OIDC_SCOPE
+          value: "openid profile email"
 
   - it: should omit API keys that are explicitly cleared
     set:

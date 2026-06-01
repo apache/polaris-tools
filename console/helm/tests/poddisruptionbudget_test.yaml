@@ -121,7 +121,7 @@ tests:
       - equal:
           path: metadata.annotations
           value:
-            app.example.com/release: "polaris-release"
+            app.example.com/release: "polaris-console-release"
 
   - it: should set custom maxUnavailable
     set:
@@ -176,7 +176,7 @@ tests:
       - equal:
           path: spec.selector.matchLabels
           value:
-            app.kubernetes.io/name: polaris
+            app.kubernetes.io/name: polaris-console
             app.kubernetes.io/instance: polaris-console-release
   - it: should set selector labels with name override
     set:

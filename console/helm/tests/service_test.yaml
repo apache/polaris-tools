@@ -114,15 +114,13 @@ tests:
           path: spec.ports
           value:
             - port: 80
+              targetPort: 80
               protocol: TCP
-              name: polaris-console-http
-  - it: should set service ports
+              name: http
+  - it: should set service port
     set:
       service:
-        ports:
-          - port: 8080
-            targetPort: 8080
-            name: polaris-console-http
+        port: 8080
     asserts:
       - equal:
           path: spec.ports
@@ -130,37 +128,57 @@ tests:
             - port: 8080
               targetPort: 8080
               protocol: TCP
-              name: polaris-console-http
+              name: http
+  - it: should set service targetPort
+    set:
+      service:
+        port: 8080
+        targetPort: 9090
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - port: 8080
+              targetPort: 9090
+              protocol: TCP
+              name: http
+  - it: should set service protocol
+    set:
+      service:
+        protocol: UDP
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - port: 80
+              targetPort: 80
+              protocol: UDP
+              name: http
+
   # node port
   - it: should set nodeport only when service type is NodePort
     set:
       service:
         type: NodePort
-        ports:
-          - port: 18181
-            targetPort: 18181
-            nodePort: 30081
-            name: polaris-console-http
+        port: 18181
+        nodePort: 30081
     asserts:
       - equal:
-         path: spec.type
-         value: NodePort
+          path: spec.type
+          value: NodePort
       - equal:
           path: spec.ports
           value:
             - port: 18181
               targetPort: 18181
               protocol: TCP
-              name: polaris-console-http
+              name: http
               nodePort: 30081
-  - it: should not set nodeport type is NodePort and nodePort value is empty
+  - it: should not set nodeport when service type is NodePort and nodePort value is empty
     set:
       service:
         type: NodePort
-        ports:
-          - port: 18181
-            targetPort: 18181
-            name: polaris-console-http
+        port: 18181
     asserts:
       - equal:
           path: spec.type
@@ -171,48 +189,7 @@ tests:
             - port: 18181
               targetPort: 18181
               protocol: TCP
-              name: polaris-console-http
-
-  - it: should set node port only if service type is NodePort
-    set:
-      service:
-        type: NodePort
-        ports:
-          - port: 18181
-            targetPort: 18181
-            nodePort: 30081
-            name: polaris-console-http
-    asserts:
-      - equal:
-          path: spec.type
-          value: NodePort
-      - equal:
-          path: spec.ports
-          value:
-            - port: 18181
-              targetPort: 18181
-              protocol: TCP
-              name: polaris-console-http
-              nodePort: 30081
-  - it: should not set node port if service type is NodePort and nodePort is empty
-    set:
-      service:
-        type: NodePort
-        ports:
-          - port: 18181
-            targetPort: 18181
-            name: polaris-console-http
-    asserts:
-      - equal:
-          path: spec.type
-          value: NodePort
-      - equal:
-          path: spec.ports
-          value:
-            - port: 18181
-              targetPort: 18181
-              protocol: TCP
-              name: polaris-console-http
+              name: http
 
   # spec.sessionAffinity
   - it: should set service session affinity by default

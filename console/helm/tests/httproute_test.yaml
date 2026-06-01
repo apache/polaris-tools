@@ -131,7 +131,8 @@ tests:
       - equal:
           path: spec.hostnames
           value: 
-            - example.com api.example.com
+            - example.com
+            - api.example.com
 
   # spec.parentRefs (with httproute enabled)
   - it: should set httproute parent refs with gateway name and namespace
@@ -176,7 +177,7 @@ tests:
           count: 1
       - equal:
           path: spec.rules[0].backendRefs[0].name
-          value: polaris-release
+          value: polaris-console-release
       - equal:
           path: spec.rules[0].backendRefs[0].port
           value: 80

@@ -227,6 +227,9 @@ service:
   # -- The type of service to create.
   # @section -- Service
   type: ClusterIP
+  # -- The name of the service port. Must match a container port name when used by ingress/HTTPRoute by name.
+  # @section -- Service
+  name: http
   # -- The port the service listens on.
   # @section -- Service
   port: 80
@@ -286,7 +289,7 @@ ingress:
   # -- Hostnames and paths the Ingress will route.
   # @section -- Routing
   hosts:
-    - host: console.example.local
+    - host: chart-example.local
       paths:
         - path: /
           pathType: Prefix

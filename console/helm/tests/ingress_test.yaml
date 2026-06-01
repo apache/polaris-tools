@@ -87,7 +87,7 @@ tests:
       - isSubset:
           path: metadata.labels
           content:
-            app.kubernetes.io/name: polaris
+            app.kubernetes.io/name: polaris-console
             app.kubernetes.io/instance: polaris-console-release
             app.kubernetes.io/version: 4.5.6
             app.kubernetes.io/managed-by: Helm
@@ -168,14 +168,14 @@ tests:
                       service:
                         name: polaris-console-release
                         port:
-                          number: 8181
+                          number: 80
 
   # spec.rules (with ingress enabled - custom paths)
   - it: should set ingress with custom paths
     set:
       ingress.enabled: true
       ingress.hosts:
-        - host: chart-example.local
+        - host: console-chart-example.local
           paths:
             - path: /api
               pathType: Prefix
@@ -183,7 +183,7 @@ tests:
       - equal:
           path: spec.rules
           value:
-            - host: chart-example.local
+            - host: console-chart-example.local
               http:
                 paths:
                   - path: /api
@@ -192,4 +192,4 @@ tests:
                       service:
                         name: polaris-console-release
                         port:
-                          number: 8181
+                          number: 80
