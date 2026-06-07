@@ -20,8 +20,23 @@ package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.{Config, ConfigFactory}
 
+import scala.jdk.CollectionConverters._
+
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
+
+  private def readHeaders(http: Config): Map[String, String] = {
+    if (http.hasPath("headers")) {
+      val headersConfig = http.getConfig("headers")
+      val result = collection.mutable.Map[String, String]()
+      headersConfig.entrySet().asScala.foreach { entry =>
+        result(entry.getKey) = headersConfig.getString(entry.getKey)
+      }
+      result.toMap
+    } else {
+      Map.empty[String, String]
+    }
+  }
 
   def apply(): BenchmarkConfig = {
     val config: Config = ConfigFactory.load().withFallback(ConfigFactory.load("benchmark-defaults"))
@@ -32,9 +47,16 @@ object BenchmarkConfig {
     val workload: Config = config.getConfig("workload")
 
     val connectionParams = ConnectionParameters(
+      http.getString("base-url"),
+      readHeaders(http)
+    )
+
+    val authParams = AuthParameters(
       auth.getString("client-id"),
       auth.getString("client-secret"),
-      http.getString("base-url")
+      auth.getInt("refresh-interval-seconds"),
+      auth.getInt("max-retries"),
+      auth.getIntList("retryable-http-codes").toArray.map(_.asInstanceOf[Int]).toSet
     )
 
     val workloadParams = {
@@ -51,6 +73,7 @@ object BenchmarkConfig {
           ccConfig.getInt("duration-in-minutes")
         ),
         ReadTreeDatasetParameters(
+          rtdConfig.getInt("namespace-concurrency"),
           rtdConfig.getInt("table-concurrency"),
           rtdConfig.getInt("view-concurrency")
         ),
@@ -86,15 +109,17 @@ object BenchmarkConfig {
       dataset.getInt("max-views"),
       dataset.getInt("columns-per-view"),
       dataset.getInt("view-properties"),
-      dataset.getString("storage-config-info")
+      dataset.getString("storage-config-info"),
+      dataset.getBoolean("mangle-names")
     )
 
-    BenchmarkConfig(connectionParams, workloadParams, datasetParams)
+    BenchmarkConfig(connectionParams, authParams, workloadParams, datasetParams)
   }
 }
 
 case class BenchmarkConfig(
     connectionParameters: ConnectionParameters,
+    authParameters: AuthParameters,
     workloadParameters: WorkloadParameters,
     datasetParameters: DatasetParameters
 ) {}

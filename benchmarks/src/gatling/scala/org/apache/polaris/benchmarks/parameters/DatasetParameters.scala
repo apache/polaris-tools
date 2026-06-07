@@ -37,6 +37,7 @@ import org.apache.polaris.benchmarks.NAryTreeBuilder
  * @param numColumnsPerView The number of columns per view to create.
  * @param numViewProperties The number of view properties to create.
  * @param storageConfigInfo The JSON to supply when creating a new StorageConfigInfo for a catalog.
+ * @param mangleNames Whether to mangle entity names to have longer, less predictable names.
  */
 case class DatasetParameters(
     numCatalogs: Int,
@@ -52,7 +53,8 @@ case class DatasetParameters(
     numViewsMax: Int,
     numColumnsPerView: Int,
     numViewProperties: Int,
-    storageConfigInfo: String
+    storageConfigInfo: String,
+    mangleNames: Boolean
 ) {
   val nAryTree: NAryTreeBuilder = NAryTreeBuilder(nsWidth, nsDepth)
   val maxPossibleTables: Int = nAryTree.numberOfLastLevelElements * numTablesPerNs

@@ -19,7 +19,6 @@
 
 [versions]
 assertj = "3.27.3"
-aws = "2.33.0" # this is in mapping with iceberg repo.
 checkstyle = "10.21.3"
 errorprone = "2.36.0"
 errorproneSlf4j = "0.1.28"
@@ -35,23 +34,12 @@ junit = "5.12.0"
 logback = "1.5.17"
 logcaptor = "2.10.1"
 nessie = "0.104.5"
-nessieRunner = "0.32.2"
 picocli = "4.7.6"
-shadowPlugin = "8.1.1"
 slf4j = "1.7.36"
 testcontainers = "1.21.3"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
-aws-sdk-apache-client = { module = "software.amazon.awssdk:apache-client", version.ref = "aws" }
-aws-sdk-auth = { module = "software.amazon.awssdk:auth", version.ref = "aws" }
-aws-sdk-dynamo = { module = "software.amazon.awssdk:dynamodb", version.ref = "aws" }
-aws-sdk-glue = { module = "software.amazon.awssdk:glue", version.ref = "aws" }
-aws-sdk-kms = { module = "software.amazon.awssdk:kms", version.ref = "aws" }
-aws-sdk-lakeformation = { module = "software.amazon.awssdk:lakeformation", version.ref = "aws" }
-aws-sdk-sts = { module = "software.amazon.awssdk:sts", version.ref = "aws" }
-aws-sdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws" }
-aws-sdk-url-connection-client = { module = "software.amazon.awssdk:url-connection-client", version.ref = "aws" }
 checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
 errorprone-annotations = { module = "com.google.errorprone:error_prone_annotations", version.ref = "errorprone" }
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
@@ -78,7 +66,7 @@ slf4j = { module = "org.slf4j:log4j-over-slf4j", version.ref = "slf4j" }
 
 [plugins]
 errorprone = { id = "net.ltgt.errorprone", version = "4.1.0" }
-nessie-run = { id = "org.projectnessie", version.ref = "nessieRunner" }
+nessie-run = { id = "org.projectnessie", version = "0.32.7" }
 nexus-publish-plugin = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 rat = { id = "org.nosphere.apache.rat", version = "0.8.1" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadowPlugin" }
+shadow = { id = "com.gradleup.shadow", version = "9.3.2" }

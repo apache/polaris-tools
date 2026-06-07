@@ -21,7 +21,7 @@ import org.nosphere.apache.rat.RatTask
 
 plugins {
     scala
-    id("io.gatling.gradle") version "3.13.5.2"
+    id("io.gatling.gradle") version "3.14.9.8"
     id("com.diffplug.spotless") version "7.0.2"
     id("org.nosphere.apache.rat") version "0.8.1"
 }
@@ -92,3 +92,17 @@ tasks.named<RatTask>("rat").configure {
     excludes.add("**/*.svg")
     excludes.add("**/*.puml")
 }
+
+tasks.named<Wrapper>("wrapper") {
+  actions.addLast {
+    val script = scriptFile.readText()
+    val scriptLines = script.lines().toMutableList()
+
+    val insertAtLine = scriptLines.indexOf("# Use the maximum available, or set MAX_FD != -1 to use that value.")
+    scriptLines.add(insertAtLine, "")
+    scriptLines.add(insertAtLine, ". \"\${APP_HOME}/gradle/gradlew-include.sh\"")
+
+    scriptFile.writeText(scriptLines.joinToString("\n"))
+  }
+}
+

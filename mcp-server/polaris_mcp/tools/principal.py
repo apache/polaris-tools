@@ -38,16 +38,13 @@ class PolarisPrincipalTool(McpTool):
     """Manage principals via the Polaris management API."""
 
     TOOL_NAME = "polaris-principal-request"
-    TOOL_DESCRIPTION = (
-        "Manage principals via the Polaris management API (list, get, create, update, delete, "
-        "rotate/reset credentials, role assignment)."
-    )
+    TOOL_DESCRIPTION = "Perform principal operations (list, get, create, update, delete, rotate, reset, list-roles, assign-role, revoke-role)."
 
-    LIST_ALIASES: Set[str] = {"list"}
+    LIST_ALIASES: Set[str] = {"list", "ls"}
+    GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
-    GET_ALIASES: Set[str] = {"get"}
     UPDATE_ALIASES: Set[str] = {"update"}
-    DELETE_ALIASES: Set[str] = {"delete", "remove"}
+    DELETE_ALIASES: Set[str] = {"delete", "drop", "remove"}
     ROTATE_ALIASES: Set[str] = {"rotate-credentials", "rotate"}
     RESET_ALIASES: Set[str] = {"reset-credentials", "reset"}
     LIST_ROLES_ALIASES: Set[str] = {"list-principal-roles", "list-roles"}
@@ -128,6 +125,10 @@ class PolarisPrincipalTool(McpTool):
         delegate_args: JSONDict = {}
         copy_if_object(arguments.get("query"), delegate_args, "query")
         copy_if_object(arguments.get("headers"), delegate_args, "headers")
+
+        realm = arguments.get("realm")
+        if isinstance(realm, str) and realm.strip():
+            delegate_args["realm"] = realm
 
         if normalized == "list":
             self._handle_list(delegate_args)

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-includeBuild("apprunner-build-logic") { name = "polaris-apprunner-build-logic" }
+includeBuild("build-logic")
 
 if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
   throw GradleException(
@@ -67,7 +67,9 @@ dependencyResolutionManagement {
 
 gradle.beforeProject {
   version = baseVersion
-  group = "org.apache.polaris.tools.apprunner"
+  // Note: the Gradle plugin ID is the group ID here. Both should be "aligned",
+  // so that the plugin ID is within this group.
+  group = "org.apache.polaris.apprunner"
 }
 
 val isCI = System.getenv("CI") != null

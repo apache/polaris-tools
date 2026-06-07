@@ -27,6 +27,7 @@ plugins {
   id("eclipse")
   id("polaris-apprunner-root")
   alias(libs.plugins.rat)
+  alias(libs.plugins.jetbrains.changelog)
 }
 
 version = rootProject.rootDir.resolve("version.txt").readText().trim()
@@ -65,6 +66,8 @@ eclipse { project { name = ideName } }
 tasks.named<RatTask>("rat").configure {
   // These are Gradle file pattern syntax
   excludes.add("**/build/**")
+  excludes.add("gradle/wrapper/gradle-wrapper*")
+  excludes.add("**/gradle/wrapper/gradle-wrapper*")
 
   excludes.add("LICENSE")
   excludes.add("NOTICE")
@@ -77,7 +80,9 @@ tasks.named<RatTask>("rat").configure {
   excludes.add(".java-version")
   excludes.add("**/.keep")
 
-  excludes.add("gradle/wrapper/gradle-wrapper*.jar*")
+  excludes.add("**/gradle/wrapper/gradle-wrapper*.jar*")
+  // This gradle.properties is git-ignored and generated during the build
+  excludes.add("gradle-plugin/src/smoketest/gradle.properties")
 
   excludes.add("**/*.iml")
   excludes.add("**/*.iws")
@@ -90,7 +95,7 @@ tasks.named<RatTask>("rat").configure {
   excludes.add("**/*.env*")
 
   excludes.add("**/kotlin-compiler*")
-  excludes.add("**/apprunner-build-logic/.kotlin/**")
+  excludes.add("**/build-logic/.kotlin/**")
 
   excludes.add(
     "gradle-plugin/src/main/resources/META-INF/gradle-plugins/org.apache.polaris.apprunner"
@@ -127,5 +132,39 @@ nexusPublishing {
       snapshotRepositoryUrl =
         URI.create("https://repository.apache.org/content/repositories/snapshots/")
     }
+  }
+}
+
+changelog {
+  repositoryUrl.set("https://github.com/apache/polaris-tools")
+  title.set("Apache Polaris Apprunner Changelog")
+  versionPrefix.set("apache-polaris-apprunner-")
+  header.set(provider { version.get() })
+  groups.set(
+    listOf(
+      "Highlights",
+      "Upgrade notes",
+      "Breaking changes",
+      "New Features",
+      "Changes",
+      "Deprecations",
+      "Fixes",
+      "Commits",
+    )
+  )
+  version.set(provider { project.version.toString() })
+}
+
+tasks.named<Wrapper>("wrapper") {
+  actions.addLast {
+    val script = scriptFile.readText()
+    val scriptLines = script.lines().toMutableList()
+
+    val insertAtLine =
+      scriptLines.indexOf("# Use the maximum available, or set MAX_FD != -1 to use that value.")
+    scriptLines.add(insertAtLine, "")
+    scriptLines.add(insertAtLine, $$". \"${APP_HOME}/gradle/gradlew-include.sh\"")
+
+    scriptFile.writeText(scriptLines.joinToString("\n"))
   }
 }

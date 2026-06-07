@@ -105,6 +105,7 @@ def test_call_builds_request_and_metadata_with_json_body() -> None:
     assert not result.is_error
     assert f"POST {expected_url}" in result.text
     assert '"result": "ok"' in result.text
+    assert result.metadata is not None
     assert result.metadata["method"] == "POST"
     assert result.metadata["url"] == expected_url
     assert result.metadata["status"] == 201
@@ -155,6 +156,7 @@ def test_call_uses_authorization_provider_and_handles_plain_text() -> None:
 
     assert result.is_error
     assert "Status: 404" in result.text
+    assert result.metadata is not None
     assert result.metadata["url"] == expected_url
     assert result.metadata["request"]["bodyText"] == "payload"
     assert result.metadata["response"]["bodyText"] == "failure"
@@ -169,3 +171,68 @@ def test_call_requires_non_empty_path() -> None:
         tool.call({"method": "GET"})
 
     http.request.assert_not_called()
+
+
+def test_call_with_realm() -> None:
+    tool, http, auth = _create_tool()
+    http.request.return_value = _build_response(status=200, body="{}")
+    tool.call(
+        {
+            "method": "GET",
+            "path": "namespace",
+            "realm": "realm1",
+        }
+    )
+    auth.authorization_header.assert_called_once_with("realm1")
+    call_args = http.request.call_args
+    headers = call_args[1]["headers"]
+    assert headers["Polaris-Realm"] == "realm1"
+
+
+def test_call_with_existed_realm() -> None:
+    tool, http, auth = _create_tool()
+    http.request.return_value = _build_response(status=200, body="{}")
+    tool.call(
+        {
+            "method": "GET",
+            "path": "namespace",
+            "headers": {"Polaris-Realm": "existing_realm"},
+            "realm": "realm1",
+        }
+    )
+    call_args = http.request.call_args
+    headers = call_args[1]["headers"]
+    assert headers["Polaris-Realm"] == "existing_realm"
+
+
+def test_call_with_custom_realm_header(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("POLARIS_REALM_CONTEXT_HEADER_NAME", "X-Polaris-Realm")
+    tool, http, auth = _create_tool()
+    http.request.return_value = _build_response(status=200, body="{}")
+    tool.call(
+        {
+            "method": "GET",
+            "path": "namespace",
+            "realm": "realm1",
+        }
+    )
+    call_args = http.request.call_args
+    headers = call_args[1]["headers"]
+    assert "Polaris-Realm" not in headers
+    assert headers["X-Polaris-Realm"] == "realm1"
+
+
+def test_call_without_provide_realm() -> None:
+    tool, http, auth = _create_tool()
+    http.request.return_value = _build_response(status=200, body="{}")
+    tool.call(
+        {
+            "method": "GET",
+            "path": "namespace",
+        }
+    )
+    call_args = http.request.call_args
+    headers = call_args[1]["headers"]
+    assert "Polaris-Realm" not in headers

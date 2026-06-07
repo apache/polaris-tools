@@ -29,8 +29,14 @@ name: MCP Server CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'mcp-server/**'
+      - '.github/**'    
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'mcp-server/**'
+      - '.github/**'    
 
 env:
   GRADLE_TOS_ACCEPTED: ${{ vars.GRADLE_TOS_ACCEPTED }}
@@ -54,6 +60,21 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            21
+            ${{ matrix.java-version != '21' && matrix.java-version || '' }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check
+        run: |
+          cd mcp-server
+          ./gradlew rat
+
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -62,7 +83,7 @@ jobs:
       - name: Sync dependencies
         working-directory: mcp-server
         run: |
-          uv sync --extra test --extra dev
+          uv sync --all-extras
 
       - name: Lint
         working-directory: mcp-server

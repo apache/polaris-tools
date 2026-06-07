@@ -28,7 +28,7 @@ val polarisTarball by
   configurations.creating { description = "Used to reference the distribution tarball" }
 
 dependencies {
-  polarisTarball("org.apache.polaris:polaris-quarkus-server:1.0.0-incubating-SNAPSHOT:@tgz")
+  polarisTarball("org.apache.polaris:polaris-quarkus-server:1.0.0-SNAPSHOT:@tgz")
 }
 
 // Directory where the Polaris tarball is extracted to

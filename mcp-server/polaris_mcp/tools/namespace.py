@@ -40,12 +40,12 @@ class PolarisNamespaceTool(McpTool):
     """Manage namespaces through the Polaris REST API."""
 
     TOOL_NAME = "polaris-namespace-request"
-    TOOL_DESCRIPTION = "Manage namespaces in an Iceberg catalog (list, get, create, update properties, delete)."
+    TOOL_DESCRIPTION = "Perform namespace operations (list, get, create, exists, get-properties, delete)."
 
-    LIST_ALIASES: Set[str] = {"list"}
-    GET_ALIASES: Set[str] = {"get", "load"}
-    EXISTS_ALIASES: Set[str] = {"exists", "head"}
+    LIST_ALIASES: Set[str] = {"list", "ls"}
+    GET_ALIASES: Set[str] = {"get", "load", "fetch"}
     CREATE_ALIASES: Set[str] = {"create"}
+    EXISTS_ALIASES: Set[str] = {"exists", "head"}
     UPDATE_PROPS_ALIASES: Set[str] = {
         "update-properties",
         "set-properties",
@@ -131,6 +131,10 @@ class PolarisNamespaceTool(McpTool):
         delegate_args: JSONDict = {}
         copy_if_object(arguments.get("query"), delegate_args, "query")
         copy_if_object(arguments.get("headers"), delegate_args, "headers")
+
+        realm = arguments.get("realm")
+        if isinstance(realm, str) and realm.strip():
+            delegate_args["realm"] = realm
 
         if normalized == "list":
             self._handle_list(delegate_args, catalog)

@@ -27,6 +27,7 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   HttpRequestBuilderWithStatusSave
 }
 import org.apache.polaris.benchmarks.parameters.{DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.util.Mangler
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{Format, Json}
 
@@ -41,6 +42,7 @@ case class ViewActions(
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
   private val logger = LoggerFactory.getLogger(getClass)
+  private val mangler = Mangler(dp.mangleNames)
 
   /**
    * Creates a base Gatling Feeder that generates view identities. Each row contains the basic
@@ -53,7 +55,7 @@ case class ViewActions(
       val catalogId = 0
       val parentNamespacePath: Seq[String] = dp.nAryTree
         .pathToRoot(namespaceId)
-        .map(ordinal => s"NS_$ordinal")
+        .map(mangler.maybeMangleNs)
       val positionInLevel = namespaceId - dp.nAryTree.lastLevelOrdinals.head
 
       Range(0, dp.numViewsPerNs)
@@ -64,7 +66,7 @@ case class ViewActions(
             "catalogName" -> s"C_$catalogId",
             "parentNamespacePath" -> parentNamespacePath,
             "multipartNamespace" -> parentNamespacePath.mkString("%1F"),
-            "viewName" -> s"V_$viewId",
+            "viewName" -> mangler.maybeMangleView(viewId),
             "viewId" -> viewId
           )
         }
