@@ -37,8 +37,12 @@ spec:
       {{- if .Values.image.pullSecrets }}
       {{- toYaml .Values.image.pullSecrets | nindent 6 }}
       {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: polaris-console
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
