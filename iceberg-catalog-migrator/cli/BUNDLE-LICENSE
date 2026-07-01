@@ -1239,6 +1239,13 @@ License: BSD 3-Clause
 
 --------------------------------------------------------------------------------
 
+This artifact bundles iq80 LevelDB (Java port of LevelDB).
+
+Project URL: https://github.com/dain/leveldb
+License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
 This artifact bundles Project Nessie.
 
 Project URL: https://github.com/projectnessie/nessie
