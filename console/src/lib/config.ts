@@ -27,6 +27,7 @@ interface AppConfig {
   VITE_OIDC_CLIENT_ID?: string
   VITE_OIDC_REDIRECT_URI?: string
   VITE_OIDC_SCOPE?: string
+  VITE_OIDC_PRINCIPAL_CLAIMS?: string
 }
 
 declare global {
@@ -59,4 +60,8 @@ export const config = {
   OIDC_CLIENT_ID: getConfig("VITE_OIDC_CLIENT_ID", ""),
   OIDC_REDIRECT_URI: getConfig("VITE_OIDC_REDIRECT_URI", ""),
   OIDC_SCOPE: getConfig("VITE_OIDC_SCOPE", "openid profile email"),
+  OIDC_PRINCIPAL_CLAIMS: getConfig(
+    "VITE_OIDC_PRINCIPAL_CLAIMS",
+    "sub,principal,principal_name,name",
+  ),
 }
