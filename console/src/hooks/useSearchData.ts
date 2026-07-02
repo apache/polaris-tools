@@ -108,13 +108,11 @@ export function useSearchData(enabled: boolean): SearchData {
       const results = await Promise.allSettled(
         allNamespacePairs.map(async ({ catalog, namespace }) => {
           const tables = await tablesApi.list(catalog, namespace)
-          return tables.map(
-            (t): ObjectEntry => ({
-              catalog,
-              namespace: t.namespace || namespace,
-              name: t.name,
-            })
-          )
+          return tables.map((t): ObjectEntry => ({
+            catalog,
+            namespace: t.namespace || namespace,
+            name: t.name,
+          }))
         })
       )
       return results
@@ -131,13 +129,11 @@ export function useSearchData(enabled: boolean): SearchData {
       const results = await Promise.allSettled(
         allNamespacePairs.map(async ({ catalog, namespace }) => {
           const views = await viewsApi.list(catalog, namespace)
-          return views.map(
-            (v): ObjectEntry => ({
-              catalog,
-              namespace: v.namespace || namespace,
-              name: v.name,
-            })
-          )
+          return views.map((v): ObjectEntry => ({
+            catalog,
+            namespace: v.namespace || namespace,
+            name: v.name,
+          }))
         })
       )
       return results

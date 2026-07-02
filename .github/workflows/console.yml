@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ["20.19", "22.12"]
+        node-version: ["20.19", "22.13"]
 
     steps:
       - name: Checkout Polaris Tools project
