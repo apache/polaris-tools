@@ -32,7 +32,7 @@
     // Update all dockerfiles
     "ignorePaths": [],
     // UBI images use timestamp-based versions; allow large increments
-    "maxMajorIncrement": 99999999,
+    "maxMajorIncrement": 9999999999,
   },
 
   packageRules: [
