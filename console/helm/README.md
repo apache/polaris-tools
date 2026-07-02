@@ -19,8 +19,7 @@ under the License.
 
 # Helm Chart for Apache Polaris Console
 
-The Apache Polaris Console is a web UI for [Apache Polaris](https://polaris.apache.org/),
-an open-source catalog console for Apache Polaris.
+The Apache Polaris Console is a web UI for [Apache Polaris](https://polaris.apache.org/).
 
 ## Requirements
 

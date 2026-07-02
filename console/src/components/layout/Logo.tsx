@@ -24,6 +24,7 @@ interface LogoProps {
   showText?: boolean
   className?: string
   clickable?: boolean
+  inverted?: boolean
 }
 
 export function Logo({
@@ -31,6 +32,7 @@ export function Logo({
   showText = true,
   className = "",
   clickable = true,
+  inverted = false,
 }: LogoProps) {
   const isCompact = variant === "compact"
 
@@ -44,7 +46,9 @@ export function Logo({
       />
       {showText && (
         <div className="flex flex-col">
-          <span className={`font-bold text-foreground ${isCompact ? "text-sm" : "text-base"}`}>
+          <span
+            className={`font-semibold ${inverted ? "text-white" : "text-foreground"} ${isCompact ? "text-sm" : "text-base"}`}
+          >
             Apache Polaris
           </span>
         </div>

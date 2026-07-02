@@ -499,7 +499,7 @@ export function PrivilegesTab() {
 
         {/* Table */}
         <div className="flex justify-center">
-          <div className="w-full max-w-4xl rounded-md border">
+          <div className="w-full max-w-4xl rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (

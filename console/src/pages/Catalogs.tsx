@@ -245,7 +245,7 @@ export function Catalogs() {
             </p>
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-xl border border-border/60 bg-card shadow-card overflow-hidden">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (

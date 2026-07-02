@@ -78,6 +78,8 @@ spec:
       {{- if ne .Values.terminationGracePeriodSeconds nil }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.containerSecurityContext }}

@@ -204,8 +204,8 @@
 
 This product includes code from Project Nessie.
 
-* helm/polaris/templates/_helpers.tpl
-* helm/polaris/templates/serviceaccount.yaml
+* helm/templates/_helpers.tpl
+* helm/templates/serviceaccount.yaml
 
 Copyright: Copyright 2015-2025 Dremio Corporation
 Home page: https://projectnessie.org/
