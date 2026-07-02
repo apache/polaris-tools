@@ -115,15 +115,15 @@ console-helm-install-plugins: ## Install required Helm plugins (unittest, schema
 console-helm-lint: ## Run Helm chart lint check
 	@$(MAKE) -C console helm-lint
 
-.PHONY: helm-schema-generate
+.PHONY: console-helm-schema-generate
 console-helm-schema-generate: ## Generate Helm chart JSON schema from values.yaml
 	@$(MAKE) -C console helm-schema-generate
 
-.PHONY: helm-schema-verify
+.PHONY: console-helm-schema-verify
 console-helm-schema-verify: ## Verify Helm chart JSON schema is up to date
 	@$(MAKE) -C console helm-schema-verify
 
-.PHONY: helm-unittest
+.PHONY: console-helm-unittest
 console-helm-unittest: ## Run Helm chart unittest
 	@$(MAKE) -C console helm-unittest
 
