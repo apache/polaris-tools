@@ -111,7 +111,7 @@ console-helm: ## Run most Helm targets (schema, unittest, and lint)
 console-helm-install-plugins: ## Install required Helm plugins (unittest, schema)
 	@$(MAKE) -C console helm-install-plugins
 
-.PHONY: helm-lint
+.PHONY: console-helm-lint
 console-helm-lint: ## Run Helm chart lint check
 	@$(MAKE) -C console helm-lint
 
