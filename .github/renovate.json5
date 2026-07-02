@@ -28,6 +28,13 @@
     ":dependencyDashboard",
   ],
 
+  dockerfile: {
+    // Update all dockerfiles
+    "ignorePaths": [],
+    // UBI images use timestamp-based versions; allow large increments
+    "maxMajorIncrement": 99999999,
+  },
+
   packageRules: [
     // Check for updates, do not merge automatically. This rule does effectively nothing, but serves as a
     // reference for the kinds of managers used in Polaris.
