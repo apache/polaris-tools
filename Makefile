@@ -101,6 +101,32 @@ console-lint-fix: ## Fix linting issues in the console project
 console-version: ## Display version for console project
 	@$(MAKE) -C console version
 
+##@ Console Helm
+
+.PHONY: console-helm
+console-helm: ## Run most Helm targets (schema, unittest, and lint)
+	@$(MAKE) -C console helm
+
+.PHONY: console-helm-install-plugins
+console-helm-install-plugins: ## Install required Helm plugins (unittest, schema)
+	@$(MAKE) -C console helm-install-plugins
+
+.PHONY: console-helm-lint
+console-helm-lint: ## Run Helm chart lint check
+	@$(MAKE) -C console helm-lint
+
+.PHONY: console-helm-schema-generate
+console-helm-schema-generate: ## Generate Helm chart JSON schema from values.yaml
+	@$(MAKE) -C console helm-schema-generate
+
+.PHONY: console-helm-schema-verify
+console-helm-schema-verify: ## Verify Helm chart JSON schema is up to date
+	@$(MAKE) -C console helm-schema-verify
+
+.PHONY: console-helm-unittest
+console-helm-unittest: ## Run Helm chart unittest
+	@$(MAKE) -C console helm-unittest
+
 ##@ MCP
 
 .PHONY: mcp-build

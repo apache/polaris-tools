@@ -19,7 +19,30 @@
 
 apiVersion: v2
 name: polaris-console
+description: A Helm chart for Apache Polaris Console
 type: application
-description: Apache Polaris Console
-version: 0.1.0
-appVersion: "0.1.0"
+version: 1.6.0-SNAPSHOT
+appVersion: 1.6.0-SNAPSHOT
+home: https://polaris.apache.org/
+icon: https://raw.githubusercontent.com/apache/polaris/main/site/static/img/logos/polaris-brandmark.png
+sources:
+  - https://github.com/apache/polaris-tools
+keywords:
+  - polaris
+  - iceberg
+maintainers:
+  - name: Apache Polaris PMC
+    email: dev@polaris.apache.org
+    url: https://polaris.apache.org/
+annotations:
+  artifacthub.io/links: |
+    - name: Homepage
+      url: https://polaris.apache.org/
+    - name: Source Code
+      url: https://github.com/apache/polaris-tools
+    - name: Documentation
+      url: https://polaris.apache.org/
+    - name: Support
+      url: https://github.com/apache/polaris-tools/issues
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: database

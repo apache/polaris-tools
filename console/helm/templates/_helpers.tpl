@@ -19,15 +19,18 @@
 
 */}}
 
+
 {{/*
-Expand the name of the chart.
+  Expand the name of the chart.
 */}}
 {{- define "polaris-console.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
+  Create a default fully qualified app name.
+  We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+  If release name contains chart name it will be used as a full name.
 */}}
 {{- define "polaris-console.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -43,14 +46,14 @@ Create a default fully qualified app name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
+  Create chart name and version as used by the chart label.
 */}}
 {{- define "polaris-console.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Common labels
+  Common labels
 */}}
 {{- define "polaris-console.labels" -}}
 helm.sh/chart: {{ include "polaris-console.chart" . }}
@@ -62,7 +65,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+  Selector labels
 */}}
 {{- define "polaris-console.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "polaris-console.name" . }}
@@ -70,11 +73,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Validate that only one of ingress or httproute is enabled
+  Validate that only one of ingress or httproute is enabled
 */}}
 {{- define "polaris-console.validateRouting" -}}
 {{- if and .Values.ingress.enabled .Values.httproute.enabled }}
 {{- fail "Cannot enable both ingress and httproute. Please enable only one." }}
 {{- end }}
+{{- if and (not .Values.httproute.enabled) .Values.gateway.enabled }}
+{{- fail "In order to use the gateway please enable the httproute and disable the ingress."}}
+{{- end }}
 {{- end }}
 
+{{/*
+  Create the name of the service account to use
+*/}}
+{{- define "polaris-console.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "polaris-console.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
