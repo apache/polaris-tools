@@ -32,7 +32,7 @@ Below are some examples of registering tables from one catalog to another.
 ### Registering All Tables from Hadoop Catalog to Polaris Catalog
 
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar register \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar register \
 --source-catalog-type HADOOP \
 --source-catalog-properties warehouse=/tmp/warehouse,type=hadoop \
 --target-catalog-type REST  \
@@ -46,7 +46,7 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar register \
 In this example, only tables t1 and t2 in namespace foo will be migrated.
 
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type HADOOP \
 --source-catalog-properties warehouse=/tmp/warehouse,type=hadoop \
 --target-catalog-type REST  \
@@ -56,7 +56,7 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 
 ### Migrate from GLUE Catalog to Polaris Catalog
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type GLUE \
 --source-catalog-properties warehouse=s3a://some-bucket/wh/,io-impl=org.apache.iceberg.aws.s3.S3FileIO \
 --target-catalog-type REST  \
@@ -65,7 +65,7 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 
 ### Migrate from HIVE Catalog to Polaris Catalog
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type HIVE \
 --source-catalog-properties warehouse=s3a://some-bucket/wh/,io-impl=org.apache.iceberg.aws.s3.S3FileIO,uri=thrift://localhost:9083 \
 --target-catalog-type REST  \
@@ -78,7 +78,7 @@ source catalog directory in `storage_configuration_info`.
 
 ### Migrate from DYNAMODB Catalog to Polaris Catalog
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type DYNAMODB \
 --source-catalog-properties warehouse=s3a://some-bucket/wh/,io-impl=org.apache.iceberg.aws.s3.S3FileIO \
 --target-catalog-type REST  \
@@ -87,7 +87,7 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 
 ### Migrate from JDBC Catalog to Polaris Catalog
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \ 
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \ 
 --source-catalog-type JDBC \
 --source-catalog-properties warehouse=/tmp/warehouseJdbc,jdbc.user=root,jdbc.password=pass,uri=jdbc:mysql://localhost:3306/db1,name=catalogName \
 --target-catalog-type REST  \
@@ -96,7 +96,7 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 
 ### Migrate Only Tables Starting with "foo"
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type HIVE \
 --source-catalog-properties warehouse=s3a://some-bucket/wh/,io-impl=org.apache.iceberg.aws.s3.S3FileIO,uri=thrift://localhost:9083 \
 --target-catalog-type NESSIE  \
@@ -109,7 +109,7 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 The file idx.txt contains each table identifier to migrate delimited by a newline.
 
 ```shell
-java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+java -jar iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type HIVE \
 --source-catalog-properties warehouse=/tmp/warehouse,type=hadoop \
 --target-catalog-type NESSIE  \
