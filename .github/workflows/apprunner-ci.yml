@@ -59,15 +59,7 @@ jobs:
             21
             ${{ matrix.java-version != '21' && matrix.java-version || '' }}
           distribution: 'temurin'
-
-      # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
-      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4
-        with:
-          # The setup-gradle action fails, if the wrapper is not using the right version or is not present.
-          # Our `gradlew` validates the integrity of the `gradle-wrapper.jar`, so it's safe to disable this.
-          validate-wrappers: false
+          cache: gradle
 
       - name: Code style checks and tests
         run: |
