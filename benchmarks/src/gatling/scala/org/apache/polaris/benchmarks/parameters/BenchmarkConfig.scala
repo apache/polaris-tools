@@ -25,7 +25,7 @@ import scala.jdk.CollectionConverters._
 object BenchmarkConfig {
   val config: BenchmarkConfig = apply()
 
-  private def readHeaders(http: Config): Map[String, String] = {
+  private def readHeaders(http: Config): Map[String, String] =
     if (http.hasPath("headers")) {
       val headersConfig = http.getConfig("headers")
       val result = collection.mutable.Map[String, String]()
@@ -36,7 +36,6 @@ object BenchmarkConfig {
     } else {
       Map.empty[String, String]
     }
-  }
 
   def apply(): BenchmarkConfig = {
     val config: Config = ConfigFactory.load().withFallback(ConfigFactory.load("benchmark-defaults"))
