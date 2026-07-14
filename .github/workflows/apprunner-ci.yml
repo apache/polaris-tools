@@ -63,7 +63,7 @@ jobs:
       # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
         with:
           # The setup-gradle action fails, if the wrapper is not using the right version or is not present.
           # Our `gradlew` validates the integrity of the `gradle-wrapper.jar`, so it's safe to disable this.
