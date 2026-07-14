@@ -185,6 +185,7 @@ val shadowJar =
       "DISCLAIMER",
       "META-INF/DISCLAIMER",
       "META-INF/ASL2.0",
+      "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
 
       // Proguard configurations used during the Guava build (don't care about those)
       "META-INF/proguard/**",

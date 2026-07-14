@@ -37,8 +37,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public class PolarisContainer extends GenericContainer<PolarisContainer> {
 
-  private static final DockerImageName IMAGE =
-      DockerImageName.parse("apache/polaris:1.1.0-incubating");
+  private static final DockerImageName IMAGE = DockerImageName.parse("apache/polaris:1.6.0");
   private static final int POLARIS_PORT = 8181;
 
   public static final String CATALOG_NAME = "test";
