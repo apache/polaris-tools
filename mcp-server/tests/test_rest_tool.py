@@ -236,3 +236,70 @@ def test_call_without_provide_realm() -> None:
     call_args = http.request.call_args
     headers = call_args[1]["headers"]
     assert "Polaris-Realm" not in headers
+
+
+def test_call_forwards_incoming_authorization_when_provider_returns_none() -> None:
+    tool, http, auth = _create_tool()
+    auth.authorization_header.return_value = None
+    http.request.return_value = _build_response(status=200, body="{}")
+
+    with mock.patch(
+        "polaris_mcp.rest.get_http_headers",
+        return_value={"authorization": "Bearer incoming"},
+    ) as get_headers:
+        tool.call({"method": "GET", "path": "namespace"})
+
+    get_headers.assert_called_once_with(include={"authorization"})
+    headers = http.request.call_args[1]["headers"]
+    assert headers["Authorization"] == "Bearer incoming"
+
+
+def test_call_omits_authorization_when_provider_and_incoming_empty() -> None:
+    tool, http, auth = _create_tool()
+    auth.authorization_header.return_value = None
+    http.request.return_value = _build_response(status=200, body="{}")
+
+    with mock.patch("polaris_mcp.rest.get_http_headers", return_value={}):
+        tool.call({"method": "GET", "path": "namespace"})
+
+    headers = http.request.call_args[1]["headers"]
+    assert not any(name.lower() == "authorization" for name in headers)
+
+
+def test_call_prefers_provider_token_over_incoming_authorization() -> None:
+    tool, http, auth = _create_tool()
+    auth.authorization_header.return_value = "Bearer provided"
+    http.request.return_value = _build_response(status=200, body="{}")
+
+    with mock.patch(
+        "polaris_mcp.rest.get_http_headers",
+        return_value={"authorization": "Bearer incoming"},
+    ) as get_headers:
+        tool.call({"method": "GET", "path": "namespace"})
+
+    get_headers.assert_not_called()
+    headers = http.request.call_args[1]["headers"]
+    assert headers["Authorization"] == "Bearer provided"
+
+
+def test_call_explicit_authorization_header_skips_incoming_forwarding() -> None:
+    tool, http, auth = _create_tool()
+    auth.authorization_header.return_value = None
+    http.request.return_value = _build_response(status=200, body="{}")
+
+    with mock.patch(
+        "polaris_mcp.rest.get_http_headers",
+        return_value={"authorization": "Bearer incoming"},
+    ) as get_headers:
+        tool.call(
+            {
+                "method": "GET",
+                "path": "namespace",
+                "headers": {"Authorization": "Bearer explicit"},
+            }
+        )
+
+    auth.authorization_header.assert_not_called()
+    get_headers.assert_not_called()
+    headers = http.request.call_args[1]["headers"]
+    assert headers["Authorization"] == "Bearer explicit"
