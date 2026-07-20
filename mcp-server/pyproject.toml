@@ -29,7 +29,7 @@ requires-python = ">=3.10,<4.0"
 license = "Apache-2.0"
 keywords = ["Apache Polaris", "Polaris", "Model Context Protocol"]
 dependencies = [
-    "fastmcp>=2.13.0",
+    "fastmcp>=3.1.0",
     "urllib3>=2.7.0,<3.0.0",
     "python-json-logger>=4.0.0",
     "python-dotenv>=1.2.2",
