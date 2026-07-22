@@ -184,3 +184,25 @@ java -jar cli/build/libs/polaris-synchronizer-cli.jar sync-polaris \
 > nor remove or modify them or their assignments to principals/principal-roles on the target. This is to accommodate that 
 > the tool itself will be running with the permission levels for these principals and roles, and we do not want to modify 
 > the tool's permissions at runtime.
+
+At the end of every run, `sync-polaris` prints a consolidated synchronization report summarizing how
+many entities of each type were created, overwritten, removed, skipped (already in sync), or failed,
+along with a list of any failures encountered:
+
+```
+=== Synchronization Report ===
+Principal:               3 created, 0 overwritten, 0 removed, 0 skipped, 1 failed
+Catalog:                  2 created, 1 overwritten, 0 removed, 5 skipped, 0 failed
+Table:                   20 created, 0 overwritten, 0 removed, 40 skipped, 2 failed
+
+Failures:
+  - Principal 'alice': <exception message>
+  - Table 'db.orders': <exception message>
+===============================
+```
+
+By default, `sync-polaris` exits with status `0` regardless of whether individual entities failed to
+synchronize (matching the pre-existing behavior, where failures are logged and the run continues).
+Pass `--fail-on-error` to make the command exit with a non-zero status if the report contains any
+failures. This is distinct from `--halt-on-failure`, which aborts the run as soon as the first failure
+occurs; `--fail-on-error` lets the run finish synchronizing everything it can, then fails afterward.
