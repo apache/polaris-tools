@@ -50,7 +50,7 @@ These commands:
 3. Build the tool
 4. Create a JAR file in `iceberg-catalog-migrator/cli/build/libs/` directory
 
-The JAR file will be created with name `iceberg-catalog-migrator-cli-<version>.jar` where `<version>` is the version of the tool found in the `iceberg-catalog-migrator/version.txt` file.  For the examples below, we will assume the version is `0.0.1-SNAPSHOT`, so the JAR file name will be `iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar`.
+The JAR file will be created with name `iceberg-catalog-migrator-cli-<version>.jar` where `<version>` is the version of the tool found in the `iceberg-catalog-migrator/version.txt` file.  For the examples below, we will assume the version is `1.6.0`, so the JAR file name will be `iceberg-catalog-migrator-cli-1.6.0.jar`.
 
 ### Step 2: Set the Object Storage Environment Variables
 The tool will need access to the underlying object storage via environmental variables. For this example, we will use AWS S3 with an access key and id:
@@ -84,12 +84,12 @@ export TOKEN_TARGET=xxxxxxx
 ### Step 4: Validate the Migration
 Execute the following command to understand how to migrate the tables:
 ```shell
-java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar register -h  
+java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-1.6.0.jar register -h  
 ```
 
 In the example, execute the following command to perform a dry run migration. This will not migrate the tables but will provide information on the operation:
 ```shell
-java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar register \
+java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-1.6.0.jar register \
 --source-catalog-type REST \
 --source-catalog-properties uri=http://sourcecatalog:8181/api/catalog,warehouse=test,token=$TOKEN_SOURCE \
 --target-catalog-type REST  \
@@ -103,7 +103,7 @@ After validating all inputs, the console will display a list of table identifier
 
 In the example, execute the following command to perform a migration:
 ```shell
-java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar migrate \
+java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-1.6.0.jar migrate \
 --source-catalog-type REST \
 --source-catalog-properties uri=http://sourcecatalog:8181/api/catalog,warehouse=test,token=$TOKEN_SOURCE \
 --target-catalog-type REST  \
