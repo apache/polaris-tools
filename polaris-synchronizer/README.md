@@ -184,3 +184,14 @@ java -jar cli/build/libs/polaris-synchronizer-cli.jar sync-polaris \
 > nor remove or modify them or their assignments to principals/principal-roles on the target. This is to accommodate that 
 > the tool itself will be running with the permission levels for these principals and roles, and we do not want to modify 
 > the tool's permissions at runtime.
+
+> :bulb: If you only need to migrate Polaris management entities (catalogs, catalog-roles, grants) and want to skip
+> synchronizing Iceberg namespaces and tables, run the tool with the `--skip-iceberg-content` flag. This is useful when
+> Iceberg content is synchronized through another means, or when speeding up a sync where namespace/table content isn't needed.
+
+# Testing Locally
+
+See [`manual-test/`](manual-test/README.md) for a self-contained docker-compose setup that brings up a source and
+target Polaris instance and walks through running `sync-polaris`, including with `--skip-iceberg-content`, without
+needing a real Polaris deployment.
+
