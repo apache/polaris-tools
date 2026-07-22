@@ -1,0 +1,29 @@
+# ── Polaris connection ────────────────────────────────────────────────────────
+polaris.uri=http://localhost:8181/api/catalog
+polaris.warehouse=my-catalog
+
+# OAuth2 client credentials (used to obtain a bearer token at startup)
+polaris.client.id=root
+polaris.client.secret=s3cr3t
+
+# Token endpoint — defaults to {polaris.uri}/v1/oauth/tokens if omitted
+# polaris.token.endpoint=http://localhost:8181/api/catalog/v1/oauth/tokens
+
+# ── Display options ───────────────────────────────────────────────────────────
+# Maximum rows to print for SELECT results (safety cap)
+cli.max-display-rows=100
+
+# ── S3 / FileIO properties ────────────────────────────────────────────────────
+# Any key not prefixed with polaris. or cli. is passed directly to the catalog.
+
+# For real AWS S3:
+# s3.region=us-east-1
+
+# For MinIO or other S3-compatible storage:
+# s3.endpoint=http://localhost:9000
+# s3.path-style-access=true
+# s3.access-key-id=minioadmin
+# s3.secret-access-key=minioadmin
+
+# FileIO implementation (omit for real S3, set for MinIO/RustFS/etc.)
+# io-impl=org.apache.iceberg.aws.s3.S3FileIO
