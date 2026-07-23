@@ -95,3 +95,6 @@ build
 # Ignore Gradle wrapper jar file
 gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper-*.sha256
+
+# Generated test credentials (manual-test docker-compose seed volume)
+manual-test/seed/

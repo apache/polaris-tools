@@ -1,0 +1,88 @@
+services:
+
+  # ── Polaris instances ────────────────────────────────────────────────────────
+  # Official Apache Polaris image. No Postgres/RDS — Polaris defaults to its
+  # in-memory metastore when no datasource is configured. Both instances share
+  # a single FILE storage volume mounted at the same path, so metadata written
+  # by source is readable by target — this lets a full sync (including
+  # namespace/table content) actually succeed, so you can compare it against
+  # a `--skip-iceberg-content` run in this example.
+
+  polaris-source:
+    image: apache/polaris:1.1.0-incubating
+    container_name: polaris-source
+    hostname: polaris-source
+    ports:
+      - "8181:8181"
+      - "8182:8182"
+    environment:
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
+      JAVA_OPTS_APPEND: >-
+        -Dpolaris.readiness.ignore-severe-issues=true
+        -Dpolaris.features."SUPPORTED_CATALOG_STORAGE_TYPES"=["FILE"]
+        -Dpolaris.features."ALLOW_INSECURE_STORAGE_TYPES"=true
+        -Dpolaris.features."ALLOW_UNSTRUCTURED_TABLE_LOCATION"=true
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8182/q/health/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    volumes:
+      - shared-storage:/tmp/polaris
+    networks:
+      - polaris-net
+
+  polaris-target:
+    image: apache/polaris:1.1.0-incubating
+    container_name: polaris-target
+    hostname: polaris-target
+    ports:
+      - "8183:8181"
+      - "8184:8182"
+    environment:
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
+      JAVA_OPTS_APPEND: >-
+        -Dpolaris.readiness.ignore-severe-issues=true
+        -Dpolaris.features."SUPPORTED_CATALOG_STORAGE_TYPES"=["FILE"]
+        -Dpolaris.features."ALLOW_INSECURE_STORAGE_TYPES"=true
+        -Dpolaris.features."ALLOW_UNSTRUCTURED_TABLE_LOCATION"=true
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8182/q/health/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    volumes:
+      - shared-storage:/tmp/polaris
+    networks:
+      - polaris-net
+
+  # ── Init container ────────────────────────────────────────────────────────
+  # Seeds SOURCE with: catalog + principal + principal-role + catalog-role +
+  # grant + namespace + table. TARGET is left completely empty — polaris-synchronizer
+  # is responsible for creating the catalog/catalog-role/grants (and, unless
+  # --skip-iceberg-content is used, the namespace/table) on the target.
+
+  polaris-init:
+    build:
+      context: ./init
+    container_name: polaris-init
+    dns_search: "."
+    depends_on:
+      polaris-source:
+        condition: service_healthy
+      polaris-target:
+        condition: service_healthy
+    volumes:
+      - ./seed:/seed
+    restart: "no"
+    networks:
+      - polaris-net
+
+networks:
+  polaris-net:
+    driver: bridge
+
+volumes:
+  shared-storage:
