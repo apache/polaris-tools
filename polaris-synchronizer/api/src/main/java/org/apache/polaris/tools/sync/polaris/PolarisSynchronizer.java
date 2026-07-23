@@ -32,6 +32,7 @@ import org.apache.polaris.core.admin.model.GrantResource;
 import org.apache.polaris.core.admin.model.Principal;
 import org.apache.polaris.core.admin.model.PrincipalRole;
 import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
+import org.apache.polaris.tools.sync.polaris.access.CredentialWriter;
 import org.apache.polaris.tools.sync.polaris.catalog.BaseTableWithETag;
 import org.apache.polaris.tools.sync.polaris.catalog.ETagManager;
 import org.apache.polaris.tools.sync.polaris.catalog.MetadataNotModifiedException;
@@ -59,6 +60,8 @@ public class PolarisSynchronizer {
 
   private final ETagManager etagManager;
 
+  private final CredentialWriter credentialWriter;
+
   private final boolean haltOnFailure;
 
   private final boolean diffOnly;
@@ -70,6 +73,7 @@ public class PolarisSynchronizer {
       PolarisService source,
       PolarisService target,
       ETagManager etagManager,
+      CredentialWriter credentialWriter,
       boolean diffOnly) {
     this.clientLogger =
         clientLogger == null ? LoggerFactory.getLogger(PolarisSynchronizer.class) : clientLogger;
@@ -78,6 +82,7 @@ public class PolarisSynchronizer {
     this.source = source;
     this.target = target;
     this.etagManager = etagManager;
+    this.credentialWriter = credentialWriter;
     this.diffOnly = diffOnly;
   }
 
@@ -140,10 +145,9 @@ public class PolarisSynchronizer {
     for (Principal principal : principalSyncPlan.entitiesToCreate()) {
       try {
         PrincipalWithCredentials createdPrincipal = target.createPrincipal(principal);
-        clientLogger.info("Created principal {} on target. Target credentials: {}:{} - {}/{}",
+        credentialWriter.writeCredentials(createdPrincipal);
+        clientLogger.info("Created principal {} on target. - {}/{}",
                 principal.getName(),
-                createdPrincipal.getCredentials().getClientId(),
-                createdPrincipal.getCredentials().getClientSecret(),
                 ++syncsCompleted,
                 totalSyncsToComplete
         );
@@ -158,10 +162,9 @@ public class PolarisSynchronizer {
       try {
         target.dropPrincipal(principal.getName());
         PrincipalWithCredentials overwrittenPrincipal = target.createPrincipal(principal);
-        clientLogger.info("Overwrote principal {} on target. Target credentials: {}:{} - {}/{}",
+        credentialWriter.writeCredentials(overwrittenPrincipal);
+        clientLogger.info("Overwrote principal {} on target. - {}/{}",
                 principal.getName(),
-                overwrittenPrincipal.getCredentials().getClientId(),
-                overwrittenPrincipal.getCredentials().getClientSecret(),
                 ++syncsCompleted,
                 totalSyncsToComplete
         );
