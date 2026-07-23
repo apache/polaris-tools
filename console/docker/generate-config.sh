@@ -16,11 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Copy nginx configuration (no substitution needed since we use direct API calls)
-cp /opt/app-root/etc/nginx.d/default.conf.template /opt/app-root/etc/nginx.d/default.conf
-
-echo "Configured nginx for static file serving"
-
 # Generate runtime configuration from environment variables
 cat > /opt/app-root/src/config.js << EOF
 // Runtime configuration generated from environment variables
