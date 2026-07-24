@@ -32,6 +32,7 @@ import org.apache.polaris.core.admin.model.Catalog;
 import org.apache.polaris.core.admin.model.PrincipalRole;
 import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
 import org.apache.polaris.tools.sync.polaris.access.AccessControlService;
+import org.apache.polaris.tools.sync.polaris.access.CredentialWriter;
 import org.apache.polaris.tools.sync.polaris.service.PolarisService;
 import org.apache.polaris.tools.sync.polaris.service.impl.PolarisApiService;
 import org.slf4j.Logger;
@@ -83,13 +84,34 @@ public class CreateOmnipotentPrincipalCommand implements Callable<Integer> {
       })
   private int concurrency;
 
+  @CommandLine.Option(
+          names = {"--credential-output-type"},
+          defaultValue = "CONSOLE",
+          description = "One of { CONSOLE, FILE, CUSTOM }. Default: CONSOLE. Controls how the newly generated " +
+                  "principal credentials are output."
+  )
+  private CredentialWriterFactory.Type credentialWriterType;
+
+  @CommandLine.Option(
+          names = {"--credential-output-properties"},
+          description = "Properties to initialize credential output." +
+                  "\nFor type FILE:" +
+                  "\n\t- " + JsonFileCredentialWriter.JSON_FILE_PROPERTY + ": The JSON Lines file to write principal credentials to." +
+                  "\n\t- " + JsonFileCredentialWriter.APPEND_PROPERTY + ": (default: false) Whether to append to an existing file instead of overwriting it." +
+                  "\nFor type CUSTOM:" +
+                  "\n\t- " + CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY + ": The classname of the CredentialWriter service provider to load via ServiceLoader."
+  )
+  private Map<String, String> credentialWriterProperties;
+
   @Override
   public Integer call() throws Exception {
     polarisApiConnectionProperties.putIfAbsent(PolarisApiService.ICEBERG_WRITE_ACCESS_PROPERTY,
             String.valueOf(withWriteAccess));
 
     try (PolarisService polaris = PolarisServiceFactory.createPolarisService(
-            PolarisServiceFactory.ServiceType.API, polarisApiConnectionProperties)) {
+            PolarisServiceFactory.ServiceType.API, polarisApiConnectionProperties);
+         CredentialWriter credentialWriter =
+                 CredentialWriterFactory.createCredentialWriter(credentialWriterType, credentialWriterProperties)) {
 
       AccessControlService accessControlService = new AccessControlService((PolarisApiService) polaris);
 
@@ -171,16 +193,7 @@ public class CreateOmnipotentPrincipalCommand implements Callable<Integer> {
               "Encountered issues creating catalog roles for the following catalogs: {}",
               failedCatalogs.stream().map(Catalog::getName).toList());
 
-      consoleLog.info(
-              "\n======================================================\n"
-                      + "Omnipotent Principal Credentials:\n"
-                      + "\tname = {}\n"
-                      + "\tclientId = {}\n"
-                      + "\tclientSecret = {}\n"
-                      + "======================================================",
-              principalWithCredentials.getPrincipal().getName(),
-              principalWithCredentials.getCredentials().getClientId(),
-              principalWithCredentials.getCredentials().getClientSecret());
+      credentialWriter.writeCredentials(principalWithCredentials);
 
     }
 

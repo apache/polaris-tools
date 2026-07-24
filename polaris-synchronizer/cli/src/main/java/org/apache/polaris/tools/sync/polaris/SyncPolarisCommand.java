@@ -20,6 +20,7 @@ package org.apache.polaris.tools.sync.polaris;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
+import org.apache.polaris.tools.sync.polaris.access.CredentialWriter;
 import org.apache.polaris.tools.sync.polaris.catalog.ETagManager;
 import org.apache.polaris.tools.sync.polaris.planning.AccessControlAwarePlanner;
 import org.apache.polaris.tools.sync.polaris.planning.CatalogNameFilterPlanner;
@@ -80,10 +81,29 @@ public class SyncPolarisCommand implements Callable<Integer> {
           names = {"--sync-principals"},
           description = "Enable synchronization of principals across the source and target, and assign them to " +
                   "the appropriate principal roles. WARNING: Principal client-id and client-secret will be reset on " +
-                  "the target Polaris instance, and the new credentials for the principals created on the target will " +
-                  "be logged to stdout."
+                  "the target Polaris instance. The new credentials for principals created on the target will be " +
+                  "output via the configured --credential-output-type (default: logged to stdout)."
   )
   private boolean shouldSyncPrincipals;
+
+  @CommandLine.Option(
+          names = {"--credential-output-type"},
+          defaultValue = "CONSOLE",
+          description = "One of { CONSOLE, FILE, CUSTOM }. Default: CONSOLE. Controls how newly generated/rotated " +
+                  "principal credentials on the target are output."
+  )
+  private CredentialWriterFactory.Type credentialWriterType;
+
+  @CommandLine.Option(
+          names = {"--credential-output-properties"},
+          description = "Properties to initialize credential output." +
+                  "\nFor type FILE:" +
+                  "\n\t- " + JsonFileCredentialWriter.JSON_FILE_PROPERTY + ": The JSON Lines file to write principal credentials to." +
+                  "\n\t- " + JsonFileCredentialWriter.APPEND_PROPERTY + ": (default: false) Whether to append to an existing file instead of overwriting it." +
+                  "\nFor type CUSTOM:" +
+                  "\n\t- " + CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY + ": The classname of the CredentialWriter service provider to load via ServiceLoader."
+  )
+  private Map<String, String> credentialWriterProperties;
 
   @CommandLine.Option(
           names = {"--halt-on-failure"},
@@ -142,7 +162,9 @@ public class SyncPolarisCommand implements Callable<Integer> {
                     PolarisServiceFactory.ServiceType.API, sourceProperties);
             PolarisService target = PolarisServiceFactory.createPolarisService(
                     PolarisServiceFactory.ServiceType.API, targetProperties);
-            ETagManager etagManager = ETagManagerFactory.createETagManager(etagManagerType, etagManagerProperties)
+            ETagManager etagManager = ETagManagerFactory.createETagManager(etagManagerType, etagManagerProperties);
+            CredentialWriter credentialWriter =
+                    CredentialWriterFactory.createCredentialWriter(credentialWriterType, credentialWriterProperties)
     ) {
       PolarisSynchronizer synchronizer =
               new PolarisSynchronizer(
@@ -152,6 +174,8 @@ public class SyncPolarisCommand implements Callable<Integer> {
                       source,
                       target,
                       etagManager,
+                      credentialWriter,
+                      diffOnly);
                       diffOnly,
                       skipIcebergContent);
       synchronizer.syncPrincipalRoles();
