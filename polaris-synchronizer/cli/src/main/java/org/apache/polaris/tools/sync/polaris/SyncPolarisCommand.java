@@ -125,6 +125,13 @@ public class SyncPolarisCommand implements Callable<Integer> {
   private boolean diffOnly;
 
   @CommandLine.Option(
+          names = {"--skip-iceberg-content"},
+          description = "Skip synchronization of Iceberg namespaces and tables. Catalogs, catalog-roles, and " +
+                  "grants will still be synchronized."
+  )
+  private boolean skipIcebergContent;
+
+  @CommandLine.Option(
           names = {"--strategy"},
           defaultValue = "CREATE_ONLY",
           description = "The synchronization strategy to use. Options: " +
@@ -169,6 +176,8 @@ public class SyncPolarisCommand implements Callable<Integer> {
                       etagManager,
                       credentialWriter,
                       diffOnly);
+                      diffOnly,
+                      skipIcebergContent);
       synchronizer.syncPrincipalRoles();
       if (shouldSyncPrincipals) {
         consoleLog.warn("Principal migration will reset credentials on the target Polaris instance. " +
