@@ -46,10 +46,9 @@ public class JsonFileCredentialWriter implements CredentialWriter, Closeable {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  private BufferedWriter writer;
+  private final BufferedWriter writer;
 
-  @Override
-  public void initialize(Map<String, String> properties) {
+  public JsonFileCredentialWriter(Map<String, String> properties) {
     if (!properties.containsKey(JSON_FILE_PROPERTY)) {
       throw new IllegalArgumentException("Missing required property " + JSON_FILE_PROPERTY);
     }

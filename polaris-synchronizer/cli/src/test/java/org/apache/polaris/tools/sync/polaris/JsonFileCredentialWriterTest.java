@@ -55,8 +55,8 @@ public class JsonFileCredentialWriterTest {
     public void writesSingleLineOfValidJson() throws Exception {
         Path path = tempDir.resolve("single.jsonl");
 
-        try (JsonFileCredentialWriter writer = new JsonFileCredentialWriter()) {
-            writer.initialize(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()));
+        try (JsonFileCredentialWriter writer =
+                new JsonFileCredentialWriter(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()))) {
             writer.writeCredentials(buildPrincipal("test-principal", "client-id", "client-secret"));
         }
 
@@ -73,8 +73,8 @@ public class JsonFileCredentialWriterTest {
     public void appendsMultipleEntriesAsJsonLines() throws Exception {
         Path path = tempDir.resolve("multi.jsonl");
 
-        try (JsonFileCredentialWriter writer = new JsonFileCredentialWriter()) {
-            writer.initialize(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()));
+        try (JsonFileCredentialWriter writer =
+                new JsonFileCredentialWriter(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()))) {
             writer.writeCredentials(buildPrincipal("principal-1", "id-1", "secret-1"));
             writer.writeCredentials(buildPrincipal("principal-2", "id-2", "secret-2"));
             writer.writeCredentials(buildPrincipal("principal-3", "id-3", "secret-3"));
@@ -93,8 +93,8 @@ public class JsonFileCredentialWriterTest {
         Path path = tempDir.resolve("overwrite.jsonl");
         Files.writeString(path, "{\"stale\":\"data\"}\n");
 
-        try (JsonFileCredentialWriter writer = new JsonFileCredentialWriter()) {
-            writer.initialize(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()));
+        try (JsonFileCredentialWriter writer =
+                new JsonFileCredentialWriter(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()))) {
             writer.writeCredentials(buildPrincipal("fresh-principal", "id", "secret"));
         }
 
@@ -108,10 +108,10 @@ public class JsonFileCredentialWriterTest {
         Path path = tempDir.resolve("append.jsonl");
         Files.writeString(path, "{\"principal\":{\"name\":\"existing\"}}\n");
 
-        try (JsonFileCredentialWriter writer = new JsonFileCredentialWriter()) {
-            writer.initialize(Map.of(
-                    JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString(),
-                    JsonFileCredentialWriter.APPEND_PROPERTY, "true"));
+        try (JsonFileCredentialWriter writer =
+                new JsonFileCredentialWriter(Map.of(
+                        JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString(),
+                        JsonFileCredentialWriter.APPEND_PROPERTY, "true"))) {
             writer.writeCredentials(buildPrincipal("new-principal", "id", "secret"));
         }
 
@@ -129,8 +129,8 @@ public class JsonFileCredentialWriterTest {
         org.junit.jupiter.api.Assumptions.assumeTrue(
                 FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
 
-        try (JsonFileCredentialWriter writer = new JsonFileCredentialWriter()) {
-            writer.initialize(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()));
+        try (JsonFileCredentialWriter writer =
+                new JsonFileCredentialWriter(Map.of(JsonFileCredentialWriter.JSON_FILE_PROPERTY, path.toString()))) {
             writer.writeCredentials(buildPrincipal("principal", "id", "secret"));
         }
 

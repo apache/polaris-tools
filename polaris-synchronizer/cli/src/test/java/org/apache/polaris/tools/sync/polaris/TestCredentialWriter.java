@@ -20,27 +20,17 @@ package org.apache.polaris.tools.sync.polaris;
 
 import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
 import org.apache.polaris.tools.sync.polaris.access.CredentialWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/** Implementation that logs principal credentials to the console. */
-public class ConsoleCredentialWriter implements CredentialWriter {
-
-  private final Logger consoleLog = LoggerFactory.getLogger("console-log");
+/**
+ * No-op {@link CredentialWriter} registered as a service provider (see {@code
+ * META-INF/services/org.apache.polaris.tools.sync.polaris.access.CredentialWriter}) so that {@link
+ * CredentialWriterFactory}'s {@code CUSTOM} type can be exercised in tests via {@link
+ * java.util.ServiceLoader}.
+ */
+public class TestCredentialWriter implements CredentialWriter {
 
   @Override
-  public void writeCredentials(PrincipalWithCredentials principalWithCredentials) {
-    consoleLog.info(
-        "\n======================================================\n"
-            + "Principal Credentials:\n"
-            + "\tname = {}\n"
-            + "\tclientId = {}\n"
-            + "\tclientSecret = {}\n"
-            + "======================================================",
-        principalWithCredentials.getPrincipal().getName(),
-        principalWithCredentials.getCredentials().getClientId(),
-        principalWithCredentials.getCredentials().getClientSecret());
-  }
+  public void writeCredentials(PrincipalWithCredentials principalWithCredentials) {}
 
   @Override
   public void close() {}

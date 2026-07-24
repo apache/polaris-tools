@@ -57,15 +57,24 @@ public class CredentialWriterFactoryTest {
     public void constructCustomCredentialWriterSuccessfully() throws Exception {
         try (var writer = CredentialWriterFactory.createCredentialWriter(
                 CredentialWriterFactory.Type.CUSTOM,
-                Map.of(CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY, ConsoleCredentialWriter.class.getName()))) {
+                Map.of(CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY, TestCredentialWriter.class.getName()))) {
             Assertions.assertNotNull(writer);
+            Assertions.assertInstanceOf(TestCredentialWriter.class, writer);
         }
     }
 
     @Test
-    public void failToConstructCustomCredentialWriter() {
+    public void failToConstructCustomCredentialWriterMissingProperty() {
         Assertions.assertThrows(Exception.class, () ->
                 CredentialWriterFactory.createCredentialWriter(CredentialWriterFactory.Type.CUSTOM, Map.of()));
+    }
+
+    @Test
+    public void failToConstructCustomCredentialWriterUnregisteredClass() {
+        Assertions.assertThrows(Exception.class, () ->
+                CredentialWriterFactory.createCredentialWriter(
+                        CredentialWriterFactory.Type.CUSTOM,
+                        Map.of(CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY, ConsoleCredentialWriter.class.getName())));
     }
 
 }

@@ -101,7 +101,7 @@ public class SyncPolarisCommand implements Callable<Integer> {
                   "\n\t- " + JsonFileCredentialWriter.JSON_FILE_PROPERTY + ": The JSON Lines file to write principal credentials to." +
                   "\n\t- " + JsonFileCredentialWriter.APPEND_PROPERTY + ": (default: false) Whether to append to an existing file instead of overwriting it." +
                   "\nFor type CUSTOM:" +
-                  "\n\t- " + CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY + ": The classname for the custom CredentialWriter implementation."
+                  "\n\t- " + CredentialWriterFactory.CUSTOM_CLASS_NAME_PROPERTY + ": The classname of the CredentialWriter service provider to load via ServiceLoader."
   )
   private Map<String, String> credentialWriterProperties;
 

@@ -18,21 +18,17 @@
  */
 package org.apache.polaris.tools.sync.polaris.access;
 
-import java.util.Map;
 import org.apache.polaris.core.admin.model.PrincipalWithCredentials;
 
 /**
  * Generic interface to output newly generated/rotated principal credentials. This allows the
  * destination of the credentials to be completely independent from the tool.
+ *
+ * <p>Implementations should be fully configured and ready to use once constructed; obtaining and
+ * applying any configuration is the responsibility of {@code CredentialWriterFactory}, not of
+ * callers of this interface.
  */
 public interface CredentialWriter extends AutoCloseable {
-
-  /**
-   * Used to initialize the instance for use. Should be called prior to calling any methods.
-   *
-   * @param properties properties to configure instance with
-   */
-  void initialize(Map<String, String> properties);
 
   /**
    * Outputs the given principal's credentials.
