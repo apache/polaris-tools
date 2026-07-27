@@ -77,7 +77,7 @@ public class PolarisSynchronizer {
       PolarisService target,
       ETagManager etagManager,
       boolean diffOnly,
-      SynchronizationReport report) {
+      SynchronizationReport report,
       boolean skipIcebergContent) {
     this.clientLogger =
         clientLogger == null ? LoggerFactory.getLogger(PolarisSynchronizer.class) : clientLogger;

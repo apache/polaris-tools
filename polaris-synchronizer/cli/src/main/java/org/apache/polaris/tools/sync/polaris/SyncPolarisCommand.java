@@ -163,7 +163,7 @@ public class SyncPolarisCommand implements Callable<Integer> {
                       target,
                       etagManager,
                       diffOnly,
-                      report);
+                      report,
                       skipIcebergContent);
       synchronizer.syncPrincipalRoles();
       if (shouldSyncPrincipals) {

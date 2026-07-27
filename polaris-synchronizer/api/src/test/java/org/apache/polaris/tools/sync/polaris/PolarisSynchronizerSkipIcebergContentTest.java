@@ -37,6 +37,7 @@ import org.apache.polaris.core.admin.model.StorageConfigInfo;
 import org.apache.polaris.tools.sync.polaris.catalog.NoOpETagManager;
 import org.apache.polaris.tools.sync.polaris.planning.NoOpSyncPlanner;
 import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationPlan;
+import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationReport;
 import org.apache.polaris.tools.sync.polaris.service.IcebergCatalogService;
 import org.apache.polaris.tools.sync.polaris.service.PolarisService;
 import org.junit.jupiter.api.Assertions;
@@ -299,6 +300,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             target,
             new NoOpETagManager(),
             false,
+            new SynchronizationReport(),
             true);
 
     synchronizer.syncCatalogs();
@@ -323,6 +325,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             target,
             new NoOpETagManager(),
             false,
+            new SynchronizationReport(),
             false);
 
     synchronizer.syncCatalogs();
@@ -354,6 +357,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             target,
             new NoOpETagManager(),
             false,
+            new SynchronizationReport(),
             true);
 
     synchronizer.syncCatalogs();
