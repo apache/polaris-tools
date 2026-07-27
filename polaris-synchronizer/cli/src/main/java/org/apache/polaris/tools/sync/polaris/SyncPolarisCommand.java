@@ -26,6 +26,7 @@ import org.apache.polaris.tools.sync.polaris.planning.CatalogNameFilterPlanner;
 import org.apache.polaris.tools.sync.polaris.planning.ModificationAwarePlanner;
 import org.apache.polaris.tools.sync.polaris.planning.BaseStrategyPlanner;
 import org.apache.polaris.tools.sync.polaris.planning.SynchronizationPlanner;
+import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationReport;
 import org.apache.polaris.tools.sync.polaris.service.PolarisService;
 import org.apache.polaris.tools.sync.polaris.service.impl.PolarisApiService;
 import org.slf4j.Logger;
@@ -125,6 +126,13 @@ public class SyncPolarisCommand implements Callable<Integer> {
   )
   private BaseStrategyPlanner.Strategy strategy;
 
+  @CommandLine.Option(
+          names = {"--fail-on-error"},
+          description = "Exit with a non-zero status if any entity failed to synchronize, checked after the " +
+                  "synchronization run completes. Unlike --halt-on-failure, this does not stop the run early."
+  )
+  private boolean failOnError;
+
   @Override
   public Integer call() throws Exception {
     SynchronizationPlanner planner = SynchronizationPlanner.builder(new BaseStrategyPlanner(strategy))
@@ -132,6 +140,8 @@ public class SyncPolarisCommand implements Callable<Integer> {
             .conditionallyWrapBy(catalogNameRegex != null, p -> new CatalogNameFilterPlanner(catalogNameRegex, p))
             .wrapBy(AccessControlAwarePlanner::new)
             .build();
+
+    SynchronizationReport report = new SynchronizationReport();
 
     // auto generate omnipotent principals with write access on the target, read only access on source
     sourceProperties.put(PolarisApiService.ICEBERG_WRITE_ACCESS_PROPERTY, Boolean.toString(false));
@@ -153,6 +163,7 @@ public class SyncPolarisCommand implements Callable<Integer> {
                       target,
                       etagManager,
                       diffOnly,
+                      report,
                       skipIcebergContent);
       synchronizer.syncPrincipalRoles();
       if (shouldSyncPrincipals) {
@@ -163,6 +174,8 @@ public class SyncPolarisCommand implements Callable<Integer> {
       synchronizer.syncCatalogs();
     }
 
-    return 0;
+    consoleLog.info(report.render());
+
+    return (failOnError && report.hasFailures()) ? 1 : 0;
   }
 }
