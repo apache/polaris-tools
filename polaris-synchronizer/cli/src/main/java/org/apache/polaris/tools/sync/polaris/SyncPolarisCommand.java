@@ -175,7 +175,6 @@ public class SyncPolarisCommand implements Callable<Integer> {
                       target,
                       etagManager,
                       credentialWriter,
-                      diffOnly);
                       diffOnly,
                       skipIcebergContent);
       synchronizer.syncPrincipalRoles();

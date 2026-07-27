@@ -76,7 +76,6 @@ public class PolarisSynchronizer {
       PolarisService target,
       ETagManager etagManager,
       CredentialWriter credentialWriter,
-      boolean diffOnly) {
       boolean diffOnly,
       boolean skipIcebergContent) {
     this.clientLogger =
