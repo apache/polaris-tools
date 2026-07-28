@@ -50,8 +50,8 @@ RUN groupadd --gid 10001 polaris && \
 COPY LICENSE-BUNDLE /LICENSE
 COPY NOTICE /NOTICE
 
-# Copy custom nginx configuration as template
-COPY docker/nginx.conf /opt/app-root/etc/nginx.d/default.conf.template
+# Copy location blocks into the UBI default server block via nginx.default.d include
+COPY docker/nginx.conf /opt/app-root/etc/nginx.default.d/default.conf
 # Copy runtime config generation script
 COPY --chown=10000:10001 --chmod=744 docker/generate-config.sh /generate-config.sh
 # Copy built application from builder stage

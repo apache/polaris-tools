@@ -37,7 +37,10 @@ import org.apache.polaris.tools.sync.polaris.catalog.BaseTableWithETag;
 import org.apache.polaris.tools.sync.polaris.catalog.ETagManager;
 import org.apache.polaris.tools.sync.polaris.catalog.MetadataNotModifiedException;
 import org.apache.polaris.tools.sync.polaris.planning.SynchronizationPlanner;
+import org.apache.polaris.tools.sync.polaris.planning.plan.EntityType;
+import org.apache.polaris.tools.sync.polaris.planning.plan.SyncOutcome;
 import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationPlan;
+import org.apache.polaris.tools.sync.polaris.planning.plan.SynchronizationReport;
 import org.apache.polaris.tools.sync.polaris.service.IcebergCatalogService;
 import org.apache.polaris.tools.sync.polaris.service.PolarisService;
 import org.apache.polaris.tools.sync.polaris.service.impl.PolarisIcebergCatalogService;
@@ -66,6 +69,7 @@ public class PolarisSynchronizer {
 
   private final boolean diffOnly;
 
+  private final SynchronizationReport report;
   private final boolean skipIcebergContent;
 
   public PolarisSynchronizer(
@@ -77,6 +81,7 @@ public class PolarisSynchronizer {
       ETagManager etagManager,
       CredentialWriter credentialWriter,
       boolean diffOnly,
+      SynchronizationReport report,
       boolean skipIcebergContent) {
     this.clientLogger =
         clientLogger == null ? LoggerFactory.getLogger(PolarisSynchronizer.class) : clientLogger;
@@ -87,6 +92,7 @@ public class PolarisSynchronizer {
     this.etagManager = etagManager;
     this.credentialWriter = credentialWriter;
     this.diffOnly = diffOnly;
+    this.report = report;
     this.skipIcebergContent = skipIcebergContent;
   }
 
@@ -132,16 +138,20 @@ public class PolarisSynchronizer {
     principalSyncPlan
             .entitiesToSkipAndSkipChildren()
             .forEach(
-                    principal ->
-                            clientLogger.info("Skipping principal {}.", principal.getName()));
+                    principal -> {
+                            clientLogger.info("Skipping principal {}.", principal.getName());
+                            report.recordSuccess(EntityType.PRINCIPAL, SyncOutcome.SKIPPED);
+                    });
 
     principalSyncPlan
             .entitiesNotModified()
             .forEach(
-                    principal ->
+                    principal -> {
                             clientLogger.info(
                                     "No change detected for principal {}, skipping.",
-                                    principal.getName()));
+                                    principal.getName());
+                            report.recordSuccess(EntityType.PRINCIPAL, SyncOutcome.SKIPPED);
+                    });
 
     int syncsCompleted = 0;
     final int totalSyncsToComplete = totalSyncsToComplete(principalSyncPlan);
@@ -155,10 +165,12 @@ public class PolarisSynchronizer {
                 ++syncsCompleted,
                 totalSyncsToComplete
         );
+        report.recordSuccess(EntityType.PRINCIPAL, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error("Failed to create principal {} on target. - {}/{}",
                 principal.getName(), ++syncsCompleted, totalSyncsToComplete, e);
+        report.recordFailure(EntityType.PRINCIPAL, principal.getName(), e);
       }
     }
 
@@ -172,10 +184,12 @@ public class PolarisSynchronizer {
                 ++syncsCompleted,
                 totalSyncsToComplete
         );
+        report.recordSuccess(EntityType.PRINCIPAL, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error("Failed to overwrite principal {} on target. - {}/{}",
                 principal.getName(), ++syncsCompleted, totalSyncsToComplete, e);
+        report.recordFailure(EntityType.PRINCIPAL, principal.getName(), e);
       }
     }
 
@@ -184,10 +198,12 @@ public class PolarisSynchronizer {
         target.dropPrincipal(principal.getName());
         clientLogger.info("Removed principal {} on target. - {}/{}",
                 principal.getName(), ++syncsCompleted, totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error("Failed to remove principal {} ont target. - {}/{}",
                 principal.getName(), ++syncsCompleted, totalSyncsToComplete, e);
+        report.recordFailure(EntityType.PRINCIPAL, principal.getName(), e);
       }
     }
 
@@ -232,17 +248,21 @@ public class PolarisSynchronizer {
     assignedPrincipalRoleSyncPlan
             .entitiesToSkip()
             .forEach(
-                    principalRole ->
+                    principalRole -> {
                             clientLogger.info("Skipping assignment of principal-role {} to principal {}.",
-                                    principalName, principalRole.getName()));
+                                    principalName, principalRole.getName());
+                            report.recordSuccess(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, SyncOutcome.SKIPPED);
+                    });
 
     assignedPrincipalRoleSyncPlan
             .entitiesNotModified()
             .forEach(
-                    principalRole ->
+                    principalRole -> {
                             clientLogger.info(
                                     "Principal {} is already assigned to principal-role {}, skipping.",
-                                    principalName, principalRole.getName()));
+                                    principalName, principalRole.getName());
+                            report.recordSuccess(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, SyncOutcome.SKIPPED);
+                    });
 
     int syncsCompleted = 0;
     final int totalSyncsToComplete = totalSyncsToComplete(assignedPrincipalRoleSyncPlan);
@@ -252,10 +272,12 @@ public class PolarisSynchronizer {
         target.assignPrincipalRole(principalName, principalRole.getName());
         clientLogger.info("Assigned principal-role {} to principal {}. - {}/{}",
                 principalRole.getName(), principalName, ++syncsCompleted, totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error("Failed to assign principal-role {} to principal {}. - {}/{}",
                 principalRole.getName(), principalName, ++syncsCompleted, totalSyncsToComplete);
+        report.recordFailure(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, principalRole.getName(), e);
       }
     }
 
@@ -264,10 +286,12 @@ public class PolarisSynchronizer {
         target.assignPrincipalRole(principalName, principalRole.getName());
         clientLogger.info("Assigned principal-role {} to principal {}. - {}/{}",
                 principalRole.getName(), principalName, ++syncsCompleted, totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error("Failed to assign principal-role {} to principal {}. - {}/{}",
                 principalRole.getName(), principalName, ++syncsCompleted, totalSyncsToComplete);
+        report.recordFailure(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, principalRole.getName(), e);
       }
     }
 
@@ -276,10 +300,12 @@ public class PolarisSynchronizer {
         target.revokePrincipalRole(principalName, principalRole.getName());
         clientLogger.info("Revoked principal-role {} from principal {}. - {}/{}",
                 principalRole.getName(), principalName, ++syncsCompleted, totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error("Failed to revoke principal-role {} to principal {}. - {}/{}",
                 principalRole.getName(), principalName, ++syncsCompleted, totalSyncsToComplete);
+        report.recordFailure(EntityType.PRINCIPAL_ROLE_ASSIGNMENT, principalRole.getName(), e);
       }
     }
   }
@@ -314,16 +340,20 @@ public class PolarisSynchronizer {
     principalRoleSyncPlan
         .entitiesToSkip()
         .forEach(
-            principalRole ->
-                clientLogger.info("Skipping principal-role {}.", principalRole.getName()));
+            principalRole -> {
+                clientLogger.info("Skipping principal-role {}.", principalRole.getName());
+                report.recordSuccess(EntityType.PRINCIPAL_ROLE, SyncOutcome.SKIPPED);
+            });
 
     principalRoleSyncPlan
         .entitiesNotModified()
         .forEach(
-            principalRole ->
+            principalRole -> {
                 clientLogger.info(
                     "No change detected for principal-role {}, skipping.",
-                    principalRole.getName()));
+                    principalRole.getName());
+                report.recordSuccess(EntityType.PRINCIPAL_ROLE, SyncOutcome.SKIPPED);
+            });
 
     int syncsCompleted = 0;
     final int totalSyncsToComplete = totalSyncsToComplete(principalRoleSyncPlan);
@@ -336,6 +366,7 @@ public class PolarisSynchronizer {
             principalRole.getName(),
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL_ROLE, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -344,6 +375,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.PRINCIPAL_ROLE, principalRole.getName(), e);
       }
     }
 
@@ -356,6 +388,7 @@ public class PolarisSynchronizer {
             principalRole.getName(),
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL_ROLE, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -364,6 +397,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.PRINCIPAL_ROLE, principalRole.getName(), e);
       }
     }
 
@@ -375,6 +409,7 @@ public class PolarisSynchronizer {
             principalRole.getName(),
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.PRINCIPAL_ROLE, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -383,6 +418,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.PRINCIPAL_ROLE, principalRole.getName(), e);
       }
     }
   }
@@ -441,22 +477,26 @@ public class PolarisSynchronizer {
     assignedPrincipalRoleSyncPlan
         .entitiesToSkip()
         .forEach(
-            principalRole ->
+            principalRole -> {
                 clientLogger.info(
                     "Skipping assignment of principal-role {} to catalog-role {} in catalog {}.",
                     principalRole.getName(),
                     catalogRoleName,
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.CATALOG_ROLE_ASSIGNMENT, SyncOutcome.SKIPPED);
+            });
 
     assignedPrincipalRoleSyncPlan
         .entitiesNotModified()
         .forEach(
-            principalRole ->
+            principalRole -> {
                 clientLogger.info(
                     "Principal-role {} is already assigned to catalog-role {} in catalog {}. Skipping.",
                     principalRole.getName(),
                     catalogRoleName,
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.CATALOG_ROLE_ASSIGNMENT, SyncOutcome.SKIPPED);
+            });
 
     int syncsCompleted = 0;
     int totalSyncsToComplete = totalSyncsToComplete(assignedPrincipalRoleSyncPlan);
@@ -472,6 +512,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG_ROLE_ASSIGNMENT, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -482,6 +523,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG_ROLE_ASSIGNMENT, principalRole.getName(), e);
       }
     }
 
@@ -496,6 +538,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG_ROLE_ASSIGNMENT, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -506,6 +549,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG_ROLE_ASSIGNMENT, principalRole.getName(), e);
       }
     }
 
@@ -520,6 +564,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG_ROLE_ASSIGNMENT, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -530,6 +575,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG_ROLE_ASSIGNMENT, principalRole.getName(), e);
       }
     }
   }
@@ -563,21 +609,28 @@ public class PolarisSynchronizer {
 
     catalogSyncPlan
         .entitiesToSkip()
-        .forEach(catalog -> clientLogger.info("Skipping catalog {}.", catalog.getName()));
+        .forEach(catalog -> {
+            clientLogger.info("Skipping catalog {}.", catalog.getName());
+            report.recordSuccess(EntityType.CATALOG, SyncOutcome.SKIPPED);
+        });
 
     catalogSyncPlan
         .entitiesToSkipAndSkipChildren()
         .forEach(
-            catalog ->
+            catalog -> {
                 clientLogger.info(
-                    "Skipping catalog {} and all child entities.", catalog.getName()));
+                    "Skipping catalog {} and all child entities.", catalog.getName());
+                report.recordSuccess(EntityType.CATALOG, SyncOutcome.SKIPPED);
+            });
 
     catalogSyncPlan
         .entitiesNotModified()
         .forEach(
-            catalog ->
+            catalog -> {
                 clientLogger.info(
-                    "No change detected in catalog {}. Skipping.", catalog.getName()));
+                    "No change detected in catalog {}. Skipping.", catalog.getName());
+                report.recordSuccess(EntityType.CATALOG, SyncOutcome.SKIPPED);
+            });
 
     int syncsCompleted = 0;
     int totalSyncsToComplete = totalSyncsToComplete(catalogSyncPlan);
@@ -590,6 +643,7 @@ public class PolarisSynchronizer {
             catalog.getName(),
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -598,6 +652,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG, catalog.getName(), e);
       }
     }
 
@@ -610,6 +665,7 @@ public class PolarisSynchronizer {
             catalog.getName(),
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -618,6 +674,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG, catalog.getName(), e);
       }
     }
 
@@ -629,6 +686,7 @@ public class PolarisSynchronizer {
             catalog.getName(),
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -637,6 +695,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG, catalog.getName(), e);
       }
     }
 
@@ -720,27 +779,33 @@ public class PolarisSynchronizer {
     catalogRoleSyncPlan
         .entitiesToSkip()
         .forEach(
-            catalogRole ->
+            catalogRole -> {
                 clientLogger.info(
-                    "Skipping catalog-role {} in catalog {}.", catalogRole.getName(), catalogName));
+                    "Skipping catalog-role {} in catalog {}.", catalogRole.getName(), catalogName);
+                report.recordSuccess(EntityType.CATALOG_ROLE, SyncOutcome.SKIPPED);
+            });
 
     catalogRoleSyncPlan
         .entitiesToSkipAndSkipChildren()
         .forEach(
-            catalogRole ->
+            catalogRole -> {
                 clientLogger.info(
                     "Skipping catalog-role {} in catalog {} and all child entities.",
                     catalogRole.getName(),
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.CATALOG_ROLE, SyncOutcome.SKIPPED);
+            });
 
     catalogRoleSyncPlan
         .entitiesNotModified()
         .forEach(
-            catalogRole ->
+            catalogRole -> {
                 clientLogger.info(
                     "No change detected in catalog-role {} in catalog {}. Skipping.",
                     catalogRole.getName(),
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.CATALOG_ROLE, SyncOutcome.SKIPPED);
+            });
 
     int syncsCompleted = 0;
     int totalSyncsToComplete = totalSyncsToComplete(catalogRoleSyncPlan);
@@ -754,6 +819,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG_ROLE, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -763,6 +829,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG_ROLE, catalogRole.getName(), e);
       }
     }
 
@@ -776,6 +843,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG_ROLE, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -785,6 +853,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG_ROLE, catalogRole.getName(), e);
       }
     }
 
@@ -797,6 +866,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.CATALOG_ROLE, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -806,6 +876,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.CATALOG_ROLE, catalogRole.getName(), e);
       }
     }
 
@@ -866,22 +937,26 @@ public class PolarisSynchronizer {
     grantSyncPlan
         .entitiesToSkip()
         .forEach(
-            grant ->
+            grant -> {
                 clientLogger.info(
                     "Skipping addition of grant {} to catalog-role {} in catalog {}.",
                     grant.getType(),
                     catalogRoleName,
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.GRANT, SyncOutcome.SKIPPED);
+            });
 
     grantSyncPlan
         .entitiesNotModified()
         .forEach(
-            grant ->
+            grant -> {
                 clientLogger.info(
                     "Grant {} was already added to catalog-role {} in catalog {}. Skipping.",
                     grant.getType(),
                     catalogRoleName,
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.GRANT, SyncOutcome.SKIPPED);
+            });
 
     int syncsCompleted = 0;
     int totalSyncsToComplete = totalSyncsToComplete(grantSyncPlan);
@@ -896,6 +971,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.GRANT, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -906,6 +982,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.GRANT, grant.getType().toString(), e);
       }
     }
 
@@ -919,6 +996,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.GRANT, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -929,6 +1007,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.GRANT, grant.getType().toString(), e);
       }
     }
 
@@ -942,6 +1021,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.GRANT, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -952,6 +1032,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.GRANT, grant.getType().toString(), e);
       }
     }
   }
@@ -1017,12 +1098,14 @@ public class PolarisSynchronizer {
     namespaceSynchronizationPlan
         .entitiesNotModified()
         .forEach(
-            namespace ->
+            namespace -> {
                 clientLogger.info(
                     "No change detected for namespace {} in namespace {} for catalog {}, skipping.",
                     namespace,
                     parentNamespace,
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.NAMESPACE, SyncOutcome.SKIPPED);
+            });
 
     for (Namespace namespace : namespaceSynchronizationPlan.entitiesToCreate()) {
       try {
@@ -1035,6 +1118,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.NAMESPACE, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -1045,6 +1129,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.NAMESPACE, namespace.toString(), e);
       }
     }
 
@@ -1069,6 +1154,7 @@ public class PolarisSynchronizer {
                     catalogName,
                     ++syncsCompleted,
                     totalSyncsToComplete);
+            report.recordSuccess(EntityType.NAMESPACE, SyncOutcome.SKIPPED);
             continue;
           }
         }
@@ -1082,6 +1168,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.NAMESPACE, SyncOutcome.OVERWRITTEN);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -1092,6 +1179,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.NAMESPACE, namespace.toString(), e);
       }
     }
 
@@ -1105,6 +1193,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.NAMESPACE, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -1115,6 +1204,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.NAMESPACE, namespace.toString(), e);
       }
     }
 
@@ -1181,12 +1271,14 @@ public class PolarisSynchronizer {
     tableSyncPlan
         .entitiesToSkip()
         .forEach(
-            tableId ->
+            tableId -> {
                 clientLogger.info(
                     "Skipping table {} in namespace {} in catalog {}.",
                     tableId,
                     namespace,
-                    catalogName));
+                    catalogName);
+                report.recordSuccess(EntityType.TABLE, SyncOutcome.SKIPPED);
+            });
 
     int syncsCompleted = 0;
     int totalSyncsToComplete = totalSyncsToComplete(tableSyncPlan);
@@ -1213,6 +1305,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.TABLE, SyncOutcome.CREATED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -1223,6 +1316,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.TABLE, tableId.toString(), e);
       }
     }
 
@@ -1256,6 +1350,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.TABLE, SyncOutcome.OVERWRITTEN);
       } catch (MetadataNotModifiedException e) {
         clientLogger.info(
             "Table {} in namespace {} in catalog {} with was not modified, not overwriting in target catalog. - {}/{}",
@@ -1264,6 +1359,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.TABLE, SyncOutcome.SKIPPED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.error(
@@ -1274,6 +1370,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.TABLE, tableId.toString(), e);
       }
     }
 
@@ -1287,6 +1384,7 @@ public class PolarisSynchronizer {
             catalogName,
             ++syncsCompleted,
             totalSyncsToComplete);
+        report.recordSuccess(EntityType.TABLE, SyncOutcome.REMOVED);
       } catch (Exception e) {
         if (haltOnFailure) throw e;
         clientLogger.info(
@@ -1297,6 +1395,7 @@ public class PolarisSynchronizer {
             ++syncsCompleted,
             totalSyncsToComplete,
             e);
+        report.recordFailure(EntityType.TABLE, table.toString(), e);
       }
     }
   }
