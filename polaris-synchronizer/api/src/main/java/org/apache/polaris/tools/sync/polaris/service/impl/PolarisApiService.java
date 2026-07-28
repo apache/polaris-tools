@@ -83,8 +83,15 @@ public class PolarisApiService implements PolarisService {
 
         this.authenticationSession = new AuthenticationSessionWrapper(properties);
 
-        client.setRequestInterceptor(requestBuilder
-                -> authenticationSession.getSessionHeaders().forEach(requestBuilder::header));
+        String realm = properties.get("realm");
+        String realmHeaderName = properties.getOrDefault("realm-header-name", "Polaris-Realm");
+
+        client.setRequestInterceptor(requestBuilder -> {
+            authenticationSession.getSessionHeaders().forEach(requestBuilder::header);
+            if (realm != null) {
+                requestBuilder.header(realmHeaderName, realm);
+            }
+        });
 
         this.baseUrl = baseUrl;
         this.api = new PolarisManagementDefaultApi(client);
