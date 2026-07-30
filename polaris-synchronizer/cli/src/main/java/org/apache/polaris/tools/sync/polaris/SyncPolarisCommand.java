@@ -113,6 +113,16 @@ public class SyncPolarisCommand implements Callable<Integer> {
   private boolean skipIcebergContent;
 
   @CommandLine.Option(
+          names = {"--skip-catalog-sync"},
+          description = "Skip creation, overwrite, and removal of catalogs themselves. Catalog-roles and grants " +
+                  "will still be synchronized for catalogs that already exist on the target. Catalogs that only " +
+                  "exist on the source will be skipped entirely, since there is no matching catalog on the target " +
+                  "to synchronize catalog-roles and grants against. Useful for disaster-recovery setups where " +
+                  "target catalogs are pre-created with different storage locations than the source."
+  )
+  private boolean skipCatalogSync;
+
+  @CommandLine.Option(
           names = {"--strategy"},
           defaultValue = "CREATE_ONLY",
           description = "The synchronization strategy to use. Options: " +
@@ -164,7 +174,8 @@ public class SyncPolarisCommand implements Callable<Integer> {
                       etagManager,
                       diffOnly,
                       report,
-                      skipIcebergContent);
+                      skipIcebergContent,
+                      skipCatalogSync);
       synchronizer.syncPrincipalRoles();
       if (shouldSyncPrincipals) {
         consoleLog.warn("Principal migration will reset credentials on the target Polaris instance. " +

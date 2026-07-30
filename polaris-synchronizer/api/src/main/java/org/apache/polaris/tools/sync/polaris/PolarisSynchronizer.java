@@ -68,6 +68,7 @@ public class PolarisSynchronizer {
 
   private final SynchronizationReport report;
   private final boolean skipIcebergContent;
+  private final boolean skipCatalogSync;
 
   public PolarisSynchronizer(
       Logger clientLogger,
@@ -78,7 +79,8 @@ public class PolarisSynchronizer {
       ETagManager etagManager,
       boolean diffOnly,
       SynchronizationReport report,
-      boolean skipIcebergContent) {
+      boolean skipIcebergContent,
+      boolean skipCatalogSync) {
     this.clientLogger =
         clientLogger == null ? LoggerFactory.getLogger(PolarisSynchronizer.class) : clientLogger;
     this.haltOnFailure = haltOnFailure;
@@ -89,6 +91,7 @@ public class PolarisSynchronizer {
     this.diffOnly = diffOnly;
     this.report = report;
     this.skipIcebergContent = skipIcebergContent;
+    this.skipCatalogSync = skipCatalogSync;
   }
 
   /**
@@ -632,7 +635,19 @@ public class PolarisSynchronizer {
     int syncsCompleted = 0;
     int totalSyncsToComplete = totalSyncsToComplete(catalogSyncPlan);
 
+    Set<String> catalogNamesSkippedFromChildSync = new HashSet<>();
+
     for (Catalog catalog : catalogSyncPlan.entitiesToCreate()) {
+      if (skipCatalogSync) {
+        clientLogger.warn(
+            "Skipping creation of catalog {} because catalog synchronization is disabled. It does "
+                + "not exist on the target, so its catalog-roles and grants will not be synced either.",
+            catalog.getName());
+        report.recordSuccess(EntityType.CATALOG, SyncOutcome.SKIPPED);
+        catalogNamesSkippedFromChildSync.add(catalog.getName());
+        continue;
+      }
+
       try {
         target.createCatalog(catalog);
         clientLogger.info(
@@ -654,6 +669,15 @@ public class PolarisSynchronizer {
     }
 
     for (Catalog catalog : catalogSyncPlan.entitiesToOverwrite()) {
+      if (skipCatalogSync) {
+        clientLogger.info(
+            "Skipping overwrite of catalog {} because catalog synchronization is disabled. "
+                + "Catalog-roles and grants will still be synced against the existing target catalog.",
+            catalog.getName());
+        report.recordSuccess(EntityType.CATALOG, SyncOutcome.SKIPPED);
+        continue;
+      }
+
       try {
         target.dropCatalogCascade(catalog.getName());
         target.createCatalog(catalog);
@@ -676,6 +700,14 @@ public class PolarisSynchronizer {
     }
 
     for (Catalog catalog : catalogSyncPlan.entitiesToRemove()) {
+      if (skipCatalogSync) {
+        clientLogger.info(
+            "Skipping removal of catalog {} because catalog synchronization is disabled.",
+            catalog.getName());
+        report.recordSuccess(EntityType.CATALOG, SyncOutcome.SKIPPED);
+        continue;
+      }
+
       try {
         target.dropCatalogCascade(catalog.getName());
         clientLogger.info(
@@ -697,6 +729,9 @@ public class PolarisSynchronizer {
     }
 
     for (Catalog catalog : catalogSyncPlan.entitiesToSyncChildren()) {
+      if (catalogNamesSkippedFromChildSync.contains(catalog.getName())) {
+        continue;
+      }
 
       if (skipIcebergContent) {
         clientLogger.info(
