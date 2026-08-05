@@ -57,6 +57,7 @@ public class PolarisContainer extends GenericContainer<PolarisContainer> {
     Preconditions.checkArgument(hostDirectory != null, "host directory is null");
     this.hostDirectory = hostDirectory;
     this.withFileSystemBind(hostDirectory, hostDirectory, BindMode.READ_WRITE);
+    this.withStartupAttempts(5);
     Wait.forHttp("/").forStatusCode(200);
     this.withExposedPorts(POLARIS_PORT).withEnv("JAVA_TOOL_OPTIONS", "-Duser.dir=" + hostDirectory);
   }

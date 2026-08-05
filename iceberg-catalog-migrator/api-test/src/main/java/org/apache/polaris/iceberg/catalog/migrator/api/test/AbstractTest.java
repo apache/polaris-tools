@@ -30,6 +30,7 @@ import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.types.Types;
 import org.junit.jupiter.api.AfterAll;
@@ -46,6 +47,10 @@ public abstract class AbstractTest {
   public static final TableIdentifier FOO_TBL2 = TableIdentifier.of(FOO, "tbl2");
   public static final TableIdentifier BAR_TBL3 = TableIdentifier.of(BAR, "tbl3");
   public static final TableIdentifier BAR_TBL4 = TableIdentifier.of(BAR, "tbl4");
+
+  public static final TableIdentifier FOO_VIEW1 = TableIdentifier.of(FOO, "view1");
+  public static final TableIdentifier FOO_VIEW2 = TableIdentifier.of(FOO, "view2");
+  public static final TableIdentifier BAR_VIEW3 = TableIdentifier.of(BAR, "view3");
 
   private static final List<Namespace> defaultNamespaceList = Arrays.asList(FOO, BAR, DB1);
 
@@ -108,13 +113,18 @@ public abstract class AbstractTest {
   }
 
   protected static void dropNamespaces() {
-    Stream.of(sourceCatalog, targetCatalog)
-        .map(catalog -> (SupportsNamespaces) catalog)
-        .forEach(
-            catalog ->
-                defaultNamespaceList.stream()
-                    .filter(catalog::namespaceExists)
-                    .forEach(catalog::dropNamespace));
+    Stream.of(sourceCatalog, targetCatalog).forEach(AbstractTest::dropNamespaces);
+  }
+
+  protected static void dropSourceNamespaces() {
+    dropNamespaces(sourceCatalog);
+  }
+
+  private static void dropNamespaces(Catalog catalog) {
+    SupportsNamespaces namespaces = (SupportsNamespaces) catalog;
+    defaultNamespaceList.stream()
+        .filter(namespaces::namespaceExists)
+        .forEach(namespaces::dropNamespace);
   }
 
   protected static void createTables() {
@@ -126,14 +136,70 @@ public abstract class AbstractTest {
     sourceCatalog.createTable(BAR_TBL4, schema);
   }
 
+  protected static void createView() {
+    createView(FOO_VIEW1, "select * from foo.tbl1");
+  }
+
+  protected static void createViews() {
+    createView(FOO_VIEW2, "select * from foo.tbl2");
+    createView(BAR_VIEW3, "select * from bar.tbl3");
+  }
+
+  protected static void createView(TableIdentifier identifier, String sql) {
+    if (sourceCatalog instanceof ViewCatalog viewCatalog) {
+      SupportsNamespaces namespaces = (SupportsNamespaces) sourceCatalog;
+      if (!namespaces.namespaceExists(identifier.namespace())) {
+        namespaces.createNamespace(identifier.namespace());
+      }
+      viewCatalog
+          .buildView(identifier)
+          .withSchema(schema)
+          .withDefaultNamespace(identifier.namespace())
+          .withDefaultCatalog(sourceCatalog.name())
+          .withQuery("spark", sql)
+          .withProperty("prop1", "val1")
+          .create();
+    }
+  }
+
   protected static void dropTables() {
-    Stream.of(sourceCatalog, targetCatalog)
+    dropTables(targetCatalog, false);
+    dropTables(sourceCatalog, true);
+  }
+
+  private static void dropTables(Catalog catalog, boolean purge) {
+    defaultNamespaceList.stream()
+        .filter(namespace -> ((SupportsNamespaces) catalog).namespaceExists(namespace))
         .forEach(
-            catalog ->
-                defaultNamespaceList.stream()
-                    .filter(namespace -> ((SupportsNamespaces) catalog).namespaceExists(namespace))
-                    .forEach(
-                        namespace -> catalog.listTables(namespace).forEach(catalog::dropTable)));
+            namespace ->
+                catalog
+                    .listTables(namespace)
+                    .forEach(identifier -> catalog.dropTable(identifier, purge)));
+  }
+
+  protected static void dropViews() {
+    dropViews(targetCatalog);
+    dropViews(sourceCatalog);
+  }
+
+  private static void dropViews(Catalog catalog) {
+    if (catalog instanceof ViewCatalog viewCatalog) {
+      defaultNamespaceList.stream()
+          .filter(namespace -> ((SupportsNamespaces) catalog).namespaceExists(namespace))
+          .forEach(
+              namespace ->
+                  viewCatalog
+                      .listViews(namespace)
+                      .forEach(identifier -> dropViewIfPresent(viewCatalog, identifier)));
+    }
+  }
+
+  private static void dropViewIfPresent(ViewCatalog viewCatalog, TableIdentifier identifier) {
+    try {
+      viewCatalog.dropView(identifier);
+    } catch (RuntimeException e) {
+      // Best-effort cleanup between tests.
+    }
   }
 
   protected static Map<String, String> nessieCatalogProperties(boolean isSourceCatalog) {

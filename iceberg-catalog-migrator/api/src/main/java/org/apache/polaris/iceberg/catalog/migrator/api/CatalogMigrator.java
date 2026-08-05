@@ -34,9 +34,12 @@ import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.iceberg.exceptions.AlreadyExistsException;
 import org.apache.iceberg.exceptions.NoSuchNamespaceException;
 import org.apache.iceberg.hadoop.HadoopCatalog;
+import org.apache.iceberg.view.BaseView;
+import org.apache.iceberg.view.ViewOperations;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +137,55 @@ public abstract class CatalogMigrator {
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
+  public Set<TableIdentifier> getMatchingViewIdentifiers(String identifierRegex) {
+    LOG.info("Collecting all the namespaces from source catalog...");
+    Set<Namespace> namespaces = new LinkedHashSet<>();
+    getAllNamespacesFromSourceCatalog(Namespace.empty(), namespaces);
+
+    return getMatchingViewIdentifiers(identifierRegex, namespaces);
+  }
+
+  private Set<TableIdentifier> getMatchingViewIdentifiers(
+      String identifierRegex, Set<Namespace> namespaces) {
+
+    if (!(sourceCatalog() instanceof ViewCatalog)) {
+      return new LinkedHashSet<>();
+    }
+
+    Predicate<TableIdentifier> matchedIdentifiersPredicate;
+    if (identifierRegex == null) {
+      LOG.info("Collecting all the views from all the namespaces of source catalog...");
+      matchedIdentifiersPredicate = tableIdentifier -> true;
+    } else {
+      LOG.info(
+          "Collecting all the views from all the namespaces of source catalog"
+              + " which matches the regex pattern:{}",
+          identifierRegex);
+      Pattern pattern = Pattern.compile(identifierRegex);
+      matchedIdentifiersPredicate =
+          tableIdentifier -> pattern.matcher(tableIdentifier.toString()).matches();
+    }
+    return namespaces.stream()
+        .flatMap(
+            namespace -> {
+              try {
+                return ((ViewCatalog) sourceCatalog())
+                    .listViews(namespace).stream().filter(matchedIdentifiersPredicate);
+              } catch (IllegalArgumentException | NoSuchNamespaceException exception) {
+                if (namespace.isEmpty()) {
+                  // some catalogs don't support empty namespace.
+                  // Hence, just log the warning and ignore the exception.
+                  LOG.warn(
+                      "Failed to identify views from empty namespace : {}", exception.getMessage());
+                  return Stream.empty();
+                } else {
+                  throw exception;
+                }
+              }
+            })
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+  }
+
   /**
    * Register or Migrate a single table from one catalog(source catalog) to another catalog(target
    * catalog).
@@ -167,6 +219,41 @@ public abstract class CatalogMigrator {
       } else {
         LOG.error(
             "Failed to delete the table after migration {} : {}",
+            identifier,
+            exception.getMessage());
+      }
+    }
+    return this;
+  }
+
+  public CatalogMigrator migrateView(TableIdentifier identifier) {
+    Preconditions.checkArgument(identifier != null, "Identifier is null");
+    Preconditions.checkState(
+        deleteEntriesFromSourceCatalog(),
+        "Registering views is unsupported. Use migrate to migrate views.");
+    Preconditions.checkState(
+        sourceCatalog() instanceof ViewCatalog, "source catalog doesn't support views");
+    Preconditions.checkState(
+        targetCatalog() instanceof ViewCatalog, "target catalog doesn't support views");
+
+    boolean isRegistered = registerViewToTargetCatalog(identifier);
+    if (isRegistered) {
+      resultBuilder.addRegisteredViewIdentifiers(identifier);
+    } else {
+      resultBuilder.addFailedToRegisterViewIdentifiers(identifier);
+    }
+
+    try {
+      if (isRegistered && !((ViewCatalog) sourceCatalog()).dropView(identifier)) {
+        resultBuilder.addFailedToDeleteViewIdentifiers(identifier);
+      }
+    } catch (Exception exception) {
+      resultBuilder.addFailedToDeleteViewIdentifiers(identifier);
+      if (enableStacktrace()) {
+        LOG.error("Failed to delete the view after migration {}", identifier, exception);
+      } else {
+        LOG.error(
+            "Failed to delete the view after migration {} : {}",
             identifier,
             exception.getMessage());
       }
@@ -221,6 +308,30 @@ public abstract class CatalogMigrator {
         LOG.error("Unable to register the table {}", tableIdentifier, ex);
       } else {
         LOG.error("Unable to register the table {} : {}", tableIdentifier, ex.getMessage());
+      }
+      return false;
+    }
+  }
+
+  private String currentViewMetadataFileLocation(TableIdentifier identifier) {
+    ViewOperations ops =
+        ((BaseView) ((ViewCatalog) sourceCatalog()).loadView(identifier)).operations();
+    return ops.current().metadataFileLocation();
+  }
+
+  private boolean registerViewToTargetCatalog(TableIdentifier identifier) {
+    try {
+      createNamespacesIfNotExistOnTargetCatalog(identifier.namespace());
+      // register the view to the target catalog
+      String metadataFileLocation = currentViewMetadataFileLocation(identifier);
+      ((ViewCatalog) targetCatalog()).registerView(identifier, metadataFileLocation);
+      LOG.info("Successfully registered the view {}", identifier);
+      return true;
+    } catch (Exception ex) {
+      if (enableStacktrace()) {
+        LOG.error("Unable to register the view {}", identifier, ex);
+      } else {
+        LOG.error("Unable to register the view {} : {}", identifier, ex.getMessage());
       }
       return false;
     }

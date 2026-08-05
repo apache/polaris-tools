@@ -32,13 +32,17 @@ import java.util.Map;
 import nl.altindag.log.LogCaptor;
 import nl.altindag.log.model.LogEvent;
 import org.apache.iceberg.catalog.Catalog;
+import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.iceberg.exceptions.NoSuchTableException;
+import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrator;
 import org.apache.polaris.iceberg.catalog.migrator.api.test.AbstractTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -109,11 +113,14 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
 
   @BeforeEach
   protected void beforeEach() {
+    dropViews();
+    dropTables();
     createTables();
   }
 
   @AfterEach
   protected void afterEach() {
+    dropViews();
     dropTables();
   }
 
@@ -164,6 +171,73 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
       Assertions.assertThat(sourceCatalog.listTables(BAR))
           .containsExactlyInAnyOrder(BAR_TBL3, BAR_TBL4);
     }
+  }
+
+  @Test
+  public void testMigrateSelectedViews() throws Exception {
+    Assumptions.assumeTrue(
+        supportsViewMigration(), "source and target catalogs must support views");
+
+    createView();
+
+    List<String> argsList = defaultArgs();
+    argsList.addAll(Arrays.asList("--view-identifiers", FOO_VIEW1.toString()));
+    RunCLI run = runCLI(true, argsList);
+
+    Assertions.assertThat(run.getExitCode()).isEqualTo(0);
+    Assertions.assertThat(run.getOut())
+        .doesNotContain("Identified 4 tables for migration.")
+        .contains("Identified 1 views for migration.")
+        .contains(
+            String.format(
+                "Summary: %nSuccessfully migrated 1 views from %s catalog to %s catalog.",
+                sourceCatalogType, targetCatalogType))
+        .contains(String.format("Details: %nSuccessfully migrated these views:%n[%s]", FOO_VIEW1));
+
+    Assertions.assertThat(targetCatalog.listTables(FOO)).isEmpty();
+    Assertions.assertThat(targetCatalog.listTables(BAR)).isEmpty();
+    Assertions.assertThat(((ViewCatalog) targetCatalog).listViews(FOO)).contains(FOO_VIEW1);
+
+    Assertions.assertThat(sourceCatalog.listTables(FOO))
+        .containsExactlyInAnyOrder(FOO_TBL1, FOO_TBL2);
+    Assertions.assertThat(sourceCatalog.listTables(BAR))
+        .containsExactlyInAnyOrder(BAR_TBL3, BAR_TBL4);
+    Assertions.assertThat(((ViewCatalog) sourceCatalog).listViews(FOO)).isEmpty();
+  }
+
+  @Test
+  public void testMigrateAllTablesAndViews() throws Exception {
+    Assumptions.assumeTrue(
+        supportsViewMigration(), "source and target catalogs must support views");
+
+    createViews();
+
+    RunCLI run = runCLI(true, defaultArgs());
+
+    Assertions.assertThat(run.getExitCode()).isEqualTo(0);
+    Assertions.assertThat(run.getOut())
+        .contains("Identified 4 tables for migration.")
+        .contains("Identified 2 views for migration.")
+        .contains(
+            String.format(
+                "Summary: %n"
+                    + "Successfully migrated 4 tables from %s catalog to %s catalog.%n"
+                    + "Successfully migrated 2 views from %s catalog to %s catalog.",
+                sourceCatalogType, targetCatalogType, sourceCatalogType, targetCatalogType))
+        .contains(String.format("Details: %nSuccessfully migrated these tables:%n"))
+        .contains(String.format("Successfully migrated these views:%n"));
+
+    Assertions.assertThat(targetCatalog.listTables(FOO))
+        .containsExactlyInAnyOrder(FOO_TBL1, FOO_TBL2);
+    Assertions.assertThat(targetCatalog.listTables(BAR))
+        .containsExactlyInAnyOrder(BAR_TBL3, BAR_TBL4);
+    Assertions.assertThat(((ViewCatalog) targetCatalog).listViews(FOO)).contains(FOO_VIEW2);
+    Assertions.assertThat(((ViewCatalog) targetCatalog).listViews(BAR)).containsExactly(BAR_VIEW3);
+
+    Assertions.assertThat(sourceCatalog.listTables(FOO)).isEmpty();
+    Assertions.assertThat(sourceCatalog.listTables(BAR)).isEmpty();
+    Assertions.assertThat(((ViewCatalog) sourceCatalog).listViews(FOO)).isEmpty();
+    Assertions.assertThat(((ViewCatalog) sourceCatalog).listViews(BAR)).isEmpty();
   }
 
   @ParameterizedTest
@@ -385,8 +459,9 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
   public void testRegisterNoTables(boolean deleteSourceTables) throws Exception {
     validateAssumptionForHadoopCatalogAsSource(deleteSourceTables);
 
-    // clean up the default tables present in the source catalog.
+    // clean up the default tables and views present in the source catalog.
     dropTables();
+    dropViews();
 
     RunCLI run = runCLI(deleteSourceTables, defaultArgs());
 
@@ -482,5 +557,13 @@ public abstract class AbstractCLIMigrationTest extends AbstractTest {
       argsList.add(0, "migrate");
     }
     return RunCLI.run(argsList.toArray(new String[0]));
+  }
+
+  private static boolean supportsViewMigration() {
+    // Hive view migration is skipped until Iceberg's Hive view metadata lookup is reliable here.
+    // Revisit after https://github.com/apache/iceberg/pull/17532 is available.
+    return sourceCatalog instanceof ViewCatalog
+        && targetCatalog instanceof ViewCatalog
+        && !(sourceCatalog instanceof HiveCatalog);
   }
 }

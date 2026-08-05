@@ -25,6 +25,8 @@ import java.util.Map;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 
 public class ITHadoopToPolarisCLIMigrationTest extends AbstractCLIMigrationTest {
 
@@ -32,13 +34,38 @@ public class ITHadoopToPolarisCLIMigrationTest extends AbstractCLIMigrationTest 
 
   @BeforeAll
   protected static void setup() throws Exception {
+    restartPolarisContainer();
+    initializeSourceCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
+  }
+
+  @Override
+  protected void beforeEach() {
+    // Replaced by the TestInfo-aware setup below.
+  }
+
+  @BeforeEach
+  protected void beforeEach(TestInfo testInfo) {
+    if (requiresEmptyTargetCatalog(testInfo)) {
+      restartPolarisContainer();
+    }
+    dropViews();
+    dropTables();
+    createTables();
+  }
+
+  private static void restartPolarisContainer() {
+    if (polarisContainer != null) {
+      polarisContainer.stop();
+    }
     polarisContainer = new PolarisContainer(sourceCatalogWarehouse);
     polarisContainer.start();
 
-    assertThat(polarisContainer.httpGet("/api/management/v1/catalogs"))
-        .contains(PolarisContainer.CATALOG_NAME);
-
-    initializeSourceCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
+    try {
+      assertThat(polarisContainer.httpGet("/api/management/v1/catalogs"))
+          .contains(PolarisContainer.CATALOG_NAME);
+    } catch (Exception e) {
+      throw new AssertionError("Error listing Polaris catalogs", e);
+    }
 
     initializeTargetCatalog(
         CatalogMigrationUtil.CatalogType.REST,
@@ -50,6 +77,17 @@ public class ITHadoopToPolarisCLIMigrationTest extends AbstractCLIMigrationTest 
             "token",
             polarisContainer.getAccessToken(
                 polarisContainer.getClientId(), polarisContainer.getClientSecret())));
+  }
+
+  private static boolean requiresEmptyTargetCatalog(TestInfo testInfo) {
+    return testInfo
+        .getTestMethod()
+        .map(
+            method ->
+                method.getName().equals("testRegister")
+                    || method.getName().equals("testRegisterWithFewFailures")
+                    || method.getName().equals("testRegisterSelectedTables"))
+        .orElse(false);
   }
 
   @AfterAll

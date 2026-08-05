@@ -43,6 +43,7 @@ public class ProcessIdentifiersTest {
   public void testIdentifiersSet() {
     // test empty set
     Assertions.assertThat(new IdentifierOptions().processIdentifiersInput()).isEmpty();
+    Assertions.assertThat(new ViewIdentifierOptions().processIdentifiersInput()).isEmpty();
 
     // test valid elements
     IdentifierOptions identifierOptions = new IdentifierOptions();
@@ -50,6 +51,12 @@ public class ProcessIdentifiersTest {
     Assertions.assertThat(identifierOptions.processIdentifiersInput())
         .containsExactlyInAnyOrder(
             TableIdentifier.parse("foo.abc"), TableIdentifier.parse("bar.def"));
+
+    ViewIdentifierOptions viewIdentifierOptions = new ViewIdentifierOptions();
+    viewIdentifierOptions.identifiers = Sets.newHashSet("foo.view1", "bar.view2");
+    Assertions.assertThat(viewIdentifierOptions.processIdentifiersInput())
+        .containsExactlyInAnyOrder(
+            TableIdentifier.parse("foo.view1"), TableIdentifier.parse("bar.view2"));
   }
 
   @Test
@@ -115,6 +122,13 @@ public class ProcessIdentifiersTest {
     Assertions.assertThatThrownBy(options::processIdentifiersInput)
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("File specified in `--identifiers-from-file` option does not exist");
+
+    ViewIdentifierOptions viewOptions = new ViewIdentifierOptions();
+    viewOptions.identifiersFromFile = "path/to/file";
+    Assertions.assertThatThrownBy(viewOptions::processIdentifiersInput)
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining(
+            "File specified in `--view-identifiers-from-file` option does not exist");
   }
 
   @Test
@@ -135,5 +149,17 @@ public class ProcessIdentifiersTest {
     Assertions.assertThatThrownBy(options::processIdentifiersInput)
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("--identifiers-regex should not be empty");
+
+    ViewIdentifierOptions viewOptions = new ViewIdentifierOptions();
+    viewOptions.identifiersRegEx = "(23erf423!";
+    Assertions.assertThatThrownBy(viewOptions::processIdentifiersInput)
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("--view-identifiers-regex pattern is not compilable");
+
+    viewOptions = new ViewIdentifierOptions();
+    viewOptions.identifiersRegEx = "  ";
+    Assertions.assertThatThrownBy(viewOptions::processIdentifiersInput)
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("--view-identifiers-regex should not be empty");
   }
 }

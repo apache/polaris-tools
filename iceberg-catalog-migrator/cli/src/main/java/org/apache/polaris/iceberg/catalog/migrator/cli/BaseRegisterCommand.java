@@ -32,6 +32,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrationResult;
 import org.apache.polaris.iceberg.catalog.migrator.api.CatalogMigrator;
 import org.slf4j.Logger;
@@ -89,6 +90,10 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
   public static final String FAILED_IDENTIFIERS_FILE = "failed_identifiers.txt";
   public static final String FAILED_TO_DELETE_AT_SOURCE_FILE = "failed_to_delete_at_source.txt";
   public static final String DRY_RUN_FILE = "dry_run_identifiers.txt";
+  public static final String DRY_RUN_VIEW_FILE = "dry_run_view_identifiers.txt";
+  public static final String FAILED_VIEW_IDENTIFIERS_FILE = "failed_view_identifiers.txt";
+  public static final String FAILED_TO_DELETE_VIEW_AT_SOURCE_FILE =
+      "failed_to_delete_view_at_source.txt";
 
   private static final Logger consoleLog = LoggerFactory.getLogger("console-log");
 
@@ -105,15 +110,29 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
 
   protected abstract String operate();
 
+  protected ViewIdentifierOptions viewIdentifierOptions() {
+    return null;
+  }
+
   @Override
   public Integer call() {
     Set<TableIdentifier> identifiers = Collections.emptySet();
+    Set<TableIdentifier> viewIdentifiers = Collections.emptySet();
+    boolean tableSelectorSpecified = identifierOptions != null;
     String identifierRegEx = identifierOptions != null ? identifierOptions.identifiersRegEx : null;
 
     if (identifierOptions != null) {
       identifiers = identifierOptions.processIdentifiersInput();
     }
-    checkAndWarnAboutIdentifiers(identifiers, identifierRegEx);
+
+    ViewIdentifierOptions viewIdentifierOptions = viewIdentifierOptions();
+    boolean viewSelectorSpecified = viewIdentifierOptions != null;
+    String viewIdentifierRegEx =
+        viewIdentifierOptions != null ? viewIdentifierOptions.identifiersRegEx : null;
+
+    if (viewIdentifierOptions != null) {
+      viewIdentifiers = viewIdentifierOptions.processIdentifiersInput();
+    }
 
     validateOutputDir();
 
@@ -134,29 +153,73 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
       CatalogMigrator catalogMigrator =
           catalogMigrator(sourceCatalog, targetCatalog, enableStackTrace);
 
-      if (identifiers.isEmpty()) {
+      boolean isMigrate = catalogMigrator.deleteEntriesFromSourceCatalog();
+      boolean supportViewMigration =
+          sourceCatalog instanceof ViewCatalog && targetCatalog instanceof ViewCatalog;
+
+      boolean tableSelectionRequested = !viewSelectorSpecified || tableSelectorSpecified;
+      boolean viewSelectionRequested =
+          isMigrate && (!tableSelectorSpecified || viewSelectorSpecified);
+
+      if (identifiers.isEmpty() && tableSelectionRequested) {
+        checkAndWarnAboutIdentifiers(identifierRegEx, "table");
         consoleLog.info("Identifying tables for {} ...", operation());
         identifiers = catalogMigrator.getMatchingTableIdentifiers(identifierRegEx);
         if (identifiers.isEmpty()) {
           consoleLog.warn(
               "No tables were identified for {}. Please check `catalog_migration.log` file for more info.",
               operation());
-          return 1;
         }
+      }
+
+      if (viewSelectorSpecified && !isMigrate) {
+        consoleLog.error("View migration is supported only by the `migrate` command.");
+        return 1;
+      }
+
+      if (viewSelectorSpecified && !supportViewMigration) {
+        consoleLog.error(
+            "View migration is not supported because {} catalog does not support views.",
+            sourceCatalog instanceof ViewCatalog ? "target" : "source");
+        return 1;
+      }
+
+      if (supportViewMigration && viewIdentifiers.isEmpty() && viewSelectionRequested) {
+        checkAndWarnAboutIdentifiers(viewIdentifierRegEx, "view");
+        consoleLog.info("Identifying views for {} ...", operation());
+        viewIdentifiers = catalogMigrator.getMatchingViewIdentifiers(viewIdentifierRegEx);
+        if (viewIdentifiers.isEmpty()) {
+          consoleLog.warn(
+              "No views were identified for {}. Please check `catalog_migration.log` file for more info.",
+              operation());
+        }
+      }
+
+      if (identifiers.isEmpty() && viewIdentifiers.isEmpty()) {
+        String content =
+            supportViewMigration && viewSelectionRequested ? "tables or views" : "tables";
+        consoleLog.warn(
+            "No {} were identified for {}. Please check `catalog_migration.log` file for more info.",
+            content,
+            operation());
+        return 1;
       }
 
       if (isDryRun) {
         consoleLog.info("Dry run is completed.");
-        handleDryRunResult(identifiers);
+        if (tableSelectionRequested) {
+          handleDryRunResult(identifiers);
+        }
+        if (supportViewMigration && viewSelectionRequested && !viewIdentifiers.isEmpty()) {
+          handleDryRunViewResult(viewIdentifiers);
+        }
         return 0;
       }
 
-      consoleLog.info("Identified {} tables for {}.", identifiers.size(), operation());
+      if (!identifiers.isEmpty()) {
+        consoleLog.info("Identified {} tables for {}.", identifiers.size(), operation());
+        consoleLog.info("Started {} ...", operation());
 
-      consoleLog.info("Started {} ...", operation());
-
-      CatalogMigrationResult result;
-      try {
         int processedIdentifiersCount = 0;
         for (TableIdentifier identifier : identifiers) {
           catalogMigrator.registerTable(identifier);
@@ -170,15 +233,36 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
                 identifiers.size());
           }
         }
-      } finally {
-        consoleLog.info("Finished {} ...", operation());
-        result = catalogMigrator.result();
-        handleResults(result);
+        consoleLog.info("Finished {} tables ...", operation());
       }
+
+      if (!viewIdentifiers.isEmpty()) {
+        consoleLog.info("Identified {} views for {}.", viewIdentifiers.size(), operation());
+        consoleLog.info("Started {} ...", operation());
+
+        int processedViewIdentifiersCount = 0;
+        for (TableIdentifier identifier : viewIdentifiers) {
+          catalogMigrator.migrateView(identifier);
+          processedViewIdentifiersCount++;
+          if (processedViewIdentifiersCount % BATCH_SIZE == 0
+              || processedViewIdentifiersCount == viewIdentifiers.size()) {
+            consoleLog.info(
+                "Attempted {} for {} views out of {} views.",
+                operation(),
+                processedViewIdentifiersCount,
+                viewIdentifiers.size());
+          }
+        }
+        consoleLog.info("Finished {} views ...", operation());
+      }
+
+      CatalogMigrationResult result = catalogMigrator.result();
+      handleResults(result);
 
       if (!result.failedToRegisterTableIdentifiers().isEmpty()
           || !result.failedToDeleteTableIdentifiers().isEmpty()
-          || result.registeredTableIdentifiers().isEmpty()) {
+          || !result.failedToRegisterViewIdentifiers().isEmpty()
+          || !result.failedToDeleteViewIdentifiers().isEmpty()) {
         return 1;
       }
 
@@ -199,20 +283,21 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
     }
   }
 
-  private void checkAndWarnAboutIdentifiers(
-      Set<TableIdentifier> identifiers, String identifierRegEx) {
-    if (identifiers.isEmpty()) {
-      if (identifierRegEx != null) {
-        consoleLog.warn(
-            "User has not specified the table identifiers."
-                + " Will be selecting all the tables from all the namespaces from the source catalog "
-                + "which matches the regex pattern:{}",
-            identifierRegEx);
-      } else {
-        consoleLog.warn(
-            "User has not specified the table identifiers."
-                + " Will be selecting all the tables from all the namespaces from the source catalog.");
-      }
+  private void checkAndWarnAboutIdentifiers(String identifierRegEx, String content) {
+    if (identifierRegEx != null) {
+      consoleLog.warn(
+          "User has not specified the {} identifiers."
+              + " Will be selecting all the {}s from all the namespaces from the source catalog "
+              + "which matches the regex pattern:{}",
+          content,
+          content,
+          identifierRegEx);
+    } else {
+      consoleLog.warn(
+          "User has not specified the {} identifiers."
+              + " Will be selecting all the {}s from all the namespaces from the source catalog.",
+          content,
+          content);
     }
   }
 
@@ -237,6 +322,16 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
       writeToFile(
           outputDirPath.resolve(FAILED_TO_DELETE_AT_SOURCE_FILE),
           result.failedToDeleteTableIdentifiers());
+      if (!result.failedToRegisterViewIdentifiers().isEmpty()) {
+        writeToFile(
+            outputDirPath.resolve(FAILED_VIEW_IDENTIFIERS_FILE),
+            result.failedToRegisterViewIdentifiers());
+      }
+      if (!result.failedToDeleteViewIdentifiers().isEmpty()) {
+        writeToFile(
+            outputDirPath.resolve(FAILED_TO_DELETE_VIEW_AT_SOURCE_FILE),
+            result.failedToDeleteViewIdentifiers());
+      }
     } finally {
       printSummary(result);
       printDetails(result);
@@ -248,6 +343,14 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
       writeToFile(outputDirPath.resolve(DRY_RUN_FILE), identifiers);
     } finally {
       printDryRunResult(identifiers);
+    }
+  }
+
+  private void handleDryRunViewResult(Set<TableIdentifier> identifiers) {
+    try {
+      writeToFile(outputDirPath.resolve(DRY_RUN_VIEW_FILE), identifiers);
+    } finally {
+      printDryRunViewResult(identifiers);
     }
   }
 
@@ -284,6 +387,37 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
           System.lineSeparator(),
           FAILED_TO_DELETE_AT_SOURCE_FILE);
     }
+    if (!result.registeredViewIdentifiers().isEmpty()) {
+      consoleLog.info(
+          "Successfully {} {} views from {} catalog to {} catalog.",
+          operated(),
+          result.registeredViewIdentifiers().size(),
+          sourceCatalogOptions.type.name(),
+          targetCatalogOptions.type.name());
+    }
+    if (!result.failedToRegisterViewIdentifiers().isEmpty()) {
+      consoleLog.error(
+          "Failed to {} {} views from {} catalog to {} catalog. "
+              + "Please check the `catalog_migration.log` file for the failure reason. "
+              + "Failed identifiers are written into `{}`. "
+              + "Retry with that file using `--view-identifiers-from-file` option "
+              + "if the failure is because of network/connection timeouts.",
+          operate(),
+          result.failedToRegisterViewIdentifiers().size(),
+          sourceCatalogOptions.type.name(),
+          targetCatalogOptions.type.name(),
+          FAILED_VIEW_IDENTIFIERS_FILE);
+    }
+    if (!result.failedToDeleteViewIdentifiers().isEmpty()) {
+      consoleLog.error(
+          "Failed to delete {} views from {} catalog. "
+              + "Please check the `catalog_migration.log` file for the failure reason. "
+              + "{}Failed to delete identifiers are written into `{}`.",
+          result.failedToDeleteViewIdentifiers().size(),
+          sourceCatalogOptions.type.name(),
+          System.lineSeparator(),
+          FAILED_TO_DELETE_VIEW_AT_SOURCE_FILE);
+    }
   }
 
   private void printDetails(CatalogMigrationResult result) {
@@ -310,6 +444,29 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
           System.lineSeparator(),
           result.failedToDeleteTableIdentifiers());
     }
+
+    if (!result.registeredViewIdentifiers().isEmpty()) {
+      consoleLog.info(
+          "Successfully {} these views:{}{}",
+          operated(),
+          System.lineSeparator(),
+          result.registeredViewIdentifiers());
+    }
+
+    if (!result.failedToRegisterViewIdentifiers().isEmpty()) {
+      consoleLog.error(
+          "Failed to {} these views:{}{}",
+          operate(),
+          System.lineSeparator(),
+          result.failedToRegisterViewIdentifiers());
+    }
+
+    if (!result.failedToDeleteViewIdentifiers().isEmpty()) {
+      consoleLog.error(
+          "Failed to delete these views from source catalog:{}{}",
+          System.lineSeparator(),
+          result.failedToDeleteViewIdentifiers());
+    }
   }
 
   private void printDryRunResult(Set<TableIdentifier> result) {
@@ -322,6 +479,22 @@ public abstract class BaseRegisterCommand implements Callable<Integer> {
         DRY_RUN_FILE);
     consoleLog.info(
         "Details: {}Identified these tables for {} by dry-run:{}{}",
+        System.lineSeparator(),
+        operation(),
+        System.lineSeparator(),
+        result);
+  }
+
+  private void printDryRunViewResult(Set<TableIdentifier> result) {
+    consoleLog.info("Summary: ");
+    consoleLog.info(
+        "Identified {} views for {} by dry-run. These identifiers are also written into {}. "
+            + "This file can be used with `--view-identifiers-from-file` option for an actual run.",
+        result.size(),
+        operation(),
+        DRY_RUN_VIEW_FILE);
+    consoleLog.info(
+        "Details: {}Identified these views for {} by dry-run:{}{}",
         System.lineSeparator(),
         operation(),
         System.lineSeparator(),

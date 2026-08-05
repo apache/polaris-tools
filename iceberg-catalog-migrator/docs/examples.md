@@ -117,6 +117,29 @@ java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
 --identifiers-from-file ids.txt
 ```
 
+### Migrate Selected Views
+
+View migration is supported only by the `migrate` command. If no table or view selectors are
+provided, `migrate` identifies all tables and all views supported by both catalogs. Use view
+selectors when only specific views should be migrated. `--view-identifiers-from-file` and
+`--view-identifiers-regex` are also available and behave like the table selector options.
+
+| Table selector | View selector | What happens |
+|---|---|---|
+| Not specified | Not specified | Migrates **all tables** and **all views** |
+| Specified | Not specified | Migrates **selected tables only**, no views |
+| Not specified | Specified | Migrates **selected views only**, no tables |
+| Specified | Specified | Migrates **selected tables** and **selected views** |
+
+```shell
+java -jar iceberg-catalog-migrator-cli-0.0.1.jar migrate \
+--source-catalog-type REST \
+--source-catalog-properties uri=http://sourcecatalog:8181/api/catalog,warehouse=test,token=$TOKEN_SOURCE \
+--target-catalog-type REST  \
+--target-catalog-properties uri=http://targetcatalog:8181/api/catalog,warehouse=test,token=$TOKEN_TARGET \
+--view-identifiers foo.view1,foo.view2
+```
+
 
 ## Tips
 1. Before migrating tables to Polaris, make sure the catalog is configured to the `base-location` same as source catalog `warehouse` location during catalog creation.
