@@ -78,9 +78,6 @@ tasks.named<RatTask>("rat").configure {
 
     // Rat can't scan binary images
     excludes.add("**/*.png")
-
-    // ServiceLoader provider-config files are plain classnames with no comment syntax for a header
-    excludes.add("**/META-INF/services/**")
 }
 
 tasks.named<Wrapper>("wrapper") {
