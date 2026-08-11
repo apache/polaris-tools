@@ -37,6 +37,7 @@ dependencies {
   implementation("org.slf4j:log4j-over-slf4j:2.0.17")
   implementation("org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.7.1")
   implementation("org.apache.commons:commons-csv:1.13.0")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
   runtimeOnly("ch.qos.logback:logback-classic:1.5.17")
 
   testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")

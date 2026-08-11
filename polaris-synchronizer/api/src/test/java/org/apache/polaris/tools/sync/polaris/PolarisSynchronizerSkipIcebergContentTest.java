@@ -299,6 +299,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             source,
             target,
             new NoOpETagManager(),
+            null,
             false,
             new SynchronizationReport(),
             true);
@@ -324,6 +325,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             source,
             target,
             new NoOpETagManager(),
+            null,
             false,
             new SynchronizationReport(),
             false);
@@ -356,6 +358,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             source,
             target,
             new NoOpETagManager(),
+            null,
             false,
             new SynchronizationReport(),
             true);
