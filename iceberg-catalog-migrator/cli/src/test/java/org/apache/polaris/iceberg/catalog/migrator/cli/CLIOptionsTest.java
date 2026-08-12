@@ -160,6 +160,61 @@ public class CLIOptionsTest {
     executeAndValidateResults("migrate", args, expectedMessage, 2);
   }
 
+  @Test
+  public void testViewOptionsAreOnlyAcceptedForMigrate() throws Exception {
+    executeAndValidateResults(
+        "register",
+        Lists.newArrayList("--view-identifiers", "foo.view1"),
+        "Unknown options: '--view-identifiers', 'foo.view1'",
+        2);
+  }
+
+  @Test
+  public void testViewIdentifierOptionsAreMutuallyExclusiveForMigrate() throws Exception {
+    List<String> args =
+        Lists.newArrayList(
+            "--source-catalog-type",
+            "HADOOP",
+            "--source-catalog-properties",
+            "k1=v1,k2=v2",
+            "--target-catalog-type",
+            "HIVE",
+            "--target-catalog-properties",
+            "k3=v3, k4=v4",
+            "--view-identifiers",
+            "foo.view1",
+            "--view-identifiers-from-file",
+            "file.txt",
+            "--view-identifiers-regex",
+            "^foo\\.");
+    String expectedMessage =
+        "Error: --view-identifiers=<identifiers>, --view-identifiers-from-file=<identifiersFromFile>, --view-identifiers-regex=<identifiersRegEx> are mutually exclusive (specify only one)";
+
+    executeAndValidateResults("migrate", args, expectedMessage, 2);
+  }
+
+  @Test
+  public void testViewIdentifierAndRegexOptionsAreMutuallyExclusiveForMigrate() throws Exception {
+    List<String> args =
+        Lists.newArrayList(
+            "--source-catalog-type",
+            "HADOOP",
+            "--source-catalog-properties",
+            "k1=v1,k2=v2",
+            "--target-catalog-type",
+            "HIVE",
+            "--target-catalog-properties",
+            "k3=v3, k4=v4",
+            "--view-identifiers",
+            "foo.view1",
+            "--view-identifiers-regex",
+            "^foo\\.");
+    String expectedMessage =
+        "Error: --view-identifiers=<identifiers>, --view-identifiers-regex=<identifiersRegEx> are mutually exclusive (specify only one)";
+
+    executeAndValidateResults("migrate", args, expectedMessage, 2);
+  }
+
   private static Stream<Arguments> invalidArgs() {
     return Stream.of(
         arguments(

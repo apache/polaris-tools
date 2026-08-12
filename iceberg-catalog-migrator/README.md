@@ -19,10 +19,10 @@
 
 # Iceberg Catalog Migrator
  
-The Iceberg Catalog Migrator is a command-line tool that enables bulk migration of [Apache Iceberg](https://iceberg.apache.org/) tables from one [Iceberg Catalog](https://iceberg.apache.org/rest-catalog-spec/) to another without the need to copy the data. This tool works with all Iceberg Catalogs; not just Polaris.
+The Iceberg Catalog Migrator is a command-line tool that enables bulk migration of [Apache Iceberg](https://iceberg.apache.org/) tables and views from one [Iceberg Catalog](https://iceberg.apache.org/rest-catalog-spec/) to another without the need to copy the data. This tool works with all Iceberg Catalogs; not just Polaris.
 
 The migrator tool provides two operations:
-* Migrate - Bulk migration of the Iceberg tables from source catalog to target catalog. Table entries from source catalog will be deleted after the successful migration to the target catalog.
+* Migrate - Bulk migration of the Iceberg tables and views from source catalog to target catalog. Table and view entries from source catalog will be deleted after the successful migration to the target catalog.
 * Register - Bulk register the Iceberg tables from source catalog to target catalog. 
 
 > :warning: `register` command just registers the table.
@@ -31,9 +31,12 @@ Which means the table will be present in both the catalogs after registering.
 It is recommended to use the 'migrate' command in CLI to automatically delete the table from source catalog after registering
 or avoid operating tables from the source catalog after registering if 'migrate' command is not used.**
 
-> :warning: **Avoid using this tool when there are in-progress commits for tables in the source catalog 
+> :warning: **Avoid using this tool when there are in-progress commits for tables or views in the source catalog
 to prevent missing updates, data loss and table corruption in the target catalog. 
 In-progress commits may not be properly transferred and could compromise the integrity of your data.**
+
+Views are migrated only by the `migrate` command. The `register` command remains table-only because
+Iceberg view deletion does not expose a purge-false mode equivalent to table migration.
 
 Please use the [getting started guide](docs/getting-started.md) for a step-by-step guide on how to use the tool.
 

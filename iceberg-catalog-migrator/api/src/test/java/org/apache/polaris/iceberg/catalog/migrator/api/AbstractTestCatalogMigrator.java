@@ -26,12 +26,16 @@ import nl.altindag.log.model.LogEvent;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.iceberg.exceptions.NoSuchTableException;
+import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.polaris.iceberg.catalog.migrator.api.test.AbstractTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -65,6 +69,7 @@ public abstract class AbstractTestCatalogMigrator extends AbstractTest {
 
   @AfterEach
   protected void afterEach() {
+    dropViews();
     dropTables();
   }
 
@@ -172,6 +177,61 @@ public abstract class AbstractTestCatalogMigrator extends AbstractTest {
     Assertions.assertThat(targetCatalog.listTables(FOO))
         .containsExactlyInAnyOrder(FOO_TBL1, FOO_TBL2);
     Assertions.assertThat(targetCatalog.listTables(BAR)).containsExactly(BAR_TBL3);
+  }
+
+  @Test
+  public void testMigrateView() {
+    Assumptions.assumeTrue(
+        supportsViewMigration(), "source and target catalogs must support views");
+
+    createView();
+
+    CatalogMigrationResult result =
+        catalogMigratorWithDefaultArgs(true).migrateView(FOO_VIEW1).result();
+
+    Assertions.assertThat(result.registeredViewIdentifiers()).containsExactly(FOO_VIEW1);
+    Assertions.assertThat(result.failedToRegisterViewIdentifiers()).isEmpty();
+    Assertions.assertThat(result.failedToDeleteViewIdentifiers()).isEmpty();
+
+    Assertions.assertThat(((ViewCatalog) targetCatalog).listViews(FOO)).containsExactly(FOO_VIEW1);
+    Assertions.assertThat(((ViewCatalog) sourceCatalog).listViews(FOO)).isEmpty();
+    Assertions.assertThat(sourceCatalog.listTables(FOO))
+        .containsExactlyInAnyOrder(FOO_TBL1, FOO_TBL2);
+  }
+
+  @Test
+  public void testMigrateAllViews() {
+    Assumptions.assumeTrue(
+        supportsViewMigration(), "source and target catalogs must support views");
+
+    createViews();
+
+    CatalogMigrator catalogMigrator = catalogMigratorWithDefaultArgs(true);
+    catalogMigrator.getMatchingViewIdentifiers(null).forEach(catalogMigrator::migrateView);
+    CatalogMigrationResult result = catalogMigrator.result();
+
+    Assertions.assertThat(result.registeredViewIdentifiers())
+        .containsExactlyInAnyOrder(FOO_VIEW2, BAR_VIEW3);
+    Assertions.assertThat(result.failedToRegisterViewIdentifiers()).isEmpty();
+    Assertions.assertThat(result.failedToDeleteViewIdentifiers()).isEmpty();
+
+    Assertions.assertThat(((ViewCatalog) targetCatalog).listViews(FOO)).containsExactly(FOO_VIEW2);
+    Assertions.assertThat(((ViewCatalog) targetCatalog).listViews(BAR)).containsExactly(BAR_VIEW3);
+    Assertions.assertThat(((ViewCatalog) sourceCatalog).listViews(FOO)).isEmpty();
+    Assertions.assertThat(((ViewCatalog) sourceCatalog).listViews(BAR)).isEmpty();
+    Assertions.assertThat(sourceCatalog.listTables(FOO))
+        .containsExactlyInAnyOrder(FOO_TBL1, FOO_TBL2);
+  }
+
+  @Test
+  public void testRegisterViewIsUnsupportedUseMigrate() {
+    Assumptions.assumeTrue(
+        supportsViewMigration(), "source and target catalogs must support views");
+
+    Assertions.assertThatThrownBy(
+            () -> catalogMigratorWithDefaultArgs(false).migrateView(FOO_VIEW1))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("Registering views is unsupported. Use migrate to migrate views.");
   }
 
   @ParameterizedTest
@@ -341,5 +401,13 @@ public abstract class AbstractTestCatalogMigrator extends AbstractTest {
     CatalogMigrator catalogMigrator = catalogMigratorWithDefaultArgs(deleteSourceTables);
     catalogMigrator.getMatchingTableIdentifiers(null).forEach(catalogMigrator::registerTable);
     return catalogMigrator.result();
+  }
+
+  private static boolean supportsViewMigration() {
+    // Hive view migration is skipped until Iceberg's Hive view metadata lookup is reliable here.
+    // Revisit after https://github.com/apache/iceberg/pull/17532 is available.
+    return sourceCatalog instanceof ViewCatalog
+        && targetCatalog instanceof ViewCatalog
+        && !(sourceCatalog instanceof HiveCatalog);
   }
 }

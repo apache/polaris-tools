@@ -30,4 +30,10 @@ public interface CatalogMigrationResult {
   List<TableIdentifier> failedToRegisterTableIdentifiers();
 
   List<TableIdentifier> failedToDeleteTableIdentifiers();
+
+  List<TableIdentifier> registeredViewIdentifiers();
+
+  List<TableIdentifier> failedToRegisterViewIdentifiers();
+
+  List<TableIdentifier> failedToDeleteViewIdentifiers();
 }

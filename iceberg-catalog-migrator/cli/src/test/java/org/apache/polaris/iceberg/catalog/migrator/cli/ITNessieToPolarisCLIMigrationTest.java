@@ -53,7 +53,7 @@ public class ITNessieToPolarisCLIMigrationTest extends AbstractCLIMigrationTest 
 
   @AfterAll
   protected static void tearDown() throws Exception {
-    dropNamespaces();
+    dropSourceNamespaces();
 
     if (polarisContainer != null) {
       polarisContainer.stop();

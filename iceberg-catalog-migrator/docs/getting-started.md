@@ -34,7 +34,7 @@ Migration happens in five steps:
 2. Set the object storage environment variables
 3. Get access to the source and target catalogs
 4. Validate the migration
-5. Migrate the tables
+5. Migrate tables and views
 
 ### Step 1: Build the Iceberg Catalog Migrator
 Execute the following commands to build the tool:
@@ -82,14 +82,15 @@ export TOKEN_TARGET=xxxxxxx
 ```
 
 ### Step 4: Validate the Migration
-Execute the following command to understand how to migrate the tables:
+Execute the following command to understand how to migrate tables and views:
 ```shell
-java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar register -h  
+java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar migrate -h
 ```
 
-In the example, execute the following command to perform a dry run migration. This will not migrate the tables but will provide information on the operation:
+In the example, execute the following command to perform a dry run migration. This will not migrate
+tables or views, but will provide information on the operation:
 ```shell
-java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar register \
+java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar migrate \
 --source-catalog-type REST \
 --source-catalog-properties uri=http://sourcecatalog:8181/api/catalog,warehouse=test,token=$TOKEN_SOURCE \
 --target-catalog-type REST  \
@@ -97,9 +98,12 @@ java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar regis
 --dry-run
 ```
 
-After validating all inputs, the console will display a list of table identifiers that are identified for migration. This information will also be written to a file called `dry_run.txt`,
+After validating all inputs, the console will display the table identifiers identified for
+migration. When both catalogs support Iceberg views, it also displays the view identifiers
+identified for migration. Table identifiers are written to `dry_run_identifiers.txt`; view
+identifiers are written to `dry_run_view_identifiers.txt` when views are identified.
 
-### Step 5: Migrate the Tables
+### Step 5: Migrate Tables and Views
 
 In the example, execute the following command to perform a migration:
 ```shell
@@ -109,6 +113,20 @@ java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar migra
 --target-catalog-type REST  \
 --target-catalog-properties uri=http://targetcatalog:8181/api/catalog,warehouse=test,token=$TOKEN_TARGET
 ```
+
+When both catalogs support Iceberg views, the same `migrate` command also migrates views. To migrate
+specific views, use view selector options:
+```shell
+java -jar ./cli/build/libs/iceberg-catalog-migrator-cli-0.0.1-SNAPSHOT.jar migrate \
+--source-catalog-type REST \
+--source-catalog-properties uri=http://sourcecatalog:8181/api/catalog,warehouse=test,token=$TOKEN_SOURCE \
+--target-catalog-type REST  \
+--target-catalog-properties uri=http://targetcatalog:8181/api/catalog,warehouse=test,token=$TOKEN_TARGET \
+--view-identifiers foo.view1,foo.view2
+```
+
+View migration is supported only by the `migrate` command. The `register` command remains table-only
+because Iceberg view deletion does not expose a purge-false mode equivalent to table migration.
 
 Please note that a log file will be created to verify the migration proceeded successfully.
 If any issues occur, please use [the troubleshooting guide](./troubleshooting.md).

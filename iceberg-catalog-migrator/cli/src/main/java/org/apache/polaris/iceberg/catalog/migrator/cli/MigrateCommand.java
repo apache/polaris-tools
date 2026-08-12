@@ -35,13 +35,21 @@ import picocli.CommandLine;
     // of sorted order.
     sortOptions = false,
     description =
-        "Bulk migrate the iceberg tables from source catalog to target catalog without data copy."
-            + " Table entries from source catalog will be deleted after the successful migration to the target "
-            + "catalog.")
+        "Bulk migrate the iceberg tables and views from source catalog to target catalog without "
+            + "data copy. Table and view entries from source catalog will be deleted after the "
+            + "successful migration to the target catalog.")
 public class MigrateCommand extends BaseRegisterCommand {
 
   private static final String newLine = System.lineSeparator();
   private static final Logger consoleLog = LoggerFactory.getLogger("console-log");
+
+  @CommandLine.ArgGroup(heading = "View identifier options: %n")
+  private ViewIdentifierOptions viewIdentifierOptions;
+
+  @Override
+  protected ViewIdentifierOptions viewIdentifierOptions() {
+    return viewIdentifierOptions;
+  }
 
   @Override
   protected CatalogMigrator catalogMigrator(
@@ -75,7 +83,7 @@ public class MigrateCommand extends BaseRegisterCommand {
             + "{}\tSo, while using this tool please make sure there are no in-progress commits for the source "
             + "catalog.{}"
             + "{}"
-            + "\tb) After the migration, successfully migrated tables will be deleted from the source catalog "
+            + "\tb) After the migration, successfully migrated tables and views will be deleted from the source catalog "
             + "{}\tand can only be accessed from the target catalog.",
         newLine,
         newLine,
