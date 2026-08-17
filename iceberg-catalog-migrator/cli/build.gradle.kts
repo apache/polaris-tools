@@ -182,6 +182,7 @@ val shadowJar =
       "META-INF/**/DISCLAIMER",
       "LICENSE*",
       "NOTICE*",
+      "THIRD-PARTY-NOTICES",
       "DISCLAIMER",
       "META-INF/DISCLAIMER",
       "META-INF/ASL2.0",
