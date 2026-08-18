@@ -21,6 +21,7 @@ import { createContext, useContext, useState, type ReactNode } from "react"
 import { toast } from "sonner"
 import { authApi } from "@/api/auth"
 import { apiClient } from "@/api/client"
+import { config } from "@/lib/config"
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -34,7 +35,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(config.PROXY_AUTH)
   const [loading] = useState<boolean>(false)
 
   const login = async (clientId: string, clientSecret: string, scope: string) => {
