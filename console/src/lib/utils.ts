@@ -19,6 +19,7 @@
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { config } from "@/lib/config"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -45,8 +46,14 @@ export function decodeJWT(token: string): Record<string, unknown> | null {
 }
 
 /**
- * Extracts the principal name from a JWT token
- * The principal name is typically in the 'sub' (subject) claim
+ * Extracts the principal name from a JWT token.
+ * The claims to inspect and their priority order are controlled by the
+ * VITE_OIDC_PRINCIPAL_CLAIMS environment variable (comma-separated list).
+ * Defaults to "sub,principal,principal_name,name".
+ *
+ * Example for Entra ID / Azure AD:
+ *   VITE_OIDC_PRINCIPAL_CLAIMS=preferred_username,email,sub,name
+ *
  * @param token - The JWT token string
  * @returns The principal name or null if not found
  */
@@ -55,12 +62,14 @@ export function getPrincipalNameFromToken(token: string): string | null {
   if (!decoded) {
     return null
   }
-  // Try common JWT claim names for the principal/subject
-  return (
-    (decoded.sub as string) ||
-    (decoded.principal as string) ||
-    (decoded.principal_name as string) ||
-    (decoded.name as string) ||
-    null
-  )
+  const claims = config.OIDC_PRINCIPAL_CLAIMS.split(",")
+    .map((c) => c.trim())
+    .filter(Boolean)
+  for (const claim of claims) {
+    const value = decoded[claim]
+    if (typeof value === "string" && value) {
+      return value
+    }
+  }
+  return null
 }
