@@ -1,0 +1,203 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Release - 4 - Publish Release After Vote Success
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (check to enable, uncheck to perform actual operations)'
+        required: false
+        type: boolean
+        default: true
+      staging_repository_id:
+        description: 'Nexus staging repository ID to release (e.g., orgapachepolaris-1234), required for tools that publish Maven artifacts'
+        required: false
+        type: string
+
+jobs:
+  publish-release:
+    name: Release - 4 - Publish Release After Vote Success
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          # Fetch full history for proper branch operations
+          fetch-depth: 0
+          # Use a token with write permissions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up environment variables
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+          echo "## Mode" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "DRY_RUN=1" >> $GITHUB_ENV
+            echo "‼️ DRY_RUN mode enabled - No actual changes will be made" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DRY_RUN=0" >> $GITHUB_ENV
+            echo "DRY_RUN mode disabled - Performing actual operations" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Validate staging repository ID parameter
+          staging_repo_id="${{ github.event.inputs.staging_repository_id }}"
+          if [[ -z "${staging_repo_id}" ]]; then
+            echo "❌ Staging repository ID is required but not provided." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          echo "staging_repo_id=${staging_repo_id}" >> $GITHUB_ENV
+
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+          echo "## Input Parameters" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Staging Repository ID | \`${staging_repo_id}\` |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check necessity of publishing artifacts
+        run: source "${LIBS_DIR}/_gh_determine_built_flavors.sh"
+
+      - name: Auto-determine release parameters from branch and Git state
+        env:
+          git_ref: ${{ github.ref }}
+        run: source "${LIBS_DIR}/_gh_release_prepare.sh"
+
+      - name: Copy distribution from SVN dev to release space
+        env:
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: source "${LIBS_DIR}/_gh_release_copy_dist.sh"
+
+      - name: Set up Helm
+        if: env.skip_helm != '1'
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
+        with:
+          version: 'latest'
+
+      - name: Update Helm index in release space
+        if: env.skip_helm != '1'
+        env:
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+          source "${LIBS_DIR}/_gh_release_helm.sh"
+
+      - name: Create final release tag and push to Git repository
+        run: source "${LIBS_DIR}/_gh_release_push_git_tag.sh"
+
+      - name: Set up Docker Buildx
+        if: env.skip_docker != '1'
+        run: |
+          docker buildx use default
+          docker buildx create \
+          --platform linux/amd64,linux/arm64 \
+          --use \
+          --name polarisbuild \
+          --driver-opt network=host || docker buildx use polarisbuild
+          docker buildx inspect
+
+      - name: Set up Java
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Log in to Docker Hub
+        if: ${{ env.DRY_RUN == '0' && env.skip_docker != '1' }}
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Publish Docker images to Docker Hub
+        if: env.skip_docker != '1'
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Call tool-specific docker-artifacts script
+          (cd ${tool} ; ./releasey/docker-release.sh)
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Docker Images
+          ✅ Polaris Server and Admin Tool Docker images published to Docker Hub
+          EOT
+
+      - name: Release to PyPI
+        if: ${{ env.skip_python != '1' }}
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Call tool-specific maven-artifacts script
+          (cd ${tool} ; ./releasey/python-release.sh)
+
+      - name: Release candidate repository on Nexus
+        if: ${{ env.skip_maven != '1' }}
+        env:
+          ORG_GRADLE_PROJECT_apacheUsername: ${{ secrets.APACHE_USERNAME }}
+          ORG_GRADLE_PROJECT_apachePassword: ${{ secrets.APACHE_PASSWORD }}
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Call tool-specific maven-artifacts script
+          (cd ${tool} ; ./releasey/maven-release.sh)
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_gh_release_create_github.sh"
+
+      - name: Summary
+        run: |
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Summary
+          🎉 Release published successfully:
+
+          | Component | Status |
+          | --- | --- |
+          | Distribution artifacts | ✅ Moved to release space |
+          | Helm chart and index | ✅ Updated in release space |
+          | Git release tag | ✅ Created and pushed |
+          | GitHub release | ✅ Created with artifacts attached |
+          | Docker images | ✅ Published to Docker Hub |
+          | Nexus repository | ✅ Released |
+          | Version | \`${version_without_rc}\` |
+          | Final release tag | \`${final_release_tag}\` |
+          EOT
+
+          source "${LIBS_DIR}/_gh_rc_email_proposal.sh"
+
