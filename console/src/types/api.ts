@@ -201,6 +201,7 @@ export interface TableSchema {
   type: string
   fields: SchemaField[]
   "schema-id"?: number
+  "identifier-field-ids"?: number[]
 }
 
 export interface SchemaField {
