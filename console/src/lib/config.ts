@@ -27,6 +27,10 @@ interface AppConfig {
   VITE_OIDC_CLIENT_ID?: string
   VITE_OIDC_REDIRECT_URI?: string
   VITE_OIDC_SCOPE?: string
+  VITE_PROXY_AUTH?: string
+  VITE_PROXY_USERINFO_PATH?: string
+  VITE_PROXY_USER_FIELDS?: string
+  VITE_PROXY_PRINCIPAL_FIELD?: string
 }
 
 declare global {
@@ -59,4 +63,8 @@ export const config = {
   OIDC_CLIENT_ID: getConfig("VITE_OIDC_CLIENT_ID", ""),
   OIDC_REDIRECT_URI: getConfig("VITE_OIDC_REDIRECT_URI", ""),
   OIDC_SCOPE: getConfig("VITE_OIDC_SCOPE", "openid profile email"),
+  PROXY_AUTH: getConfig("VITE_PROXY_AUTH", "false") === "true",
+  PROXY_USERINFO_PATH: getConfig("VITE_PROXY_USERINFO_PATH", "/oauth2/userinfo"),
+  PROXY_USER_FIELDS: getConfig("VITE_PROXY_USER_FIELDS", "preferredUsername,user,email"),
+  PROXY_PRINCIPAL_FIELD: getConfig("VITE_PROXY_PRINCIPAL_FIELD", ""),
 }
