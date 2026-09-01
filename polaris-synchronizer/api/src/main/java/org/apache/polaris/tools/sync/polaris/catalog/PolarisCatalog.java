@@ -117,6 +117,13 @@ public class PolarisCatalog extends RESTCatalog
 
     this.authenticationSession.getSessionHeaders().forEach(requestBuilder::header);
 
+    // this manual HTTP path bypasses RESTSessionCatalog's "header.<name>" property convention,
+    // so the realm-context header must be attached explicitly here as well
+    String realm = this.properties.get("realm");
+    if (realm != null) {
+      requestBuilder.header(this.properties.getOrDefault("realm-header-name", "Polaris-Realm"), realm);
+    }
+
     // specify last known etag in if-none-match header
     if (etag != null) {
       requestBuilder.header(HttpHeaders.IF_NONE_MATCH, etag);

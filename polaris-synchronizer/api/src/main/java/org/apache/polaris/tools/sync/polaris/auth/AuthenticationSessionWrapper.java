@@ -43,9 +43,17 @@ public class AuthenticationSessionWrapper implements Closeable {
     private final ScheduledExecutorService executor;
 
     public AuthenticationSessionWrapper(Map<String, String> properties) {
-        this.restClient = HTTPClient.builder(Map.of())
-                .uri(properties.get(OAuth2Properties.OAUTH2_SERVER_URI))
-                .build();
+        HTTPClient.Builder clientBuilder = HTTPClient.builder(Map.of())
+                .uri(properties.get(OAuth2Properties.OAUTH2_SERVER_URI));
+
+        // some Polaris deployments require the realm-context header on the token endpoint
+        // itself, not just on subsequent management/catalog API calls
+        String realm = properties.get("realm");
+        if (realm != null) {
+            clientBuilder.withHeader(properties.getOrDefault("realm-header-name", "Polaris-Realm"), realm);
+        }
+
+        this.restClient = clientBuilder.build();
         this.authSession = this.newAuthSession(this.restClient, properties);
         this.executor = ThreadPools.newScheduledPool(UUID.randomUUID() + "-token-refresh", 1);
     }
