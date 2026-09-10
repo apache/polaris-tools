@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
@@ -38,6 +39,14 @@ fun Project.configureJava() {
       attributes["Implementation-Version"] = project.version
     }
     duplicatesStrategy = DuplicatesStrategy.WARN
+
+    // Shadow JARs provide bundle-specific legal files. All other JARs use the clean project legal
+    // files, which omit distribution-only content such as the Gradle wrapper attribution.
+    if (this !is ShadowJar) {
+      into("META-INF") {
+        from(rootProject.file("gradle/jar-licenses")) { include("LICENSE", "NOTICE") }
+      }
+    }
   }
 
   repositories {

@@ -188,6 +188,10 @@ val shadowJar =
       "META-INF/ASL2.0",
       "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
 
+      // Hadoop's browser UI is not used by the catalog migrator. Excluding it also avoids
+      // distributing unrelated JavaScript, stylesheets, and image assets.
+      "webapps/**",
+
       // Proguard configurations used during the Guava build (don't care about those)
       "META-INF/proguard/**",
       // irrelevant for the CLI
