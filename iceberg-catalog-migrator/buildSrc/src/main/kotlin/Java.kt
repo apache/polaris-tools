@@ -43,11 +43,8 @@ fun Project.configureJava() {
     // Shadow JARs provide bundle-specific legal files. All other JARs use the clean project legal
     // files, which omit distribution-only content such as the Gradle wrapper attribution.
     if (this !is ShadowJar) {
-      from(rootProject.rootDir) {
-        include("gradle/jar-licenses/LICENSE").eachFile { path = "META-INF/$sourceName" }
-      }
-      from(rootProject.rootDir) {
-        include("gradle/jar-licenses/NOTICE").eachFile { path = "META-INF/$sourceName" }
+      into("META-INF") {
+        from(rootProject.file("gradle/jar-licenses")) { include("LICENSE", "NOTICE") }
       }
     }
   }
