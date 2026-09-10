@@ -61,6 +61,7 @@ const schema = z
     s3_stsEndpoint: z.string().optional(),
     s3_stsUnavailable: z.boolean().optional(),
     s3_pathStyleAccess: z.boolean().optional(),
+    s3_kmsUnavailable: z.boolean().optional(),
 
     // Azure
     azure_tenantId: z.string().optional(),
@@ -141,6 +142,8 @@ export function EditCatalogModal({
           storageConfigInfo.stsUnavailable = values.s3_stsUnavailable
         if (typeof values.s3_pathStyleAccess === "boolean")
           storageConfigInfo.pathStyleAccess = values.s3_pathStyleAccess
+        if (typeof values.s3_kmsUnavailable === "boolean")
+          storageConfigInfo.kmsUnavailable = values.s3_kmsUnavailable
       }
       if (values.storageType === "AZURE") {
         if (values.azure_tenantId) storageConfigInfo.tenantId = values.azure_tenantId
@@ -217,6 +220,7 @@ export function EditCatalogModal({
         s3_stsEndpoint: storageConfig?.stsEndpoint || "",
         s3_stsUnavailable: storageConfig?.stsUnavailable || false,
         s3_pathStyleAccess: storageConfig?.pathStyleAccess || false,
+        s3_kmsUnavailable: storageConfig?.kmsUnavailable || false,
         azure_tenantId: storageConfig?.tenantId || "",
         azure_multiTenantAppName: storageConfig?.multiTenantAppName || "",
         azure_consentUrl: storageConfig?.consentUrl || "",
@@ -341,6 +345,13 @@ export function EditCatalogModal({
                 </label>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Whether S3 requests should use path-style addressing for buckets.
+                </p>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" {...register("s3_kmsUnavailable")} /> KMS unavailable
+                </label>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Indicates that Polaris should not use KMS (e.g. if KMS is not available). Use this
+                  for S3-compatible storage backends that do not support KMS.
                 </p>
               </div>
             </div>
