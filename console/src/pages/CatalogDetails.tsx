@@ -293,6 +293,24 @@ export function CatalogDetails() {
                         </span>
                       </div>
                     )}
+                    {catalog.connectionConfigInfo.remoteCatalogName && (
+                      <div className="flex gap-2 mt-2">
+                        <span className="font-mono text-sm text-muted-foreground">
+                          Remote Catalog Name:
+                        </span>
+                        <span className="font-mono text-sm">
+                          {catalog.connectionConfigInfo.remoteCatalogName}
+                        </span>
+                      </div>
+                    )}
+                    {catalog.connectionConfigInfo.warehouse && (
+                      <div className="flex gap-2 mt-2">
+                        <span className="font-mono text-sm text-muted-foreground">Warehouse:</span>
+                        <span className="font-mono text-sm">
+                          {catalog.connectionConfigInfo.warehouse}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
