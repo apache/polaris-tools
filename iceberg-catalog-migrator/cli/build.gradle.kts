@@ -192,6 +192,11 @@ val shadowJar =
       // distributing unrelated JavaScript, stylesheets, and image assets.
       "webapps/**",
 
+      // UI resources pulled in transitively by Hive that are not used by this CLI.
+      // Excluding them also avoids distributing their separate CDDL and CC-BY content.
+      "META-INF/taglib.tld",
+      "groovy/ui/icons/**",
+
       // Proguard configurations used during the Guava build (don't care about those)
       "META-INF/proguard/**",
       // irrelevant for the CLI
