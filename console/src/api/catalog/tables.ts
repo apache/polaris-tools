@@ -26,6 +26,7 @@ import type {
   LoadTableResult,
   LoadGenericTableResponse,
   GenericTableIdentifier,
+  SchemaField,
 } from "@/types/api"
 
 /**
@@ -128,6 +129,41 @@ export const tablesApi = {
       },
     }
     await apiClient.getCatalogClient().post(`/${encodeURIComponent(prefix)}/tables/rename`, payload)
+  },
+
+  /**
+   * Update table schema using the commit API.
+   * Sends add-schema + set-current-schema updates with an assert-current-schema-id requirement.
+   */
+  updateSchema: async (
+    prefix: string,
+    namespace: string[],
+    tableName: string,
+    newSchemaFields: SchemaField[],
+    currentSchemaId: number,
+    identifierFieldIds?: number[]
+  ): Promise<void> => {
+    const namespaceStr = encodeNamespace(namespace)
+    const schema: Record<string, unknown> = {
+      type: "struct",
+      fields: newSchemaFields,
+    }
+    if (identifierFieldIds && identifierFieldIds.length > 0) {
+      schema["identifier-field-ids"] = identifierFieldIds
+    }
+    const body = {
+      requirements: [{ type: "assert-current-schema-id", "current-schema-id": currentSchemaId }],
+      updates: [
+        { action: "add-schema", schema },
+        { action: "set-current-schema", "schema-id": -1 },
+      ],
+    }
+    await apiClient
+      .getCatalogClient()
+      .post(
+        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/tables/${encodeURIComponent(tableName)}`,
+        body
+      )
   },
 
   /**
