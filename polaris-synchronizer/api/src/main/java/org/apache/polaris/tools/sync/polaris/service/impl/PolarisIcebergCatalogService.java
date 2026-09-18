@@ -61,6 +61,14 @@ public class PolarisIcebergCatalogService implements IcebergCatalogService {
                 "credential", String.format("%s:%s", clientId, clientSecret));
         catalogProperties.putIfAbsent("scope", "PRINCIPAL_ROLE:ALL");
 
+        // forward the realm-context header on every Iceberg REST catalog call, leveraging
+        // RESTSessionCatalog's built-in "header.<name>" -> HTTP header property convention
+        String realm = properties.get("realm");
+        if (realm != null) {
+            String realmHeaderName = properties.getOrDefault("realm-header-name", "Polaris-Realm");
+            catalogProperties.put("header." + realmHeaderName, realm);
+        }
+
         this.catalog = (PolarisCatalog) CatalogUtil.loadCatalog(
                 PolarisCatalog.class.getName(),
                 "SOURCE_CATALOG_REST_" + catalogName,
