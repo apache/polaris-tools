@@ -66,6 +66,7 @@ case class ViewActions(
             "catalogName" -> s"C_$catalogId",
             "parentNamespacePath" -> parentNamespacePath,
             "multipartNamespace" -> parentNamespacePath.mkString("%1F"),
+            "namespaceJsonPath" -> Json.toJson(parentNamespacePath).toString(),
             "viewName" -> mangler.maybeMangleView(viewId),
             "viewId" -> viewId
           )
