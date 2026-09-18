@@ -44,37 +44,48 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies that {@code --skip-iceberg-content} prevents {@link PolarisSynchronizer#syncCatalogs()}
- * from ever initializing an Iceberg REST catalog session, while still synchronizing catalog roles.
+ * Verifies that {@code --skip-catalog-sync} prevents {@link PolarisSynchronizer#syncCatalogs()}
+ * from creating, overwriting, or removing catalog objects on the target, while still synchronizing
+ * catalog-roles/grants for catalogs that already exist on the target.
  */
-public class PolarisSynchronizerSkipIcebergContentTest {
+public class PolarisSynchronizerSkipCatalogSyncTest {
 
-  private static final Catalog catalog =
-      new PolarisCatalog()
-          .name("catalog")
-          .type(Catalog.TypeEnum.INTERNAL)
-          .properties(new CatalogProperties())
-          .storageConfigInfo(
-              new AwsStorageConfigInfo()
-                  .storageType(StorageConfigInfo.StorageTypeEnum.S3)
-                  .roleArn("roleArn")
-                  .userArn("userArn")
-                  .externalId("externalId")
-                  .region("region"));
+  private static Catalog newCatalog(String name) {
+    return new PolarisCatalog()
+        .name(name)
+        .type(Catalog.TypeEnum.INTERNAL)
+        .properties(new CatalogProperties())
+        .storageConfigInfo(
+            new AwsStorageConfigInfo()
+                .storageType(StorageConfigInfo.StorageTypeEnum.S3)
+                .roleArn("roleArn")
+                .userArn("userArn")
+                .externalId("externalId")
+                .region("region"));
+  }
 
-  private static final CatalogRole catalogRole = new CatalogRole().name("catalog-role");
+  private static final Catalog sourceOnlyCatalog = newCatalog("source-only-catalog");
+  private static final Catalog overwriteCatalog = newCatalog("overwrite-catalog");
+  private static final Catalog removeCatalog = newCatalog("remove-catalog");
 
-  private static final GrantResource tableScopedGrant =
-      new GrantResource().type(GrantResource.TypeEnum.TABLE);
-
-  /** Planner that always presents {@link #catalog} as needing its children synced. */
-  private static class SingleCatalogPlanner extends NoOpSyncPlanner {
+  /** Planner that stages one catalog for CREATE, one for OVERWRITE, and one for REMOVE. */
+  private static class CreateOverwriteRemovePlanner extends NoOpSyncPlanner {
     @Override
     public SynchronizationPlan<Catalog> planCatalogSync(
         List<Catalog> catalogsOnSource, List<Catalog> catalogsOnTarget) {
       SynchronizationPlan<Catalog> plan = new SynchronizationPlan<>();
-      plan.skipEntity(catalog);
+      plan.createEntity(sourceOnlyCatalog);
+      plan.overwriteEntity(overwriteCatalog);
+      plan.removeEntity(removeCatalog);
       return plan;
+    }
+
+    @Override
+    public SynchronizationPlan<CatalogRole> planCatalogRoleSync(
+        String catalogName,
+        List<CatalogRole> catalogRolesOnSource,
+        List<CatalogRole> catalogRolesOnTarget) {
+      return new SynchronizationPlan<>();
     }
 
     @Override
@@ -85,34 +96,6 @@ public class PolarisSynchronizerSkipIcebergContentTest {
         List<Namespace> namespacesOnTarget) {
       // NoOpSyncPlanner returns null here, which would NPE once syncNamespaces() runs.
       return new SynchronizationPlan<>();
-    }
-  }
-
-  /**
-   * Planner that, in addition to {@link SingleCatalogPlanner}'s behavior, always presents
-   * {@link #catalogRole} as needing its children synced and always stages {@link #tableScopedGrant}
-   * for creation - regardless of whether the underlying table was ever synced.
-   */
-  private static class SingleCatalogWithGrantPlanner extends SingleCatalogPlanner {
-    @Override
-    public SynchronizationPlan<CatalogRole> planCatalogRoleSync(
-        String catalogName,
-        List<CatalogRole> catalogRolesOnSource,
-        List<CatalogRole> catalogRolesOnTarget) {
-      SynchronizationPlan<CatalogRole> plan = new SynchronizationPlan<>();
-      plan.skipEntity(catalogRole);
-      return plan;
-    }
-
-    @Override
-    public SynchronizationPlan<GrantResource> planGrantSync(
-        String catalogName,
-        String catalogRoleName,
-        List<GrantResource> grantsOnSource,
-        List<GrantResource> grantsOnTarget) {
-      SynchronizationPlan<GrantResource> plan = new SynchronizationPlan<>();
-      plan.createEntity(tableScopedGrant);
-      return plan;
     }
   }
 
@@ -156,13 +139,13 @@ public class PolarisSynchronizerSkipIcebergContentTest {
     public void close() {}
   }
 
-  /** Stub {@link PolarisService} that tracks how often Iceberg and catalog-role sync is attempted. */
+  /** Stub {@link PolarisService} that tracks catalog create/overwrite/remove and catalog-role sync calls. */
   private static class TrackingPolarisService implements PolarisService {
 
     private final List<Catalog> catalogs;
-    final List<GrantResource> grantsAdded = new ArrayList<>();
-    int initializeIcebergCatalogServiceCalls = 0;
-    int listCatalogRolesCalls = 0;
+    final List<String> catalogsCreated = new ArrayList<>();
+    final List<String> catalogsDropped = new ArrayList<>();
+    final List<String> catalogRoleSyncsAttempted = new ArrayList<>();
 
     TrackingPolarisService(List<Catalog> catalogs) {
       this.catalogs = catalogs;
@@ -227,14 +210,18 @@ public class PolarisSynchronizerSkipIcebergContentTest {
     }
 
     @Override
-    public void createCatalog(Catalog catalog) {}
+    public void createCatalog(Catalog catalog) {
+      catalogsCreated.add(catalog.getName());
+    }
 
     @Override
-    public void dropCatalogCascade(String catalogName) {}
+    public void dropCatalogCascade(String catalogName) {
+      catalogsDropped.add(catalogName);
+    }
 
     @Override
     public List<CatalogRole> listCatalogRoles(String catalogName) {
-      listCatalogRolesCalls++;
+      catalogRoleSyncsAttempted.add(catalogName);
       return List.of();
     }
 
@@ -269,16 +256,13 @@ public class PolarisSynchronizerSkipIcebergContentTest {
     }
 
     @Override
-    public void addGrant(String catalogName, String catalogRoleName, GrantResource grant) {
-      grantsAdded.add(grant);
-    }
+    public void addGrant(String catalogName, String catalogRoleName, GrantResource grant) {}
 
     @Override
     public void revokeGrant(String catalogName, String catalogRoleName, GrantResource grant) {}
 
     @Override
     public IcebergCatalogService initializeIcebergCatalogService(String catalogName) {
-      initializeIcebergCatalogServiceCalls++;
       return new CountingIcebergCatalogService();
     }
 
@@ -287,89 +271,65 @@ public class PolarisSynchronizerSkipIcebergContentTest {
   }
 
   @Test
-  public void testSkipIcebergContentSkipsIcebergSyncButStillSyncsCatalogRoles() {
-    TrackingPolarisService source = new TrackingPolarisService(List.of(catalog));
-    TrackingPolarisService target = new TrackingPolarisService(List.of());
+  public void testSkipCatalogSyncSkipsCreateOverwriteAndRemoveButStillSyncsRolesForExistingCatalogs() {
+    TrackingPolarisService source =
+        new TrackingPolarisService(List.of(sourceOnlyCatalog, overwriteCatalog));
+    TrackingPolarisService target = new TrackingPolarisService(List.of(overwriteCatalog, removeCatalog));
 
     PolarisSynchronizer synchronizer =
         new PolarisSynchronizer(
             null,
             false,
-            new SingleCatalogPlanner(),
+            new CreateOverwriteRemovePlanner(),
             source,
             target,
             new NoOpETagManager(),
-            null,
             false,
             new SynchronizationReport(),
-            true,
-            false);
+            true /* skipIcebergContent */,
+            true /* skipCatalogSync */);
 
     synchronizer.syncCatalogs();
 
-    Assertions.assertEquals(0, source.initializeIcebergCatalogServiceCalls);
-    Assertions.assertEquals(0, target.initializeIcebergCatalogServiceCalls);
-    Assertions.assertEquals(1, source.listCatalogRolesCalls);
-    Assertions.assertEquals(1, target.listCatalogRolesCalls);
+    // no catalog objects should be created, overwritten (dropped+recreated), or removed on target
+    Assertions.assertEquals(List.of(), target.catalogsCreated);
+    Assertions.assertEquals(List.of(), target.catalogsDropped);
+
+    // the source-only catalog has no match on target, so it must be excluded from catalog-role sync
+    Assertions.assertFalse(
+        target.catalogRoleSyncsAttempted.contains(sourceOnlyCatalog.getName()));
+
+    // the catalog that exists on both sides should still have its catalog-roles synced
+    Assertions.assertTrue(target.catalogRoleSyncsAttempted.contains(overwriteCatalog.getName()));
+    Assertions.assertTrue(source.catalogRoleSyncsAttempted.contains(overwriteCatalog.getName()));
   }
 
   @Test
-  public void testIcebergContentSyncedWhenNotSkipped() {
-    TrackingPolarisService source = new TrackingPolarisService(List.of(catalog));
-    TrackingPolarisService target = new TrackingPolarisService(List.of());
+  public void testCatalogSyncedWhenNotSkipped() {
+    TrackingPolarisService source =
+        new TrackingPolarisService(List.of(sourceOnlyCatalog, overwriteCatalog));
+    TrackingPolarisService target = new TrackingPolarisService(List.of(overwriteCatalog, removeCatalog));
 
     PolarisSynchronizer synchronizer =
         new PolarisSynchronizer(
             null,
             false,
-            new SingleCatalogPlanner(),
+            new CreateOverwriteRemovePlanner(),
             source,
             target,
             new NoOpETagManager(),
-            null,
             false,
             new SynchronizationReport(),
-            false,
-            false);
+            true /* skipIcebergContent */,
+            false /* skipCatalogSync */);
 
     synchronizer.syncCatalogs();
 
-    Assertions.assertEquals(1, source.initializeIcebergCatalogServiceCalls);
-    Assertions.assertEquals(1, target.initializeIcebergCatalogServiceCalls);
-    Assertions.assertEquals(1, source.listCatalogRolesCalls);
-    Assertions.assertEquals(1, target.listCatalogRolesCalls);
-  }
-
-  /**
-   * Documents a known consequence of {@code --skip-iceberg-content}: grant sync is not scoped by
-   * grant type, so a TABLE- or NAMESPACE-scoped grant is still applied to the target even though the
-   * table/namespace it refers to was never synced. Against a real Polaris server this would likely
-   * fail server-side (grant referencing an unknown resource); this test only proves the client still
-   * attempts it.
-   */
-  @Test
-  public void testTableScopedGrantsStillAttemptedWhenIcebergContentSkipped() {
-    TrackingPolarisService source = new TrackingPolarisService(List.of(catalog));
-    TrackingPolarisService target = new TrackingPolarisService(List.of());
-
-    PolarisSynchronizer synchronizer =
-        new PolarisSynchronizer(
-            null,
-            false,
-            new SingleCatalogWithGrantPlanner(),
-            source,
-            target,
-            new NoOpETagManager(),
-            null,
-            false,
-            new SynchronizationReport(),
-            true,
-            false);
-
-    synchronizer.syncCatalogs();
-
-    Assertions.assertEquals(0, source.initializeIcebergCatalogServiceCalls);
-    Assertions.assertEquals(0, target.initializeIcebergCatalogServiceCalls);
-    Assertions.assertEquals(List.of(tableScopedGrant), target.grantsAdded);
+    Assertions.assertEquals(
+        List.of(sourceOnlyCatalog.getName(), overwriteCatalog.getName()), target.catalogsCreated);
+    Assertions.assertEquals(
+        List.of(overwriteCatalog.getName(), removeCatalog.getName()), target.catalogsDropped);
+    Assertions.assertTrue(target.catalogRoleSyncsAttempted.contains(sourceOnlyCatalog.getName()));
+    Assertions.assertTrue(target.catalogRoleSyncsAttempted.contains(overwriteCatalog.getName()));
   }
 }
