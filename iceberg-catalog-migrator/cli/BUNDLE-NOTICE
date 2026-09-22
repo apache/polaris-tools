@@ -123,7 +123,7 @@ This artifact bundles Joda Time with the following in its NOTICE:
 
 -------------------------------------------------------------------------
 
-This artifact bundles DataNucleus with the following in its NOTICE:
+This artifact bundles DataNucleus API JDO and Core with the following in their NOTICE files:
 | ===================================================================
 | This product includes software developed by many individuals,
 | including the following:
@@ -154,7 +154,41 @@ This artifact bundles DataNucleus with the following in its NOTICE:
 | ===================================================================
 | This product also includes software developed by the TJDO project
 | (http://tjdo.sourceforge.net/).
-| 
+
+This artifact bundles DataNucleus RDBMS with the following in its NOTICE:
+| ===================================================================
+| This product includes software developed by many individuals,
+| including the following:
+| ===================================================================
+| Andy Jefferson
+| Erik Bengtson
+| Joerg von Frantzius
+| Marco Schulze
+|
+|
+| ===================================================================
+| This product has included contributions from some individuals,
+| including the following:
+| ===================================================================
+| Barry Haddow
+| Ralph Ullrich
+| David Ezzio
+| Brendan de Beer
+| David Eaves
+| Martin Taal
+| Tony Lai
+| Roland Szabo
+| Anton Troshin (Timesten)
+|
+| ===================================================================
+| This product also includes software developed by the TJDO project
+| (http://tjdo.sourceforge.net/).
+| ===================================================================
+|
+| ===================================================================
+| This product also includes software developed by the Apache Commons project
+| (http://commons.apache.org/).
+| ===================================================================
 
 -------------------------------------------------------------------------
 
@@ -179,6 +213,10 @@ This artifact bundles Eclipse Microprofile OpenAPI with the following in its NOT
 This artifact bundles Project Nessie with the following in its NOTICE:
 | Nessie
 | Copyright 2015-2025 Dremio Corporation
+|
+| This project includes code from Apache Polaris. The initial code for the
+| Polaris project was donated to the ASF by Snowflake Inc.
+| (https://www.snowflake.com/) copyright 2024.
 
 -------------------------------------------------------------------------
 
@@ -211,6 +249,50 @@ This artifact bundles Netty with the following in its NOTICE:
 |     * license/LICENSE.jctools.txt (ASL2 License)
 |   * HOMEPAGE:
 |     * https://github.com/JCTools/JCTools
+|
+| Apache Harmony
+| Copyright 2006, 2010 The Apache Software Foundation.
+|
+| This product includes software developed at
+| The Apache Software Foundation (https://www.apache.org/).
+
+-------------------------------------------------------------------------
+
+This artifact bundles Apache Hadoop 3.4.3 with the following in its NOTICE:
+| Apache Hadoop
+| Copyright 2006 and onwards The Apache Software Foundation.
+|
+| This product includes software developed at
+| The Apache Software Foundation (http://www.apache.org/).
+|
+| Export Control Notice
+| ---------------------
+|
+| This distribution includes cryptographic software.  The country in
+| which you currently reside may have restrictions on the import,
+| possession, use, and/or re-export to another country, of
+| encryption software.  BEFORE using any encryption software, please
+| check your country's laws, regulations and policies concerning the
+| import, possession, or use, and re-export of encryption software, to
+| see if this is permitted.  See <http://www.wassenaar.org/> for more
+| information.
+|
+| The U.S. Government Department of Commerce, Bureau of Industry and
+| Security (BIS), has classified this software as Export Commodity
+| Control Number (ECCN) 5D002.C.1, which includes information security
+| software using or performing cryptographic functions with asymmetric
+| algorithms.  The form and manner of this Apache Software Foundation
+| distribution makes it eligible for export under the License Exception
+| ENC Technology Software Unrestricted (TSU) exception (see the BIS
+| Export Administration Regulations, Section 740.13) for both object
+| code and source code.
+|
+| The following provides more details on the included cryptographic software:
+|
+| This software uses the SSL libraries from the Jetty project written
+| by mortbay.org.
+| Hadoop Yarn Server Web Proxy uses the BouncyCastle Java
+| cryptography APIs written by the Legion of the Bouncy Castle Inc.
 
 -------------------------------------------------------------------------
 
@@ -292,13 +374,12 @@ This artifact bundles Groovy with the following in its NOTICE:
 |
 | Antlr 2 (http://www.antlr2.org/)
 | ASM (http://asm.ow2.org/)
-| GPars (http://www.gpars.org/)
-| Hamcrest (https://github.com/hamcrest/JavaHamcrest)
-| JCommander (http://jcommander.org/)
-| Openbeans (https://code.google.com/p/openbeans/)
-| QDox (http://qdox.codehaus.org/)
-| TestNG (http://testng.org/)
-| XStream (http://xstream.codehaus.org/)
+|
+| The following files in Groovy's JSR-223 component use the JSR-223 license
+| included in META-INF/LICENSE:
+| org/codehaus/groovy/jsr223/GroovyCompiledScript.class
+| org/codehaus/groovy/jsr223/GroovyScriptEngineFactory.class
+| org/codehaus/groovy/jsr223/GroovyScriptEngineImpl.class
 
 -------------------------------------------------------------------------
 
