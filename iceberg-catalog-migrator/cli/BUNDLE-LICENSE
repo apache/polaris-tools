@@ -1441,7 +1441,7 @@ License: BSD 3-Clause
 This artifact bundles libstdc++ with Snappy Java native libraries.
 
 Project URL: https://gcc.gnu.org/onlinedocs/libstdc++/
-License: GCC Runtime Library Exception - http://gcc.gnu.org/onlinedocs/libstdc++/manual/license.html
+License: GNU GPL 3.0 with GCC Runtime Library Exception 3.1
 The complete GPL 3.0 and GCC Runtime Library Exception 3.1 texts are included below.
 
 --------------------------------------------------------------------------------
@@ -3021,7 +3021,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 GNU General Public License 3.0
-Applies to: libstdc++ within Snappy Java native libraries
+Relevant to: libstdc++ with GCC Runtime Library Exception 3.1 (full text below)
 --------------------------------------------------------------------------------
 
 GNU GENERAL PUBLIC LICENSE
@@ -3260,7 +3260,7 @@ The GNU General Public License does not permit incorporating your program into p
 
 --------------------------------------------------------------------------------
 GCC Runtime Library Exception 3.1
-Applies to: libstdc++ within Snappy Java native libraries
+Applies to: libstdc++ within Snappy Java native libraries, together with GPL 3.0 above
 --------------------------------------------------------------------------------
 
 GCC RUNTIME LIBRARY EXCEPTION
