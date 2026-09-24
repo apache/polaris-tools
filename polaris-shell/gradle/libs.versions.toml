@@ -1,0 +1,54 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+[versions]
+antlr4        = "4.13.2"
+assertj       = "3.27.3"
+awssdk        = "2.42.13"
+guava         = "33.4.0-jre"
+hadoop        = "3.4.1"
+iceberg       = "1.10.0"
+junit         = "5.12.0"
+mockito       = "5.17.0"
+shadow        = "9.3.2"
+slf4j         = "2.0.17"
+testcontainers = "2.0.5"
+
+[libraries]
+antlr4                 = { module = "org.antlr:antlr4",                           version.ref = "antlr4" }
+antlr4-engine-runtime  = { module = "org.antlr:antlr4-runtime",                   version.ref = "antlr4" }
+assertj                = { module = "org.assertj:assertj-core",                   version.ref = "assertj" }
+awssdk-dynamodb             = { module = "software.amazon.awssdk:dynamodb",              version.ref = "awssdk" }
+awssdk-glue                = { module = "software.amazon.awssdk:glue",                 version.ref = "awssdk" }
+awssdk-kms                 = { module = "software.amazon.awssdk:kms",                  version.ref = "awssdk" }
+awssdk-lakeformation       = { module = "software.amazon.awssdk:lakeformation",        version.ref = "awssdk" }
+awssdk-s3                  = { module = "software.amazon.awssdk:s3",                   version.ref = "awssdk" }
+awssdk-sts                 = { module = "software.amazon.awssdk:sts",                  version.ref = "awssdk" }
+awssdk-url-connection-client = { module = "software.amazon.awssdk:url-connection-client", version.ref = "awssdk" }
+guava                  = { module = "com.google.guava:guava",                     version.ref = "guava" }
+hadoop-common          = { module = "org.apache.hadoop:hadoop-common",            version.ref = "hadoop" }
+hadoop-client-runtime  = { module = "org.apache.hadoop:hadoop-client-runtime",    version.ref = "hadoop" }
+iceberg-bom            = { module = "org.apache.iceberg:iceberg-bom",             version.ref = "iceberg" }
+junit-bom              = { module = "org.junit:junit-bom",                        version.ref = "junit" }
+mockito-junit-jupiter  = { module = "org.mockito:mockito-junit-jupiter",          version.ref = "mockito" }
+slf4j-api              = { module = "org.slf4j:slf4j-api",                        version.ref = "slf4j" }
+testcontainers-bom     = { module = "org.testcontainers:testcontainers-bom",      version.ref = "testcontainers" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
