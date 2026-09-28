@@ -451,5 +451,19 @@ https://github.com/apache/polaris-tools/releases/tag/apache-polaris-iceberg-cata
 Thank you to everyone who contributed to and verified this release.
 ```
 
-After mirroring completes, remove superseded versions from `dist/release`
-according to ASF and project policy; they remain in the Apache archive.
+### 13.5. Remove superseded releases
+
+After mirroring completes, remove superseded versions from `dist/release` as
+described in the Polaris
+[dist.apache.org manual steps](https://polaris.apache.org/community/release-guides/semi-automated-release-guide/#manual-steps-on-distapacheorg).
+ASF policy requires keeping only the current release there; removed releases
+remain available from the Apache archive. This operation also requires Polaris
+PMC release privileges.
+
+For example, after publishing `1.1.0`, a PMC member removes `1.0.0` with:
+
+```shell
+svn rm \
+  "https://dist.apache.org/repos/dist/release/polaris/apache-polaris-iceberg-catalog-migrator/1.0.0" \
+  -m "Remove old Apache Polaris Iceberg Catalog Migrator release 1.0.0 (superseded by 1.1.0)"
+```
