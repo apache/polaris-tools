@@ -395,6 +395,10 @@ Publish exactly what was voted on; do not rebuild it.
 
 ### 13.1. Move the distributions to the release repository
 
+Publishing to `dist/release` requires Polaris PMC release privileges. If the
+release manager does not have these privileges, ask a PMC member to run this
+command:
+
 ```shell
 svn mv \
   "https://dist.apache.org/repos/dist/dev/polaris/apache-polaris-${TOOL}/${VERSION}" \
@@ -428,7 +432,9 @@ only; do not run `publishToApache` again.
 
 ### 13.4. Announce the release
 
-After Apache mirrors and Maven Central synchronize, announce the release:
+The SVN commit can complete before the release appears on
+`downloads.apache.org`. After Apache mirrors and Maven Central synchronize,
+announce the release:
 
 ```text
 Subject: [ANNOUNCE] Apache Polaris Iceberg Catalog Migrator <VERSION> released
