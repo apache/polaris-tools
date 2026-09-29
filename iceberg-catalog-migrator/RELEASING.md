@@ -37,8 +37,8 @@ This runbook covers manual releases from `apache/polaris-tools`. Commands use
 Never store ASF passwords, Nexus tokens, signing-key passphrases, or other
 credentials in this repository, release artifacts, logs, or release emails.
 
-Optionally start a `[DISCUSS]` thread on `dev@polaris.apache.org` to agree on
-scope and release blockers.
+Before the planned release, start a `[DISCUSS]` thread on
+`dev@polaris.apache.org` to agree on scope and release blockers.
 
 ## 2. Configure release signing
 
@@ -88,21 +88,20 @@ Wait until it is visible at <https://downloads.apache.org/polaris/KEYS>.
 
 ### 2.3. Configure Gradle signing and Nexus credentials
 
-Configure user-level `~/.gradle/gradle.properties`:
+Signing is required for every release. Configure the signing key in the
+user-level `~/.gradle/gradle.properties`:
 
 ```properties
 signing.gnupg.keyName=<FULL_GPG_FINGERPRINT>
-apacheUsername=<ASF_ID>
-apachePassword=<NEXUS_TOKEN_OR_PASSWORD>
 ```
 
-If required:
+If Gradle cannot locate `gpg`, configure its executable explicitly:
 
 ```properties
 signing.gnupg.executable=gpg
 ```
 
-Or provide credentials through the environment:
+Provide Nexus credentials through the environment:
 
 ```shell
 export ORG_GRADLE_PROJECT_apacheUsername="<ASF_ID>"
@@ -114,7 +113,8 @@ history.
 
 ## 3. Prepare a clean release checkout
 
-Use a fresh clone or dedicated worktree:
+Use a fresh clone or dedicated worktree. Verify that `origin` identifies the
+Apache repository before fetching or pushing release refs:
 
 ```shell
 git clone git@github.com:apache/polaris-tools.git polaris-tools-release
@@ -124,7 +124,7 @@ git fetch origin --tags
 export REPO_ROOT="$(git rev-parse --show-toplevel)"
 ```
 
-Confirm the remote identifies `apache/polaris-tools`, then set the coordinates:
+Then set the coordinates:
 
 ```shell
 export VERSION="x.y.z"
