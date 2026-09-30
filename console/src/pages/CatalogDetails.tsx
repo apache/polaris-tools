@@ -226,6 +226,14 @@ export function CatalogDetails() {
                             </span>
                           </div>
                         )}
+                        {catalog.storageConfigInfo.kmsUnavailable && (
+                          <div className="flex gap-2">
+                            <span className="font-mono text-sm text-muted-foreground">
+                              KMS Unavailable:
+                            </span>
+                            <span className="font-mono text-sm">true</span>
+                          </div>
+                        )}
                       </div>
                     )}
                     {catalog.storageConfigInfo.storageType === "AZURE" && (
