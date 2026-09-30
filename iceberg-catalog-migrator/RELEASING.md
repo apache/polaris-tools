@@ -105,11 +105,15 @@ Provide Nexus credentials through the environment:
 
 ```shell
 export ORG_GRADLE_PROJECT_apacheUsername="<ASF_ID>"
-export ORG_GRADLE_PROJECT_apachePassword="<NEXUS_TOKEN_OR_PASSWORD>"
+printf 'Nexus token or password: '
+read -s ORG_GRADLE_PROJECT_apachePassword
+printf '\n'
+export ORG_GRADLE_PROJECT_apachePassword
 ```
 
 Use the ASF ID, not the token name, as the username. Keep secrets out of shell
-history.
+history. After the final Nexus operation, clear the password with
+`unset ORG_GRADLE_PROJECT_apachePassword`.
 
 ## 3. Prepare a clean release checkout
 
