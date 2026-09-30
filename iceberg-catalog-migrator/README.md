@@ -41,3 +41,5 @@ Iceberg view deletion does not expose a purge-false mode equivalent to table mig
 Please use the [getting started guide](docs/getting-started.md) for a step-by-step guide on how to use the tool.
 
 Please use the [examples guide](./docs/examples.md) to learn about the different options available in the tool.
+
+Release managers should follow the project-specific [release guide](./RELEASING.md).
