@@ -1,0 +1,426 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Release - 3 - Build and Publish Release Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (check to enable, uncheck to perform actual operations)'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  prerequisite-checks:
+    name: Prerequisite Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      dry_run: ${{ steps.set-outputs.outputs.dry_run }}
+      tool: ${{ steps.prepare.outputs.tool }}
+      git_tag: ${{ steps.prepare.outputs.git_tag }}
+      version_without_rc: ${{ steps.prepare.outputs.version_without_rc }}
+      rc_number: ${{ steps.prepare.outputs.rc_number }}
+      skip_maven: ${{ steps.flavors.outputs.skip_maven }}
+      skip_docker: ${{ steps.flavors.outputs.skip_docker }}
+      skip_helm: ${{ steps.flavors.outputs.skip_helm }}
+      skip_python: ${{ steps.flavors.outputs.skip_python }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment variables
+        id: set-outputs
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+          echo "## Mode" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "DRY_RUN=1" >> $GITHUB_ENV
+            echo "dry_run=1" >> $GITHUB_OUTPUT
+            echo "‼️ DRY_RUN mode enabled - No actual changes will be made" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DRY_RUN=0" >> $GITHUB_ENV
+            echo "dry_run=0" >> $GITHUB_OUTPUT
+            echo "DRY_RUN mode disabled - Performing actual operations" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Validate release candidate tag
+        id: prepare
+        env:
+          git_ref: ${{ github.ref }}
+        run: source "${LIBS_DIR}/_gh_rc_prepare.sh"
+
+      - name: Determine flavors to build
+        id: flavors
+        run: source "${LIBS_DIR}/_gh_determine_built_flavors.sh"
+
+  build-source-tarball:
+    name: Build and Stage Source Tarball
+    runs-on: ubuntu-latest
+    needs: prerequisite-checks
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      tool: ${{ needs.prerequisite-checks.outputs.tool }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment variables
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Extract information from release candidate tag
+        run: source "${LIBS_DIR}/_gh_rc_build_prepare.sh"
+
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Build and stage source tarball
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: source "${LIBS_DIR}/_gh_rc_stage_source.sh"
+
+  build-and-stage-maven:
+    name: Build and Publish Maven Artifacts
+    runs-on: ubuntu-latest
+    needs: prerequisite-checks
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      tool: ${{ needs.prerequisite-checks.outputs.tool }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+      skip_maven: ${{ needs.prerequisite-checks.outputs.skip_maven }}
+    outputs:
+      staging_repo_id: ${{ steps.publish-nexus.publish.staging_repo_id }}
+      staging_repo_url: ${{ steps.publish-nexus.publish.staging_repo_url }}
+
+    steps:
+      - name: Checkout repository
+        if: env.skip_maven != '1'
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment variables
+        if: env.skip_maven != '1'
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Extract information from release candidate tag
+        if: env.skip_maven != '1'
+        run: source "${LIBS_DIR}/_gh_rc_build_prepare.sh"
+
+      - name: Set up Java
+        if: env.skip_maven != '1'
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install Subversion
+        if: env.skip_maven != '1'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Import GPG key
+        if: env.skip_maven != '1'
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Assemble artifacts
+        if: env.skip_maven != '1'
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Call tool-specific maven-artifacts script
+          (cd ${tool} ; ./releasey/maven-build.sh)
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Build
+          Maven artifacts built successfully
+          EOT
+
+      - name: Stage artifacts to Apache dist dev repository
+        if: env.skip_maven != '1'
+        env:
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+          source "${LIBS_DIR}/_gh_rc_stage_dist_artifacts.sh"
+
+      - name: Publish and close Apache Nexus staging repository
+        id: publish
+        if: env.skip_maven != '1'
+        env:
+          ORG_GRADLE_PROJECT_apacheUsername: ${{ secrets.APACHE_USERNAME }}
+          ORG_GRADLE_PROJECT_apachePassword: ${{ secrets.APACHE_PASSWORD }}
+        run: source "${LIBS_DIR}/_gh_rc_publish_nexus.sh"
+
+  build-and-stage-python:
+    name: Build and Stage Python Packages
+    runs-on: ubuntu-latest
+    needs: prerequisite-checks
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      tool: ${{ needs.prerequisite-checks.outputs.tool }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+      skip_python: ${{ needs.prerequisite-checks.outputs.skip_python }}
+
+    steps:
+      - name: Checkout repository
+        if: env.skip_python != '1'
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment variables
+        if: env.skip_python != '1'
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Extract information from release candidate tag
+        if: env.skip_python != '1'
+        run: source "${LIBS_DIR}/_gh_rc_build_prepare.sh"
+
+      - name: Install Subversion
+        if: env.skip_python != '1'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Import GPG key
+        if: env.skip_python != '1'
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Build Python Packages
+        if: env.skip_python != '1'
+        run: |
+          # Call tool-specific build script
+          (cd ${tool} ; ./releasey/python-build.sh)
+
+      - name: Stage artifacts to Apache dist dev repository
+        if: env.skip_python != '1'
+        env:
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+          source "${LIBS_DIR}/_gh_rc_stage_dist_artifacts.sh"
+
+  build-docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: 
+      - prerequisite-checks
+      - build-and-stage-maven
+      - build-and-stage-python
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      tool: ${{ needs.prerequisite-checks.outputs.tool }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+      skip_docker: ${{ needs.prerequisite-checks.outputs.skip_docker }}
+
+    steps:
+      - name: Checkout repository
+        if: env.skip_docker != '1'
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment variables
+        if: env.skip_docker != '1'
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Extract information from release candidate tag
+        if: env.skip_docker != '1'
+        run: source "${LIBS_DIR}/_gh_rc_build_prepare.sh"
+
+      - name: Set up Java
+        if: env.skip_docker != '1'
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build and Push Polaris Server Docker images
+        if: env.skip_docker != '1'
+        run: |
+          # Call tool-specific maven-publish script
+          (cd ${tool} ; ./releasey/docker-build.sh)
+
+          echo "## Docker Images Summary" >> $GITHUB_STEP_SUMMARY
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          🎉 Docker images built successfully:
+
+          | Component | Status |
+          | --- | --- |
+          | Polaris Server Docker image | ✅ Built |
+          | Polaris Admin Tool Docker image | ✅ Built |
+          EOT
+
+  build-and-stage-helm-chart:
+    name: Build and Stage Helm Chart
+    runs-on: ubuntu-latest
+    needs:
+      - prerequisite-checks
+      - build-docker
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      tool: ${{ needs.prerequisite-checks.outputs.tool }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+      skip_helm: ${{ needs.prerequisite-checks.outputs.skip_helm }}
+
+    steps:
+      - name: Checkout repository
+        if: env.skip_helm != '1'
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment variables
+        if: env.skip_helm != '1'
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Extract information from release candidate tag
+        if: env.skip_helm != '1'
+        run: source "${LIBS_DIR}/_gh_rc_build_prepare.sh"
+
+      - name: Set up Helm
+        if: env.skip_helm != '1'
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
+        with:
+          version: 'latest'
+
+      - name: Install Subversion
+        if: env.skip_helm != '1'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Import GPG key
+        if: env.skip_helm != '1'
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Build Helm Charts
+        if: env.skip_helm != '1'
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          # Call tool-specific maven-publish script
+          (cd ${tool} ; ./releasey/helm-build.sh)
+
+      - name: Stage Helm Charts
+        if: env.skip_helm != '1'
+        env:
+          SVN_USERNAME: ${{ secrets.APACHE_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.APACHE_PASSWORD }}
+        run: |
+          # Call tool-specific maven-publish script
+          (cd ${tool} ; ./releasey/helm-stage.sh)
+
+
+  finish:
+    name: Build and Publish Release Artifacts Finished
+    runs-on: ubuntu-latest
+    needs:
+      - prerequisite-checks
+      - build-source-tarball
+      - build-and-stage-maven
+      - build-and-stage-python
+      - build-docker
+      - build-and-stage-helm-chart
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      tool: ${{ needs.prerequisite-checks.outputs.tool }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+      staging_repo_id: ${{ needs.build-and-stage-maven.outputs.staging_repo_id }}
+      staging_repo_url: ${{ needs.build-and-stage-maven.outputs.staging_repo_url }}
+    steps:
+      - name: Summary
+        run: source "${LIBS_DIR}/_gh_rc_email_proposal.sh"
