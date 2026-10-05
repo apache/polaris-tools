@@ -373,12 +373,10 @@ public abstract class AbstractTestCatalogMigrator extends AbstractTest {
     Assertions.assertThat(result.registeredTableIdentifiers()).containsExactly(identifier);
     Map<String, String> targetProperties = target.loadNamespaceMetadata(namespace);
     if (targetCatalog instanceof HadoopCatalog) {
-      // HadoopCatalog doesn't support namespace properties, so the namespace is created without.
       Assertions.assertThat(targetProperties).doesNotContainKey("comment");
     } else {
       Assertions.assertThat(targetProperties).containsEntry("comment", "migrated namespace");
     }
-    // the target catalog assigns its own namespace location.
     if (sourceLocation != null) {
       Assertions.assertThat(targetProperties.get("location")).isNotEqualTo(sourceLocation);
     }

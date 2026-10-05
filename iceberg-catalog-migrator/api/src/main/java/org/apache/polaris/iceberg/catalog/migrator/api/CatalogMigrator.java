@@ -288,12 +288,12 @@ public abstract class CatalogMigrator {
     }
   }
 
+  // Namespace properties are copied best effort: failing to copy them must not fail the table.
   private void createNamespaceOnTargetCatalog(Namespace namespace) {
     SupportsNamespaces target = (SupportsNamespaces) targetCatalog();
     try {
       target.createNamespace(namespace, sourceNamespaceProperties(namespace));
     } catch (UnsupportedOperationException ex) {
-      // some catalogs (like HadoopCatalog) don't support namespace properties.
       LOG.warn(
           "Target catalog doesn't support namespace properties. "
               + "Creating namespace {} without properties : {}",
@@ -303,19 +303,15 @@ public abstract class CatalogMigrator {
     }
   }
 
-  /**
-   * Properties of the source namespace to set on the target namespace. The {@code location}
-   * property is not copied because it refers to the source catalog's storage layout; the target
-   * catalog assigns its own namespace location.
-   */
   private Map<String, String> sourceNamespaceProperties(Namespace namespace) {
     try {
       Map<String, String> properties =
           new HashMap<>(((SupportsNamespaces) sourceCatalog()).loadNamespaceMetadata(namespace));
+      // location points into the source catalog's storage, so let the target assign its own.
       properties.remove(NAMESPACE_LOCATION_PROPERTY);
       return properties;
     } catch (NoSuchNamespaceException ex) {
-      // implicit namespaces (like parents of a nested namespace) have no properties.
+      // implicit namespace, so there's nothing to copy.
       return Map.of();
     } catch (Exception ex) {
       if (enableStacktrace()) {

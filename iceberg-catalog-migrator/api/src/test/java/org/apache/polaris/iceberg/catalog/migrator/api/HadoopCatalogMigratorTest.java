@@ -47,8 +47,7 @@ public class HadoopCatalogMigratorTest extends AbstractTestCatalogMigrator {
   @ValueSource(booleans = {true, false})
   public void testRegisterWithNewNamespaceWhenPropertiesCannotBeCopied(
       boolean sourcePropertiesReadable) {
-    // The target HadoopCatalog rejects namespace properties, and the source may fail to read them.
-    // Either way, the namespace is created without properties and the table is still registered.
+    // HadoopCatalog can't store namespace properties, so the source fakes them.
     HadoopCatalog source =
         new HadoopCatalog() {
           @Override
