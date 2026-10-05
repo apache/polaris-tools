@@ -20,9 +20,11 @@ package org.apache.polaris.iceberg.catalog.migrator.api;
 
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -85,6 +87,7 @@ public abstract class CatalogMigrator {
   }
 
   private static final Logger LOG = LoggerFactory.getLogger(CatalogMigrator.class);
+  private static final String NAMESPACE_LOCATION_PROPERTY = "location";
   private final ImmutableCatalogMigrationResult.Builder resultBuilder =
       ImmutableCatalogMigrationResult.builder();
   private final Set<Namespace> processedNamespaces = new HashSet<>();
@@ -273,7 +276,7 @@ public abstract class CatalogMigrator {
         Namespace namespace = Namespace.of(Arrays.copyOfRange(levels, 0, index + 1));
         if (processedNamespaces.add(namespace)) {
           try {
-            ((SupportsNamespaces) targetCatalog()).createNamespace(namespace);
+            createNamespaceOnTargetCatalog(namespace);
           } catch (AlreadyExistsException ex) {
             LOG.debug(
                 "{}.Ignoring the error as forcefully creating the namespace even if it exists to avoid "
@@ -282,6 +285,53 @@ public abstract class CatalogMigrator {
           }
         }
       }
+    }
+  }
+
+  private void createNamespaceOnTargetCatalog(Namespace namespace) {
+    SupportsNamespaces target = (SupportsNamespaces) targetCatalog();
+    try {
+      target.createNamespace(namespace, sourceNamespaceProperties(namespace));
+    } catch (UnsupportedOperationException ex) {
+      // some catalogs (like HadoopCatalog) don't support namespace properties.
+      LOG.warn(
+          "Target catalog doesn't support namespace properties. "
+              + "Creating namespace {} without properties : {}",
+          namespace,
+          ex.getMessage());
+      target.createNamespace(namespace);
+    }
+  }
+
+  /**
+   * Properties of the source namespace to set on the target namespace. The {@code location}
+   * property is not copied because it refers to the source catalog's storage layout; the target
+   * catalog assigns its own namespace location.
+   */
+  private Map<String, String> sourceNamespaceProperties(Namespace namespace) {
+    try {
+      Map<String, String> properties =
+          new HashMap<>(((SupportsNamespaces) sourceCatalog()).loadNamespaceMetadata(namespace));
+      properties.remove(NAMESPACE_LOCATION_PROPERTY);
+      return properties;
+    } catch (NoSuchNamespaceException ex) {
+      // implicit namespaces (like parents of a nested namespace) have no properties.
+      return Map.of();
+    } catch (Exception ex) {
+      if (enableStacktrace()) {
+        LOG.warn(
+            "Unable to load the properties of namespace {} from source catalog. "
+                + "Creating it in target catalog without properties",
+            namespace,
+            ex);
+      } else {
+        LOG.warn(
+            "Unable to load the properties of namespace {} from source catalog. "
+                + "Creating it in target catalog without properties : {}",
+            namespace,
+            ex.getMessage());
+      }
+      return Map.of();
     }
   }
 
