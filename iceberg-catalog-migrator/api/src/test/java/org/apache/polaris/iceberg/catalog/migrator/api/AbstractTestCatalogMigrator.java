@@ -25,9 +25,11 @@ import nl.altindag.log.LogCaptor;
 import nl.altindag.log.model.LogEvent;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.Namespace;
+import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.iceberg.exceptions.NoSuchTableException;
+import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.polaris.iceberg.catalog.migrator.api.test.AbstractTest;
 import org.assertj.core.api.Assertions;
@@ -349,6 +351,40 @@ public abstract class AbstractTestCatalogMigrator extends AbstractTest {
     Assertions.assertThat(result.failedToDeleteTableIdentifiers()).isEmpty();
 
     Assertions.assertThat(targetCatalog.listTables(DB1)).containsExactly(tbl5);
+  }
+
+  @Test
+  public void testRegisterWithNewNamespaceCopiesProperties() {
+    Assumptions.assumeFalse(
+        sourceCatalog instanceof HadoopCatalog,
+        "HadoopCatalog doesn't support namespace properties");
+
+    Namespace namespace = Namespace.of("db_props");
+    TableIdentifier identifier = TableIdentifier.of(namespace, "tbl");
+    SupportsNamespaces source = (SupportsNamespaces) sourceCatalog;
+    SupportsNamespaces target = (SupportsNamespaces) targetCatalog;
+    source.createNamespace(namespace, Map.of("comment", "migrated namespace"));
+    sourceCatalog.createTable(identifier, schema);
+    String sourceLocation = source.loadNamespaceMetadata(namespace).get("location");
+
+    CatalogMigrationResult result =
+        catalogMigratorWithDefaultArgs(false).registerTable(identifier).result();
+
+    Assertions.assertThat(result.registeredTableIdentifiers()).containsExactly(identifier);
+    Map<String, String> targetProperties = target.loadNamespaceMetadata(namespace);
+    if (targetCatalog instanceof HadoopCatalog) {
+      Assertions.assertThat(targetProperties).doesNotContainKey("comment");
+    } else {
+      Assertions.assertThat(targetProperties).containsEntry("comment", "migrated namespace");
+    }
+    if (sourceLocation != null) {
+      Assertions.assertThat(targetProperties.get("location")).isNotEqualTo(sourceLocation);
+    }
+
+    targetCatalog.dropTable(identifier, false);
+    sourceCatalog.dropTable(identifier, true);
+    target.dropNamespace(namespace);
+    source.dropNamespace(namespace);
   }
 
   @ParameterizedTest
