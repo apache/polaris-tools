@@ -21,7 +21,7 @@ export const QUERY_ENGINES = [
   { value: "apache-spark", label: "Apache Spark" },
   { value: "snowflake", label: "Snowflake" },
   { value: "apache-flink", label: "Apache Flink" },
-  { value: "pylceberg", label: "Pylceberg" },
+  { value: "pyiceberg", label: "PyIceberg" },
   { value: "apache-doris", label: "Apache Doris" },
   { value: "starburst-galaxy", label: "Starburst Galaxy" },
   { value: "starrocks", label: "StarRocks" },
