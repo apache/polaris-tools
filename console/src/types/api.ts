@@ -32,6 +32,7 @@ export interface StorageConfigInfo {
   stsEndpoint?: string
   stsUnavailable?: boolean
   pathStyleAccess?: boolean
+  kmsUnavailable?: boolean
   // Azure-specific
   tenantId?: string
   multiTenantAppName?: string
