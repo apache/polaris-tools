@@ -29,7 +29,9 @@ public class CLIUtil {
             "\n\t- token: the bearer token to authenticate against the Polaris instance with." +
             "\n\t- oauth2-server-uri: the uri of the OAuth2 server to authenticate to. (eg. http://localhost:8181/api/catalog/v1/oauth/tokens)" +
             "\n\t- credential: the client credentials to use to authenticate against the Polaris instance (eg. <client_id>:client_secret>)" +
-            "\n\t- scope: the scope to authenticate with for the service_admin (eg. PRINCIPAL_ROLE:ALL)";
+            "\n\t- scope: the scope to authenticate with for the service_admin (eg. PRINCIPAL_ROLE:ALL)" +
+            "\n\t- realm: the realm to send in the realm-context header on every request to the Polaris instance (eg. POLARIS). If unset, no realm header is sent." +
+            "\n\t- realm-header-name: (default: Polaris-Realm) the name of the header used to convey the realm; must match the Polaris instance's configured polaris.realm-context.header-name";
 
     public static final String OMNIPOTENT_PRINCIPAL_PROPERTIES_DESCRIPTION =
             "\nOmnipotent Principal Properties:" +
