@@ -45,6 +45,10 @@ export interface ConnectionConfigInfo {
   uri?: string
   authenticationParameters?: unknown
   serviceIdentity?: unknown
+  // ICEBERG_REST-specific
+  remoteCatalogName?: string
+  // HADOOP/HIVE-specific
+  warehouse?: string
 }
 
 export interface Catalog {
