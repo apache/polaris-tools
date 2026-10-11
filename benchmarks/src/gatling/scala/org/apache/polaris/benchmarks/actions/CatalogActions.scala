@@ -27,7 +27,6 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   HttpRequestBuilderWithStatusSave
 }
 import org.apache.polaris.benchmarks.parameters.DatasetParameters
-import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicReference
 
@@ -46,7 +45,6 @@ case class CatalogActions(
     maxRetries: Int = 10,
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   /**
    * Creates a Gatling Feeder that generates catalog names and their default storage locations. Each
@@ -116,17 +114,5 @@ case class CatalogActions(
       .check(jsonPath("$.name").is("#{catalogName}"))
       .check(jsonPath("$.properties.default-base-location").is("#{defaultBaseLocation}"))
       .check(jsonPath("$.storageConfigInfo.allowedLocations[0]").is("#{defaultBaseLocation}"))
-  )
-
-  /**
-   * Lists all available Iceberg catalogs in the deployment. This operation does not rely on any
-   * feeder data.
-   */
-  val fetchAllCatalogs: ChainBuilder = exec(
-    http("Fetch all Catalogs")
-      .get("/api/management/v1/catalogs")
-      .header("Authorization", "Bearer #{accessToken}")
-      .header("Content-Type", "application/json")
-      .check(status.is(200))
   )
 }

@@ -29,13 +29,10 @@ import org.apache.polaris.benchmarks.parameters.{
   DatasetParameters,
   WorkloadParameters
 }
-import org.apache.polaris.benchmarks.util.CircularIterator
-import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration._
 
 class CreateCommits extends Simulation {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   // --------------------------------------------------------------------------------
   // Load parameters
@@ -49,8 +46,8 @@ class CreateCommits extends Simulation {
   // Helper values
   // --------------------------------------------------------------------------------
   private val setupActions = SetupActions(cp, ap)
-  private val tableActions = TableActions(dp, wp, setupActions.accessToken)
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
+  private val tableActions = TableActions(dp, setupActions.accessToken)
+  private val viewActions = ViewActions(dp, setupActions.accessToken)
 
   // --------------------------------------------------------------------------------
   // Read and write workloads:

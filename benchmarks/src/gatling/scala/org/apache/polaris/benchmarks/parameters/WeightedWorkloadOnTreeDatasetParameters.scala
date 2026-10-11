@@ -19,13 +19,10 @@
 package org.apache.polaris.benchmarks.parameters
 
 import com.typesafe.config.Config
-import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
-import scala.collection.immutable.LazyList
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 /**

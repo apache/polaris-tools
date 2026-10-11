@@ -26,9 +26,8 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   retryOnHttpStatus,
   HttpRequestBuilderWithStatusSave
 }
-import org.apache.polaris.benchmarks.parameters.{DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.parameters.DatasetParameters
 import org.apache.polaris.benchmarks.util.Mangler
-import org.slf4j.LoggerFactory
 import play.api.libs.json.{Format, Json}
 
 import java.time.Instant
@@ -36,12 +35,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 case class ViewActions(
     dp: DatasetParameters,
-    wp: WorkloadParameters,
     accessToken: AtomicReference[String],
     maxRetries: Int = 10,
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
-  private val logger = LoggerFactory.getLogger(getClass)
   private val mangler = Mangler(dp.mangleNames)
 
   /**
@@ -176,7 +173,6 @@ case class ViewActions(
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views/#{viewName}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
-      .check(jsonPath("$.metadata.view-uuid").saveAs("viewUuid"))
       .check(jsonPath("$.metadata.location").is("#{location}"))
       .check(
         jsonPath("$.metadata.properties")
@@ -225,7 +221,7 @@ case class ViewActions(
           )
         )
         .saveHttpStatusCode()
-        .check(status.is(200).saveAs("lastStatus"))
+        .check(status.is(200))
     )
 }
 
@@ -235,8 +231,6 @@ case class ViewActions(
  */
 object ViewField {
   implicit val format: Format[ViewField] = Json.format[ViewField]
-
-  def fromList(json: String): Seq[ViewField] = Json.parse(json).as[Seq[ViewField]]
 }
 
 /**

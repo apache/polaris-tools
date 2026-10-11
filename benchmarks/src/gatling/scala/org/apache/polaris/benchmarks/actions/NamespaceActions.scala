@@ -26,9 +26,8 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   retryOnHttpStatus,
   HttpRequestBuilderWithStatusSave
 }
-import org.apache.polaris.benchmarks.parameters.{DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.parameters.DatasetParameters
 import org.apache.polaris.benchmarks.util.Mangler
-import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
 import java.util.concurrent.atomic.AtomicReference
@@ -38,19 +37,16 @@ import java.util.concurrent.atomic.AtomicReference
  * authenticate and manage access tokens for API requests.
  *
  * @param dp Dataset parameters controlling the dataset generation
- * @param wp Workload parameters controlling the workload generation
  * @param accessToken Reference to the authentication token shared across actions
  * @param maxRetries Maximum number of retry attempts for failed operations
  * @param retryableHttpCodes HTTP status codes that should trigger a retry
  */
 case class NamespaceActions(
     dp: DatasetParameters,
-    wp: WorkloadParameters,
     accessToken: AtomicReference[String],
     maxRetries: Int = 10,
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
-  private val logger = LoggerFactory.getLogger(getClass)
   private val mangler = Mangler(dp.mangleNames)
 
   /**

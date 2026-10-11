@@ -30,7 +30,6 @@ import org.apache.polaris.benchmarks.parameters.{
   WorkloadParameters
 }
 import org.apache.polaris.benchmarks.util.CircularIterator
-import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration._
 
@@ -41,7 +40,6 @@ import scala.concurrent.duration._
  * the ReadUpdateTreeDatasetParameters.
  */
 class ReadUpdateTreeDataset extends Simulation {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   // --------------------------------------------------------------------------------
   // Load parameters
@@ -55,10 +53,9 @@ class ReadUpdateTreeDataset extends Simulation {
   // Helper values
   // --------------------------------------------------------------------------------
   private val setupActions = SetupActions(cp, ap)
-  private val catActions = CatalogActions(dp, setupActions.accessToken)
-  private val nsActions = NamespaceActions(dp, wp, setupActions.accessToken)
-  private val tblActions = TableActions(dp, wp, setupActions.accessToken)
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
+  private val nsActions = NamespaceActions(dp, setupActions.accessToken)
+  private val tblActions = TableActions(dp, setupActions.accessToken)
+  private val viewActions = ViewActions(dp, setupActions.accessToken)
 
   private val nsListFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
   private val nsExistsFeeder = new CircularIterator(nsActions.namespaceIdentityFeeder)
