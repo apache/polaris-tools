@@ -62,20 +62,30 @@ case class NamespaceActions(
    */
   def namespaceIdentityFeeder(): Feeder[Any] = Iterator
     .from(0)
-    .map { tableId =>
-      val namespaceId = tableId
-      val namespacePath: Seq[String] = dp.nAryTree
-        .pathToRoot(namespaceId)
-        .map(mangler.maybeMangleNs)
-      Map(
-        "catalogName" -> "C_0",
-        "namespaceId" -> tableId,
-        "namespacePath" -> namespacePath,
-        "namespaceJsonPath" -> Json.toJson(namespacePath).toString(),
-        "namespaceMultipartPath" -> namespacePath.mkString("%1F")
-      )
-    }
+    .map(namespaceIdentity)
     .take(dp.nAryTree.numberOfNodes)
+
+  /**
+   * Creates a Gatling Feeder that generates the identities of the namespaces located at a given depth of the n-ary.
+   * Rows have the same attribute as the ones of [[NamespaceActions.namespaceIdentityFeeder()]]
+   *
+   * @param depth The depth of the namespaces, where the root namespace is at the depth 0
+   * @return An iterator providing namespace details
+   */
+  def namespaceDeletionFeeder(depth: Int): Feeder[Any] = dp.nAryTree.ordinalsAtDepth(depth).iterator.map(namespaceIdentity)
+
+  private def namespaceIdentity(namespaceId: Int): Map[String, Any] = {
+    val namespacePath: Seq[String] = dp.nAryTree
+      .pathToRoot(namespaceId)
+      .map(mangler.maybeMangleNs)
+    Map(
+      "catalogName" -> "C_0",
+      "namespaceId" -> namespaceId,
+      "namespacePath" -> namespacePath,
+      "namespaceJsonPath" -> Json.toJson(namespacePath).toString(),
+      "namespaceMultipartPath" -> namespacePath.mkString("%1F")
+    )
+  }
 
   /**
    * Creates a Gatling Feeder that generates namespace hierarchies. Each row is associated with a
@@ -229,5 +239,17 @@ case class NamespaceActions(
         )
         .saveHttpStatusCode()
         .check(status.is(200))
+    )
+
+  /**
+   * Delete an Iceberg namespace by its path. A namespace that does not exist is ignored.
+   */
+  val deleteNamespace: ChainBuilder =
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete namespace")(
+      http("Delete Namespace")
+        .delete("/api/catalog/v1/#{catalogName}/namespaces/#{namespaceMultipartPath}")
+        .header("Authorization", "Bearer #{accessToken}")
+        .saveHttpStatusCode()
+        .check(status.in(204, 404))
     )
 }

@@ -241,6 +241,17 @@ case class TableActions(
         .saveHttpStatusCode()
         .check(status.is(200).saveAs("lastStatus"))
     )
+
+  /**
+   * Delete an Iceberg table by its name and namespace path. A table that does not exist is ignored.
+   */
+  val deleteTable: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete Table")(
+    http("Delete Table")
+      .delete(s"/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}")
+      .header("Authorization", "Bearer #{accessToken}")
+      .saveHttpStatusCode()
+      .check(status.in(204, 404))
+  )
 }
 
 /**
