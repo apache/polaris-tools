@@ -236,7 +236,7 @@ case class ViewActions(
       .delete("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views/#{viewName}")
       .header("Authorization", "Bearer #{accessToken}")
       .saveHttpStatusCode()
-      .check(status.in(204, 204))
+      .check(status.in(204, 404))
   )
 }
 
