@@ -66,13 +66,15 @@ case class NamespaceActions(
     .take(dp.nAryTree.numberOfNodes)
 
   /**
-   * Creates a Gatling Feeder that generates the identities of the namespaces located at a given depth of the n-ary.
-   * Rows have the same attribute as the ones of [[NamespaceActions.namespaceIdentityFeeder()]]
+   * Creates a Gatling Feeder that generates the identities of the namespaces located at a given
+   * depth of the n-ary. Rows have the same attribute as the ones of
+   * [[NamespaceActions.namespaceIdentityFeeder()]]
    *
    * @param depth The depth of the namespaces, where the root namespace is at the depth 0
    * @return An iterator providing namespace details
    */
-  def namespaceDeletionFeeder(depth: Int): Feeder[Any] = dp.nAryTree.ordinalsAtDepth(depth).iterator.map(namespaceIdentity)
+  def namespaceDeletionFeeder(depth: Int): Feeder[Any] =
+    dp.nAryTree.ordinalsAtDepth(depth).iterator.map(namespaceIdentity)
 
   private def namespaceIdentity(namespaceId: Int): Map[String, Any] = {
     val namespacePath: Seq[String] = dp.nAryTree

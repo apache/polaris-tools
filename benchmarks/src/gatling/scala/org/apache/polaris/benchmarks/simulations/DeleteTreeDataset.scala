@@ -23,21 +23,26 @@ import io.gatling.core.structure.{PopulationBuilder, ScenarioBuilder}
 import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
-import org.apache.polaris.benchmarks.parameters.{AuthParameters, ConnectionParameters, DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.parameters.{
+  AuthParameters,
+  ConnectionParameters,
+  DatasetParameters,
+  WorkloadParameters
+}
 import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * This simulation is a 100% delete workload that removes a tree dataset create by [[CreateTreeDataset]] in Polaris.
- * It must be run with the same dataset parameters as the ones used to create the dataset.
+ * This simulation is a 100% delete workload that removes a tree dataset create by
+ * [[CreateTreeDataset]] in Polaris. It must be run with the same dataset parameters as the ones
+ * used to create the dataset.
  *
- * Tables and views are deleted first, then namespaces one tree level at a time starting from the deepest level, then the catalogs.
- * Entities that don't exist are ignored.
+ * Tables and views are deleted first, then namespaces one tree level at a time starting from the
+ * deepest level, then the catalogs. Entities that don't exist are ignored.
  *
- * Tables are dropped with purge which would remove their data and metadata files on drop. DROP_WITH_PURGE_ENABLE must be
- * enabled on the server side.
- *
+ * Tables are dropped with purge which would remove their data and metadata files on drop.
+ * DROP_WITH_PURGE_ENABLE must be enabled on the server side.
  */
 class DeleteTreeDataset extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -97,7 +102,8 @@ class DeleteTreeDataset extends Simulation {
     scenario(s"Delete namespaces at depth $depth using the Iceberg REST API")
       .exec(setupActions.restoreAccessTokenInSession)
       .asLongAs(session =>
-        deletedNamespaces.getAndIncrement() < numNamespacesAtDepth && session.contains("accessToken")
+        deletedNamespaces.getAndIncrement() < numNamespacesAtDepth && session
+          .contains("accessToken")
       )(
         feed(namespaceActions.namespaceDeletionFeeder(depth))
           .exec(namespaceActions.deleteNamespace)
@@ -137,13 +143,13 @@ class DeleteTreeDataset extends Simulation {
     .andThen(deleteViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
     .andThen(deleteTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
 
-  private val deleteViewsTablesAndNamespaces: PopulationBuilder = (dp.nsDepth - 1 to 0 by -1).foldLeft(deleteViewsAndTables) {
-    (populationBuilder, depth) =>
+  private val deleteViewsTablesAndNamespaces: PopulationBuilder =
+    (dp.nsDepth - 1 to 0 by -1).foldLeft(deleteViewsAndTables) { (populationBuilder, depth) =>
       val users = math.min(namespaceThroughput, dp.nAryTree.ordinalsAtDepth(depth).size)
       populationBuilder.andThen(
         deleteNamespacesAtDepth(depth).inject(atOnceUsers(users)).protocols(httpProtocol)
       )
-  }
+    }
 
   setUp(
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),

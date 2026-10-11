@@ -247,7 +247,9 @@ case class TableActions(
    */
   val deleteTable: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete Table")(
     http("Delete Table")
-      .delete(s"/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}")
+      .delete(
+        s"/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}"
+      )
       .header("Authorization", "Bearer #{accessToken}")
       .saveHttpStatusCode()
       .check(status.in(204, 404))
