@@ -24,11 +24,16 @@ package org.apache.polaris.benchmarks.parameters
  * @param namespaceThroughput The number of namespace operations to perform per second.
  * @param tableThroughput The number of table operations to perform per second.
  * @param viewThroughput The number of view operations to perform per second.
+ * @param purge Whether tables are dropped with purge. When true, the table's data and metadata
+ *   files are removed as well, which requires DROP_WITH_PURGE_ENABLED to be enabled on the server
+ *   side. Views are always dropped without purge, as their metadata purging is governed by the
+ *   server-side PURGE_VIEW_METADATA_ON_DROP configuration.
  */
 case class DeleteTreeDatasetParameters(
     namespaceThroughput: Int,
     tableThroughput: Int,
-    viewThroughput: Int
+    viewThroughput: Int,
+    purge: Boolean
 ) {
   require(namespaceThroughput >= 0, "Namespace throughput cannot be negative")
   require(tableThroughput >= 0, "Table throughput cannot be negative")

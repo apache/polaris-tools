@@ -84,7 +84,8 @@ object BenchmarkConfig {
         DeleteTreeDatasetParameters(
           dtdConfig.getInt("namespace-concurrency"),
           dtdConfig.getInt("table-concurrency"),
-          dtdConfig.getInt("view-concurrency")
+          dtdConfig.getInt("view-concurrency"),
+          dtdConfig.getBoolean("purge")
         ),
         ReadUpdateTreeDatasetParameters(
           rutdConfig.getDouble("read-write-ratio"),

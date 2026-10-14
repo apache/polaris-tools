@@ -41,8 +41,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * Tables and views are deleted first, then namespaces one tree level at a time starting from the
  * deepest level, then the catalogs. Entities that don't exist are ignored.
  *
- * Tables are dropped with purge which would remove their data and metadata files on drop.
- * DROP_WITH_PURGE_ENABLE must be enabled on the server side.
+ * Tables are dropped with purge as controlled by the `purge` configuration (default false). When
+ * enabled, it removes their data and metadata files on drop and requires DROP_WITH_PURGE_ENABLED to
+ * be enabled on the server side. Views are always dropped without purge; their metadata purging is
+ * governed by the server-side PURGE_VIEW_METADATA_ON_DROP configuration.
  */
 class DeleteTreeDataset extends Simulation {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -59,6 +61,7 @@ class DeleteTreeDataset extends Simulation {
   // Helper values
   // --------------------------------------------------------------------------------
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
+  private val purge: Boolean = wp.deleteTreeDataset.purge
   private val setupActions = SetupActions(cp, ap)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken, 0, Set())
   private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
@@ -90,7 +93,7 @@ class DeleteTreeDataset extends Simulation {
       deletedTables.getAndIncrement() < dp.numTables && session.contains("accessToken")
     )(
       feed(tableActions.tableIdentityFeeder())
-        .exec(tableActions.deleteTable)
+        .exec(tableActions.deleteTable(purge))
     )
 
   // --------------------------------------------------------------------------------

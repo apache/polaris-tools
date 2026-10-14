@@ -244,16 +244,21 @@ case class TableActions(
 
   /**
    * Delete an Iceberg table by its name and namespace path. A table that does not exist is ignored.
+   *
+   * @param purge When true, the table is dropped with purge, which also removes the table's data
+   *   and metadata files. This requires DROP_WITH_PURGE_ENABLED to be enabled on the server side.
    */
-  val deleteTable: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete Table")(
-    http("Delete Table")
-      .delete(
-        s"/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}"
-      )
-      .header("Authorization", "Bearer #{accessToken}")
-      .saveHttpStatusCode()
-      .check(status.in(204, 404))
-  )
+  def deleteTable(purge: Boolean): ChainBuilder =
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete Table")(
+      http("Delete Table")
+        .delete(
+          s"/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}"
+        )
+        .queryParam("purgeRequested", purge.toString)
+        .header("Authorization", "Bearer #{accessToken}")
+        .saveHttpStatusCode()
+        .check(status.in(204, 404))
+    )
 }
 
 /**
