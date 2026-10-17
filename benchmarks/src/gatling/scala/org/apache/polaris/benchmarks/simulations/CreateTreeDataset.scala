@@ -29,7 +29,6 @@ import org.apache.polaris.benchmarks.parameters.{
   DatasetParameters,
   WorkloadParameters
 }
-import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.duration._
@@ -39,7 +38,6 @@ import scala.concurrent.duration._
  * to be used against an empty Polaris instance.
  */
 class CreateTreeDataset extends Simulation {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   // --------------------------------------------------------------------------------
   // Load parameters
@@ -55,9 +53,9 @@ class CreateTreeDataset extends Simulation {
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
   private val setupActions = SetupActions(cp, ap)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken, 0, Set())
-  private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val tableActions = TableActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 5, Set(500))
+  private val namespaceActions = NamespaceActions(dp, setupActions.accessToken, 5, Set(500))
+  private val tableActions = TableActions(dp, setupActions.accessToken, 5, Set(500))
+  private val viewActions = ViewActions(dp, setupActions.accessToken, 5, Set(500))
 
   private val createdCatalogs = new AtomicInteger()
   private val createdNamespaces = new AtomicInteger()

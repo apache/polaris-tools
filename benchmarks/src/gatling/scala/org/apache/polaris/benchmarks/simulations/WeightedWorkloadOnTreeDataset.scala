@@ -31,7 +31,6 @@ import org.apache.polaris.benchmarks.parameters.{
   RandomNumberProvider,
   WorkloadParameters
 }
-import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration._
 
@@ -41,8 +40,6 @@ import scala.concurrent.duration._
  * intended to be used against a Polaris instance with a pre-existing tree dataset.
  */
 class WeightedWorkloadOnTreeDataset extends Simulation {
-  private val logger = LoggerFactory.getLogger(getClass)
-
   // --------------------------------------------------------------------------------
   // Load parameters
   // --------------------------------------------------------------------------------
@@ -69,7 +66,7 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
   // Helper values
   // --------------------------------------------------------------------------------
   private val setupActions = SetupActions(cp, ap)
-  private val tblActions = TableActions(dp, wp, setupActions.accessToken)
+  private val tblActions = TableActions(dp, setupActions.accessToken)
 
   // --------------------------------------------------------------------------------
   // Build up the HTTP protocol configuration and set up the simulation

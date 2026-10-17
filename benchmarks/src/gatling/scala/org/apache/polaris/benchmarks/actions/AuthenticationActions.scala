@@ -27,7 +27,6 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   HttpRequestBuilderWithStatusSave
 }
 import org.apache.polaris.benchmarks.parameters.{AuthParameters, ConnectionParameters}
-import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicReference
 
@@ -44,7 +43,6 @@ case class AuthenticationActions(
     ap: AuthParameters,
     accessToken: AtomicReference[String]
 ) {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   /**
    * Creates a Gatling Feeder that provides authentication credentials. The feeder continuously

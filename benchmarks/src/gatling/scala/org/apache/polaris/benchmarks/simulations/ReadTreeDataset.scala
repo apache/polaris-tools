@@ -24,7 +24,6 @@ import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
 import org.apache.polaris.benchmarks.parameters.{AuthParameters, WorkloadParameters}
-import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.duration._
@@ -36,7 +35,6 @@ import scala.concurrent.duration._
  * exactly once.
  */
 class ReadTreeDataset extends Simulation {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   // --------------------------------------------------------------------------------
   // Load parameters
@@ -52,9 +50,9 @@ class ReadTreeDataset extends Simulation {
   private val numNamespaces: Int = dp.nAryTree.numberOfNodes
   private val setupActions = SetupActions(cp, ap)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken)
-  private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken)
-  private val tableActions = TableActions(dp, wp, setupActions.accessToken)
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken)
+  private val namespaceActions = NamespaceActions(dp, setupActions.accessToken)
+  private val tableActions = TableActions(dp, setupActions.accessToken)
+  private val viewActions = ViewActions(dp, setupActions.accessToken)
 
   private val verifiedCatalogs = new AtomicInteger()
   private val verifiedNamespaces = new AtomicInteger()

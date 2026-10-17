@@ -26,11 +26,8 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   retryOnHttpStatus,
   HttpRequestBuilderWithStatusSave
 }
-import org.apache.polaris.benchmarks.parameters.{DatasetParameters, WorkloadParameters}
+import org.apache.polaris.benchmarks.parameters.DatasetParameters
 import org.apache.polaris.benchmarks.util.Mangler
-import org.slf4j.LoggerFactory
-import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json.{Format, Json}
 
 import java.util.concurrent.atomic.AtomicReference
@@ -40,19 +37,16 @@ import java.util.concurrent.atomic.AtomicReference
  * manage tables within namespaces.
  *
  * @param dp Dataset parameters controlling the dataset generation
- * @param wp Workload parameters controlling the workload configuration
  * @param accessToken Reference to the authentication token shared across actions
  * @param maxRetries Maximum number of retry attempts for failed operations
  * @param retryableHttpCodes HTTP status codes that should trigger a retry
  */
 case class TableActions(
     dp: DatasetParameters,
-    wp: WorkloadParameters,
     accessToken: AtomicReference[String],
     maxRetries: Int = 10,
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
-  private val logger = LoggerFactory.getLogger(getClass)
   private val mangler = Mangler(dp.mangleNames)
 
   /**
@@ -186,7 +180,6 @@ case class TableActions(
       .get("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/tables/#{tableName}")
       .header("Authorization", "Bearer #{accessToken}")
       .check(status.is(200))
-      .check(jsonPath("$.metadata.table-uuid").saveAs("tableUuid"))
       .check(jsonPath("$.metadata.location").is("#{location}"))
       .check(
         jsonPath("$.metadata.properties")
@@ -239,7 +232,7 @@ case class TableActions(
           )
         )
         .saveHttpStatusCode()
-        .check(status.is(200).saveAs("lastStatus"))
+        .check(status.is(200))
     )
 
   /**
@@ -267,8 +260,6 @@ case class TableActions(
  */
 object TableField {
   implicit val format: Format[TableField] = Json.format[TableField]
-
-  def fromList(json: String): Seq[TableField] = Json.parse(json).as[Seq[TableField]]
 }
 
 /**

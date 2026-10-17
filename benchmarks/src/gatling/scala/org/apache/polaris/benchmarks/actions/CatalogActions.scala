@@ -27,7 +27,6 @@ import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   HttpRequestBuilderWithStatusSave
 }
 import org.apache.polaris.benchmarks.parameters.DatasetParameters
-import org.slf4j.LoggerFactory
 
 import java.util.concurrent.atomic.AtomicReference
 
@@ -46,7 +45,6 @@ case class CatalogActions(
     maxRetries: Int = 10,
     retryableHttpCodes: Set[Int] = Set(409, 500)
 ) {
-  private val logger = LoggerFactory.getLogger(getClass)
 
   /**
    * Creates a Gatling Feeder that generates catalog names and their default storage locations. Each
