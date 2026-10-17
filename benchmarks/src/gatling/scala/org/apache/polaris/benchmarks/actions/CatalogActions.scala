@@ -115,4 +115,29 @@ case class CatalogActions(
       .check(jsonPath("$.properties.default-base-location").is("#{defaultBaseLocation}"))
       .check(jsonPath("$.storageConfigInfo.allowedLocations[0]").is("#{defaultBaseLocation}"))
   )
+
+  /**
+   * Lists all available Iceberg catalogs in the deployment. This operation does not rely on any
+   * feeder data.
+   */
+  val fetchAllCatalogs: ChainBuilder = exec(
+    http("Fetch all Catalogs")
+      .get("/api/management/v1/catalogs")
+      .header("Authorization", "Bearer #{accessToken}")
+      .header("Content-Type", "application/json")
+      .check(status.is(200))
+  )
+
+  /**
+   * Delete an Iceberg catalog by name. The catalog name is defined in the
+   * [[CatalogActions.feeder]]. A catalog that does not exist is ignored.
+   */
+  val deleteCatalog: ChainBuilder =
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete catalog")(
+      http("Delete Catalog")
+        .delete("/api/management/v1/catalogs/#{catalogName}")
+        .header("Authorization", "Bearer #{accessToken}")
+        .saveHttpStatusCode()
+        .check(status.in(204, 404))
+    )
 }

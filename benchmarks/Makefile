@@ -59,6 +59,13 @@ create-dataset-simulation: benchmarks-pre-requisite ## Run create dataset simula
       -Dconfig.file=${APPLICATION_CONF_PATH}
 	@echo "--- Create dataset simulation completed ---"
 
+.PHONY: delete-dataset-simulation
+delete-dataset-simulation: benchmarks-pre-requisite ## Run delete dataset simulation
+	@echo "--- Running delete dataset simulation ---"
+	@./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.DeleteTreeDataset \
+      -Dconfig.file=${APPLICATION_CONF_PATH}
+	@echo "--- Delete dataset simulation completed ---"
+
 .PHONY: read-simulation
 read-simulation: benchmarks-pre-requisite ## Run read simulation
 	@echo "--- Running read simulation ---"

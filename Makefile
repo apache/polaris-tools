@@ -39,6 +39,10 @@ benchmarks-create-commits-simulation: ## Run create commits simulation
 benchmarks-create-dataset-simulation: ## Run create dataset simulation
 	@$(MAKE) -C benchmarks create-dataset-simulation
 
+.PHONY: benchmarks-delete-dataset-simulation
+benchmarks-delete-dataset-simulation: ## Run delete dataset simulation
+	@$(MAKE) -C benchmarks delete-dataset-simulation
+
 .PHONY: benchmarks-read-simulation
 benchmarks-read-simulation: ## Run read simulation
 	@$(MAKE) -C benchmarks read-simulation

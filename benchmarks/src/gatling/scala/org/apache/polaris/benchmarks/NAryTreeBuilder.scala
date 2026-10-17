@@ -92,24 +92,32 @@ case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
     }
 
   /**
-   * Returns a range of ordinals for the nodes on the last level of a complete n-ary tree.
+   * Returns a range of ordinals for the nodes at a given depth of a complete n-ary tree.
    *
+   * @param depth The depth of the nodes, where the root namespace is at the depth 0.
    * @return The range of ordinals for the nodes on the last level of the tree.
    */
-  val lastLevelOrdinals: Range = {
-    val lastLevel = nsDepth - 1
+  def ordinalsAtDepth(depth: Int): Range = {
+    require(depth >= 0 && depth < nsDepth, s"Depth ($depth) must be in [0, $nsDepth]")
     if (nsWidth == 1) {
       // For a unary tree, the only node at depth d is simply the node with ordinal d.
-      Range.inclusive(lastLevel, lastLevel)
+      Range.inclusive(depth, depth)
     } else {
       // The sum of nodes from level 0 to level d-1 is (n^d - 1) / (n - 1)
-      val start = ((math.pow(nsWidth, lastLevel) - 1) / (nsWidth - 1)).toInt
+      val start = ((math.pow(nsWidth, depth) - 1) / (nsWidth - 1)).toInt
       // The sum of nodes from level 0 to level d is (n^(d+1) - 1) / (n - 1)
       // Therefore, the last ordinal at depth d is:
-      val end = (((math.pow(nsWidth, lastLevel + 1) - 1) / (nsWidth - 1)).toInt) - 1
+      val end = (((math.pow(nsWidth, depth + 1) - 1) / (nsWidth - 1)).toInt) - 1
       Range.inclusive(start, end)
     }
   }
+
+  /**
+   * Return a range of ordinals for the nodes on the last level of a complete n-ary tree.
+   *
+   * @return the range of ordinals for the nodes on the last level of the tree.
+   */
+  val lastLevelOrdinals: Range = ordinalsAtDepth(nsDepth - 1)
 
   val numberOfLastLevelElements: Int = {
     val lastLevel = nsDepth - 1

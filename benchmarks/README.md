@@ -24,6 +24,7 @@ Benchmarks for the Polaris service using Gatling.
 ## Available Benchmarks
 
 - `org.apache.polaris.benchmarks.simulations.CreateTreeDataset`: Creates a test dataset with a specific structure.  It is a write-only workload designed to populate the system for subsequent benchmarks.
+- `org.apache.polaris.benchmarks.simulations.DeleteTreeDataset`: Deletes the test dataset created by CreateTreeDataset. Tables are dropped with purge as controlled by the `delete-tree-dataset.purge` configuration (default `false`). When enabled, dropping a table also removes its data and metadata files and requires DROP_WITH_PURGE_ENABLED to be enabled on the server side. Views are always dropped without purge; their metadata purging is governed by the server-side PURGE_VIEW_METADATA_ON_DROP configuration.
 - `org.apache.polaris.benchmarks.simulations.ReadTreeDataset`: Performs read-only operations to fetch namespaces, tables, and views.  Some attributes of the objects are also fetched.  This benchmark is intended to be used against a Polaris instance with a pre-existing tree dataset.  It has no side effects on the dataset and can be executed multiple times without any issues.
 - `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset`: Performs read and update operations against a Polaris instance populated with a test dataset.  It is a read/write workload that can be used to test the system's ability to handle concurrent read and update operations.  It is not destructive and does not prevent subsequent executions of `ReadTreeDataset` or `ReadUpdateTreeDataset`.
 - `org.apache.polaris.benchmarks.simulations.CreateCommits`: Creates table and view commits at configurable rates.  This benchmark is useful for testing the system's ability to handle table and view commits and can be used to generate a history of thousands of commits for both tables and views.
@@ -144,6 +145,9 @@ make create-commits-simulation
 
 # Weighted workload
 make weighted-workload-simulation
+
+# Dataset deletion
+make delete-dataset-simulation
 ```
 
 A message will show the location of the Gatling report:
