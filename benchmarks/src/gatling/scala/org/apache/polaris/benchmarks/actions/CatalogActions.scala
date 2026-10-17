@@ -129,4 +129,17 @@ case class CatalogActions(
       .header("Content-Type", "application/json")
       .check(status.is(200))
   )
+
+  /**
+   * Delete an Iceberg catalog by name. The catalog name is defined in the
+   * [[CatalogActions.feeder]]. A catalog that does not exist is ignored.
+   */
+  val deleteCatalog: ChainBuilder =
+    retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete catalog")(
+      http("Delete Catalog")
+        .delete("/api/management/v1/catalogs/#{catalogName}")
+        .header("Authorization", "Bearer #{accessToken}")
+        .saveHttpStatusCode()
+        .check(status.in(204, 404))
+    )
 }

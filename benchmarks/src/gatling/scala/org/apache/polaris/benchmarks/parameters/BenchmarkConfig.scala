@@ -62,6 +62,7 @@ object BenchmarkConfig {
       val ccConfig = workload.getConfig("create-commits")
       val rtdConfig = workload.getConfig("read-tree-dataset")
       val ctdConfig = workload.getConfig("create-tree-dataset")
+      val dtdConfig = workload.getConfig("delete-tree-dataset")
       val rutdConfig = workload.getConfig("read-update-tree-dataset")
       val wwotdConfig = workload.getConfig("weighted-workload-on-tree-dataset")
 
@@ -79,6 +80,12 @@ object BenchmarkConfig {
         CreateTreeDatasetParameters(
           ctdConfig.getInt("table-concurrency"),
           ctdConfig.getInt("view-concurrency")
+        ),
+        DeleteTreeDatasetParameters(
+          dtdConfig.getInt("namespace-concurrency"),
+          dtdConfig.getInt("table-concurrency"),
+          dtdConfig.getInt("view-concurrency"),
+          dtdConfig.getBoolean("purge")
         ),
         ReadUpdateTreeDatasetParameters(
           rutdConfig.getDouble("read-write-ratio"),

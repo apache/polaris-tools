@@ -227,6 +227,17 @@ case class ViewActions(
         .saveHttpStatusCode()
         .check(status.is(200).saveAs("lastStatus"))
     )
+
+  /**
+   * Delete an Iceberg view by its name and namespace path. A view that does not exist is ignored.
+   */
+  val deleteView: ChainBuilder = retryOnHttpStatus(maxRetries, retryableHttpCodes, "Delete View")(
+    http("Delete View")
+      .delete("/api/catalog/v1/#{catalogName}/namespaces/#{multipartNamespace}/views/#{viewName}")
+      .header("Authorization", "Bearer #{accessToken}")
+      .saveHttpStatusCode()
+      .check(status.in(204, 404))
+  )
 }
 
 /**
