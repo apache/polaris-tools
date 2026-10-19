@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * This simulation is a 100% delete workload that removes a tree dataset create by
+ * This simulation is a 100% delete workload that removes a tree dataset created by
  * [[CreateTreeDataset]] in Polaris. It must be run with the same dataset parameters as the ones
  * used to create the dataset.
  *
@@ -64,9 +64,9 @@ class DeleteTreeDataset extends Simulation {
   private val purge: Boolean = wp.deleteTreeDataset.purge
   private val setupActions = SetupActions(cp, ap)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken, 0, Set())
-  private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val tableActions = TableActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 5, Set(500))
+  private val namespaceActions = NamespaceActions(dp, setupActions.accessToken, 5, Set(500))
+  private val tableActions = TableActions(dp, setupActions.accessToken, 5, Set(500))
+  private val viewActions = ViewActions(dp, setupActions.accessToken, 5, Set(500))
 
   private val deletedCatalogs = new AtomicInteger()
   private val deletedTables = new AtomicInteger()
@@ -141,10 +141,19 @@ class DeleteTreeDataset extends Simulation {
   private val tableThroughput = wp.deleteTreeDataset.tableThroughput
   private val viewThroughput = wp.deleteTreeDataset.viewThroughput
 
-  private val deleteViewsAndTables: PopulationBuilder = setupActions.waitForAuthentication
+  private val waitForDeleteAuthentication: PopulationBuilder = setupActions.waitForAuthentication
     .inject(atOnceUsers(1))
-    .andThen(deleteViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
-    .andThen(deleteTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+
+  private val deleteViewsAndTables: PopulationBuilder = {
+    val afterViews =
+      if (dp.numViews > 0) {
+        waitForDeleteAuthentication
+          .andThen(deleteViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
+      } else {
+        waitForDeleteAuthentication
+      }
+    afterViews.andThen(deleteTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+  }
 
   private val deleteViewsTablesAndNamespaces: PopulationBuilder =
     (dp.nsDepth - 1 to 0 by -1).foldLeft(deleteViewsAndTables) { (populationBuilder, depth) =>
@@ -160,9 +169,12 @@ class DeleteTreeDataset extends Simulation {
       .andThen(deleteCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   ).assertions(
-    details("Delete View").successfulRequests.count.is(dp.numViews),
-    details("Delete Table").successfulRequests.count.is(dp.numTables),
-    details("Delete Namespace").successfulRequests.count.is(numNamespaces),
-    details("Delete Catalog").successfulRequests.count.is(dp.numCatalogs)
+    (if (dp.numViews > 0) Seq(details("Delete View").successfulRequests.count.is(dp.numViews))
+     else Seq.empty) ++
+      Seq(
+        details("Delete Table").successfulRequests.count.is(dp.numTables),
+        details("Delete Namespace").successfulRequests.count.is(numNamespaces),
+        details("Delete Catalog").successfulRequests.count.is(dp.numCatalogs)
+      ): _*
   )
 }

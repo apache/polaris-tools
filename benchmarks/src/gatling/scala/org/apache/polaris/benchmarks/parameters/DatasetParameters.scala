@@ -30,10 +30,13 @@ import org.apache.polaris.benchmarks.NAryTreeBuilder
  * @param numNamespaceProperties The number of namespace properties to create.
  * @param numTablesPerNs The number of tables per namespace to create.
  * @param numTablesMax The maximum number of tables to create. If set to -1, all tables are created.
+ *   Must be positive or -1.
  * @param numColumnsPerTable The number of columns per table to create.
  * @param numTableProperties The number of table properties to create.
- * @param numViewsPerNs The number of views per namespace to create.
- * @param numViewsMax The maximum number of views to create. If set to -1, all views are created.
+ * @param numViewsPerNs The number of views per namespace to create. If set to 0, views are disabled
+ *   and no simulation performs view operations.
+ * @param numViewsMax The maximum number of views to create. If set to -1, all views are created. If
+ *   set to 0, no views are created.
  * @param numColumnsPerView The number of columns per view to create.
  * @param numViewProperties The number of view properties to create.
  * @param storageConfigInfo The JSON to supply when creating a new StorageConfigInfo for a catalog.
@@ -59,26 +62,34 @@ case class DatasetParameters(
   val nAryTree: NAryTreeBuilder = NAryTreeBuilder(nsWidth, nsDepth)
   val maxPossibleTables: Int = nAryTree.numberOfLastLevelElements * numTablesPerNs
   private val maxPossibleViews = nAryTree.numberOfLastLevelElements * numViewsPerNs
-  val numTables: Int = if (numTablesMax <= 0) maxPossibleTables else numTablesMax
-  val numViews: Int = if (numViewsMax <= 0) maxPossibleViews else numViewsMax
+  val numTables: Int = if (numTablesMax == -1) maxPossibleTables else numTablesMax
+  val numViews: Int = if (numViewsMax == -1) maxPossibleViews else numViewsMax
 
   require(numCatalogs > 0, "Number of catalogs must be positive")
   require(defaultBaseLocation.nonEmpty, "Base location cannot be empty")
   require(nsWidth > 0, "Namespace width must be positive")
   require(nsDepth > 0, "Namespace depth must be positive")
   require(numNamespaceProperties >= 0, "Number of namespace properties cannot be negative")
-  require(numTablesPerNs >= 0, "Number of tables per namespace cannot be negative")
+  require(numTablesPerNs > 0, "Number of tables per namespace must be positive")
   require(numColumnsPerTable > 0, "Number of columns per table must be positive")
   require(numTableProperties >= 0, "Number of table properties cannot be negative")
   require(numViewsPerNs >= 0, "Number of views per namespace cannot be negative")
   require(numColumnsPerView > 0, "Number of columns per view must be positive")
   require(numViewProperties >= 0, "Number of view properties cannot be negative")
   require(
-    numTablesMax == -1 || numTablesMax <= maxPossibleTables,
+    numTablesMax == -1 || numTablesMax > 0,
+    s"Maximum number of tables ($numTablesMax) must be positive, or -1 for no cap"
+  )
+  require(
+    numTablesMax <= maxPossibleTables,
     s"Maximum number of tables ($numTablesMax) cannot exceed computed total ($maxPossibleTables)"
   )
   require(
-    numViewsMax == -1 || numViewsMax <= maxPossibleViews,
+    numViewsMax >= -1,
+    s"Maximum number of views ($numViewsMax) cannot be negative, except -1 for no cap"
+  )
+  require(
+    numViewsMax <= maxPossibleViews,
     s"Maximum number of views ($numViewsMax) cannot exceed computed total ($maxPossibleViews)"
   )
 }

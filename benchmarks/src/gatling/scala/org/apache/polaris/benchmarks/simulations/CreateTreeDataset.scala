@@ -19,7 +19,7 @@
 package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.core.structure.{PopulationBuilder, ScenarioBuilder}
 import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
@@ -125,25 +125,37 @@ class CreateTreeDataset extends Simulation {
   private val tableThroughput = wp.createTreeDataset.tableThroughput
   private val viewThroughput = wp.createTreeDataset.viewThroughput
 
+  private val datasetPopulation: PopulationBuilder = setupActions.waitForAuthentication
+    .inject(atOnceUsers(1))
+    .andThen(createCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
+    .andThen(
+      createNamespaces
+        .inject(
+          constantUsersPerSec(1).during(1.seconds),
+          constantUsersPerSec(dp.nsWidth - 1).during(dp.nsDepth.seconds)
+        )
+        .protocols(httpProtocol)
+    )
+    .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+
+  private val datasetPopulationWithViews: PopulationBuilder =
+    if (dp.numViews > 0) {
+      datasetPopulation
+        .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
+    } else {
+      datasetPopulation
+    }
+
   setUp(
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
-    setupActions.waitForAuthentication
-      .inject(atOnceUsers(1))
-      .andThen(createCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
-      .andThen(
-        createNamespaces
-          .inject(
-            constantUsersPerSec(1).during(1.seconds),
-            constantUsersPerSec(dp.nsWidth - 1).during(dp.nsDepth.seconds)
-          )
-          .protocols(httpProtocol)
-      )
-      .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
-      .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
+    datasetPopulationWithViews
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   ).assertions(
-    details("Create Namespace").successfulRequests.count.is(numNamespaces),
-    details("Create Table").successfulRequests.count.is(dp.numTables),
-    details("Create View").successfulRequests.count.is(dp.numViews)
+    Seq(
+      details("Create Namespace").successfulRequests.count.is(numNamespaces),
+      details("Create Table").successfulRequests.count.is(dp.numTables)
+    ) ++
+      (if (dp.numViews > 0) Seq(details("Create View").successfulRequests.count.is(dp.numViews))
+       else Seq.empty): _*
   )
 }
