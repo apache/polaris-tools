@@ -473,15 +473,25 @@ export function CreateTableModal({
         })
       }
 
-      // Add partition spec if configured
+      // Add partition spec if configured. Iceberg REST expects "partition-spec".
       if (partitionFields.length > 0) {
-        request.partitionSpec = {
-          fields: partitionFields.map((pf, idx) => ({
-            "source-id": fields.find((f) => f.name === pf.sourceColumn)?.id || 0,
-            "field-id": 1000 + idx,
-            name: `${pf.sourceColumn}_${pf.transform}`,
-            transform: pf.transform,
-          })),
+        request["partition-spec"] = {
+          "spec-id": 0,
+          fields: partitionFields.map((pf, idx) => {
+            const source = schemaFields.find((f) => f.name === pf.sourceColumn)
+            if (!source) {
+              throw new Error(`Partition column not found in schema: ${pf.sourceColumn}`)
+            }
+            return {
+              "source-id": source.id,
+              "field-id": 1000 + idx,
+              name:
+                pf.transform === "identity"
+                  ? pf.sourceColumn
+                  : `${pf.sourceColumn}_${pf.transform}`,
+              transform: pf.transform,
+            }
+          }),
         }
       }
 

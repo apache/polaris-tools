@@ -211,10 +211,22 @@ export interface SchemaField {
   comment?: string
 }
 
+export interface PartitionField {
+  "source-id": number
+  "field-id"?: number
+  name: string
+  transform: string
+}
+
+export interface PartitionSpec {
+  "spec-id"?: number
+  fields: PartitionField[]
+}
+
 export interface CreateTableRequest {
   name: string
   schema: TableSchema
-  partitionSpec?: unknown
+  "partition-spec"?: PartitionSpec
   properties?: Record<string, string>
 }
 
