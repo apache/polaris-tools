@@ -39,7 +39,9 @@ import java.util.concurrent.atomic.AtomicInteger
  * used to create the dataset.
  *
  * Tables and views are deleted first, then namespaces one tree level at a time starting from the
- * deepest level, then the catalogs. Entities that don't exist are ignored.
+ * deepest level, then the catalogs. Entities that don't exist are ignored. Table and view deletion
+ * is skipped when the dataset does not contain any (see `tables-per-namespace` and
+ * `views-per-namespace`).
  *
  * Tables are dropped with purge as controlled by the `purge` configuration (default false). When
  * enabled, it removes their data and metadata files on drop and requires DROP_WITH_PURGE_ENABLED to
@@ -152,7 +154,11 @@ class DeleteTreeDataset extends Simulation {
       } else {
         waitForDeleteAuthentication
       }
-    afterViews.andThen(deleteTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+    if (dp.numTables > 0) {
+      afterViews.andThen(deleteTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+    } else {
+      afterViews
+    }
   }
 
   private val deleteViewsTablesAndNamespaces: PopulationBuilder =
@@ -171,8 +177,9 @@ class DeleteTreeDataset extends Simulation {
   ).assertions(
     (if (dp.numViews > 0) Seq(details("Delete View").successfulRequests.count.is(dp.numViews))
      else Seq.empty) ++
+      (if (dp.numTables > 0) Seq(details("Delete Table").successfulRequests.count.is(dp.numTables))
+       else Seq.empty) ++
       Seq(
-        details("Delete Table").successfulRequests.count.is(dp.numTables),
         details("Delete Namespace").successfulRequests.count.is(numNamespaces),
         details("Delete Catalog").successfulRequests.count.is(dp.numCatalogs)
       ): _*

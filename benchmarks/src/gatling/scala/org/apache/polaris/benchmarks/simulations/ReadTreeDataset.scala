@@ -132,15 +132,23 @@ class ReadTreeDataset extends Simulation {
     .inject(atOnceUsers(1))
     .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
     .andThen(verifyNamespaces.inject(atOnceUsers(namespaceThroughput)).protocols(httpProtocol))
-    .andThen(verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
 
-  private val readPopulationWithViews: PopulationBuilder =
-    if (dp.numViews > 0) {
+  private val readPopulationWithTables: PopulationBuilder =
+    if (dp.numTables > 0) {
       readPopulation.andThen(
-        verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol)
+        verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol)
       )
     } else {
       readPopulation
+    }
+
+  private val readPopulationWithViews: PopulationBuilder =
+    if (dp.numViews > 0) {
+      readPopulationWithTables.andThen(
+        verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol)
+      )
+    } else {
+      readPopulationWithTables
     }
 
   setUp(

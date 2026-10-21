@@ -36,6 +36,6 @@ case class DeleteTreeDatasetParameters(
     purge: Boolean
 ) {
   require(namespaceThroughput > 0, "Namespace throughput must be positive")
-  require(tableThroughput > 0, "Table throughput must be positive")
-  require(viewThroughput > 0, "View throughput must be positive")
+  require(tableThroughput >= 0, "Table throughput cannot be negative")
+  require(viewThroughput >= 0, "View throughput cannot be negative")
 }

@@ -28,9 +28,10 @@ import org.apache.polaris.benchmarks.NAryTreeBuilder
  * @param nsWidth The width of the namespace n-ary tree.
  * @param nsDepth The depth of the namespace n-ary tree.
  * @param numNamespaceProperties The number of namespace properties to create.
- * @param numTablesPerNs The number of tables per namespace to create.
+ * @param numTablesPerNs The number of tables per namespace to create. If set to 0, tables are
+ *   disabled and no simulation performs table operations.
  * @param numTablesMax The maximum number of tables to create. If set to -1, all tables are created.
- *   Must be positive or -1.
+ *   If set to 0, no tables are created.
  * @param numColumnsPerTable The number of columns per table to create.
  * @param numTableProperties The number of table properties to create.
  * @param numViewsPerNs The number of views per namespace to create. If set to 0, views are disabled
@@ -70,15 +71,15 @@ case class DatasetParameters(
   require(nsWidth > 0, "Namespace width must be positive")
   require(nsDepth > 0, "Namespace depth must be positive")
   require(numNamespaceProperties >= 0, "Number of namespace properties cannot be negative")
-  require(numTablesPerNs > 0, "Number of tables per namespace must be positive")
+  require(numTablesPerNs >= 0, "Number of tables per namespace cannot be negative")
   require(numColumnsPerTable > 0, "Number of columns per table must be positive")
   require(numTableProperties >= 0, "Number of table properties cannot be negative")
   require(numViewsPerNs >= 0, "Number of views per namespace cannot be negative")
   require(numColumnsPerView > 0, "Number of columns per view must be positive")
   require(numViewProperties >= 0, "Number of view properties cannot be negative")
   require(
-    numTablesMax == -1 || numTablesMax > 0,
-    s"Maximum number of tables ($numTablesMax) must be positive, or -1 for no cap"
+    numTablesMax >= -1,
+    s"Maximum number of tables ($numTablesMax) cannot be negative, except -1 for no cap"
   )
   require(
     numTablesMax <= maxPossibleTables,

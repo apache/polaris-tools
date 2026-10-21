@@ -136,14 +136,21 @@ class CreateTreeDataset extends Simulation {
         )
         .protocols(httpProtocol)
     )
-    .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+
+  private val datasetPopulationWithTables: PopulationBuilder =
+    if (dp.numTables > 0) {
+      datasetPopulation
+        .andThen(createTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
+    } else {
+      datasetPopulation
+    }
 
   private val datasetPopulationWithViews: PopulationBuilder =
     if (dp.numViews > 0) {
-      datasetPopulation
+      datasetPopulationWithTables
         .andThen(createViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
     } else {
-      datasetPopulation
+      datasetPopulationWithTables
     }
 
   setUp(
@@ -151,10 +158,9 @@ class CreateTreeDataset extends Simulation {
     datasetPopulationWithViews
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   ).assertions(
-    Seq(
-      details("Create Namespace").successfulRequests.count.is(numNamespaces),
-      details("Create Table").successfulRequests.count.is(dp.numTables)
-    ) ++
+    Seq(details("Create Namespace").successfulRequests.count.is(numNamespaces)) ++
+      (if (dp.numTables > 0) Seq(details("Create Table").successfulRequests.count.is(dp.numTables))
+       else Seq.empty) ++
       (if (dp.numViews > 0) Seq(details("Create View").successfulRequests.count.is(dp.numViews))
        else Seq.empty): _*
   )

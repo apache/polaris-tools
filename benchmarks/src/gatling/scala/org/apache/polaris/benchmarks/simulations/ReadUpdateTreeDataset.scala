@@ -76,14 +76,18 @@ class ReadUpdateTreeDataset extends Simulation {
   // Workload: Randomly read and write entities
   // --------------------------------------------------------------------------------
   private val readOperations: Seq[ChainBuilder] =
-    Seq(
-      exec(feed(nsListFeeder).exec(nsActions.fetchAllChildrenNamespaces)),
-      exec(feed(nsExistsFeeder).exec(nsActions.checkNamespaceExists)),
-      exec(feed(nsFetchFeeder).exec(nsActions.fetchNamespace)),
-      exec(feed(tblListFeeder).exec(tblActions.fetchAllTables)),
-      exec(feed(tblExistsFeeder).exec(tblActions.checkTableExists)),
-      exec(feed(tblFetchFeeder).exec(tblActions.fetchTable))
-    ) ++
+    (if (dp.numTables > 0)
+       Seq(
+         exec(feed(tblListFeeder).exec(tblActions.fetchAllTables)),
+         exec(feed(tblExistsFeeder).exec(tblActions.checkTableExists)),
+         exec(feed(tblFetchFeeder).exec(tblActions.fetchTable))
+       )
+     else Seq.empty) ++
+      Seq(
+        exec(feed(nsListFeeder).exec(nsActions.fetchAllChildrenNamespaces)),
+        exec(feed(nsExistsFeeder).exec(nsActions.checkNamespaceExists)),
+        exec(feed(nsFetchFeeder).exec(nsActions.fetchNamespace))
+      ) ++
       (if (dp.numViews > 0)
          Seq(
            exec(feed(viewListFeeder).exec(viewActions.fetchAllViews)),
@@ -96,25 +100,47 @@ class ReadUpdateTreeDataset extends Simulation {
     (if (wp.readUpdateTreeDataset.updateNamespaces)
        Seq(exec(feed(nsUpdateFeeder).exec(nsActions.updateNamespaceProperties)))
      else Seq.empty) ++
-      Seq(exec(feed(tblUpdateFeeder).exec(tblActions.updateTable))) ++
+      (if (dp.numTables > 0)
+         Seq(exec(feed(tblUpdateFeeder).exec(tblActions.updateTable)))
+       else Seq.empty) ++
       (if (dp.numViews > 0)
          Seq(exec(feed(viewUpdateFeeder).exec(viewActions.updateView)))
        else Seq.empty)
 
   private def uniformRandomOperation(operations: Seq[ChainBuilder]): ChainBuilder =
-    if (operations.size == 1) operations.head else uniformRandomSwitch(operations: _*)
+    operations match {
+      case Seq(single) => single
+      case _           => uniformRandomSwitch(operations: _*)
+    }
 
-  val readWriteScenario: ScenarioBuilder =
-    scenario("Read and write entities using the Iceberg REST API")
-      .exec(setupActions.restoreAccessTokenInSession)
-      .randomSwitch(
-        wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
-          uniformRandomOperation(readOperations)
-        ),
+  require(
+    writeOperations.nonEmpty || wp.readUpdateTreeDataset.gatlingWriteRatio <= 0.0,
+    "No write operation is enabled for ReadUpdateTreeDataset: enable at least one of " +
+      "`update-namespaces`, tables (`tables-per-namespace` / `max-tables`) or views " +
+      "(`views-per-namespace` / `max-views`), or set `read-write-ratio` to 1.0"
+  )
+
+  private val switchBranches: Seq[(Double, ChainBuilder)] = {
+    val readBranch = wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
+      uniformRandomOperation(readOperations)
+    )
+    if (writeOperations.isEmpty) {
+      // `read-write-ratio` is 1.0 here, so the read branch already carries the full weight.
+      Seq(readBranch)
+    } else {
+      Seq(
+        readBranch,
         wp.readUpdateTreeDataset.gatlingWriteRatio -> group("Write")(
           uniformRandomOperation(writeOperations)
         )
       )
+    }
+  }
+
+  val readWriteScenario: ScenarioBuilder =
+    scenario("Read and write entities using the Iceberg REST API")
+      .exec(setupActions.restoreAccessTokenInSession)
+      .randomSwitch(switchBranches: _*)
 
   // --------------------------------------------------------------------------------
   // Build up the HTTP protocol configuration and set up the simulation

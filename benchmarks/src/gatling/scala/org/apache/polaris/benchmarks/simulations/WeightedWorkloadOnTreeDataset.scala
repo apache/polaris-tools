@@ -54,6 +54,12 @@ class WeightedWorkloadOnTreeDataset extends Simulation {
     )
   }
 
+  if (dp.numTables == 0) {
+    throw new RuntimeException(
+      "This workload requires tables; enable them with `tables-per-namespace` and `max-tables`."
+    )
+  }
+
   println("### Reader distributions ###")
   wp.weightedWorkloadOnTreeDataset.readers.foreach(_.printDescription(dp))
 
