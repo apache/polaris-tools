@@ -31,6 +31,7 @@ import { SchemaViewer } from "@/components/table/SchemaViewer"
 import { MetadataViewer } from "@/components/table/MetadataViewer"
 import { RenameTableModal } from "@/components/forms/RenameTableModal"
 import { EditTablePropertiesModal } from "@/components/forms/EditTablePropertiesModal"
+import { UpdateSchemaModal } from "@/components/forms/UpdateSchemaModal"
 import {
   Dialog,
   DialogContent,
@@ -97,6 +98,7 @@ export function TableDetails() {
   // Modals
   const [renameOpen, setRenameOpen] = useState(false)
   const [editPropsOpen, setEditPropsOpen] = useState(false)
+  const [editSchemaOpen, setEditSchemaOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const nsPath = namespaceArray.join(".")
@@ -363,6 +365,13 @@ export function TableDetails() {
               </Button>
               <Button
                 variant="outline"
+                onClick={() => setEditSchemaOpen(true)}
+                disabled={!tableData}
+              >
+                Edit Schema
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => setEditPropsOpen(true)}
                 disabled={!tableData}
               >
@@ -401,6 +410,15 @@ export function TableDetails() {
             namespace={namespaceArray}
             tableName={tableName}
             properties={icebergTableData.metadata.properties}
+          />
+
+          <UpdateSchemaModal
+            open={editSchemaOpen}
+            onOpenChange={setEditSchemaOpen}
+            catalogName={catalogName}
+            namespace={namespaceArray}
+            tableName={tableName}
+            tableMetadata={icebergTableData.metadata}
           />
         </>
       )}
