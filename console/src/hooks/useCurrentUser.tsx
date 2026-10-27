@@ -34,11 +34,11 @@ interface CurrentUserInfo {
  * Hook to fetch the current logged-in user's principal information
  * Decodes the JWT token to get the principal name, then fetches full details
  */
-export function useCurrentUser(): CurrentUserInfo {
+export function useCurrentUser(principalNameOverride?: string | null): CurrentUserInfo {
   const token = apiClient.getAccessToken()
 
-  // Get principal name from token
-  const principalName = token ? getPrincipalNameFromToken(token) : null
+  // Use the override (e.g. proxy-provided) principal name, else fall back to the token
+  const principalName = principalNameOverride ?? (token ? getPrincipalNameFromToken(token) : null)
 
   // Fetch principal details
   const {
