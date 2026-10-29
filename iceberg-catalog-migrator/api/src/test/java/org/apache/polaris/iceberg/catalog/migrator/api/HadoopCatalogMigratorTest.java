@@ -22,13 +22,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class HadoopCatalogMigratorTest extends AbstractTestCatalogMigrator {
 
@@ -36,6 +41,48 @@ public class HadoopCatalogMigratorTest extends AbstractTestCatalogMigrator {
   protected static void setup() {
     initializeSourceCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
     initializeTargetCatalog(CatalogMigrationUtil.CatalogType.HADOOP, Collections.emptyMap());
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  public void testRegisterWithNewNamespaceWhenPropertiesCannotBeCopied(
+      boolean sourcePropertiesReadable) {
+    // HadoopCatalog can't store namespace properties, so the source fakes them.
+    HadoopCatalog source =
+        new HadoopCatalog() {
+          @Override
+          public Map<String, String> loadNamespaceMetadata(Namespace namespace) {
+            if (!sourcePropertiesReadable) {
+              throw new UnsupportedOperationException("not permitted");
+            }
+            return Map.of("comment", "migrated namespace");
+          }
+        };
+    source.setConf(new Configuration());
+    source.initialize("sourceCatalog", hadoopCatalogProperties(true));
+
+    Namespace namespace = Namespace.of("db_props");
+    TableIdentifier identifier = TableIdentifier.of(namespace, "tbl");
+    source.createNamespace(namespace);
+    source.createTable(identifier, schema);
+
+    CatalogMigrationResult result =
+        ImmutableCatalogMigrator.builder()
+            .sourceCatalog(source)
+            .targetCatalog(targetCatalog)
+            .deleteEntriesFromSourceCatalog(false)
+            .build()
+            .registerTable(identifier)
+            .result();
+
+    Assertions.assertThat(result.registeredTableIdentifiers()).containsExactly(identifier);
+    Assertions.assertThat(result.failedToRegisterTableIdentifiers()).isEmpty();
+    Assertions.assertThat(((SupportsNamespaces) targetCatalog).namespaceExists(namespace)).isTrue();
+
+    targetCatalog.dropTable(identifier, false);
+    source.dropTable(identifier, true);
+    ((SupportsNamespaces) targetCatalog).dropNamespace(namespace);
+    source.dropNamespace(namespace);
   }
 
   @Test
