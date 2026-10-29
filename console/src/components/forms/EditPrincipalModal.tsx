@@ -49,7 +49,8 @@ interface EditPrincipalModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   principal: Principal | null
-  onSuccess?: () => void
+  /** Called after save. For a newly created principal, receives its one-time credentials. */
+  onSuccess?: (credentials?: { clientId: string; clientSecret: string }) => void
 }
 
 export function EditPrincipalModal({
@@ -107,14 +108,14 @@ export function EditPrincipalModal({
     onSuccess: (data: Principal | PrincipalWithCredentials) => {
       toast.success(isNew ? "Principal created successfully" : "Principal updated successfully")
       queryClient.invalidateQueries({ queryKey: ["principals"] })
-      onSuccess?.()
-      if (isNew && "clientId" in data && "clientSecret" in data) {
-        // If creating new principal, PrincipalWithCredentials is returned
-        // This would typically trigger a credentials modal
-        onOpenChange(false)
+      // Creating a principal returns PrincipalWithCredentials; the client secret is shown exactly
+      // once, so hand it to the caller (which opens the CredentialsModal).
+      if (isNew && "credentials" in data) {
+        onSuccess?.(data.credentials)
       } else {
-        onOpenChange(false)
+        onSuccess?.()
       }
+      onOpenChange(false)
     },
     onError: (error: Error) => {
       toast.error(isNew ? "Failed to create principal" : "Failed to update principal", {

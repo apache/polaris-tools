@@ -308,9 +308,13 @@ export function Connections() {
           open={!!principalToEdit}
           onOpenChange={(open) => !open && setPrincipalToEdit(null)}
           principal={principalToEdit}
-          onSuccess={() => {
+          onSuccess={(credentials) => {
             queryClient.invalidateQueries({ queryKey: ["principals"] })
             setPrincipalToEdit(null)
+            if (credentials) {
+              setGeneratedCredentials(credentials)
+              setIsCredentialsModalOpen(true)
+            }
           }}
         />
       )}
