@@ -97,13 +97,22 @@ export const tablesApi = {
    * @param prefix - The catalog name
    * @param namespace - Namespace array
    * @param tableName - Table name
+   * @param purge - When true, send purgeRequested=true so the catalog may delete storage files
    */
-  delete: async (prefix: string, namespace: string[], tableName: string): Promise<void> => {
+  delete: async (
+    prefix: string,
+    namespace: string[],
+    tableName: string,
+    purge = false
+  ): Promise<void> => {
     const namespaceStr = encodeNamespace(namespace)
     await apiClient
       .getCatalogClient()
       .delete(
-        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/tables/${encodeURIComponent(tableName)}`
+        `/${encodeURIComponent(prefix)}/namespaces/${encodeURIComponent(namespaceStr)}/tables/${encodeURIComponent(tableName)}`,
+        {
+          params: purge ? { purgeRequested: true } : undefined,
+        }
       )
   },
 
