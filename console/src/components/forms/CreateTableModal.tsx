@@ -460,8 +460,9 @@ export function CreateTableModal({
         properties: {},
       }
 
+      // Iceberg REST expects the table location as a top-level field, not a property.
       if (values.location && values.location.trim()) {
-        request.properties!.location = values.location.trim()
+        request.location = values.location.trim()
       }
 
       // Add custom properties
