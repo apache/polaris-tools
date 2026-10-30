@@ -43,16 +43,16 @@ dataset.tree {
   num-catalogs = 1                               # Number of catalogs to create
   namespace-width = 2                            # Width of the namespace tree
   namespace-depth = 4                            # Depth of the namespace tree
-  tables-per-namespace = 5                       # Tables per namespace
-  views-per-namespace = 3                        # Views per namespace
+  tables-per-namespace = 5                       # Tables per namespace (0 to skip tables)
+  views-per-namespace = 3                        # Views per namespace (0 to skip views)
   columns-per-table = 10                         # Columns per table
   columns-per-view = 10                          # Columns per view
   default-base-location = "file:///tmp/polaris"  # Base location for datasets
   namespace-properties = 10                      # Number of properties to add to each namespace
   table-properties = 10                          # Number of properties to add to each table
   view-properties = 10                           # Number of properties to add to each view
-  max-tables = -1                                # Cap on total tables (-1 for no cap). Must be less than N^(D-1) * tables-per-namespace
-  max-views = -1                                 # Cap on total views (-1 for no cap). Must be less than N^(D-1) * views-per-namespace
+  max-tables = -1                                # Cap on total tables (-1 for no cap, 0 for no tables). Must be less than N^(D-1) * tables-per-namespace
+  max-views = -1                                 # Cap on total views (-1 for no cap, 0 for no views). Must be less than N^(D-1) * views-per-namespace
   mangle-names = false                           # Whether to replace entity names with MD5 hashes (default: false uses NS_0, T_0, V_0 patterns)
 }
 ```
@@ -88,7 +88,8 @@ Workload settings are configured under `workload`:
 ```hocon
 workload {
   read-update-tree-dataset {
-    read-write-ratio = 0.8  # Ratio of reads (0.0-1.0)
+    read-write-ratio = 0.8    # Ratio of reads (0.0-1.0)
+    update-namespaces = true  # Whether writes include namespace property updates
   }
 }
 ```
@@ -112,7 +113,8 @@ http {
 
 workload {
   read-update-tree-dataset {
-    read-write-ratio = 0.8  # Ratio of reads (0.0-1.0)
+    read-write-ratio = 0.8    # Ratio of reads (0.0-1.0)
+    update-namespaces = true  # Whether writes include namespace property updates
   }
 }
 ```
@@ -222,6 +224,8 @@ Total number of tables = *N*<sup>*D* − 1</sup> \* *T*
 The views are created alongside the tables. The number of views that is created under each leaf namespace is also configurable. The total number of views can easily be calculated with the following formulae, where `N` is the tree width, `D` is the total tree depth, `V` is the number of views per leaf namespace:
 
 Total number of tables = *N*<sup>*D* − 1</sup> \* *V*
+
+Tables and views are optional. Setting `tables-per-namespace` (or `max-tables`) and/or `views-per-namespace` (or `max-views`) to `0` disables them, and all benchmarks skip the corresponding operations. A namespaces-only dataset is useful to benchmark namespace operations without any object store I/O.
 
 ## Binary tree example
 

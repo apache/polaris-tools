@@ -22,11 +22,13 @@ package org.apache.polaris.benchmarks.parameters
  * Case class to hold the parameters for the ReadUpdateTreeDataset simulation.
  *
  * @param readWriteRatio The ratio of read operations to write operations (0.0-1.0).
+ * @param updateNamespaces Whether write operations include namespace property updates.
  * @param throughput The number of operations to perform per second.
  * @param durationInMinutes The duration of the simulation in minutes.
  */
 case class ReadUpdateTreeDatasetParameters(
     readWriteRatio: Double,
+    updateNamespaces: Boolean,
     throughput: Int,
     durationInMinutes: Int
 ) {

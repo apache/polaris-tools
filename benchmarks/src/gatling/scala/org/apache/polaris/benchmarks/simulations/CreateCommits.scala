@@ -19,7 +19,7 @@
 package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.core.structure.{PopulationBuilder, ScenarioBuilder}
 import io.gatling.http.Predef.http
 import org.apache.polaris.benchmarks.actions.{SetupActions, TableActions, ViewActions}
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
@@ -77,25 +77,44 @@ class CreateCommits extends Simulation {
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
 
+  // Get the configured throughput and duration
   private val tableCommitsThroughput = wp.createCommits.tableCommitsThroughput
   private val viewCommitsThroughput = wp.createCommits.viewCommitsThroughput
   private val durationInMinutes = wp.createCommits.durationInMinutes
+
+  private val commitScenarios: Seq[PopulationBuilder] =
+    (if (dp.numTables > 0)
+       Seq(
+         tableUpdateScenario
+           .inject(
+             constantUsersPerSec(tableCommitsThroughput).during(durationInMinutes.minutes)
+           )
+           .protocols(httpProtocol)
+       )
+     else Seq.empty) ++
+      (if (dp.numViews > 0)
+         Seq(
+           viewUpdateScenario
+             .inject(
+               constantUsersPerSec(viewCommitsThroughput).during(durationInMinutes.minutes)
+             )
+             .protocols(httpProtocol)
+         )
+       else Seq.empty)
+
+  private val authenticationFlow: PopulationBuilder =
+    setupActions.waitForAuthentication.inject(atOnceUsers(1))
+
+  require(
+    commitScenarios.nonEmpty,
+    "CreateCommits requires at least one table or view in the dataset; " +
+      "enable them with `tables-per-namespace` / `views-per-namespace`"
+  )
+
   setUp(
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
-    setupActions.waitForAuthentication
-      .inject(atOnceUsers(1))
-      .andThen(
-        tableUpdateScenario
-          .inject(
-            constantUsersPerSec(tableCommitsThroughput).during(durationInMinutes.minutes)
-          )
-          .protocols(httpProtocol),
-        viewUpdateScenario
-          .inject(
-            constantUsersPerSec(viewCommitsThroughput).during(durationInMinutes.minutes)
-          )
-          .protocols(httpProtocol)
-      )
+    authenticationFlow
+      .andThen(commitScenarios: _*)
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }

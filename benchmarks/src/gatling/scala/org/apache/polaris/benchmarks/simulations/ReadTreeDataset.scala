@@ -19,7 +19,7 @@
 package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.core.structure.{PopulationBuilder, ScenarioBuilder}
 import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
@@ -128,14 +128,32 @@ class ReadTreeDataset extends Simulation {
   private val tableThroughput = wp.readTreeDataset.tableThroughput
   private val viewThroughput = wp.readTreeDataset.viewThroughput
 
+  private val readPopulation: PopulationBuilder = setupActions.waitForAuthentication
+    .inject(atOnceUsers(1))
+    .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
+    .andThen(verifyNamespaces.inject(atOnceUsers(namespaceThroughput)).protocols(httpProtocol))
+
+  private val readPopulationWithTables: PopulationBuilder =
+    if (dp.numTables > 0) {
+      readPopulation.andThen(
+        verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol)
+      )
+    } else {
+      readPopulation
+    }
+
+  private val readPopulationWithViews: PopulationBuilder =
+    if (dp.numViews > 0) {
+      readPopulationWithTables.andThen(
+        verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol)
+      )
+    } else {
+      readPopulationWithTables
+    }
+
   setUp(
     setupActions.continuouslyRefreshOauthToken().inject(atOnceUsers(1)).protocols(httpProtocol),
-    setupActions.waitForAuthentication
-      .inject(atOnceUsers(1))
-      .andThen(verifyCatalogs.inject(atOnceUsers(1)).protocols(httpProtocol))
-      .andThen(verifyNamespaces.inject(atOnceUsers(namespaceThroughput)).protocols(httpProtocol))
-      .andThen(verifyTables.inject(atOnceUsers(tableThroughput)).protocols(httpProtocol))
-      .andThen(verifyViews.inject(atOnceUsers(viewThroughput)).protocols(httpProtocol))
+    readPopulationWithViews
       .andThen(setupActions.stopRefreshingToken.inject(atOnceUsers(1)).protocols(httpProtocol))
   )
 }
