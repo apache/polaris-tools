@@ -95,6 +95,11 @@ function generateDDL(
 
   lines.push(")")
 
+  const partitionBy = formatPartitionClause(metadata, currentSchema?.fields)
+  if (partitionBy) {
+    lines.push(partitionBy)
+  }
+
   // Properties
   if (metadata.properties && Object.keys(metadata.properties).length > 0) {
     lines.push("TBLPROPERTIES (")
@@ -111,6 +116,55 @@ function generateDDL(
   }
 
   return lines.join("\n")
+}
+
+function formatPartitionClause(
+  metadata: TableMetadata,
+  schemaFields: SchemaField[] | undefined
+): string | null {
+  const specs = metadata["partition-specs"]
+  if (!specs || specs.length === 0) {
+    return null
+  }
+
+  const specId = metadata["default-spec-id"]
+  const spec =
+    specId === undefined ? specs[0] : (specs.find((item) => item["spec-id"] === specId) ?? specs[0])
+  if (!spec.fields || spec.fields.length === 0) {
+    return null
+  }
+
+  const parts = spec.fields.map((field) => {
+    const source = schemaFields?.find((item) => item.id === field["source-id"])
+    const sourceName = source?.name ?? field.name
+    return formatPartitionTransform(field.transform, sourceName)
+  })
+  return `PARTITIONED BY (${parts.join(", ")})`
+}
+
+function formatPartitionTransform(transform: string, sourceName: string): string {
+  if (transform === "identity") {
+    return sourceName
+  }
+
+  const bucket = /^bucket\[(\d+)\]$/.exec(transform)
+  if (bucket) {
+    return `bucket(${bucket[1]}, ${sourceName})`
+  }
+
+  const truncate = /^truncate\[(\d+)\]$/.exec(transform)
+  if (truncate) {
+    return `truncate(${truncate[1]}, ${sourceName})`
+  }
+
+  const temporal: Record<string, string> = {
+    year: "years",
+    month: "months",
+    day: "days",
+    hour: "hours",
+  }
+  const functionName = temporal[transform] ?? transform
+  return `${functionName}(${sourceName})`
 }
 
 function formatFieldTypeForDDL(
