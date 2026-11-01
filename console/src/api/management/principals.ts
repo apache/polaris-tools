@@ -47,10 +47,13 @@ export const principalsApi = {
     return response.data
   },
 
-  update: async (principalName: string, principal: Partial<Principal>): Promise<Principal> => {
+  update: async (
+    principalName: string,
+    update: { currentEntityVersion?: number; properties: Record<string, string> }
+  ): Promise<Principal> => {
     const response = await apiClient
       .getManagementClient()
-      .put<Principal>(`/principals/${encodeURIComponent(principalName)}`, principal)
+      .put<Principal>(`/principals/${encodeURIComponent(principalName)}`, update)
     return response.data
   },
 
