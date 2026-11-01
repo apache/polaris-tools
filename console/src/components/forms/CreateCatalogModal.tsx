@@ -79,6 +79,8 @@ const schema = z
     // External connection (only when type === EXTERNAL)
     connectionType: z.enum(["ICEBERG_REST", "HADOOP", "HIVE"]).optional(),
     conn_uri: z.string().optional(),
+    conn_remoteCatalogName: z.string().optional(),
+    conn_warehouse: z.string().optional(),
     auth_type: z.enum(["OAUTH", "BEARER", "SIGV4", "IMPLICIT"]).optional(),
     // OAUTH
     oauth_tokenUri: z.string().optional(),
@@ -142,6 +144,7 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
 
   const storageType = watch("storageType")
   const catalogType = watch("type")
+  const connectionType = watch("connectionType")
   const authType = watch("auth_type")
 
   const createMutation = useMutation({
@@ -233,6 +236,14 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
           connectionType: values.connectionType!,
         }
         if (values.conn_uri) connectionConfigInfo.uri = values.conn_uri
+        // Type-gated, not just presence: RHF keeps values for unmounted inputs.
+        if (values.connectionType === "ICEBERG_REST") {
+          if (values.conn_remoteCatalogName)
+            connectionConfigInfo.remoteCatalogName = values.conn_remoteCatalogName
+        }
+        if (values.connectionType === "HADOOP" || values.connectionType === "HIVE") {
+          if (values.conn_warehouse) connectionConfigInfo.warehouse = values.conn_warehouse
+        }
         if (authenticationParameters)
           connectionConfigInfo.authenticationParameters = authenticationParameters
 
@@ -462,6 +473,28 @@ export function CreateCatalogModal({ open, onOpenChange, onCreated }: CreateCata
                 <p className="mt-1 text-xs text-muted-foreground">
                   URI to the remote catalog service (if applicable).
                 </p>
+                {connectionType === "ICEBERG_REST" && (
+                  <>
+                    <Input
+                      placeholder="Remote catalog name (optional)"
+                      {...register("conn_remoteCatalogName")}
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Name of the catalog within the remote service. Often becomes a prefix on the
+                      remote's REST paths. Older systems may call this the warehouse.
+                    </p>
+                  </>
+                )}
+                {(connectionType === "HADOOP" || connectionType === "HIVE") && (
+                  <>
+                    <Input placeholder="Warehouse (optional)" {...register("conn_warehouse")} />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {connectionType === "HADOOP"
+                        ? "The file path to where this catalog should store tables."
+                        : "The warehouse location for the hive catalog."}
+                    </p>
+                  </>
+                )}
               </div>
               <Controller
                 name="auth_type"
