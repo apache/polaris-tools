@@ -116,6 +116,21 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
+// Iceberg create-table defaults: bucket[N] -> <col>_bucket, truncate[W] -> <col>_trunc.
+// The width stays in `transform`; partition paths use `name`.
+function partitionFieldName(sourceColumn: string, transform: string): string {
+  if (transform === "identity") {
+    return sourceColumn
+  }
+  if (transform.startsWith("bucket[")) {
+    return `${sourceColumn}_bucket`
+  }
+  if (transform.startsWith("truncate[")) {
+    return `${sourceColumn}_trunc`
+  }
+  return `${sourceColumn}_${transform}`
+}
+
 interface CreateTableModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -485,10 +500,7 @@ export function CreateTableModal({
             return {
               "source-id": source.id,
               "field-id": 1000 + idx,
-              name:
-                pf.transform === "identity"
-                  ? pf.sourceColumn
-                  : `${pf.sourceColumn}_${pf.transform}`,
+              name: partitionFieldName(pf.sourceColumn, pf.transform),
               transform: pf.transform,
             }
           }),
