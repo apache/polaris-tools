@@ -466,10 +466,14 @@ export function PrincipalsTab() {
           open={!!principalToEdit}
           onOpenChange={(open) => !open && setPrincipalToEdit(null)}
           principal={principalToEdit}
-          onSuccess={() => {
+          onSuccess={(credentials) => {
             queryClient.invalidateQueries({ queryKey: ["principals"] })
             queryClient.invalidateQueries({ queryKey: ["principal-roles"] })
             setPrincipalToEdit(null)
+            if (credentials) {
+              setGeneratedCredentials(credentials)
+              setIsCredentialsModalOpen(true)
+            }
           }}
         />
       )}
