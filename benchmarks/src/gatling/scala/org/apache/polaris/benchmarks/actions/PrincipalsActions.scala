@@ -46,12 +46,18 @@ case class PrincipalsActions(
 
   private val shouldRefreshTokens: AtomicBoolean = new AtomicBoolean(true)
 
-  /** Authenticates each principal in turn, and stores its access token. */
+  /**
+   * Authenticates each principal in turn, and stores its access token. The previous principal's
+   * token is removed from the session first, so that a failed authentication cannot store it as the
+   * token of the next principal.
+   */
   private val authenticateAll: ChainBuilder =
     principals
       .zip(accessTokens)
       .map { case ((clientId, clientSecret), accessToken) =>
-        exec(_.setAll("clientId" -> clientId, "clientSecret" -> clientSecret))
+        exec(
+          _.remove("accessToken").setAll("clientId" -> clientId, "clientSecret" -> clientSecret)
+        )
           .exec(AuthenticationActions(cp, ap, accessToken).authenticateAndSaveAccessToken)
       }
       .reduce((a, b) => a.exec(b))
@@ -88,12 +94,16 @@ case class PrincipalsActions(
         session
       }
 
-  /** Sets the access token of a randomly chosen principal in the Gatling session. */
-  val restoreRandomAccessTokenInSession: ChainBuilder =
+  /** Chooses a principal at random for the rest of the session. */
+  val selectRandomPrincipal: ChainBuilder =
+    exec(_.set("principalIndex", ThreadLocalRandom.current().nextInt(accessTokens.size)))
+
+  /**
+   * Sets the latest access token of the principal chosen by [[selectRandomPrincipal]] in the
+   * Gatling session. Restoring it before each request picks up the refreshed tokens.
+   */
+  val restoreAccessTokenInSession: ChainBuilder =
     exec(session =>
-      session.set(
-        "accessToken",
-        accessTokens(ThreadLocalRandom.current().nextInt(accessTokens.size)).get()
-      )
+      session.set("accessToken", accessTokens(session("principalIndex").as[Int]).get())
     )
 }

@@ -72,12 +72,13 @@ class RemoteSigning extends Simulation {
   // --------------------------------------------------------------------------------
   val remoteSigningScenario: ScenarioBuilder =
     scenario("Load tables and sign requests using the Iceberg REST API")
-      .exec(principalsActions.restoreRandomAccessTokenInSession)
+      .exec(principalsActions.selectRandomPrincipal)
+      .exec(principalsActions.restoreAccessTokenInSession)
       .feed(tblFeeder)
       .exec(rsActions.loadTable)
       .exitHereIfFailed
       .repeat(rp.signRequestsPerTableLoad)(
-        randomSwitch(
+        exec(principalsActions.restoreAccessTokenInSession).randomSwitch(
           rp.gatlingReadRatio -> rsActions.signReadRequest,
           rp.gatlingWriteRatio -> rsActions.signWriteRequest
         )
