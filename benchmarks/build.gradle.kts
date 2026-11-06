@@ -52,6 +52,11 @@ spotless {
     }
 }
 
+// The simulations live in the Gatling source set, which the standard check tasks do not compile
+tasks.named("check") {
+    dependsOn("gatlingClasses")
+}
+
 tasks.named<RatTask>("rat").configure {
     // Gradle
     excludes.add("**/build/**")
