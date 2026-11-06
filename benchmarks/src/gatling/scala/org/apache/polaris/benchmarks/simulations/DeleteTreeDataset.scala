@@ -64,9 +64,9 @@ class DeleteTreeDataset extends Simulation {
   private val purge: Boolean = wp.deleteTreeDataset.purge
   private val setupActions = SetupActions(cp, ap)
   private val catalogActions = CatalogActions(dp, setupActions.accessToken, 0, Set())
-  private val namespaceActions = NamespaceActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val tableActions = TableActions(dp, wp, setupActions.accessToken, 5, Set(500))
-  private val viewActions = ViewActions(dp, wp, setupActions.accessToken, 5, Set(500))
+  private val namespaceActions = NamespaceActions(dp, setupActions.accessToken, 5, Set(500))
+  private val tableActions = TableActions(dp, setupActions.accessToken, 5, Set(500))
+  private val viewActions = ViewActions(dp, setupActions.accessToken, 5, Set(500))
 
   private val deletedCatalogs = new AtomicInteger()
   private val deletedTables = new AtomicInteger()
