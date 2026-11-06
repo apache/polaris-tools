@@ -29,6 +29,7 @@ Benchmarks for the Polaris service using Gatling.
 - `org.apache.polaris.benchmarks.simulations.ReadUpdateTreeDataset`: Performs read and update operations against a Polaris instance populated with a test dataset.  It is a read/write workload that can be used to test the system's ability to handle concurrent read and update operations.  It is not destructive and does not prevent subsequent executions of `ReadTreeDataset` or `ReadUpdateTreeDataset`.
 - `org.apache.polaris.benchmarks.simulations.CreateCommits`: Creates table and view commits at configurable rates.  This benchmark is useful for testing the system's ability to handle table and view commits and can be used to generate a history of thousands of commits for both tables and views.
 - `org.apache.polaris.benchmarks.simulations.WeightedWorkloadOnTreeDataset`: Performs reads and writes against tables in accordance with the configured distributions. This is useful for testing performance when clients conflict.
+- `org.apache.polaris.benchmarks.simulations.RemoteSigning`: Loads tables with S3 remote signing access delegation, then signs read and write requests for objects in those tables, as a query engine would when reading or writing data files. It requires a pre-existing tree dataset in an S3 catalog (see [Remote signing benchmarks](#remote-signing-benchmarks)). It has no side effects on the dataset.
 
 ## Parameters
 
@@ -78,6 +79,8 @@ auth {
   max-retries = 10      # Maximum number of retry attempts for authentication failures
   retryable-http-codes = [500]  # HTTP status codes that should trigger a retry
   refresh-interval-seconds = 60  # Refresh interval for the authentication token in seconds
+  token-endpoint = "/api/catalog/v1/oauth/tokens"  # Token endpoint, relative to the base URL or absolute (external IdP)
+  scope = "PRINCIPAL_ROLE:ALL"  # Scope to request; empty for none
 }
 ```
 
@@ -89,6 +92,16 @@ Workload settings are configured under `workload`:
 workload {
   read-update-tree-dataset {
     read-write-ratio = 0.8  # Ratio of reads (0.0-1.0)
+  }
+  remote-signing {
+    sign-requests-per-table-load = 1000  # Sign requests issued after each table load
+    read-write-ratio = 0.9               # Ratio of read sign requests (0.0-1.0)
+    load-model = "open"                  # "open" (fixed arrival rate) or "closed" (fixed concurrency)
+    throughput = 1                       # Open model: table loads per second
+    concurrent-users = 10                # Closed model: concurrent users
+    duration-in-minutes = 5              # Duration of the simulation
+    default-region = "us-east-1"         # Region to sign for, if the server does not return one
+    principals = []                      # Principals to spread users across (default: auth principal)
   }
 }
 ```
@@ -148,6 +161,9 @@ make weighted-workload-simulation
 
 # Dataset deletion
 make delete-dataset-simulation
+
+# Remote signing
+make remote-signing-simulation
 ```
 
 A message will show the location of the Gatling report:
@@ -171,6 +187,42 @@ For repeated testing and benchmarking purposes it's convenient to have fixed cli
 ```
 
 With the above you can run the benchmarks using a configuration file with `client-id = "admin"` and `client-secret = "admin"` - meant only for convenience in a fully airgapped system.
+
+### Remote signing benchmarks
+
+The `RemoteSigning` simulation requires:
+
+- A tree dataset created by `CreateTreeDataset` in an S3 catalog. Creating tables writes metadata files, so the storage must be reachable by Polaris. An S3-compatible object store, such as MinIO, can be used. Signing requests does not access the storage.
+- A Polaris server that supports S3 remote signing (`X-Iceberg-Access-Delegation: remote-signing`), with remote signing enabled for the catalog. Refer to the documentation of the Polaris version used.
+- Data access privileges for the benchmark principal. The `catalog_admin` role of the catalog created by `CreateTreeDataset` only manages metadata, so grant it `CATALOG_MANAGE_CONTENT` once the dataset is created:
+  ```bash
+  curl -X PUT http://localhost:8181/api/management/v1/catalogs/C_0/catalog-roles/catalog_admin/grants \
+    -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+    -d '{"grant": {"type": "catalog", "privilege": "CATALOG_MANAGE_CONTENT"}}'
+  ```
+
+Example of configuration for an S3-compatible object store listening on `localhost:9000`, with a bucket named `polaris-benchmarks`:
+
+```hocon
+dataset.tree {
+  default-base-location = "s3://polaris-benchmarks/benchmarks"
+  storage-config-info = "{\"storageType\": \"S3\", \"allowedLocations\": [\"s3://polaris-benchmarks/benchmarks\"], \"endpoint\": \"http://localhost:9000\", \"pathStyleAccess\": true, \"region\": \"us-east-1\"}"
+}
+```
+
+The corresponding Polaris server configuration, in addition to enabling remote signing, for testing purposes only:
+
+```properties
+polaris.features."SUPPORTED_CATALOG_STORAGE_TYPES"=["S3","FILE"]
+polaris.storage.aws.access-key=<access-key>
+polaris.storage.aws.secret-key=<secret-key>
+```
+
+Each simulated user loads a table and then sends `sign-requests-per-table-load` sign requests for random data files of that table. With the open load model, the sign request rate is therefore `throughput` × `sign-requests-per-table-load` per second; this model is suited to measuring latencies at a given load. With the closed load model, `concurrent-users` users run at all times, which is suited to measuring the maximum throughput.
+
+Users can be spread across several principals, listed with their client credentials in `principals`, each user using one of them at random. Each principal needs the privileges described above, through its principal roles. The Gatling report shows table loads (`Load Table with Remote Signing`) and sign requests (`Sign Read Request`, `Sign Write Request`) separately.
+
+The simulation sends back the remote signing properties returned by the table load, as Iceberg clients do, and does not depend on how the server authorizes sign requests. To compare server configurations, run it once per configuration against the same dataset, restarting the server in between.
 
 ### Benchmarks results
 
