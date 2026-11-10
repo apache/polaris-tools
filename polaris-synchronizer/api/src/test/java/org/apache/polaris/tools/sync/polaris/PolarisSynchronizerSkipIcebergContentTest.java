@@ -302,7 +302,8 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             null,
             false,
             new SynchronizationReport(),
-            true);
+            true,
+            false);
 
     synchronizer.syncCatalogs();
 
@@ -328,6 +329,7 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             null,
             false,
             new SynchronizationReport(),
+            false,
             false);
 
     synchronizer.syncCatalogs();
@@ -361,7 +363,8 @@ public class PolarisSynchronizerSkipIcebergContentTest {
             null,
             false,
             new SynchronizationReport(),
-            true);
+            true,
+            false);
 
     synchronizer.syncCatalogs();
 
