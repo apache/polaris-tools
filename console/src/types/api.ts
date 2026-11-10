@@ -213,6 +213,7 @@ export interface SchemaField {
 
 export interface CreateTableRequest {
   name: string
+  location?: string
   schema: TableSchema
   partitionSpec?: unknown
   properties?: Record<string, string>
