@@ -111,6 +111,7 @@ export interface Principal {
   type?: string
   properties?: Record<string, string>
   currentEntityVersion?: string
+  entityVersion?: number // API returns this field
 }
 
 export interface CreatePrincipalRequest {
@@ -138,6 +139,7 @@ export interface PrincipalRole {
   name: string
   properties?: Record<string, string>
   currentEntityVersion?: string
+  entityVersion?: number // API returns this field
 }
 
 export interface PrincipalRolesResponse {

@@ -137,12 +137,10 @@ export function CreateCatalogRoleModal({
         })
       } else {
         const updateCatalogName = catalogRole!.catalogName || data.catalogName
+        // The API requires a properties object even when it is empty.
         return catalogRolesApi.update(updateCatalogName, catalogRole!.name, {
-          properties: Object.keys(properties).length > 0 ? properties : undefined,
-          currentEntityVersion:
-            catalogRole?.entityVersion || catalogRole?.currentEntityVersion
-              ? parseInt(String(catalogRole.entityVersion || catalogRole.currentEntityVersion))
-              : undefined,
+          properties,
+          currentEntityVersion: catalogRole?.entityVersion,
         })
       }
     },

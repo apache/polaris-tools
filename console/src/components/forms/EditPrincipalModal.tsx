@@ -98,9 +98,10 @@ export function EditPrincipalModal({
           },
         })
       } else {
+        // The API requires both fields; it returns the version as entityVersion.
         return principalsApi.update(principal!.name, {
-          currentEntityVersion: principal?.currentEntityVersion,
-          properties: data.properties,
+          currentEntityVersion: principal?.entityVersion,
+          properties: data.properties ?? {},
         })
       }
     },

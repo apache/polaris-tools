@@ -116,11 +116,10 @@ export function CreatePrincipalRoleModal({
           properties: Object.keys(properties).length > 0 ? properties : undefined,
         })
       } else {
+        // The API requires both fields; it returns the version as entityVersion.
         return principalRolesApi.update(principalRole!.name, {
-          properties: Object.keys(properties).length > 0 ? properties : undefined,
-          currentEntityVersion: principalRole?.currentEntityVersion
-            ? parseInt(principalRole.currentEntityVersion)
-            : undefined,
+          properties,
+          currentEntityVersion: principalRole?.entityVersion,
         })
       }
     },
