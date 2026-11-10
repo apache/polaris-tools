@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ArrowLeft, RefreshCw, Table as TableIcon, Pencil, Trash2 } from "lucide-react"
@@ -25,6 +25,8 @@ import { tablesApi } from "@/api/catalog/tables"
 import { catalogsApi } from "@/api/management/catalogs"
 import { namespacesApi } from "@/api/catalog/namespaces"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TableDDLDisplay } from "@/components/catalog/TableDDLDisplay"
 import { SchemaViewer } from "@/components/table/SchemaViewer"
@@ -98,6 +100,7 @@ export function TableDetails() {
   const [renameOpen, setRenameOpen] = useState(false)
   const [editPropsOpen, setEditPropsOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [purgeOnDelete, setPurgeOnDelete] = useState(false)
 
   const nsPath = namespaceArray.join(".")
   const refreshDisabled =
@@ -112,11 +115,27 @@ export function TableDetails() {
   const icebergTableData: LoadTableResult | null =
     !isGenericTable && tableData ? (tableData as LoadTableResult) : null
 
+  // Only offer purge when the catalog explicitly allows DROP with purge.
+  const dropWithPurgeEnabled =
+    catalogQuery.data?.properties?.["polaris.config.drop-with-purge.enabled"] === "true"
+  const showPurgeOption = !isGenericTable && dropWithPurgeEnabled
+
+  useEffect(() => {
+    if (!deleteOpen) {
+      setPurgeOnDelete(false)
+    }
+  }, [deleteOpen])
+
   // Delete mutations
   const deleteIcebergMutation = useMutation({
-    mutationFn: () => tablesApi.delete(catalogName!, namespaceArray, tableName!),
+    mutationFn: () =>
+      tablesApi.delete(catalogName!, namespaceArray, tableName!, showPurgeOption && purgeOnDelete),
     onSuccess: () => {
-      toast.success("Table deleted successfully")
+      toast.success(
+        showPurgeOption && purgeOnDelete
+          ? "Table deleted. Storage purge was requested and may complete asynchronously."
+          : "Table deleted successfully"
+      )
       queryClient.invalidateQueries({ queryKey: ["tables", catalogName, namespaceArray] })
       queryClient.invalidateQueries({ queryKey: ["namespace", catalogName, namespaceArray] })
       navigate(
@@ -415,6 +434,27 @@ export function TableDetails() {
                 Are you sure you want to delete "{tableName}"? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
+            {showPurgeOption && (
+              <div className="flex items-start space-x-2 border-t pt-4">
+                <Checkbox
+                  id="purge-on-delete"
+                  checked={purgeOnDelete}
+                  onCheckedChange={(checked) => setPurgeOnDelete(checked === true)}
+                />
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="purge-on-delete"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Also purge data and metadata files from storage
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Uses purgeRequested=true. Cleanup runs asynchronously on the Polaris server.
+                    Requires polaris.config.drop-with-purge.enabled on this catalog.
+                  </p>
+                </div>
+              </div>
+            )}
             <DialogFooter>
               <Button
                 variant="outline"
@@ -430,7 +470,9 @@ export function TableDetails() {
               >
                 {deleteIcebergMutation.isPending || deleteGenericMutation.isPending
                   ? "Deleting..."
-                  : "Delete"}
+                  : showPurgeOption && purgeOnDelete
+                    ? "Delete and purge"
+                    : "Delete"}
               </Button>
             </DialogFooter>
           </DialogContent>
