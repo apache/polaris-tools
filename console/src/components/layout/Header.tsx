@@ -20,6 +20,7 @@
 import { LogOut, ChevronDown, Sun, Moon, Monitor, Search } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useProxyUser } from "@/hooks/useProxyUser"
 import { useTheme } from "@/hooks/useTheme"
 import { config } from "@/lib/config"
 import {
@@ -38,12 +39,27 @@ interface HeaderProps {
 
 export function Header({ onSearchOpen }: HeaderProps) {
   const { logout } = useAuth()
-  const { principal, principalRoles, loading } = useCurrentUser()
+  const {
+    displayName: proxyDisplayName,
+    principalName: proxyPrincipalName,
+    loading: proxyLoading,
+  } = useProxyUser()
+  const {
+    principal,
+    principalRoles,
+    loading: principalLoading,
+  } = useCurrentUser(proxyPrincipalName)
   const { theme, setTheme } = useTheme()
 
-  // Get display name and role
+  const loading = principalLoading || proxyLoading
+
+  // Get display name and role — prefer the proxy identity when deployed behind the auth proxy
   const displayName =
-    principal?.name || principal?.properties?.displayName || principal?.properties?.name || "User"
+    proxyDisplayName ||
+    principal?.name ||
+    principal?.properties?.displayName ||
+    principal?.properties?.name ||
+    "User"
   const primaryRole =
     principalRoles.length > 0
       ? principalRoles[0].name
