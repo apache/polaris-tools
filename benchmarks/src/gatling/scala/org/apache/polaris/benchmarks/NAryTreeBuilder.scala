@@ -95,10 +95,10 @@ case class NAryTreeBuilder(nsWidth: Int, nsDepth: Int) {
    * Returns a range of ordinals for the nodes at a given depth of a complete n-ary tree.
    *
    * @param depth The depth of the nodes, where the root namespace is at the depth 0.
-   * @return The range of ordinals for the nodes on the last level of the tree.
+   * @return The range of ordinals for the nodes at a given depth of the tree.
    */
   def ordinalsAtDepth(depth: Int): Range = {
-    require(depth >= 0 && depth < nsDepth, s"Depth ($depth) must be in [0, $nsDepth]")
+    require(depth >= 0 && depth < nsDepth, s"Depth ($depth) must be in [0, ${nsDepth - 1}]")
     if (nsWidth == 1) {
       // For a unary tree, the only node at depth d is simply the node with ordinal d.
       Range.inclusive(depth, depth)

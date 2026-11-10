@@ -28,12 +28,16 @@ import org.apache.polaris.benchmarks.NAryTreeBuilder
  * @param nsWidth The width of the namespace n-ary tree.
  * @param nsDepth The depth of the namespace n-ary tree.
  * @param numNamespaceProperties The number of namespace properties to create.
- * @param numTablesPerNs The number of tables per namespace to create.
+ * @param numTablesPerNs The number of tables per namespace to create. If set to 0, tables are
+ *   disabled and no simulation performs table operations.
  * @param numTablesMax The maximum number of tables to create. If set to -1, all tables are created.
+ *   If set to 0, no tables are created.
  * @param numColumnsPerTable The number of columns per table to create.
  * @param numTableProperties The number of table properties to create.
- * @param numViewsPerNs The number of views per namespace to create.
- * @param numViewsMax The maximum number of views to create. If set to -1, all views are created.
+ * @param numViewsPerNs The number of views per namespace to create. If set to 0, views are disabled
+ *   and no simulation performs view operations.
+ * @param numViewsMax The maximum number of views to create. If set to -1, all views are created. If
+ *   set to 0, no views are created.
  * @param numColumnsPerView The number of columns per view to create.
  * @param numViewProperties The number of view properties to create.
  * @param storageConfigInfo The JSON to supply when creating a new StorageConfigInfo for a catalog.
@@ -59,8 +63,8 @@ case class DatasetParameters(
   val nAryTree: NAryTreeBuilder = NAryTreeBuilder(nsWidth, nsDepth)
   val maxPossibleTables: Int = nAryTree.numberOfLastLevelElements * numTablesPerNs
   private val maxPossibleViews = nAryTree.numberOfLastLevelElements * numViewsPerNs
-  val numTables: Int = if (numTablesMax <= 0) maxPossibleTables else numTablesMax
-  val numViews: Int = if (numViewsMax <= 0) maxPossibleViews else numViewsMax
+  val numTables: Int = if (numTablesMax == -1) maxPossibleTables else numTablesMax
+  val numViews: Int = if (numViewsMax == -1) maxPossibleViews else numViewsMax
 
   require(numCatalogs > 0, "Number of catalogs must be positive")
   require(defaultBaseLocation.nonEmpty, "Base location cannot be empty")
@@ -74,11 +78,19 @@ case class DatasetParameters(
   require(numColumnsPerView > 0, "Number of columns per view must be positive")
   require(numViewProperties >= 0, "Number of view properties cannot be negative")
   require(
-    numTablesMax == -1 || numTablesMax <= maxPossibleTables,
+    numTablesMax >= -1,
+    s"Maximum number of tables ($numTablesMax) cannot be negative, except -1 for no cap"
+  )
+  require(
+    numTablesMax <= maxPossibleTables,
     s"Maximum number of tables ($numTablesMax) cannot exceed computed total ($maxPossibleTables)"
   )
   require(
-    numViewsMax == -1 || numViewsMax <= maxPossibleViews,
+    numViewsMax >= -1,
+    s"Maximum number of views ($numViewsMax) cannot be negative, except -1 for no cap"
+  )
+  require(
+    numViewsMax <= maxPossibleViews,
     s"Maximum number of views ($numViewsMax) cannot exceed computed total ($maxPossibleViews)"
   )
 }

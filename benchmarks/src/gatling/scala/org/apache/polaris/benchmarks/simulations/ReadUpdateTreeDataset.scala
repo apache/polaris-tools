@@ -19,7 +19,7 @@
 package org.apache.polaris.benchmarks.simulations
 
 import io.gatling.core.Predef._
-import io.gatling.core.structure.ScenarioBuilder
+import io.gatling.core.structure.{ChainBuilder, ScenarioBuilder}
 import io.gatling.http.Predef._
 import org.apache.polaris.benchmarks.actions._
 import org.apache.polaris.benchmarks.parameters.BenchmarkConfig.config
@@ -75,31 +75,72 @@ class ReadUpdateTreeDataset extends Simulation {
   // --------------------------------------------------------------------------------
   // Workload: Randomly read and write entities
   // --------------------------------------------------------------------------------
+  private val readOperations: Seq[ChainBuilder] =
+    (if (dp.numTables > 0)
+       Seq(
+         exec(feed(tblListFeeder).exec(tblActions.fetchAllTables)),
+         exec(feed(tblExistsFeeder).exec(tblActions.checkTableExists)),
+         exec(feed(tblFetchFeeder).exec(tblActions.fetchTable))
+       )
+     else Seq.empty) ++
+      Seq(
+        exec(feed(nsListFeeder).exec(nsActions.fetchAllChildrenNamespaces)),
+        exec(feed(nsExistsFeeder).exec(nsActions.checkNamespaceExists)),
+        exec(feed(nsFetchFeeder).exec(nsActions.fetchNamespace))
+      ) ++
+      (if (dp.numViews > 0)
+         Seq(
+           exec(feed(viewListFeeder).exec(viewActions.fetchAllViews)),
+           exec(feed(viewExistsFeeder).exec(viewActions.checkViewExists)),
+           exec(feed(viewFetchFeeder).exec(viewActions.fetchView))
+         )
+       else Seq.empty)
+
+  private val writeOperations: Seq[ChainBuilder] =
+    (if (wp.readUpdateTreeDataset.updateNamespaces)
+       Seq(exec(feed(nsUpdateFeeder).exec(nsActions.updateNamespaceProperties)))
+     else Seq.empty) ++
+      (if (dp.numTables > 0)
+         Seq(exec(feed(tblUpdateFeeder).exec(tblActions.updateTable)))
+       else Seq.empty) ++
+      (if (dp.numViews > 0)
+         Seq(exec(feed(viewUpdateFeeder).exec(viewActions.updateView)))
+       else Seq.empty)
+
+  private def uniformRandomOperation(operations: Seq[ChainBuilder]): ChainBuilder =
+    operations match {
+      case Seq(single) => single
+      case _           => uniformRandomSwitch(operations: _*)
+    }
+
+  require(
+    writeOperations.nonEmpty || wp.readUpdateTreeDataset.gatlingWriteRatio <= 0.0,
+    "No write operation is enabled for ReadUpdateTreeDataset: enable at least one of " +
+      "`update-namespaces`, tables (`tables-per-namespace` / `max-tables`) or views " +
+      "(`views-per-namespace` / `max-views`), or set `read-write-ratio` to 1.0"
+  )
+
+  private val switchBranches: Seq[(Double, ChainBuilder)] = {
+    val readBranch = wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
+      uniformRandomOperation(readOperations)
+    )
+    if (writeOperations.isEmpty) {
+      // `read-write-ratio` is 1.0 here, so the read branch already carries the full weight.
+      Seq(readBranch)
+    } else {
+      Seq(
+        readBranch,
+        wp.readUpdateTreeDataset.gatlingWriteRatio -> group("Write")(
+          uniformRandomOperation(writeOperations)
+        )
+      )
+    }
+  }
+
   val readWriteScenario: ScenarioBuilder =
     scenario("Read and write entities using the Iceberg REST API")
       .exec(setupActions.restoreAccessTokenInSession)
-      .randomSwitch(
-        wp.readUpdateTreeDataset.gatlingReadRatio -> group("Read")(
-          uniformRandomSwitch(
-            exec(feed(nsListFeeder).exec(nsActions.fetchAllChildrenNamespaces)),
-            exec(feed(nsExistsFeeder).exec(nsActions.checkNamespaceExists)),
-            exec(feed(nsFetchFeeder).exec(nsActions.fetchNamespace)),
-            exec(feed(tblListFeeder).exec(tblActions.fetchAllTables)),
-            exec(feed(tblExistsFeeder).exec(tblActions.checkTableExists)),
-            exec(feed(tblFetchFeeder).exec(tblActions.fetchTable)),
-            exec(feed(viewListFeeder).exec(viewActions.fetchAllViews)),
-            exec(feed(viewExistsFeeder).exec(viewActions.checkViewExists)),
-            exec(feed(viewFetchFeeder).exec(viewActions.fetchView))
-          )
-        ),
-        wp.readUpdateTreeDataset.gatlingWriteRatio -> group("Write")(
-          uniformRandomSwitch(
-            exec(feed(nsUpdateFeeder).exec(nsActions.updateNamespaceProperties)),
-            exec(feed(tblUpdateFeeder).exec(tblActions.updateTable)),
-            exec(feed(viewUpdateFeeder).exec(viewActions.updateView))
-          )
-        )
-      )
+      .randomSwitch(switchBranches: _*)
 
   // --------------------------------------------------------------------------------
   // Build up the HTTP protocol configuration and set up the simulation

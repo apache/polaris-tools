@@ -89,6 +89,7 @@ object BenchmarkConfig {
         ),
         ReadUpdateTreeDatasetParameters(
           rutdConfig.getDouble("read-write-ratio"),
+          rutdConfig.getBoolean("update-namespaces"),
           rutdConfig.getInt("throughput"),
           rutdConfig.getInt("duration-in-minutes")
         ),
