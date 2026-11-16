@@ -55,7 +55,9 @@ object BenchmarkConfig {
       auth.getString("client-secret"),
       auth.getInt("refresh-interval-seconds"),
       auth.getInt("max-retries"),
-      auth.getIntList("retryable-http-codes").toArray.map(_.asInstanceOf[Int]).toSet
+      auth.getIntList("retryable-http-codes").toArray.map(_.asInstanceOf[Int]).toSet,
+      auth.getString("token-endpoint"),
+      auth.getString("scope")
     )
 
     val workloadParams = {
@@ -65,6 +67,7 @@ object BenchmarkConfig {
       val dtdConfig = workload.getConfig("delete-tree-dataset")
       val rutdConfig = workload.getConfig("read-update-tree-dataset")
       val wwotdConfig = workload.getConfig("weighted-workload-on-tree-dataset")
+      val rsConfig = workload.getConfig("remote-signing")
 
       WorkloadParameters(
         CreateCommitsParameters(
@@ -97,6 +100,20 @@ object BenchmarkConfig {
           WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "readers"),
           WeightedWorkloadOnTreeDatasetParameters.loadDistributionsList(wwotdConfig, "writers"),
           wwotdConfig.getInt("duration-in-minutes")
+        ),
+        RemoteSigningParameters(
+          rsConfig.getInt("sign-requests-per-table-load"),
+          rsConfig.getDouble("read-write-ratio"),
+          rsConfig.getString("load-model"),
+          rsConfig.getInt("throughput"),
+          rsConfig.getInt("concurrent-users"),
+          rsConfig.getInt("duration-in-minutes"),
+          rsConfig.getString("default-region"),
+          rsConfig
+            .getConfigList("principals")
+            .asScala
+            .map(p => (p.getString("client-id"), p.getString("client-secret")))
+            .toSeq
         )
       )
     }

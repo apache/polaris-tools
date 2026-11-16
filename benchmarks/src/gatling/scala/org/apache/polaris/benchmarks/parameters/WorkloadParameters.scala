@@ -24,5 +24,6 @@ case class WorkloadParameters(
     createTreeDataset: CreateTreeDatasetParameters,
     deleteTreeDataset: DeleteTreeDatasetParameters,
     readUpdateTreeDataset: ReadUpdateTreeDatasetParameters,
-    weightedWorkloadOnTreeDataset: WeightedWorkloadOnTreeDatasetParameters
+    weightedWorkloadOnTreeDataset: WeightedWorkloadOnTreeDatasetParameters,
+    remoteSigning: RemoteSigningParameters
 ) {}

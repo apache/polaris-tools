@@ -80,6 +80,13 @@ read-update-simulation: benchmarks-pre-requisite ## Run read/update simulation
       -Dconfig.file=${APPLICATION_CONF_PATH}
 	@echo "--- Read/Update simulation completed ---"
 
+.PHONY: remote-signing-simulation
+remote-signing-simulation: benchmarks-pre-requisite ## Run remote signing simulation
+	@echo "--- Running remote signing simulation ---"
+	@./gradlew gatlingRun --simulation org.apache.polaris.benchmarks.simulations.RemoteSigning \
+      -Dconfig.file=${APPLICATION_CONF_PATH}
+	@echo "--- Remote signing simulation completed ---"
+
 .PHONY: reports-clean
 reports-clean: ## Clean benchmark reports
 	@echo "--- Cleaning benchmark reports ---"

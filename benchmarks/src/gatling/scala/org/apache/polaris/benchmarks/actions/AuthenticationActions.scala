@@ -22,6 +22,7 @@ import io.gatling.core.Predef._
 import io.gatling.core.feeder.Feeder
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
+import io.gatling.http.request.builder.HttpRequestBuilder
 import org.apache.polaris.benchmarks.RetryOnHttpCodes.{
   retryOnHttpStatus,
   HttpRequestBuilderWithStatusSave
@@ -61,20 +62,22 @@ case class AuthenticationActions(
   /**
    * Authenticates using client credentials and saves the access token as a session attribute. The
    * credentials are defined in the [[AuthenticationActions.feeder]]. This operation performs an
-   * OAuth2 client credentials flow, requesting full principal roles, and stores the received access
-   * token in both the Gatling session and the shared AtomicReference.
+   * OAuth2 client credentials flow against the configured token endpoint, requesting the configured
+   * scope (by default, full principal roles), and stores the received access token in both the
+   * Gatling session and the shared AtomicReference.
    *
    * There is no limit to the maximum number of users that can authenticate concurrently.
    */
   val authenticateAndSaveAccessToken: ChainBuilder =
     retryOnHttpStatus(ap.maxRetries, ap.retryableHttpCodes, "Authenticate")(
-      http("Authenticate")
-        .post("/api/catalog/v1/oauth/tokens")
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .formParam("grant_type", "client_credentials")
-        .formParam("client_id", "#{clientId}")
-        .formParam("client_secret", "#{clientSecret}")
-        .formParam("scope", "PRINCIPAL_ROLE:ALL")
+      withScope(
+        http("Authenticate")
+          .post(ap.tokenEndpoint)
+          .header("Content-Type", "application/x-www-form-urlencoded")
+          .formParam("grant_type", "client_credentials")
+          .formParam("client_id", "#{clientId}")
+          .formParam("client_secret", "#{clientSecret}")
+      )
         .saveHttpStatusCode()
         .check(status.is(200))
         .check(jsonPath("$.access_token").saveAs("accessToken"))
@@ -85,4 +88,7 @@ case class AuthenticationActions(
         }
         session
       }
+
+  private def withScope(request: HttpRequestBuilder): HttpRequestBuilder =
+    if (ap.scope.isEmpty) request else request.formParam("scope", ap.scope)
 }

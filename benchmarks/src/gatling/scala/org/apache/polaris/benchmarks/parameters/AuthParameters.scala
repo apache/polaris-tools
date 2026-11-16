@@ -26,17 +26,24 @@ package org.apache.polaris.benchmarks.parameters
  * @param refreshIntervalSeconds Refresh interval for the authentication token in seconds.
  * @param maxRetries Maximum number of retry attempts for authentication failures.
  * @param retryableHttpCodes HTTP status codes that should trigger a retry.
+ * @param tokenEndpoint The OAuth2 token endpoint, either relative to the base URL (Polaris's own
+ *   token endpoint) or absolute (e.g. an external identity provider).
+ * @param scope The scope to request, or an empty string to request no scope.
  */
 case class AuthParameters(
     clientId: String,
     clientSecret: String,
     refreshIntervalSeconds: Int,
     maxRetries: Int,
-    retryableHttpCodes: Set[Int]
+    retryableHttpCodes: Set[Int],
+    tokenEndpoint: String,
+    scope: String
 ) {
   require(clientId != null && clientId.nonEmpty, "Client ID cannot be null or empty")
   require(clientSecret != null && clientSecret.nonEmpty, "Client secret cannot be null or empty")
   require(refreshIntervalSeconds > 0, "Refresh interval must be positive")
   require(maxRetries >= 0, "Max retries cannot be negative")
   require(retryableHttpCodes != null, "Retryable HTTP codes cannot be null")
+  require(tokenEndpoint != null && tokenEndpoint.nonEmpty, "Token endpoint cannot be null or empty")
+  require(scope != null, "Scope cannot be null")
 }
