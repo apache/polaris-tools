@@ -39,10 +39,10 @@ import scala.concurrent.duration._
  * remote signing access delegation, then signs requests for objects in that table, as a query
  * engine would when reading or writing data files.
  *
- * The ratio of read sign requests to write sign requests is controlled by the readWriteRatio
- * parameter in the RemoteSigningParameters. Users can be spread across several principals, and
- * injected with an open or a closed load model. The simulation does not depend on how the server
- * authorizes sign requests, and can be used to compare server configurations.
+ * The fraction of sign requests that are reads, the others being writes, is controlled by the
+ * readWriteRatio parameter in the RemoteSigningParameters. Users can be spread across several
+ * principals, and injected with an open or a closed load model. The simulation does not depend on
+ * how the server authorizes sign requests, and can be used to compare server configurations.
  */
 class RemoteSigning extends Simulation {
 

@@ -95,7 +95,7 @@ workload {
   }
   remote-signing {
     sign-requests-per-table-load = 1000  # Sign requests issued after each table load
-    read-write-ratio = 0.9               # Ratio of read sign requests (0.0-1.0)
+    read-write-ratio = 0.9               # Fraction of sign requests that are reads (0.0-1.0)
     load-model = "open"                  # "open" (fixed arrival rate) or "closed" (fixed concurrency)
     throughput = 1                       # Open model: table loads per second
     concurrent-users = 10                # Closed model: concurrent users

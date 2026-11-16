@@ -22,7 +22,8 @@ package org.apache.polaris.benchmarks.parameters
  * Case class to hold the parameters for the RemoteSigning simulation.
  *
  * @param signRequestsPerTableLoad The number of sign requests issued after each table load.
- * @param readWriteRatio The ratio of read sign requests to write sign requests (0.0-1.0).
+ * @param readWriteRatio The fraction of sign requests that are reads, the others being writes
+ *   (0.0-1.0).
  * @param loadModel How users are injected: "open" (a fixed number of users starting per second) or
  *   "closed" (a fixed number of concurrent users).
  * @param throughput With the open load model, the number of table loads to perform per second.
